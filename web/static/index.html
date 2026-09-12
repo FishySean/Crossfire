@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crossfire</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">◈</span>
+      <span class="brand-name">Crossfire</span>
+      <span class="brand-sub">查证结果查看器</span>
+    </div>
+    <label class="run-picker">
+      <span>运行结果</span>
+      <select id="run-select"></select>
+    </label>
+  </header>
+
+  <div id="failure-banner" class="banner hidden"></div>
+  <div id="error-banner" class="banner error hidden"></div>
+
+  <main id="content" class="content hidden">
+    <section class="question-block">
+      <div class="section-eyebrow">问题</div>
+      <h1 id="question"></h1>
+      <div id="run-meta" class="run-meta"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>来源</h2>
+        <span id="source-count" class="count"></span>
+      </div>
+      <div class="sources-wrap">
+        <svg id="conflict-links" class="conflict-links"></svg>
+        <div id="sources" class="sources"></div>
+      </div>
+    </section>
+
+    <section class="panel conflict-panel">
+      <div class="panel-head">
+        <h2>冲突</h2>
+        <span id="conflict-count" class="count"></span>
+      </div>
+      <div id="conflicts" class="conflicts"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>结论</h2></div>
+      <div id="judgment" class="judgment"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

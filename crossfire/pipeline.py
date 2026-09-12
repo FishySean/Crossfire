@@ -66,7 +66,9 @@ def run(
 
     extract_started = time.monotonic()
     claims = []
-    for page in pages:
+    # index 必须是来源在 sources 里的下标，跟 fetch_done 对齐：前端按它往固定的卡片槽位里填。
+    # 用 claims 的长度会在有页面抓取失败时整体错位，把主张画到别的来源上。
+    for index, page in enumerate(pages):
         if not page["ok"]:
             continue
         claim = extract_claim(question, {**page, "tier": tier_by_url.get(page["url"])})
@@ -77,7 +79,7 @@ def run(
                 "url": claim["url"],
                 "claim": claim["claim"],
                 "tier": claim["tier"],
-                "index": len(claims) - 1,
+                "index": index,
             }
         )
         if claim.get("failure"):

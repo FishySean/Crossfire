@@ -33,8 +33,8 @@ def print_report(result: dict) -> None:
         print(f"    主张：{text}")
         print(f"    依据：{claim.get('evidence') or '-'}")
         print(f"    日期：{date}    置信度：{confidence}    类型：{claim.get('source_type')}")
-        if claim.get("parse_error"):
-            print(f"    JSON 解析失败：{claim['parse_error']}")
+        if claim.get("failure"):
+            print(f"    调用失败：{claim['failure']['detail']}")
 
     for page in result["pages"]:
         if not page["ok"]:
@@ -71,8 +71,8 @@ def print_report(result: dict) -> None:
         print("采信来源（可信度降序）：")
         for url in judgment["trusted_sources"]:
             print(f"  - {url}")
-    if judgment.get("parse_error"):
-        print(f"JSON 解析失败：{judgment['parse_error']}")
+    if judgment.get("failure"):
+        print(f"调用失败：{judgment['failure']['detail']}")
 
     print("\n--- 本次消耗 ---")
     print(f"抓取页面：{result['pages_fetched']} 成功 / {result['pages_failed']} 失败")
@@ -86,6 +86,11 @@ def print_report(result: dict) -> None:
     print(f"token 合计：输入 {result['total_input_tokens']}，输出 {result['total_output_tokens']}")
     print(f"总耗时：{result['elapsed_seconds']} 秒")
     print(f"完整结果：{result['output_path']}")
+
+    if result["failures"]:
+        print(f"\n⚠️  本次有 {len(result['failures'])} 次调用解析失败，结果可能不完整")
+        for failure in result["failures"]:
+            print(f"  - [{failure['step']}] {failure['detail']}")
 
 
 def main() -> None:

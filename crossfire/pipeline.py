@@ -55,6 +55,7 @@ def run(question_config: dict) -> dict:
         "pair": _step_usage(pairs, pair_seconds),
         "judge": _step_usage([judgment], judge_seconds),
     }
+    failures = [r["failure"] for r in [*claims, *pairs, judgment] if r.get("failure")]
 
     result = {
         "question_id": question_config["id"],
@@ -65,6 +66,7 @@ def run(question_config: dict) -> dict:
         "pages_fetched": sum(1 for p in pages if p["ok"]),
         "pages_failed": sum(1 for p in pages if not p["ok"]),
         "claude_calls": len(claims) + len(pairs) + 1,
+        "failures": failures,
         "steps": steps,
         "total_input_tokens": sum(s.get("input_tokens", 0) for s in steps.values()),
         "total_output_tokens": sum(s.get("output_tokens", 0) for s in steps.values()),

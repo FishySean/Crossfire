@@ -1,14 +1,7 @@
 import itertools
 import json
-import os
 
-from anthropic import Anthropic
-from dotenv import load_dotenv
-
-load_dotenv()
-
-MODEL = "claude-sonnet-4-6"
-MAX_TOKENS = 1000
+from crossfire.llm import call_structured
 
 PAIR_PROMPT = """你在为一个事实查证引擎比对两个来源对同一个问题的主张。
 
@@ -28,16 +21,53 @@ URL: {b_url}
 主张: {b_claim}
 原文依据: {b_evidence}
 
-严格按下面的字段返回一个 JSON 对象：
-- relation: 只能是 agree、contradict、unrelated 三者之一。agree 表示两者对该问题的回答实质一致；
-  contradict 表示两者对该问题给出了不能同时成立的回答；unrelated 表示两者在谈不同的事，无法构成对立
-- nature: 一句话说明差异到底在哪，请明确归类到下面某一种：数字不同 / 时间不同 / 定义口径不同 / 完全无关。
-  如果 relation 是 agree，就说明两者一致在什么点上
+relation 只能三选一，判定标准如下：
 
-注意区分"真矛盾"和"口径差异"：两个来源统计范围、定义或时间点不同而导致数字不同，
-属于定义口径不同或时间不同，不要一概判成 contradict 之外，也不要把它描述成某一方出错。
+contradict —— 两个说法不可能同时为真。
+  典型情形：数字不同、日期不同、归属不同，或一方明确肯定而另一方明确否定。
 
-只输出这个 JSON 对象本身。不要 markdown 代码围栏，不要任何前言或解释。"""
+agree —— 两个说法可以同时为真，且指向同一个结论。
+  重要：当一方只是另一方的更粗粒度表述、或两者详略不同时，属于 agree 而不是 contradict。
+  「无法互相印证」「粒度不够细」「没有提到具体数字」都不构成矛盾。
+
+unrelated —— 两者在谈不同的事，既不能互相印证也不能互相反驳。
+
+判定示例，请严格照此标准：
+- 「最新版本是 3.14.7」 vs 「3.14 处于 bugfix 阶段」 → agree。
+  3.14.7 就是 3.14 系列中的一个补丁版本，两句话同时成立，只是详略不同。这是粒度差异，不是矛盾。
+- 「最新版本是 3.14.7」 vs 「最新版本是 3.13」 → contradict。
+  同一时刻最新版只能有一个，两者不可能同时为真。
+- 「太阳系有 8 颗行星」 vs 「冥王星是矮行星不是行星」 → agree。
+  后者正是前者的成因，两者互相印证。
+- 「太阳系有 8 颗行星」 vs 「太阳系有 9 颗行星」 → contradict。
+- 「最新版本是 3.14.7」 vs 「Python 是一门解释型语言」 → unrelated。
+
+时效性差异的处理：如果两个说法在各自的发布时间点上都曾成立，但对「当前」这个问题
+不能同时为真，仍判 contradict，并在 nature 里说明这是时效性差异、哪一方已过时。
+
+nature 字段要求：
+- 先归类到 数字不同 / 时间不同 / 定义口径不同 / 粒度不同 / 完全无关 之一，再用一句话说明差异在哪。
+- 如果你判定 contradict，必须在 nature 里明确说出「这两句话为什么不能同时为真」。
+  如果你说不出这一点，那就不是 contradict，请改判 agree 或 unrelated。
+
+请通过 record 工具返回结果。"""
+
+PAIR_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "relation": {
+            "type": "string",
+            "enum": ["agree", "contradict", "unrelated"],
+            "description": "两个主张的关系",
+        },
+        "nature": {
+            "type": "string",
+            "description": "先归类（数字不同/时间不同/定义口径不同/粒度不同/完全无关），"
+            "再一句话说明差异。判 contradict 时必须说明两句话为何不能同时为真",
+        },
+    },
+    "required": ["relation", "nature"],
+}
 
 JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是一个问题、各来源提取出的主张，以及两两比对的结果。
 
@@ -51,22 +81,39 @@ JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是�
 
 判断原则，按优先级从高到低：
 1. 来源层级：primary（一手源、官方文档）的权重高于 news（新闻报道），news 高于 aggregator（二手聚合站）
-2. 时间：published_date 较新的主张优先，尤其当分歧属于"时间不同"时
-3. 区分矛盾性质：如果分歧来自统计口径、定义范围或时间点不同，必须明确指出"这不是谁错了，而是口径/时间不同"，
-   不要强行裁定某一方错误
+2. 时间：published_date 较新的主张优先，尤其当分歧属于「时间不同」时
+3. 区分矛盾性质：如果分歧来自统计口径、定义范围、粒度详略或时间点不同，必须明确指出
+   「这不是谁错了，而是口径/粒度/时间不同」，不要强行裁定某一方错误
 
-严格按下面的字段返回一个 JSON 对象：
-- answer: 对该问题的最终回答，一到两句话
-- confidence: 0 到 1 之间的数字，表示你对这个回答的置信度。来源之间冲突越多、越缺少一手源，置信度应越低
-- reasoning: 你如何得到这个结论，说明你采信了哪些来源、为什么，以及如何处理了分歧
-- conflicts: 字符串数组，逐条描述发现的实质分歧及其性质。没有分歧则返回空数组
-- trusted_sources: 字符串数组，你实际采信的来源 URL，按可信度从高到低排列
+来源之间冲突越多、越缺少一手源，confidence 应越低。
 
-只输出这个 JSON 对象本身。不要 markdown 代码围栏，不要任何前言或解释。"""
+请通过 record 工具返回结果。"""
+
+JUDGE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "answer": {"type": "string", "description": "对该问题的最终回答，一到两句话"},
+        "confidence": {"type": "number", "description": "0 到 1 的置信度"},
+        "reasoning": {
+            "type": "string",
+            "description": "如何得到该结论：采信了哪些来源、为什么、如何处理分歧",
+        },
+        "conflicts": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "逐条描述发现的实质分歧及其性质，没有分歧则为空数组",
+        },
+        "trusted_sources": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "实际采信的来源 URL，按可信度从高到低排列",
+        },
+    },
+    "required": ["answer", "confidence", "reasoning", "conflicts", "trusted_sources"],
+}
 
 
 def pair_claims(question: str, claims: list[dict]) -> list[dict]:
-    client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     answered = [c for c in claims if c.get("claim")]
     pairs = []
 
@@ -84,71 +131,38 @@ def pair_claims(question: str, claims: list[dict]) -> list[dict]:
             b_claim=b.get("claim"),
             b_evidence=b.get("evidence"),
         )
-        message = client.messages.create(
-            model=MODEL,
-            max_tokens=MAX_TOKENS,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = message.content[0].text.strip()
+        data = call_structured(prompt, PAIR_SCHEMA, "pair")
 
         pair = {
             "a": a["url"],
             "b": b["url"],
-            "relation": None,
-            "nature": None,
-            "usage": {
-                "input_tokens": message.usage.input_tokens,
-                "output_tokens": message.usage.output_tokens,
-            },
+            "relation": data.get("relation"),
+            "nature": data.get("nature"),
+            "usage": data["_usage"],
         }
-        try:
-            parsed = json.loads(raw)
-        except json.JSONDecodeError as e:
-            pair["parse_error"] = str(e)
-            pair["raw"] = raw
-            pairs.append(pair)
-            continue
-
-        pair["relation"] = parsed.get("relation")
-        pair["nature"] = parsed.get("nature")
+        if "_failure" in data:
+            pair["failure"] = data["_failure"]
         pairs.append(pair)
 
     return pairs
 
 
 def judge(question: str, claims: list[dict], pairs: list[dict]) -> dict:
-    client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     prompt = JUDGE_PROMPT.format(
         question=question,
         claims=json.dumps(claims, ensure_ascii=False, indent=2),
         pairs=json.dumps(pairs, ensure_ascii=False, indent=2),
     )
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=MAX_TOKENS,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    raw = message.content[0].text.strip()
+    data = call_structured(prompt, JUDGE_SCHEMA, "judge")
 
     result = {
-        "answer": None,
-        "confidence": None,
-        "reasoning": None,
-        "conflicts": [],
-        "trusted_sources": [],
+        "answer": data.get("answer"),
+        "confidence": data.get("confidence"),
+        "reasoning": data.get("reasoning"),
+        "conflicts": data.get("conflicts") or [],
+        "trusted_sources": data.get("trusted_sources") or [],
+        "usage": data["_usage"],
     }
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError as e:
-        result["parse_error"] = str(e)
-        result["raw"] = raw
-    else:
-        for key in list(result):
-            if key in parsed:
-                result[key] = parsed[key]
-
-    result["usage"] = {
-        "input_tokens": message.usage.input_tokens,
-        "output_tokens": message.usage.output_tokens,
-    }
+    if "_failure" in data:
+        result["failure"] = data["_failure"]
     return result

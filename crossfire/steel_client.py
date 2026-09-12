@@ -1,8 +1,11 @@
 import asyncio
+import hashlib
+import json
 import os
 import re
 import sys
 import time
+from pathlib import Path
 
 from dotenv import load_dotenv
 from steel import AsyncSteel, RateLimitError, Steel
@@ -11,6 +14,11 @@ load_dotenv()
 
 MAX_RETRIES = 3
 DEFAULT_CONCURRENCY = 8
+CACHE_ROOT = Path(__file__).resolve().parents[1] / "out" / "cache"
+
+
+def cache_path(cache_dir: Path, url: str) -> Path:
+    return Path(cache_dir) / f"{hashlib.sha256(url.encode()).hexdigest()[:16]}.json"
 
 # 可用性阈值：都是模块级常量，方便按实际抓取情况调。
 MIN_CONTENT_CHARS = 500  # 正文总长度下限（软屏蔽页通常只有几十字符）
@@ -146,19 +154,36 @@ def fetch_page(url: str) -> dict:
             return _shape(url, error=e)
 
 
-async def fetch_pages(urls: list[str], concurrency: int = DEFAULT_CONCURRENCY) -> list[dict]:
+async def fetch_pages(
+    urls: list[str],
+    concurrency: int = DEFAULT_CONCURRENCY,
+    use_cache: bool = False,
+    cache_dir: Path | None = None,
+    on_page=None,
+) -> list[dict]:
     client = AsyncSteel(steel_api_key=os.environ.get("STEEL_API_KEY"))
     semaphore = asyncio.Semaphore(concurrency)
 
-    async def fetch_one(url: str) -> dict:
+    async def fetch_one(index: int, url: str) -> dict:
+        if use_cache:
+            path = cache_path(cache_dir, url)
+            if path.exists():
+                page = json.loads(path.read_text(encoding="utf-8"))
+            else:
+                page = _shape(url, error=FileNotFoundError(f"缓存缺失：{path}"))
+            if on_page:
+                on_page(index, page)
+            return page
+
         async with semaphore:
             for attempt in range(MAX_RETRIES + 1):
                 try:
-                    scraped = await client.scrape(url=url, format=["markdown"])
-                    return _shape(url, result=scraped)
+                    page = _shape(url, result=await client.scrape(url=url, format=["markdown"]))
+                    break
                 except RateLimitError as e:
                     if attempt == MAX_RETRIES:
-                        return _shape(url, error=e)
+                        page = _shape(url, error=e)
+                        break
                     delay = 2**attempt
                     print(
                         f"[steel] 429 {url} — 退避 {delay}s 后第 {attempt + 1}/{MAX_RETRIES} 次重试",
@@ -166,10 +191,14 @@ async def fetch_pages(urls: list[str], concurrency: int = DEFAULT_CONCURRENCY) -
                     )
                     await asyncio.sleep(delay)
                 except Exception as e:
-                    return _shape(url, error=e)
+                    page = _shape(url, error=e)
+                    break
+        if on_page:
+            on_page(index, page)
+        return page
 
     try:
-        return list(await asyncio.gather(*(fetch_one(url) for url in urls)))
+        return list(await asyncio.gather(*(fetch_one(i, url) for i, url in enumerate(urls))))
     finally:
         await client.close()
 

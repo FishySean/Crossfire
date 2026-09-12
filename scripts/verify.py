@@ -98,6 +98,12 @@ def main() -> None:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--question", help="按 id 跑单个问题")
     group.add_argument("--all", action="store_true", help="跑全部问题")
+    parser.add_argument(
+        "--mode",
+        default="live",
+        choices=["live", "cached"],
+        help="live 走网络抓取，cached 读 out/cache/（Claude 仍真跑）",
+    )
     args = parser.parse_args()
 
     questions = load_questions()
@@ -113,7 +119,7 @@ def main() -> None:
     started = time.monotonic()
     for question_config in targets:
         try:
-            print_report(run(question_config))
+            print_report(run(question_config, mode=args.mode))
         except Exception:
             traceback.print_exc()
             raise

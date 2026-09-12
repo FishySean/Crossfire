@@ -1,6 +1,6 @@
 from crossfire.llm import call_structured
 
-MAX_CONTENT_CHARS = 40000
+MAX_CONTENT_CHARS = 8000
 
 EXTRACT_PROMPT = """你在为一个事实查证引擎工作。下面给你一个网页的正文，以及一个需要查证的问题。
 你的任务是判断这个网页针对该问题给出了什么主张。

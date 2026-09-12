@@ -1,7 +1,10 @@
+import asyncio
 import itertools
 import json
 
 from crossfire.llm import call_structured
+
+DEFAULT_PAIR_CONCURRENCY = 6
 
 PAIR_PROMPT = """你在为一个事实查证引擎比对两个来源对同一个问题的主张。
 
@@ -113,11 +116,18 @@ JUDGE_SCHEMA = {
 }
 
 
-def pair_claims(question: str, claims: list[dict]) -> list[dict]:
+async def pair_claims(
+    question: str,
+    claims: list[dict],
+    concurrency: int = DEFAULT_PAIR_CONCURRENCY,
+    on_pair=None,
+) -> list[dict]:
     answered = [c for c in claims if c.get("claim")]
-    pairs = []
+    combos = list(itertools.combinations(answered, 2))
+    semaphore = asyncio.Semaphore(concurrency)
+    pairs: list[dict | None] = [None] * len(combos)
 
-    for a, b in itertools.combinations(answered, 2):
+    async def compare(index: int, a: dict, b: dict) -> None:
         prompt = PAIR_PROMPT.format(
             question=question,
             a_url=a["url"],
@@ -131,7 +141,8 @@ def pair_claims(question: str, claims: list[dict]) -> list[dict]:
             b_claim=b.get("claim"),
             b_evidence=b.get("evidence"),
         )
-        data = call_structured(prompt, PAIR_SCHEMA, "pair")
+        async with semaphore:
+            data = await asyncio.to_thread(call_structured, prompt, PAIR_SCHEMA, "pair")
 
         pair = {
             "a": a["url"],
@@ -142,9 +153,12 @@ def pair_claims(question: str, claims: list[dict]) -> list[dict]:
         }
         if "_failure" in data:
             pair["failure"] = data["_failure"]
-        pairs.append(pair)
+        pairs[index] = pair
+        if on_pair:
+            on_pair(index, len(combos), pair)
 
-    return pairs
+    await asyncio.gather(*(compare(i, a, b) for i, (a, b) in enumerate(combos)))
+    return [p for p in pairs if p is not None]
 
 
 def judge(question: str, claims: list[dict], pairs: list[dict]) -> dict:

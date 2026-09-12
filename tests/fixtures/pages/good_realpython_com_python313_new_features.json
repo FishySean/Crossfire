@@ -1,0 +1,1074 @@
+{
+  "url": "https://realpython.com/python313-new-features/",
+  "ok": true,
+  "title": "Python 3.13: Cool New Features for You to Try – Real Python",
+  "markdown": "[Start Here](/start-here/)\n\n[Learn Python](#)\n\nStart Learning\n\n[Your Learning Plan →Your personalized Python learning plan](/account/learning-plan/)\n\n[Python Tutorials →In-depth articles and video courses](/search?kind=article&kind=course&order=newest)\n\n[Learning Paths →Guided study plans for accelerated learning](/learning-paths/)\n\nPractice\n\n[Quizzes & Exercises →Check your learning progress](/search?kind=exercise&kind=quiz)\n\n[Browse Topics →Focus on a specific area or skill level](/tutorials/all/)\n\n[Reference →Concise definitions for common Python terms](/ref/)\n\nGet Help\n\n[Code Mentor →BetaPersonalized code assistance & learning tools](/mentor/)\n\n[Office Hours →Live Q&A calls with Python experts](/office-hours/)\n\n[Community Chat →Learn with other Pythonistas](/community/)\n\nGo Deeper\n\n[Live Courses →Live, instructor-led Python courses](/live/)\n\n[Books →Round out your knowledge and learn offline](/products/books/)\n\n[Podcast →Hear what’s new in the world of Python](/podcasts/rpp/)\n\n[Unlock All Content and Become a Python Expert →Get unlimited access to all Real Python has to offer](/account/join/?from=navbar_learn)\n\n[Unlock All Content →Become a Python Expert](/account/join/?from=navbar_learn)\n\n[More](#)\n\n[Learner Stories](/learner-stories/)\n [Python Newsletter](/newsletter/)\n [Python Job Board](https://www.pythonjobshq.com)\n [Meet the Team](/team/)\n [Become a Contributor](/jobs/)\n\n[Search](/search)\n\n/\n\n[Join](/account/join/)\n\n[Sign‑In](/account/login/?intent=navbar&next=%2Fpython313-new-features%2F)\n\n— FREE Email Series —\n\n🐍 Python Tricks 💌\n\nGet Python Tricks »\n\n🔒 No spam. Unsubscribe any time.\n\n[Browse Topics](/tutorials/all/)\n\n[Guided Learning Paths](/learning-paths/)\n\n[Basics](/search?level=basics)\n\n[Intermediate](/search?level=intermediate)\n\n[Advanced](/search?level=advanced)\n\n[ai](/tutorials/ai/)\n\n[algorithms](/tutorials/algorithms/)\n\n[api](/tutorials/api/)\n\n[best-practices](/tutorials/best-practices/)\n\n[career](/tutorials/career/)\n\n[community](/tutorials/community/)\n\n[databases](/tutorials/databases/)\n\n[data-science](/tutorials/data-science/)\n\n[data-structures](/tutorials/data-structures/)\n\n[data-viz](/tutorials/data-viz/)\n\n[devops](/tutorials/devops/)\n\n[django](/tutorials/django/)\n\n[docker](/tutorials/docker/)\n\n[editors](/tutorials/editors/)\n\n[flask](/tutorials/flask/)\n\n[front-end](/tutorials/front-end/)\n\n[gamedev](/tutorials/gamedev/)\n\n[gui](/tutorials/gui/)\n\n[machine-learning](/tutorials/machine-learning/)\n\n[news](/tutorials/news/)\n\n[numpy](/tutorials/numpy/)\n\n[projects](/tutorials/projects/)\n\n[python](/tutorials/python/)\n\n[stdlib](/tutorials/stdlib/)\n\n[testing](/tutorials/testing/)\n\n[tools](/tutorials/tools/)\n\n[web-dev](/tutorials/web-dev/)\n\n[web-scraping](/tutorials/web-scraping/)\n\n[Table of Contents](#toc)\n\n[An Improved Interactive Interpreter (REPL)](#an-improved-interactive-interpreter-repl)\n\n[Better Error Messages](#better-error-messages)\n\n[Free-Threaded Python: Look Ma, No GIL](#free-threaded-python-look-ma-no-gil)\n\n[Experimental JIT Compiler](#experimental-jit-compiler)\n\n[Improvements to Static Typing](#improvements-to-static-typing)\n\n[Other Pretty Cool Features](#other-pretty-cool-features)\n\n[A Random Command Line](#a-random-command-line)\n\n[New copy.replace() for Modifying Immutable Objects](#new-copyreplace-for-modifying-immutable-objects)\n\n[Improved Globbing of Files and Directories](#improved-globbing-of-files-and-directories)\n\n[Naked Docstrings](#naked-docstrings)\n\n[So, Should You Upgrade to Python 3.13?](#so-should-you-upgrade-to-python-313)\n\n[Conclusion](#conclusion)\n\nMark as Completed\n\nShare\n\nRecommended Course\n\n[What's New in Python 3.13 53m · 12 lessons](/courses/new-features-python-313/)\n\nPython 3.13: Cool New Features for You to Try\n\nby [Geir Arne Hjelle](#author)\n\nUpdated Sep 30, 2024\n\nReading time estimate 40m\n\n[intermediate](/tutorials/intermediate/)\n\n[python](/tutorials/python/)\n\nMark as Completed\n\nShare\n\nTable of Contents\n\n[An Improved Interactive Interpreter (REPL)](#an-improved-interactive-interpreter-repl)\n\n[Better Error Messages](#better-error-messages)\n\n[Free-Threaded Python: Look Ma, No GIL](#free-threaded-python-look-ma-no-gil)\n\n[Experimental JIT Compiler](#experimental-jit-compiler)\n\n[Improvements to Static Typing](#improvements-to-static-typing)\n\n[Other Pretty Cool Features](#other-pretty-cool-features)\n\n[A Random Command Line](#a-random-command-line)\n\n[New copy.replace() for Modifying Immutable Objects](#new-copyreplace-for-modifying-immutable-objects)\n\n[Improved Globbing of Files and Directories](#improved-globbing-of-files-and-directories)\n\n[Naked Docstrings](#naked-docstrings)\n\n[So, Should You Upgrade to Python 3.13?](#so-should-you-upgrade-to-python-313)\n\n[Conclusion](#conclusion)\n\n[Remove ads](/account/join/)\n\nRecommended Course\n\n[What's New in Python 3.13](/courses/new-features-python-313/)\n (53m)\n\n[Python 3.13](https://www.python.org/downloads/release/python-3130/) was published on [October 7, 2024](https://peps.python.org/pep-0719/). This new version is a major step forward for the language, although several of the biggest changes are happening under the hood and won’t be immediately visible to you.\n\nIn a sense, Python 3.13 is laying the groundwork for some future improvements, especially to the language’s performance. As you read on, you’ll learn more about the background for this and dive into some new features that are fully available now.\n\nIn this tutorial, you’ll learn about some of the improvements in the new version, including:\n\nImprovements made to the interactive interpreter (REPL)\n\nClearer error messages that can help you fix common mistakes\n\nAdvancements done in removing the global interpreter lock (GIL) and making Python free-threaded\n\nThe implementation of an experimental Just-In-Time (JIT) compiler\n\nA host of minor upgrades to Python’s static type system\n\nIf you want to try any of the examples in this tutorial, then you’ll need to use Python 3.13. The tutorials [Python 3 Installation & Setup Guide](https://realpython.com/installing-python/) and [How Can You Install a Pre-Release Version of Python?](https://realpython.com/python-pre-release/) walk you through several options for adding a new version of Python to your system.\n\nNote: Python 3.13 was originally planned to be released on October 1, 2024. The developers found some issues during testing and [decided](https://discuss.python.org/t/incremental-gc-and-pushing-back-the-3-13-0-release/65285) to push back the release to October 7.\n\nIn addition to learning more about the new features coming to the language, you’ll also get some [advice](#so-should-you-upgrade-to-python-313) about what to consider before upgrading to the new version. Click the link below to download code examples demonstrating the new capabilities of Python 3.13:\n\nGet Your Code: [Click here to download the free sample code](https://realpython.com/bonus/python313-new-features-code/) that shows you how to use the new features in Python 3.13.\n\nTake the Quiz: Test your knowledge with our interactive “Python 3.13: Cool New Features for You to Try” quiz. You’ll receive a score upon completion to help you track your learning progress:\n\nInteractive Quiz\n [Python 3.13: Cool New Features for You to Try](/quizzes/python313-new-features/) \n\nIn this quiz, you'll test your understanding of the new features introduced in Python 3.13. By working through this quiz, you'll review the key updates and improvements in this version of Python.\n\nAn Improved Interactive Interpreter (REPL)\n\nIf you run Python without specifying any script or code, you’ll find yourself inside [Python’s interactive interpreter](https://realpython.com/python-repl/). This interpreter is informally called the REPL because it’s based on a read-evaluate-print loop. The REPL reads your input, evaluates it, and prints the result before looping back and doing the same thing again.\n\nThe Python REPL has been around for decades, and it supports an explorative workflow that makes Python a beginner-friendly language. Unfortunately, the interpreter has been missing several features you may have come to expect, including multiline editing and efficient pasting of code.\n\nNote: Experienced Python developers often install a third-party interactive interpreter instead of relying on the built-in REPL. You can learn more about the alternatives in these tutorials:\n\n[Unlock IPython’s Magical Toolbox for Your Coding Journey](https://realpython.com/ipython-interactive-python-shell/)\n\n[Discover bpython: A Python REPL With IDE-Like Features](https://realpython.com/bpython-alternative-python-repl/)\n\n[Boost Your Coding Productivity With Ptpython](https://realpython.com/ptpython-shell/)\n\nYou can also read more about alternative REPLs in the [guide to the standard REPL](https://realpython.com/python-repl/#using-an-alternative-repl).\n\nBegin by starting the REPL. You can do this by typing python in your [terminal](https://realpython.com/terminal-commands/). Depending on your setup, you may have to write py, python3, or even python3.13 instead. One way to recognize that you’re using the new interpreter shipping with Python 3.13 is that the prompt consisting of three chevrons (>>>) is subtly colored:\n\nOne improvement is that you can now use REPL-specific commands without calling them with parentheses as if they are Python functions. Here are some of the commands and keyboard shortcuts you can use:\n\nexit or quit: Exit the interpreter\n\nclear: Clear the screen\n\nhelp or F1: Access the help system\n\nF2: Open the history browser\n\nF3: Enter paste mode\n\nYou can learn more about these options in [Python 3.13 Preview: A Modern REPL](https://realpython.com/python313-repl/).\n\nRecalling code you’ve written earlier has been cumbersome in the REPL before Python 3.13, especially if you’re working with a block of code spanning several lines. Traditionally, you’ve had to bring back each line one by one by repeatedly pressing Up. Now in 3.13, you can bring back the whole block of code with a single Up keystroke.\n\nTo try this for yourself, enter the following code in your REPL:\n\nLanguage: Python\n\n>>> numbers = range(3, 13)\n>>> [\n... (number - 3)**3 for number in numbers\n... if number % 2 == 1\n... ]\n[0, 8, 64, 216, 512]\n\nYou’re creating a somewhat complex [list comprehension](https://realpython.com/list-comprehension-python/) that calculates an offset cube of a range of numbers, but only if the numbers are odd. The important part is that for readability, you split the list comprehension over several lines. Now try hitting that Up key! The interpreter recalls all four lines at once, and you can continue to use your arrow keys to move around inside of the expression.\n\nYou can make changes to your code and run it again. To execute the updated code, you need to move your cursor to the end of the last line in the code block. If you press Enter inside the expression, you’ll create a new empty line instead:\n\nThe ability to recall and edit multiline statements is a huge time-saver and will make you more efficient when working with the REPL.\n\nAnother convenience coming in Python 3.13 is proper support for pasting code. In Python 3.12 and earlier, you’d need to make sure that your code doesn’t contain any blank lines before you could copy and paste it. In the new version, pasted code is treated as a unit and executes just as it would inside a script.\n\nThis makes it more convenient to use the REPL to interactively tweak and debug your scripts. As an example, say that you want to write a script that can print [random numbers](https://realpython.com/python-random/), maybe to [act as dice](https://realpython.com/python-dice-roll/) in a tabletop game you’re playing:\n\nLanguage: Python\n Filename: roll_dice.py\n\nimport random\n\nnum_faces = 6\n\nprint(\"Hit enter to roll die (q to quit, number for # of faces) \")\nwhile True:\n roll = input()\n if roll.lower().startswith(\"q\"):\n break\n if roll.isnumeric():\n num_faces = int(roll)\n\nresult = random.randint(1, num_faces)\n print(f\"Rolling a d{num_faces:<2d} - {result:2d}\")\n\nIf you try to copy and paste this code into an older REPL, then it won’t work. The blank line inside the while loop causes issues. You enter an infinite loop that seemingly doesn’t do anything. To stop the loop, you can type q and hit Enter or press Ctrl+C.\n\nIn Python 3.13, pasting works without a hitch:\n\nLanguage: Python\n\n>>> import random\n...\n... num_faces = 6\n...\n... print(\"Hit enter to roll die (q to quit, number for # of faces) \")\n... while True:\n... roll = input()\n... if roll.lower().startswith(\"q\"):\n... break\n... if roll.isnumeric():\n... num_faces = int(roll)\n...\n... result = random.randint(1, num_faces)\n... print(f\"Rolling a d{num_faces:<2d} - {result:2d}\")\n...\nHit enter to roll die (q to quit, number for # of faces)\n13\nRolling a d13 - 10\n\nRolling a d13 - 5\n\nRolling a d13 - 3\nq\n\nNote that the prompt displays as three dots (...) for all the code that you paste, indicating that it’s all part of one code unit. In this example, you choose to roll a d13, a thirteen-sided die, three times.\n\nNote: You can learn more about Python’s new REPL in the dedicated tutorial, [Python 3.13 Preview: A Modern REPL](https://realpython.com/python313-repl/).\n\nAnother arena where your Python developer experience gets a small boost in Python 3.13 is through improved error messages, which you’ll learn about next.\n\n[Remove ads](/account/join/)\nBetter Error Messages\n\nThe REPL is great to work with when you first start using Python, and another feature you quickly run into is Python’s error messages. It hasn’t always felt like the error messages were trying to help you. However, over the last several releases, they’ve gotten friendlier and more helpful:\n\nPython 3.10 improved many error messages as they got [less technical and more precise](https://realpython.com/python310-new-features/#better-error-messages).\n\nPython 3.11 added [more information in tracebacks](https://realpython.com/python311-new-features/#more-informative-error-tracebacks), making it more convenient to figure out which code is causing issues.\n\nPython 3.12 made [import errors](https://realpython.com/python312-new-features/#improved-error-messages) more straightforward to deal with.\n\nPython 3.13 continues this great tradition of enhancing your developer experience. In this release, color is added to the tracebacks shown when you encounter a runtime error. Additionally, more kinds of error messages provide you with suggestions on how to fix errors. You’ll look closer at these in this section.\n\nFirst, you’ll provoke Python and create a runtime error to get a glimpse of the colored tracebacks. Open your REPL and define inverse() as follows:\n\nLanguage: Python\n\n>>> def inverse(number):\n... return 1 / number\n...\n\nThe inverse() function calculates the multiplicative inverse of a number. One issue that inverse() doesn’t account for, is that zero doesn’t have an inverse. In your function, you see this because inverse(0) raises a ZeroDivisionError:\n\nYour tracebacks now have colors, with important information highlighted in red and purple. In general, this should make error messages easier to read and understand.\n\nHowever, if you don’t like the colors, you can [turn them off](https://docs.python.org/3.13/using/cmdline.html#using-on-controlling-color) by setting the PYTHON_COLORS environment variable to 0.\n\nSince Python 3.10, error messages have included a Did you mean suggestion feature that can help you out if you misspell a keyword, function name, or even a module name. In Python 3.13, the suggestions are expanded to include keyword arguments in function calls. Say that you’re trying to sort a list of numbers in descending order:\n\nLanguage: Python\n\n>>> numbers = [2, 0, 2, 4, 1, 0, 0, 1]\n>>> sorted(numbers, reversed=True)\nTraceback (most recent call last):\n File \"<python-input-1>\", line 1, in <module>\n sorted(numbers, reversed=True)\n ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: sort() got an unexpected keyword argument 'reversed'.\n Did you mean 'reverse'?\n\n>>> sorted(numbers, reverse=True)\n[4, 2, 2, 1, 1, 0, 0, 0]\n\nYou try to use reverse=True to sort the numbers in reverse order. At first, you make a typo and call the argument reversed with a d at the end. Python notices this and helpfully suggests that you meant reverse.\n\nSome of the advanced features in Python are backed by simple mechanisms. For example, to create your own Python module, you only need to create a file named with a .py suffix. This is great for exploring the language, but also opens the door for things to go wrong in interesting ways.\n\nThe following scenario is something you’ve probably run into. Recall the dice-rolling script from [earlier](#an-improved-interactive-interpreter-repl). Say that you had called the file random.py instead:\n\nLanguage: Python\n Filename: random.py\n\nimport random\n\nnum_faces = 6\n\nprint(\"Hit enter to roll die (q to quit, number for # of faces) \")\nwhile True:\n roll = input()\n if roll.lower().startswith(\"q\"):\n break\n if roll.isnumeric():\n num_faces = int(roll)\n\nresult = random.randint(1, num_faces)\n print(f\"Rolling a d{num_faces:<2d} - {result:2d}\")\n\nYour game is waiting on the table and you’re excited to start rolling the dice. Run the script and let randomness unfold:\n\nLanguage: Shell\n\n$ python random.py\nHit enter to roll die (q to quit, number for # of faces)\n\nTraceback (most recent call last):\n File \"/home/realpython/random.py\", line 1, in <module>\n import random\n File \"/home/realpython/random.py\", line 13, in <module>\n result = random.randint(1, num_faces)\n ^^^^^^^^^^^^^^\nAttributeError: module 'random' has no attribute 'randint' (consider\n renaming '/home/realpython/random.py' since it has the same\n name as the standard library module named 'random' and the\n import system gives it precedence)\n\nError messages like module ‘random’ has no attribute ‘randint’ has confused Python developers for decades. Surely, [randint()](https://docs.python.org/3/library/random.html#random.randint) is one of the functions in the random module!\n\nIn Python 3.13, you no longer need to scratch your head, as the error message points out what’s likely the problem. When you created random.py, you created a new random module that shadows the one in the standard library. To fix the problem, you should rename your script.\n\nNote: You can use another workaround to make the example work. If you add the -P option and run python -P random.py, then Python won’t include your current directory in the paths that Python searches during imports, and your script won’t hide the random standard-library module.\n\nRename random.py back to roll_dice.py and run it again:\n\nLanguage: Shell\n\n$ python roll_dice.py\nHit enter to roll die (q to quit, number for # of faces)\n\nRolling a d6 - 3\n\nRolling a d6 - 1\n\nRolling a d6 - 3\n20\nRolling a d20 - 13\nq\n\nYour script is no longer hiding random from the standard library. In the example above, you first roll a regular six-sided die three times, before switching to a twenty-sided die.\n\nYou’ll see a similar error message if you happen to shadow a third-party package as well. In general, you should be careful with naming your top-level Python files the same as libraries that you plan to import.\n\nNote: Naming clashes are less of an issue in submodules that are part of a package. For example, you can create a package for [serializing data](https://realpython.com/python-serialize-data/) that can serialize to different formats like [CSV](https://realpython.com/python-csv/) and [JSON](https://realpython.com/python-json/).\n\nInside the package, you can keep format-specific code in files named csv.py and json.py without worrying that these will shadow csv and json in the standard library. This is because these files are not top-level. Instead, you access them with import serialize_package.csv or from serialyze_package import csv.\n\nThe continued work on improving your developer experience helps Python defend its position as a beginner-friendly language.\n\n[Remove ads](/account/join/)\nFree-Threaded Python: Look Ma, No GIL\n\nHigh-level languages like Python provide some conveniences for you as a developer. For example, you can trust that Python will handle memory for you. You don’t need to worry about allocating memory before initializing a data structure, and you don’t need to remember to free the memory when you’re done working with it.\n\nNote: For an in-depth exploration of the free-threading feature, check out [Python 3.13 Preview: Free Threading and a JIT Compiler](https://realpython.com/python313-free-threading-jit/).\n\nAnother programming problem that Python helps you with is making sure that your code is thread-safe. Simply put, for code to be thread-safe, it needs to ensure that two different threads of execution don’t update the same part of memory at the same time.\n\nPython’s solution to this is a bit heavy-handed. It uses a global interpreter lock (GIL) to ensure that only one thread accesses the memory at a time. For most operations, a thread must first acquire the GIL. Because this lock is global—there’s only one GIL—most Python programs are effectively single-threaded, even when they’re running on modern hardware with several CPUs available.\n\nNote: Many libraries that are written in C, including [NumPy](https://realpython.com/numpy-tutorial/), are able to bypass the GIL by handling thread safety on their own. Such code can often take advantage of computers with multiple cores.\n\nHistorically, the GIL proved to be a simple and effective solution to adding [bindings to C libraries](https://realpython.com/python-bindings-overview/) that weren’t thread-safe. The GIL has likely played a significant role in Python’s rise in popularity as a programming language.\n\nAs the number of CPUs available in computers has increased over the years, the GIL has become more of a troublemaker than a hero. The community has attempted to remove the GIL from the language several times. The most recent attempt, initialized by Sam Gross, is by far the most promising. In fact, you can set up a special free-threaded version of Python 3.13 that doesn’t have a global interpreter lock.\n\nTrying out the free-threaded version of Python requires some time and effort. You may be able to get a version from your platform’s regular distribution channel. If not, you can either download Python’s source code and build it yourself, or run Python through Docker. For more information, see [Get Your Hands on the New Features](https://realpython.com/python313-free-threading-jit/#get-your-hands-on-the-new-features) in the free threading preview.\n\nThe free-threaded Python executable is typically named python3.13t with a t suffix. Once you have your hands on a free-threaded version of Python, you can choose to enable or disable the GIL each time you run Python:\n\nLanguage: Shell\n\n$ CODE='import pyfeatures; print(pyfeatures.FreeThreading())'\n\n$ python3.13 -c \"$CODE\"\nFree Threading: unsupported\n\n$ python3.13t -c \"$CODE\"\nFree Threading: enabled ✨\n\n$ python3.13t -X gil=1 -c \"$CODE\"\nFree Threading: disabled\n\nYou enable the GIL and turn off free threading by setting -X gil=1. The pyfeatures module needed to run the above code is available in the downloadable materials. It contains functionality for detecting the status of free threading.\n\nNote that enabling the GIL on the free-threaded version isn’t completely equivalent to running the standard version of Python. At least in early versions of Python 3.13, running the free-threaded version with the GIL enabled shows some issues with performance:\nPerformance of Python 3.13 on an All-in-One Computer\n\nThis particular benchmark is run on a computer with four CPUs. Note that the graph for free-threaded Python with the GIL disabled is close to flat for the first four threads. This is very promising, as it indicates that this version of Python is able to take advantage of all cores on the computer.\n\nIf you’re interested in learning more about this benchmark, then go ahead and read [Measure the Performance Improvements of Python 3.13](https://realpython.com/python313-free-threading-jit/#measure-the-performance-improvements-of-python-313) which goes more in-depth on the performance of free-threaded Python.\n\nNote: You can learn more about Python’s global interpreter lock in [What is the Python Global Interpreter Lock?](https://realpython.com/python-gil/) and [Bypassing the GIL for Parallel Processing in Python](https://realpython.com/python-parallel-processing/#pythons-gil-prevents-threads-from-running-in-parallel).\n\nRemoving the GIL is a massive undertaking that will hopefully make Python more performant in the future. In the next section, you’ll look at another feature aimed at speeding up Python.\n\nExperimental JIT Compiler\n\nPython is an interpreted language. This is in contrast to languages like C and Rust, which are all compiled languages. In an interpreted language, you need a runtime like a Python interpreter to run your code. Compiled code, on the other hand, can typically be run directly on your system.\n\nThere are advantages and disadvantages to both models. Python is often a language that’s efficient for developers, where new code can be tested quickly. But, the code itself may run slower than equivalent compiled code.\n\nA just-in-time, or JIT, compiler provides a kind of middle ground, where the interpreter may choose to compile some code while a program is running in order to speed it up. In Python 3.13, there’s a new, experimental JIT compiler. The fact that it’s experimental means that it’s present in Python’s source code, but it’s not enabled by default.\n\nIf you want to try out the JIT compiler, you need to set up a special version of Python 3.13 with the JIT enabled. This is similar to what you need to do to try out free-threaded Python, although with different build flags.\n\nNote: Check out [Build Python With Free Threading and JIT Support](https://realpython.com/python313-free-threading-jit/#build-python-with-free-threading-and-jit-support) to learn how to build Python with JIT support.\n\nPython’s JIT compiler is based on an algorithm called [copy-and-patch](https://en.wikipedia.org/wiki/Copy-and-patch). The interpreter will look for patterns in your code that match pre-compiled templates and fill in the machine code with specific information like memory addresses of variables.\n\nJIT compilation can be effective and give better performance in code where the same operation is repeated over and over again, giving the JIT compiler time to analyze and translate your code. In one benchmark, which repeatedly calculated the [Fibonacci](https://realpython.com/fibonacci-sequence-python/) series, you can see a small improvement in performance with the JIT:\nPerformance of Python 3.13 on an All-in-One Computer\n\nIn this benchmark, Python 3.13 with the JIT enabled is faster than both Python 3.12 and regular Python 3.13. However, the JIT isn’t ready for everyday use yet, and you should limit yourself to experimenting with it. Hopefully, the JIT will have more impact in [future Python releases](https://realpython.com/python315-jit-compiler/).\n\nTo learn more about the above benchmark, as well as the new experimental JIT compiler, dig into [Python 3.13 Preview: Free Threading and a JIT Compiler](https://realpython.com/python313-free-threading-jit/#get-your-hands-on-the-new-features).\n\n[Remove ads](/account/join/)\nImprovements to Static Typing\n\nWhile Python is a dynamically typed language, you can add static type information in optional [type hints](https://realpython.com/python-type-checking/). You can run a separate type checker like [mypy](https://mypy.readthedocs.io/) or [Pyright](https://github.com/microsoft/pyright) to validate your code, or you can rely on your IDE to advise you about issues.\n\nThe foundations of Python’s static type system were defined in [PEP 484](https://peps.python.org/pep-0484) and introduced in Python 3.5. In November 2023, [PEP 729](https://peps.python.org/pep-0729/) established the [Typing Council](https://github.com/python/typing-council) and formalized the type system through a [typing specification](https://typing.readthedocs.io/en/latest/spec/).\n\nThe Typing Council governs the Python type system and aims to make it useful, usable, and stable. It maintains the typing specification and advises [Python’s Steering Council](https://realpython.com/python38-new-features/#the-python-steering-council) on [typing-related PEPs](https://peps.python.org/topic/typing/). The initial members of the Typing Council are:\n\n[Rebecca Chen](https://github.com/rchen152)\n\n[Shantanu Jain](https://github.com/hauntsaninja)\n\n[Carl Meyer](https://github.com/carljm)\n\n[Eric Traut](https://github.com/erictraut)\n\n[Jelle Zijlstra](https://github.com/JelleZijlstra)\n\nIn addition to providing more clarity in the governance of Python’s type system, the community has implemented some code-related changes as well. The following PEPs have been accepted for Python 3.13:\n\n[PEP 696](https://peps.python.org/pep-0696/): Type defaults for type parameters\n\n[PEP 742](https://peps.python.org/pep-0742/): Narrowing types with TypeIs\n\n[PEP 705](https://peps.python.org/pep-0705/): TypedDict: Read-only items\n\n[PEP 702](https://peps.python.org/pep-0702/): Marking deprecations using the type system\n\nIn this tutorial, you’ll focus on the first two changes: type defaults and improved type narrowing. If you’re interested in learning more about read-only TypedDict items or deprecations, have a look at their respective PEPs or check out the downloadable materials. The latter contains examples that you can play with on your own.\n\nSimilar to other features in the language, typing improvements are tied to a specific version of Python. However, they also require that the type checker you’re using implements the new feature. When possible, new features are backported to older Python versions through the [typing_extensions](https://pypi.org/project/typing-extensions/) library. For example, you can use TypeIs on, say, Python 3.10 by importing from typing_extensions instead of typing.\n\nNote: In this section, you’ll use [Pyright](https://microsoft.github.io/pyright/) as your type checker. You can install [Pyright](https://pypi.org/project/pyright/) into your [virtual environment](https://realpython.com/python-virtual-environments-a-primer/) using [pip](https://realpython.com/what-is-pip/):\n\nLanguage: Shell\n\n(venv) $ python -m pip install pyright\n\nIf you’re using [Visual Studio Code](https://realpython.com/advanced-visual-studio-code-python/), then you can use Pyright inside the editor through the [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) extension. You may need to activate it by setting the Python › Analysis: Type Checking Mode option in your settings.\n\nPython 3.12 introduced a [new syntax for type generics](https://realpython.com/python312-typing/). A generic type is one that’s parametrized by another type. For example, a [list](https://realpython.com/python-list/) is a generic type as you can have a list of strings or a list of integers. Both are lists, but they are parametrized by different types, namely strings and integers.\n\nTraditionally, you’ve needed to explicitly define type variables using TypeVar. Since Python 3.12, you can declare type variables in a more compact [T] syntax using square brackets:\n\nLanguage: Python\n Filename: generic_queue.py\n\nfrom collections import deque\n\nclass Queue[T]:\n def __init__(self) -> None:\n self.elements: deque[T] = deque()\n\ndef push(self, element: T) -> None:\n self.elements.append(element)\n\ndef pop(self) -> T:\n return self.elements.popleft()\n\nIn this example, you create a generic [queue](https://realpython.com/queue-in-python/) based on [deque](https://realpython.com/python-deque/). You can use the queue as follows:\n\nLanguage: Python\n\n>>> from generic_queue import Queue\n\n>>> string_queue = Queue[str]()\n>>> string_queue.push(\"three\")\n>>> string_queue.push(\"thirteen\")\n\n>>> integer_queue = Queue[int]()\n>>> integer_queue.push(3)\n>>> integer_queue.push(13)\n\nYou declare that string_queue will be a queue with string elements by adding [str] in square brackets when you create the instance. Similarly, [int] specifies that integer_queue will have integer elements. If you leave out the square brackets and call Queue() directly, then your queue can have elements of arbitrary type.\n\nYou can now specify a type default for these kinds of generic classes. This default will be assumed when you don’t explicitly define a type:\n\nLanguage: Python\n Filename: generic_queue.py\n\nfrom collections import deque\n\nclass Queue[T=str]:\n def __init__(self) -> None:\n self.elements: deque[T] = deque()\n\ndef push(self, element: T) -> None:\n self.elements.append(element)\n\ndef pop(self) -> T:\n return self.elements.popleft()\n\nstring_queue = Queue()\nreveal_type(string_queue)\n\ninteger_queue = Queue[int]()\nreveal_type(integer_queue)\n\nYou define the type default similarly to how you specify default arguments for functions. The syntax [T=str] means that if the type of T isn’t specified, then it’ll be str. To confirm this, you use the special reveal_type(). This function is understood by your type checker, but will fail if you run your code:\n\nLanguage: Shell\n\n$ pyright --pythonversion 3.13 generic_queue.py\n\ngeneric_queue.py\n generic_queue.py:15:13 - information: Type of \"string_queue\" is \"Queue[str]\"\n generic_queue.py:18:13 - information: Type of \"integer_queue\" is \"Queue[int]\"\n0 errors, 0 warnings, 2 informations\n\nWhen you run Pyright on your code, reveal_type() confirms that string_queue is a queue of strings, even if you haven’t explicitly specified it.\n\nNote: You can also use type defaults with the traditional TypeVar syntax, by writing T = TypeVar(\"T\", default=str). See the [typing specification](https://typing.readthedocs.io/en/latest/spec/generics.html#type-parameter-defaults) for more information.\n\nType defaults is a small addition that can make working with generics more convenient.\n\n[Python 3.10](https://realpython.com/python310-new-features/#type-unions-aliases-and-guards) introduced [type guards](https://typing.readthedocs.io/en/latest/spec/narrowing.html#typeguard). These allow you to narrow union types. Consider the following example of a recursively defined tree structure:\n\nLanguage: Python\n Filename: tree.py\n\n1from typing import TypeGuard\n 2\n 3type Tree = list[Tree | int]\n 4\n 5def is_tree(obj: object) -> TypeGuard[Tree]:\n 6 return isinstance(obj, list) and all(\n 7 is_tree(elem) or isinstance(elem, int) for elem in obj\n 8 )\n 9\n10def get_left_leaf_value(tree_or_leaf: Tree | int) -> int:\n11 if is_tree(tree_or_leaf):\n12 return get_left_leaf_value(tree_or_leaf[0])\n13 else:\n14 return tree_or_leaf\n\nHere, is_tree() acts as a type guard that can identify trees. In your code, a Tree is a nested list of integers. The recursive get_left_leaf_value() function takes either a Tree or a single integer. However, after checking is_tree(), you can safely access the first element of the tree on line 12.\n\nType guards have some limitations where they don’t work well with generic types and they only provide positive guarantees. The latter means that the type checker isn’t allowed to do any type narrowing if the type guard returns False.\n\nIn the example above, this means that for a type checker, tree_or_leaf on line 14 is still of type Tree | int:\n\nLanguage: Shell\n\n$ pyright --pythonversion 3.13 tree.py\n\ntree.py\n tree.py:14:16 - error: Type \"Tree | int\" isn't assignable to return type \"int\"\n   Type \"Tree | int\" is not assignable to type \"int\"\n     \"list[Tree | int]\" is not assignable to \"int\" (reportReturnType)\n1 error, 0 warnings, 0 informations\n\nHere, your type checker complains about the type in your second return statement. However, since this is in the else branch, you know that tree_or_leaf is an int. To convince your type checker of this, you’d need another type guard for integers.\n\nTypeIs is similar to TypeGuard but it provides more type narrowing information to the type checker, and solves the issue with the example above. In many cases, you can use TypeIs as a drop-in replacement for TypeGuard:\n\nLanguage: Python\n Filename: tree.py\n\n1from typing import TypeIs\n 2\n 3type Tree = list[Tree | int]\n 4\n 5def is_tree(obj: object) -> TypeIs[Tree]:\n 6 return isinstance(obj, list) and all(\n 7 is_tree(elem) or isinstance(elem, int) for elem in obj\n 8 )\n 9\n10def get_left_leaf_value(tree_or_leaf: Tree | int) -> int:\n11 if is_tree(tree_or_leaf):\n12 return get_left_leaf_value(tree_or_leaf[0])\n13 else:\n14 return tree_or_leaf\n\nYou’ve replaced TypeGuard with TypeIs. This provides more information to the type checker. In particular, it knows that tree_or_leaf can’t be a Tree if you enter the else branch on line 13, so tree_or_leaf must be an integer in this case. You can confirm this by running Pyright:\n\nLanguage: Shell\n\n$ pyright --pythonversion 3.13 tree.py\n\n0 errors, 0 warnings, 0 informations\n\nYou can read more about type narrowing and the difference between TypeGuard and TypeIs in the [typing specification](https://typing.readthedocs.io/en/latest/spec/narrowing.html).\n\nWhile Python’s type system is constantly evolving, most of the new features are actually incremental improvements on existing capabilities. This reflects that static typing in Python is fairly mature at this point.\n\n[Remove ads](/account/join/)\nOther Pretty Cool Features\n\nYou’ve seen the highlights of what’s coming in Python 3.13. However, each new release of Python contains tons of little changes contributed by enthusiastic developers. In this section, you’ll check out some of the improvements that don’t necessarily get the big headlines.\n\nA Random Command Line\n\nPython comes with several tools baked in. A couple of the more famous ones are [json.tool](https://realpython.com/python-json/#validate-json-in-the-terminal) and [http.server](https://realpython.com/python-http-server/). You access these through Python’s -m switch:\n\nLanguage: Shell\n\n$ python -m json.tool dog_friend.json\n{\n \"name\": \"Frieda\",\n \"age\": 8\n}\n\n$ python -m http.server\nServing HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...\n\nYou can use json.tool to format [JSON](https://realpython.com/python-json/) files and make them more convenient to read. With http.server, you can quickly run a local HTTP server.\n\nPython 3.13 adds a command-line interface to the random module:\n\nLanguage: Shell\n\n$ python -m random\nusage: random.py [-h] [-c CHOICE [CHOICE ...] | -i N | -f N] [input ...]\n\npositional arguments:\n input if no options given, output depends on the input\n string or multiple: same as --choice\n integer: same as --integer\n float: same as --float\n\noptions:\n -h, --help show this help message and exit\n -c, --choice CHOICE [CHOICE ...]\n print a random choice\n -i, --integer N print a random integer between 1 and N inclusive\n -f, --float N print a random floating-point number between 0 and N\n\nYou can quickly create a random number or make a random choice by calling python -m random. Depending on your input you’ll get one of three results back:\n\nIf you pass a list of elements, you’ll get one random element from the list.\n\nIf you pass an integer N, you’ll get a random integer between 1 and N.\n\nIf you pass a float x, you’ll get a random float between 0 and x.\n\nTry it out for yourself:\n\nLanguage: Shell\n\n$ python -m random Oslo Berlin London Krakow Belgrade Graz\nKrakow\n\n$ python -m random 6\n3\n\n$ python -m random 6.0\n3.132801224231027\n\nWhether you want to plan your next random getaway, simulate some dice rolls, or just need a random number, you can now turn to the random module for some quick help. By default, the kind of random result you get depends on what you pass in. However, you can also use options like --choice, --integer, and --float to be explicit:\n\nLanguage: Shell\n\n$ python -m random --float 6\n1.4284991504686064\n\nHere, you get a random floating-point number even if you pass in an integer as a limit because you specified --float. This command-line interface isn’t advanced, but it can be a quick help if you need something random.\n\nNew copy.replace() for Modifying Immutable Objects\n\nThere are several advantages to working with [immutable objects](https://realpython.com/python-mutable-vs-immutable-types/). Since an immutable object can’t change after you’ve created it, it’s straightforward to reason about its state. You can also readily [cache](https://realpython.com/lru-cache-python/) immutable objects or use them in distributed contexts.\n\nPython comes with several immutable data structures, including [tuples](https://realpython.com/python-tuple/), [frozen sets](https://realpython.com/python-sets/#frozen-sets), and [frozen data classes](https://realpython.com/python-data-classes/#immutable-data-classes). If you represent your data with immutable data structures, then you can still change the state of your data by creating new immutable objects that may share one or more fields with the original.\n\nConsider the following example, modeling a person and their current Python version:\n\nLanguage: Python\n\n>>> from typing import NamedTuple\n\n>>> class Person(NamedTuple):\n... name: str\n... place: str\n... version: str\n...\n\n>>> person = Person(name=\"Geir Arne\", place=\"Oslo\", version=\"3.12\")\n\nNow, say that your person upgrades to the latest Python version. If Person had been mutable, you could write person.version = \"3.13\". However, that’s not possible with a [named tuple](https://realpython.com/python-namedtuple/). Instead, you create a new Person object and point person to that new object:\n\nLanguage: Python\n\n>>> person = Person(name=person.name, place=person.place, version=\"3.13\")\n>>> person\nPerson(name='Geir Arne', place='Oslo', version='3.13')\n\nYou create a new Person object with the same name and location as before, but update the Python version. This works but can become hard to read, write, and maintain if your data structure has many fields.\n\nSome built-in immutable classes have support for this use case with a dedicated method. For example, you can copy date and datetime objects, replacing one or more fields as you do so:\n\nLanguage: Python\n\n>>> from datetime import date\n\n>>> today = date.today()\n>>> today\ndatetime.date(2024, 9, 30)\n\n>>> today.replace(day=1)\ndatetime.date(2024, 9, 1)\n\n>>> today.replace(month=12, day=24)\ndatetime.date(2024, 12, 24)\n\nYou use .replace() to calculate the first of the current month, or Christmas Eve this year.\n\nIn Python 3.13, a new replace() function is added to the copy module to consistently provide the same functionality to many immutable data structures. You can use copy.replace() to re-create the examples above:\n\nLanguage: Python\n\n>>> import copy\n\n>>> person = Person(name=\"Geir Arne\", place=\"Oslo\", version=\"3.12\")\n>>> copy.replace(person, version=\"3.13\")\nPerson(name='Geir Arne', place='Oslo', version='3.13')\n\n>>> copy.replace(today, day=1)\ndatetime.date(2024, 9, 1)\n\nIf you don’t provide a new value to a field with replace(), then its original value is kept. When you upgrade the Python version, you only need to specify version and not the other fields. As before, the original object doesn’t change:\n\nLanguage: Python\n\n>>> person\nPerson(name='Geir Arne', place='Oslo', version='3.12')\n\nYou’d need to explicitly update person if that’s what you want.\n\nYou can use replace() to modify data classes in addition to named tuples. You can also add a .__replace__() special method if you want replace() to work with your custom class. You’ll find an example of how this works in the downloadable materials.\n\n[Remove ads](/account/join/)\nImproved Globbing of Files and Directories\n\nPython’s [pathlib](https://realpython.com/python-pathlib/) module has many tools for working with paths and files consistently across operating systems. For example, you can [list files and directories](https://realpython.com/get-all-files-in-directory-python/#using-a-python-glob-pattern-for-conditional-listing) using .glob():\n\nLanguage: Python\n\n>>> from pathlib import Path\n\n>>> Path(\"music\")\nPosixPath('music')\n\n>>> for path in Path(\"music\").glob(\"*\"):\n... print(path)\n...\nmusic/opera\nmusic/rap\n\nIn this example, you explore the music/ directory on your computer. It contains two items, opera and rap.\n\nNote: The music/ directory has the following structure:\n\nmusic/\n│\n├── opera/\n│ ├── flower_duet.txt\n│ ├── habanera.txt\n│ └── nabucco.txt\n│\n└── rap/\n ├── bedlam_13-13.txt\n └── fight_the_power.txt\n\nYou can find the music/ directory in the downloadable materials if you want to follow along yourself.\n\nThe .glob() method uses special [glob patterns](https://en.wikipedia.org/wiki/Glob_(programming)) which have been used to represent sets of filenames since the 1970s. You use special wildcard characters like * and ? where * matches any number of any characters, while ? matches any single character.\n\nFor example, *.py matches any filename that ends with .py. Similarly, python3.1? matches names like python3.12, python3.13, and python3.1X, but not python3.1 or python3.100.\n\nOne special pattern is the globstar (**) which is available in many terminal shells. It matches all files and directories recursively. You can explore music/ in Bash with ls:\n\nLanguage: Shell\n\n$ ls music/**\nmusic/opera:\nflower_duet.txt habanera.txt nabucco.txt\n\nmusic/rap:\nbedlam_13-13.txt fight_the_power.txt\n\nUsing ls music/**, you list all directories and files inside music/. While Python has supported **, its behavior has been inconsistent with other tools. In Python 3.12, you can observe the following:\n\nLanguage: Python\n\n>>> for path in Path(\"music\").glob(\"**\"):\n... print(path)\n...\nmusic\nmusic/opera\nmusic/rap\n\n>>> for path in Path(\"music\").glob(\"**/*\"):\n... print(path)\n...\nmusic/opera\nmusic/rap\nmusic/opera/nabucco.txt\nmusic/opera/flower_duet.txt\nmusic/opera/habanera.txt\nmusic/rap/bedlam_13-13.txt\nmusic/rap/fight_the_power.txt\n\nUsing the globstar only lists directories. If you want to list both directories and files, you need to use the extended **/* pattern.\n\nIn Python 3.13, the behavior of ** is changed to be consistent with traditional tools:\n\nLanguage: Python\n\n>>> for path in Path(\"music\").glob(\"**\"):\n... print(path)\n...\nmusic\nmusic/opera\nmusic/rap\nmusic/rap/bedlam_13-13.txt\nmusic/rap/fight_the_power.txt\nmusic/opera/nabucco.txt\nmusic/opera/flower_duet.txt\nmusic/opera/habanera.txt\n\nUsing ** as your glob pattern now lists both directories and files. If you need to constrain your pattern to only show directories, then you can be explicit and add a slash (/) at the end of your pattern:\n\nLanguage: Python\n\n>>> for path in Path(\"music\").glob(\"**/\"):\n... print(path)\n...\nmusic\nmusic/opera\nmusic/rap\n\nYou add a slash (/) at the end of your pattern to make .glob() only return directories.\n\nTypically, you’ll use .glob() through pathlib. But the functionality is also available in the [glob](https://docs.python.org/3/library/glob.html) module. Python 3.13 adds a new function, [glob.translate()](https://docs.python.org/3.13/library/glob.html#glob.translate) that you can use to convert a glob pattern to a regular expression (regex).\n\n[Regular expressions](https://realpython.com/regex-python/) are patterns that you can use to search and match general strings. They are more general and [more powerful](https://xkcd.com/208/) than glob patterns, but they’re also [more complex](https://xkcd.com/1171/). If you need more flexibility when working with a glob pattern, you can try to translate it into a regular expression:\n\nLanguage: Python\n\n>>> import glob\n\n>>> pattern = glob.translate(\"music/**/*.txt\")\n>>> pattern\n'(?s:music/(?!\\\\.)[^/]*/(?!\\\\.)[^/]*\\\\.txt)\\\\Z'\n\nYou translate the glob pattern that matches any .txt file nested inside music/ into a regular expression. You can then match the regex pattern against any string using re.match():\n\nLanguage: Python\n\n>>> import re\n\n>>> re.match(pattern, \"music/opera/flower_duet.txt\")\n<re.Match object; span=(0, 27), match='music/opera/flower_duet.txt'>\n\n>>> re.match(pattern, \"music/progressive_rock/\")\n\n>>> re.match(pattern, \"music/progressive_rock/fandango.txt\")\n<re.Match object; span=(0, 35), match='music/progressive_rock/fandango.txt'>\n\nIn this example, your two file paths match the pattern, while the directory path doesn’t.\n\nPathlib now uses glob.translate() internally for several operations. This comes with a [small performance boost](https://github.com/python/cpython/pull/106703) as directories can be [walked](https://realpython.com/python312-new-features/#pathwalk-list-files-and-subdirectories) faster and Path objects can be smaller.\n\n[Remove ads](/account/join/)\nNaked Docstrings\n\nPython stores inline documentation in [docstrings](https://realpython.com/how-to-write-docstrings-in-python/). You can access these through the [help system](https://realpython.com/python-repl/#getting-help-and-introspecting-code-in-the-repl). At runtime, you can also access docstrings through .__doc__:\n\nLanguage: Python\n\n>>> import dataclasses\n\n>>> @dataclasses.dataclass\n... class Person:\n... \"\"\"Model a person with a name, location, and Python version.\"\"\"\n... name: str\n... place: str\n... version: str\n...\n>>> Person.__doc__\n'Model a person with a name, location, and Python version.'\n\nYou’ve added a docstring to Person by writing a text string immediately after the class statement. It’s a convention to use triple-quoted strings for docstrings. You can access the docstring by looking at the .__doc__ special attribute.\n\nBecause docstrings are typically written inside a function, method, or class definition, they’ll contain a fair bit of spaces. The indentation Python requires is reflected in the docstring. On Python 3.12, you’ll see something like this:\n\nLanguage: Python\n\n>>> import dataclasses\n\n>>> dataclasses.replace.__doc__\n'Return a new object replacing specified fields with new values.\\n\\n This is\n especially useful for frozen classes. Example usage::\\n\\n\n @dataclass(frozen=True)\\n class C:\\n x: int\\n\n y: int\\n\\n c = C(1, 2)\\n c1 = replace(c, x=3)\\n\n assert c1.x == 3 and c1.y == 2\\n '\n\n>>> len(dataclasses.replace.__doc__)\n299\n\n>>> print(dataclasses.replace.__doc__)\nReturn a new object replacing specified fields with new values.\n\nThis is especially useful for frozen classes. Example usage::\n\n@dataclass(frozen=True)\n class C:\n x: int\n y: int\n\nc = C(1, 2)\n c1 = replace(c, x=3)\n assert c1.x == 3 and c1.y == 2\n\nNote that every line in the docstring, except the first one, contains between four and ten leading spaces. In Python 3.13, docstrings are stripped! They’re stored with the common leading whitespace removed. Rerun the same example in the newest Python version:\n\nLanguage: Python\n\n>>> import dataclasses\n\n>>> dataclasses.replace.__doc__\n'Return a new object replacing specified fields with new values.\\n\\nThis is\n especially useful for frozen classes. Example usage::\\n\\n\n @dataclass(frozen=True)\\n class C:\\n x: int\\n y: int\\n\\n\n c = C(1, 2)\\n c1 = replace(c, x=3)\\n assert c1.x == 3 and c1.y == 2\\n'\n\n>>> len(dataclasses.replace.__doc__)\n263\n\n>>> print(dataclasses.replace.__doc__)\nReturn a new object replacing specified fields with new values.\n\nThis is especially useful for frozen classes. Example usage::\n\n@dataclass(frozen=True)\n class C:\n x: int\n y: int\n\nc = C(1, 2)\n c1 = replace(c, x=3)\n assert c1.x == 3 and c1.y == 2\n\nIn this case, four spaces have been removed from every line except the first one. This is a small optimization that means that docstrings take up less memory than before.\n\nIf you have code that relies on the exact value of .__doc__, you should test it to make sure it still behaves as expected in Python 3.13.\n\nSo, Should You Upgrade to Python 3.13?\n\nYou’ve seen several of the features coming in Python 3.13. There are even many more that you can read about in the [Python changelog](https://docs.python.org/3.13/whatsnew/3.13.html). Improved features not covered in this tutorial include:\n\n[Argparse](https://realpython.com/command-line-interfaces-python-argparse/) supports [deprecating](https://github.com/python/cpython/issues/83648) options, arguments, and subcommands in your command-line applications.\n\nDefined semantics for locals() ensuring [more consistency](https://peps.python.org/pep-0667/) when peeking into the local namespace.\n\nThe dead batteries that were [deprecated in Python 3.11](https://realpython.com/python311-new-features/#dead-batteries) have been [removed](https://peps.python.org/pep-0594/).\n\n[iOS](https://peps.python.org/pep-0730/) and [Android](https://peps.python.org/pep-0738/) are now supported platforms for Python at the [tier 3](https://peps.python.org/pep-0011/#tier-3) level.\n\nAdditionally, Python’s [annual release cycle](https://realpython.com/python39-new-features/#when-is-the-next-version-of-python-coming) has been [revised](https://www.python.org/dev/peps/pep-0602/) to extend full support from eighteen months to a full two years. Each release will still get security fixes for five years:\nClick the image to see more details.\n\nThe diagram shows the life cycles of Python 3.13 and the upcoming 3.14 and 3.15.\n\nNote: The garbage collector was rewritten to be [incremental](https://github.com/python/cpython/pull/116206) in pre-release versions of Python 3.13. This reduced maximum pause times when collecting larger memory heaps. However, it also caused much worse performance in [some examples](https://github.com/python/cpython/issues/124567). The new garbage collector implementation was therefore [taken out](https://github.com/python/cpython/pull/124770) again and won’t be part of the final 3.13 version.\n\nSo, having seen all these new improvements, should you upgrade to Python 3.13? Like for every release, the answer is a clear and loud it depends!\n\nThere isn’t any big reason not to update your local environment that you use for exploring the language. The new REPL and improved error messages are nice quality-of-life upgrades and you might see some small performance improvements. That said, if you don’t use the built-in REPL, there aren’t any super attractive features that you need to jump on either.\n\nIf you’re maintaining a library, especially one that uses Python’s C-API, you should start testing with Python 3.13, both the regular version and the free-threaded one. It’s important to surface any bugs in the implementation as soon as possible. Adding a bug report is a great contribution to the language. Your library may also need some updates to be compatible with free threading.\n\nFor code that’s running in production, you should be as diligent as ever with testing your code on Python 3.13 before upgrading your runtime. While a lot of testing has been done since Python 3.13 reached beta in May 2024, there are always bugs that surface after the official release. For critical code, you’ll be fine with running on Python 3.12 until its full support ends in [April 2025](https://peps.python.org/pep-0693/).\n\nA question that’s independent of when you upgrade your Python is when you should start using the new features. Again, it depends on your code and your situation.\n\nThis time around, there aren’t any big syntax changes, like [f-strings](https://realpython.com/python-f-strings/), the [walrus operator](https://realpython.com/python-walrus-operator/), or the [match…case statement](https://realpython.com/python310-new-features/#structural-pattern-matching) in the past. Instead, there are some functions, like copy.replace() and glob.translate() that will only be available for you on Python 3.13.\n\nIf you work on an application where you can control the running environment, you can use Python 3.13 features as soon as you’ve upgraded the environment. If you work on a team, then you need to make sure everyone’s on board and upgraded before you introduce any incompatible syntax.\n\nIf you write a library that others use, then you don’t know which version of Python they’ll be using. In this case, it pays off to be more conservative and ideally support each version throughout its lifetime. Python 3.8 reaches end-of-support in [October 2024](https://peps.python.org/pep-0569/), so you could start looking at requiring Python 3.9 as your minimal version.\n\nMoving forward, there will be [bugfix releases](https://realpython.com/python-bugfix-version/) of Python 3.13. These are planned to be released approximately every two months. If you start using Python 3.13, you should stay up-to-date with the bugfix updates, and upgrade your environment as they become available.\n\n[Remove ads](/account/join/)\nConclusion\n\nA new Python release is always great news! You’ve been on a tour of the features and improvements that have been updated in Python 3.13. Send some appreciation to all the volunteers that put time and effort into the development!\n\nIn this tutorial, you’ve seen new features and improvements, like:\n\nImprovements made to the interactive interpreter (REPL)\n\nClearer error messages that can help you fix common mistakes\n\nAdvancements done in removing the global interpreter lock (GIL) and making Python free-threaded\n\nThe implementation of an experimental Just-In-Time (JIT) compiler\n\nA host of minor upgrades to Python’s static type system\n\nYou probably won’t be able to take advantage of the new features right away, but you should install Python 3.13 on your system and play with it.\n\nGet Your Code: [Click here to download the free sample code](https://realpython.com/bonus/python313-new-features-code/) that shows you how to use the new features in Python 3.13.\n\nTake the Quiz: Test your knowledge with our interactive “Python 3.13: Cool New Features for You to Try” quiz. You’ll receive a score upon completion to help you track your learning progress:\n\nInteractive Quiz\n [Python 3.13: Cool New Features for You to Try](/quizzes/python313-new-features/) \n\nIn this quiz, you'll test your understanding of the new features introduced in Python 3.13. By working through this quiz, you'll review the key updates and improvements in this version of Python.\n\nMark as Completed\n\nShare\n\nRecommended Course\n\n[What's New in Python 3.13](/courses/new-features-python-313/)\n (53m)\n\n🐍 Python Tricks 💌\n\nGet a short & sweet Python Trick delivered to your inbox every couple of days. No spam ever. Unsubscribe any time. Curated by the Real Python team.\n\nSend Me Python Tricks »\n\nAbout Geir Arne Hjelle\n\nGeir Arne is an avid Pythonista and a member of the Real Python tutorial team.\n [» More about Geir Arne](/team/gahjelle/)\n\nEach tutorial at Real Python is created by a team of developers so that it meets our high quality standards. The team members who worked on this tutorial are:\n\n[Aldren](/team/asantos/)\n\n[Brenda](/team/bweleschuk/)\n\n[Bartosz](/team/bzaczynski/)\n\nMaster Real-World Python Skills With Unlimited Access to Real Python\n\nJoin us and get access to thousands of tutorials, hands-on video courses, and a community of expert Pythonistas:\n\n[Level Up Your Python Skills »](/account/join/?utm_source=rp_article_footer&utm_content=python313-new-features)\n\nMaster Real-World Python Skills\nWith Unlimited Access to Real Python\n\nJoin us and get access to thousands of tutorials, hands-on video courses, and a community of expert Pythonistas:\n\n[Level Up Your Python Skills »](/account/join/?utm_source=rp_article_footer&utm_content=python313-new-features)\n\nWhat Do You Think?\n\nRate this article:\n\n[LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F)\n\n[Twitter](https://twitter.com/intent/tweet/?text=Interesting%20Python%20article%20on%20%40realpython%3A%20Python%203.13%3A%20Cool%20New%20Features%20for%20You%20to%20Try&url=https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F)\n\n[Bluesky](https://bsky.app/intent/compose?text=Interesting%20Python%20article%20on%20%40realpython.com%3A%20Python%203.13%3A%20Cool%20New%20Features%20for%20You%20to%20Try%20https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F)\n\n[Facebook](https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F)\n\n[Email](mailto:?subject=Python%20article%20for%20you&body=Python%203.13%3A%20Cool%20New%20Features%20for%20You%20to%20Try%20on%20Real%20Python%0A%0Ahttps%3A%2F%2Frealpython.com%2Fpython313-new-features%2F%0A)\n\nWhat’s your #1 takeaway or favorite thing you learned? How are you going to put your newfound skills to use? Leave a comment below and let us know.\n\nCommenting Tips: The most useful comments are those written with the goal of learning from or helping out other students. [Get tips for asking good questions](https://realpython.com/python-beginner-tips/#tip-9-ask-good-questions) and [get answers to common questions in our support portal](https://support.realpython.com).Looking for a real-time conversation? Visit the [Real Python Community Chat](/community/) or join the next [“Office Hours” Live Q&A Session](/office-hours/). Happy Pythoning!\n\nKeep Learning\n\nRelated Topics:\n\n[intermediate](/tutorials/intermediate/)\n\n[python](/tutorials/python/)\n\nRelated Courses:\n\n[What's New in Python 3.13](/courses/new-features-python-313/?utm_source=realpython&utm_medium=web&utm_campaign=related-course&utm_content=python313-new-features)\n\nKeep reading Real Python by creating a free account or signing in:\n\n[Continue »](/account/signup/?intent=continue_reading&utm_source=rp&utm_medium=web&utm_campaign=rwn&utm_content=v1&next=%2Fpython313-new-features%2F)\n\nAlready have an account? [Sign-In](/account/login/?intent=continue_reading&next=/python313-new-features/)\n\nAlmost there! Complete this form and click the button below to gain instant access:\n\nPython 3.13: Cool New Features for You to Try (Sample Code)\n\nSend Code »\n\n🔒 No spam. We take your privacy seriously.\n\nLearn Python\n\n[Start Here](/start-here/)\n\n[Learning Resources](/search)\n\n[Code Mentor](/mentor/)\n\n[Python Reference](/ref/)\n\n[Python Cheat Sheet](/cheatsheets/python/)\n\n[Support Center](https://support.realpython.com/)\n\nCourses & Paths\n\n[Learning Paths](/learning-paths/)\n\n[Quizzes & Exercises](/quizzes/)\n\n[Browse Topics](/tutorials/all/)\n\n[Live Courses](/live/)\n\n[Books](/books/)\n\nCommunity\n\n[Podcast](/podcasts/rpp/)\n\n[Newsletter](/newsletter/)\n\n[Community Chat](/community/)\n\n[Office Hours](/office-hours/)\n\n[Learner Stories](/learner-stories/)\n\nMembership\n\n[Plans & Pricing](/account/join/)\n\n[Team Plans](/account/join-team/)\n\n[For Business](/account/join-team/inquiry/)\n\n[For Schools](/account/join-team/education-inquiry/)\n\n[Reviews](/learner-stories/)\n\nCompany\n\n[About Us](/about/)\n\n[Team](/team/)\n\n[Mission & Values](/mission/)\n\n[Editorial Guidelines](/editorial-guidelines/)\n\n[Sponsorships](/sponsorships/)\n\n[Careers](https://realpython.workable.com)\n\n[Press Kit](/media-kit/)\n\n[Merch](/merch)\n\n[Privacy Policy](/privacy-policy/) ⋅\n [Terms of Use](/terms/) ⋅\n\n[Security](/security/) ⋅\n\n[Contact](/contact/)\n\nHappy Pythoning!\n\n© 2012–2026 DevCademy Media Inc. DBA Real Python. All rights reserved.\n\nREALPYTHON™ is a trademark of DevCademy Media Inc.\n\nFree Bonus: Python Cheat Sheet\n ×\n\nGet a Python Cheat Sheet (PDF) and learn the basics of Python, like working with data types, dictionaries, lists, and Python functions:\n\nSend My Python Cheat Sheet »",
+  "links": [
+    {
+      "text": "Start Here",
+      "url": "/start-here/"
+    },
+    {
+      "text": "Learn Python",
+      "url": "#"
+    },
+    {
+      "text": "Your Learning Plan →Your personalized Python learning plan",
+      "url": "/account/learning-plan/"
+    },
+    {
+      "text": "Python Tutorials →In-depth articles and video courses",
+      "url": "/search?kind=article&kind=course&order=newest"
+    },
+    {
+      "text": "Learning Paths →Guided study plans for accelerated learning",
+      "url": "/learning-paths/"
+    },
+    {
+      "text": "Quizzes & Exercises →Check your learning progress",
+      "url": "/search?kind=exercise&kind=quiz"
+    },
+    {
+      "text": "Browse Topics →Focus on a specific area or skill level",
+      "url": "/tutorials/all/"
+    },
+    {
+      "text": "Reference →Concise definitions for common Python terms",
+      "url": "/ref/"
+    },
+    {
+      "text": "Code Mentor →BetaPersonalized code assistance & learning tools",
+      "url": "/mentor/"
+    },
+    {
+      "text": "Office Hours →Live Q&A calls with Python experts",
+      "url": "/office-hours/"
+    },
+    {
+      "text": "Community Chat →Learn with other Pythonistas",
+      "url": "/community/"
+    },
+    {
+      "text": "Live Courses →Live, instructor-led Python courses",
+      "url": "/live/"
+    },
+    {
+      "text": "Books →Round out your knowledge and learn offline",
+      "url": "/products/books/"
+    },
+    {
+      "text": "Podcast →Hear what’s new in the world of Python",
+      "url": "/podcasts/rpp/"
+    },
+    {
+      "text": "Unlock All Content and Become a Python Expert →Get unlimited access to all Real Python has to offer",
+      "url": "/account/join/?from=navbar_learn"
+    },
+    {
+      "text": "Unlock All Content →Become a Python Expert",
+      "url": "/account/join/?from=navbar_learn"
+    },
+    {
+      "text": "More",
+      "url": "#"
+    },
+    {
+      "text": "Learner Stories",
+      "url": "/learner-stories/"
+    },
+    {
+      "text": "Python Newsletter",
+      "url": "/newsletter/"
+    },
+    {
+      "text": "Python Job Board",
+      "url": "https://www.pythonjobshq.com"
+    },
+    {
+      "text": "Meet the Team",
+      "url": "/team/"
+    },
+    {
+      "text": "Become a Contributor",
+      "url": "/jobs/"
+    },
+    {
+      "text": "Search",
+      "url": "/search"
+    },
+    {
+      "text": "Join",
+      "url": "/account/join/"
+    },
+    {
+      "text": "Sign‑In",
+      "url": "/account/login/?intent=navbar&next=%2Fpython313-new-features%2F"
+    },
+    {
+      "text": "Browse Topics",
+      "url": "/tutorials/all/"
+    },
+    {
+      "text": "Guided Learning Paths",
+      "url": "/learning-paths/"
+    },
+    {
+      "text": "Basics",
+      "url": "/search?level=basics"
+    },
+    {
+      "text": "Intermediate",
+      "url": "/search?level=intermediate"
+    },
+    {
+      "text": "Advanced",
+      "url": "/search?level=advanced"
+    },
+    {
+      "text": "ai",
+      "url": "/tutorials/ai/"
+    },
+    {
+      "text": "algorithms",
+      "url": "/tutorials/algorithms/"
+    },
+    {
+      "text": "api",
+      "url": "/tutorials/api/"
+    },
+    {
+      "text": "best-practices",
+      "url": "/tutorials/best-practices/"
+    },
+    {
+      "text": "career",
+      "url": "/tutorials/career/"
+    },
+    {
+      "text": "community",
+      "url": "/tutorials/community/"
+    },
+    {
+      "text": "databases",
+      "url": "/tutorials/databases/"
+    },
+    {
+      "text": "data-science",
+      "url": "/tutorials/data-science/"
+    },
+    {
+      "text": "data-structures",
+      "url": "/tutorials/data-structures/"
+    },
+    {
+      "text": "data-viz",
+      "url": "/tutorials/data-viz/"
+    },
+    {
+      "text": "devops",
+      "url": "/tutorials/devops/"
+    },
+    {
+      "text": "django",
+      "url": "/tutorials/django/"
+    },
+    {
+      "text": "docker",
+      "url": "/tutorials/docker/"
+    },
+    {
+      "text": "editors",
+      "url": "/tutorials/editors/"
+    },
+    {
+      "text": "flask",
+      "url": "/tutorials/flask/"
+    },
+    {
+      "text": "front-end",
+      "url": "/tutorials/front-end/"
+    },
+    {
+      "text": "gamedev",
+      "url": "/tutorials/gamedev/"
+    },
+    {
+      "text": "gui",
+      "url": "/tutorials/gui/"
+    },
+    {
+      "text": "machine-learning",
+      "url": "/tutorials/machine-learning/"
+    },
+    {
+      "text": "news",
+      "url": "/tutorials/news/"
+    },
+    {
+      "text": "numpy",
+      "url": "/tutorials/numpy/"
+    },
+    {
+      "text": "projects",
+      "url": "/tutorials/projects/"
+    },
+    {
+      "text": "python",
+      "url": "/tutorials/python/"
+    },
+    {
+      "text": "stdlib",
+      "url": "/tutorials/stdlib/"
+    },
+    {
+      "text": "testing",
+      "url": "/tutorials/testing/"
+    },
+    {
+      "text": "tools",
+      "url": "/tutorials/tools/"
+    },
+    {
+      "text": "web-dev",
+      "url": "/tutorials/web-dev/"
+    },
+    {
+      "text": "web-scraping",
+      "url": "/tutorials/web-scraping/"
+    },
+    {
+      "text": "Table of Contents",
+      "url": "#toc"
+    },
+    {
+      "text": "An Improved Interactive Interpreter (REPL)",
+      "url": "#an-improved-interactive-interpreter-repl"
+    },
+    {
+      "text": "Better Error Messages",
+      "url": "#better-error-messages"
+    },
+    {
+      "text": "Free-Threaded Python: Look Ma, No GIL",
+      "url": "#free-threaded-python-look-ma-no-gil"
+    },
+    {
+      "text": "Experimental JIT Compiler",
+      "url": "#experimental-jit-compiler"
+    },
+    {
+      "text": "Improvements to Static Typing",
+      "url": "#improvements-to-static-typing"
+    },
+    {
+      "text": "Other Pretty Cool Features",
+      "url": "#other-pretty-cool-features"
+    },
+    {
+      "text": "A Random Command Line",
+      "url": "#a-random-command-line"
+    },
+    {
+      "text": "New copy.replace() for Modifying Immutable Objects",
+      "url": "#new-copyreplace-for-modifying-immutable-objects"
+    },
+    {
+      "text": "Improved Globbing of Files and Directories",
+      "url": "#improved-globbing-of-files-and-directories"
+    },
+    {
+      "text": "Naked Docstrings",
+      "url": "#naked-docstrings"
+    },
+    {
+      "text": "So, Should You Upgrade to Python 3.13?",
+      "url": "#so-should-you-upgrade-to-python-313"
+    },
+    {
+      "text": "Conclusion",
+      "url": "#conclusion"
+    },
+    {
+      "text": "What's New in Python 3.13 53m · 12 lessons",
+      "url": "/courses/new-features-python-313/"
+    },
+    {
+      "text": "Geir Arne Hjelle",
+      "url": "#author"
+    },
+    {
+      "text": "intermediate",
+      "url": "/tutorials/intermediate/"
+    },
+    {
+      "text": "python",
+      "url": "/tutorials/python/"
+    },
+    {
+      "text": "An Improved Interactive Interpreter (REPL)",
+      "url": "#an-improved-interactive-interpreter-repl"
+    },
+    {
+      "text": "Better Error Messages",
+      "url": "#better-error-messages"
+    },
+    {
+      "text": "Free-Threaded Python: Look Ma, No GIL",
+      "url": "#free-threaded-python-look-ma-no-gil"
+    },
+    {
+      "text": "Experimental JIT Compiler",
+      "url": "#experimental-jit-compiler"
+    },
+    {
+      "text": "Improvements to Static Typing",
+      "url": "#improvements-to-static-typing"
+    },
+    {
+      "text": "Other Pretty Cool Features",
+      "url": "#other-pretty-cool-features"
+    },
+    {
+      "text": "A Random Command Line",
+      "url": "#a-random-command-line"
+    },
+    {
+      "text": "New copy.replace() for Modifying Immutable Objects",
+      "url": "#new-copyreplace-for-modifying-immutable-objects"
+    },
+    {
+      "text": "Improved Globbing of Files and Directories",
+      "url": "#improved-globbing-of-files-and-directories"
+    },
+    {
+      "text": "Naked Docstrings",
+      "url": "#naked-docstrings"
+    },
+    {
+      "text": "So, Should You Upgrade to Python 3.13?",
+      "url": "#so-should-you-upgrade-to-python-313"
+    },
+    {
+      "text": "Conclusion",
+      "url": "#conclusion"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "What's New in Python 3.13",
+      "url": "/courses/new-features-python-313/"
+    },
+    {
+      "text": "Python 3.13",
+      "url": "https://www.python.org/downloads/release/python-3130/"
+    },
+    {
+      "text": "October 7, 2024",
+      "url": "https://peps.python.org/pep-0719/"
+    },
+    {
+      "text": "Python 3 Installation & Setup Guide",
+      "url": "https://realpython.com/installing-python/"
+    },
+    {
+      "text": "How Can You Install a Pre-Release Version of Python?",
+      "url": "https://realpython.com/python-pre-release/"
+    },
+    {
+      "text": "decided",
+      "url": "https://discuss.python.org/t/incremental-gc-and-pushing-back-the-3-13-0-release/65285"
+    },
+    {
+      "text": "advice",
+      "url": "#so-should-you-upgrade-to-python-313"
+    },
+    {
+      "text": "Click here to download the free sample code",
+      "url": "https://realpython.com/bonus/python313-new-features-code/"
+    },
+    {
+      "text": "Python 3.13: Cool New Features for You to Try",
+      "url": "/quizzes/python313-new-features/"
+    },
+    {
+      "text": "Python’s interactive interpreter",
+      "url": "https://realpython.com/python-repl/"
+    },
+    {
+      "text": "Unlock IPython’s Magical Toolbox for Your Coding Journey",
+      "url": "https://realpython.com/ipython-interactive-python-shell/"
+    },
+    {
+      "text": "Discover bpython: A Python REPL With IDE-Like Features",
+      "url": "https://realpython.com/bpython-alternative-python-repl/"
+    },
+    {
+      "text": "Boost Your Coding Productivity With Ptpython",
+      "url": "https://realpython.com/ptpython-shell/"
+    },
+    {
+      "text": "guide to the standard REPL",
+      "url": "https://realpython.com/python-repl/#using-an-alternative-repl"
+    },
+    {
+      "text": "terminal",
+      "url": "https://realpython.com/terminal-commands/"
+    },
+    {
+      "text": "Python 3.13 Preview: A Modern REPL",
+      "url": "https://realpython.com/python313-repl/"
+    },
+    {
+      "text": "list comprehension",
+      "url": "https://realpython.com/list-comprehension-python/"
+    },
+    {
+      "text": "random numbers",
+      "url": "https://realpython.com/python-random/"
+    },
+    {
+      "text": "act as dice",
+      "url": "https://realpython.com/python-dice-roll/"
+    },
+    {
+      "text": "Python 3.13 Preview: A Modern REPL",
+      "url": "https://realpython.com/python313-repl/"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "less technical and more precise",
+      "url": "https://realpython.com/python310-new-features/#better-error-messages"
+    },
+    {
+      "text": "more information in tracebacks",
+      "url": "https://realpython.com/python311-new-features/#more-informative-error-tracebacks"
+    },
+    {
+      "text": "import errors",
+      "url": "https://realpython.com/python312-new-features/#improved-error-messages"
+    },
+    {
+      "text": "turn them off",
+      "url": "https://docs.python.org/3.13/using/cmdline.html#using-on-controlling-color"
+    },
+    {
+      "text": "earlier",
+      "url": "#an-improved-interactive-interpreter-repl"
+    },
+    {
+      "text": "randint()",
+      "url": "https://docs.python.org/3/library/random.html#random.randint"
+    },
+    {
+      "text": "serializing data",
+      "url": "https://realpython.com/python-serialize-data/"
+    },
+    {
+      "text": "CSV",
+      "url": "https://realpython.com/python-csv/"
+    },
+    {
+      "text": "JSON",
+      "url": "https://realpython.com/python-json/"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "Python 3.13 Preview: Free Threading and a JIT Compiler",
+      "url": "https://realpython.com/python313-free-threading-jit/"
+    },
+    {
+      "text": "NumPy",
+      "url": "https://realpython.com/numpy-tutorial/"
+    },
+    {
+      "text": "bindings to C libraries",
+      "url": "https://realpython.com/python-bindings-overview/"
+    },
+    {
+      "text": "Get Your Hands on the New Features",
+      "url": "https://realpython.com/python313-free-threading-jit/#get-your-hands-on-the-new-features"
+    },
+    {
+      "text": "Measure the Performance Improvements of Python 3.13",
+      "url": "https://realpython.com/python313-free-threading-jit/#measure-the-performance-improvements-of-python-313"
+    },
+    {
+      "text": "What is the Python Global Interpreter Lock?",
+      "url": "https://realpython.com/python-gil/"
+    },
+    {
+      "text": "Bypassing the GIL for Parallel Processing in Python",
+      "url": "https://realpython.com/python-parallel-processing/#pythons-gil-prevents-threads-from-running-in-parallel"
+    },
+    {
+      "text": "Build Python With Free Threading and JIT Support",
+      "url": "https://realpython.com/python313-free-threading-jit/#build-python-with-free-threading-and-jit-support"
+    },
+    {
+      "text": "copy-and-patch",
+      "url": "https://en.wikipedia.org/wiki/Copy-and-patch"
+    },
+    {
+      "text": "Fibonacci",
+      "url": "https://realpython.com/fibonacci-sequence-python/"
+    },
+    {
+      "text": "future Python releases",
+      "url": "https://realpython.com/python315-jit-compiler/"
+    },
+    {
+      "text": "Python 3.13 Preview: Free Threading and a JIT Compiler",
+      "url": "https://realpython.com/python313-free-threading-jit/#get-your-hands-on-the-new-features"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "type hints",
+      "url": "https://realpython.com/python-type-checking/"
+    },
+    {
+      "text": "mypy",
+      "url": "https://mypy.readthedocs.io/"
+    },
+    {
+      "text": "Pyright",
+      "url": "https://github.com/microsoft/pyright"
+    },
+    {
+      "text": "PEP 484",
+      "url": "https://peps.python.org/pep-0484"
+    },
+    {
+      "text": "PEP 729",
+      "url": "https://peps.python.org/pep-0729/"
+    },
+    {
+      "text": "Typing Council",
+      "url": "https://github.com/python/typing-council"
+    },
+    {
+      "text": "typing specification",
+      "url": "https://typing.readthedocs.io/en/latest/spec/"
+    },
+    {
+      "text": "Python’s Steering Council",
+      "url": "https://realpython.com/python38-new-features/#the-python-steering-council"
+    },
+    {
+      "text": "typing-related PEPs",
+      "url": "https://peps.python.org/topic/typing/"
+    },
+    {
+      "text": "Rebecca Chen",
+      "url": "https://github.com/rchen152"
+    },
+    {
+      "text": "Shantanu Jain",
+      "url": "https://github.com/hauntsaninja"
+    },
+    {
+      "text": "Carl Meyer",
+      "url": "https://github.com/carljm"
+    },
+    {
+      "text": "Eric Traut",
+      "url": "https://github.com/erictraut"
+    },
+    {
+      "text": "Jelle Zijlstra",
+      "url": "https://github.com/JelleZijlstra"
+    },
+    {
+      "text": "PEP 696",
+      "url": "https://peps.python.org/pep-0696/"
+    },
+    {
+      "text": "PEP 742",
+      "url": "https://peps.python.org/pep-0742/"
+    },
+    {
+      "text": "PEP 705",
+      "url": "https://peps.python.org/pep-0705/"
+    },
+    {
+      "text": "PEP 702",
+      "url": "https://peps.python.org/pep-0702/"
+    },
+    {
+      "text": "typing_extensions",
+      "url": "https://pypi.org/project/typing-extensions/"
+    },
+    {
+      "text": "Pyright",
+      "url": "https://microsoft.github.io/pyright/"
+    },
+    {
+      "text": "Pyright",
+      "url": "https://pypi.org/project/pyright/"
+    },
+    {
+      "text": "virtual environment",
+      "url": "https://realpython.com/python-virtual-environments-a-primer/"
+    },
+    {
+      "text": "pip",
+      "url": "https://realpython.com/what-is-pip/"
+    },
+    {
+      "text": "Visual Studio Code",
+      "url": "https://realpython.com/advanced-visual-studio-code-python/"
+    },
+    {
+      "text": "Pylance",
+      "url": "https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance"
+    },
+    {
+      "text": "new syntax for type generics",
+      "url": "https://realpython.com/python312-typing/"
+    },
+    {
+      "text": "list",
+      "url": "https://realpython.com/python-list/"
+    },
+    {
+      "text": "queue",
+      "url": "https://realpython.com/queue-in-python/"
+    },
+    {
+      "text": "deque",
+      "url": "https://realpython.com/python-deque/"
+    },
+    {
+      "text": "typing specification",
+      "url": "https://typing.readthedocs.io/en/latest/spec/generics.html#type-parameter-defaults"
+    },
+    {
+      "text": "Python 3.10",
+      "url": "https://realpython.com/python310-new-features/#type-unions-aliases-and-guards"
+    },
+    {
+      "text": "type guards",
+      "url": "https://typing.readthedocs.io/en/latest/spec/narrowing.html#typeguard"
+    },
+    {
+      "text": "typing specification",
+      "url": "https://typing.readthedocs.io/en/latest/spec/narrowing.html"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "json.tool",
+      "url": "https://realpython.com/python-json/#validate-json-in-the-terminal"
+    },
+    {
+      "text": "http.server",
+      "url": "https://realpython.com/python-http-server/"
+    },
+    {
+      "text": "JSON",
+      "url": "https://realpython.com/python-json/"
+    },
+    {
+      "text": "immutable objects",
+      "url": "https://realpython.com/python-mutable-vs-immutable-types/"
+    },
+    {
+      "text": "cache",
+      "url": "https://realpython.com/lru-cache-python/"
+    },
+    {
+      "text": "tuples",
+      "url": "https://realpython.com/python-tuple/"
+    },
+    {
+      "text": "frozen sets",
+      "url": "https://realpython.com/python-sets/#frozen-sets"
+    },
+    {
+      "text": "frozen data classes",
+      "url": "https://realpython.com/python-data-classes/#immutable-data-classes"
+    },
+    {
+      "text": "named tuple",
+      "url": "https://realpython.com/python-namedtuple/"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "pathlib",
+      "url": "https://realpython.com/python-pathlib/"
+    },
+    {
+      "text": "list files and directories",
+      "url": "https://realpython.com/get-all-files-in-directory-python/#using-a-python-glob-pattern-for-conditional-listing"
+    },
+    {
+      "text": "glob patterns",
+      "url": "https://en.wikipedia.org/wiki/Glob_(programming)"
+    },
+    {
+      "text": "glob",
+      "url": "https://docs.python.org/3/library/glob.html"
+    },
+    {
+      "text": "glob.translate()",
+      "url": "https://docs.python.org/3.13/library/glob.html#glob.translate"
+    },
+    {
+      "text": "Regular expressions",
+      "url": "https://realpython.com/regex-python/"
+    },
+    {
+      "text": "more powerful",
+      "url": "https://xkcd.com/208/"
+    },
+    {
+      "text": "more complex",
+      "url": "https://xkcd.com/1171/"
+    },
+    {
+      "text": "small performance boost",
+      "url": "https://github.com/python/cpython/pull/106703"
+    },
+    {
+      "text": "walked",
+      "url": "https://realpython.com/python312-new-features/#pathwalk-list-files-and-subdirectories"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "docstrings",
+      "url": "https://realpython.com/how-to-write-docstrings-in-python/"
+    },
+    {
+      "text": "help system",
+      "url": "https://realpython.com/python-repl/#getting-help-and-introspecting-code-in-the-repl"
+    },
+    {
+      "text": "Python changelog",
+      "url": "https://docs.python.org/3.13/whatsnew/3.13.html"
+    },
+    {
+      "text": "Argparse",
+      "url": "https://realpython.com/command-line-interfaces-python-argparse/"
+    },
+    {
+      "text": "deprecating",
+      "url": "https://github.com/python/cpython/issues/83648"
+    },
+    {
+      "text": "more consistency",
+      "url": "https://peps.python.org/pep-0667/"
+    },
+    {
+      "text": "deprecated in Python 3.11",
+      "url": "https://realpython.com/python311-new-features/#dead-batteries"
+    },
+    {
+      "text": "removed",
+      "url": "https://peps.python.org/pep-0594/"
+    },
+    {
+      "text": "iOS",
+      "url": "https://peps.python.org/pep-0730/"
+    },
+    {
+      "text": "Android",
+      "url": "https://peps.python.org/pep-0738/"
+    },
+    {
+      "text": "tier 3",
+      "url": "https://peps.python.org/pep-0011/#tier-3"
+    },
+    {
+      "text": "annual release cycle",
+      "url": "https://realpython.com/python39-new-features/#when-is-the-next-version-of-python-coming"
+    },
+    {
+      "text": "revised",
+      "url": "https://www.python.org/dev/peps/pep-0602/"
+    },
+    {
+      "text": "incremental",
+      "url": "https://github.com/python/cpython/pull/116206"
+    },
+    {
+      "text": "some examples",
+      "url": "https://github.com/python/cpython/issues/124567"
+    },
+    {
+      "text": "taken out",
+      "url": "https://github.com/python/cpython/pull/124770"
+    },
+    {
+      "text": "April 2025",
+      "url": "https://peps.python.org/pep-0693/"
+    },
+    {
+      "text": "f-strings",
+      "url": "https://realpython.com/python-f-strings/"
+    },
+    {
+      "text": "walrus operator",
+      "url": "https://realpython.com/python-walrus-operator/"
+    },
+    {
+      "text": "match…case statement",
+      "url": "https://realpython.com/python310-new-features/#structural-pattern-matching"
+    },
+    {
+      "text": "October 2024",
+      "url": "https://peps.python.org/pep-0569/"
+    },
+    {
+      "text": "bugfix releases",
+      "url": "https://realpython.com/python-bugfix-version/"
+    },
+    {
+      "text": "Remove ads",
+      "url": "/account/join/"
+    },
+    {
+      "text": "Click here to download the free sample code",
+      "url": "https://realpython.com/bonus/python313-new-features-code/"
+    },
+    {
+      "text": "Python 3.13: Cool New Features for You to Try",
+      "url": "/quizzes/python313-new-features/"
+    },
+    {
+      "text": "What's New in Python 3.13",
+      "url": "/courses/new-features-python-313/"
+    },
+    {
+      "text": "» More about Geir Arne",
+      "url": "/team/gahjelle/"
+    },
+    {
+      "text": "Aldren",
+      "url": "/team/asantos/"
+    },
+    {
+      "text": "Brenda",
+      "url": "/team/bweleschuk/"
+    },
+    {
+      "text": "Bartosz",
+      "url": "/team/bzaczynski/"
+    },
+    {
+      "text": "Level Up Your Python Skills »",
+      "url": "/account/join/?utm_source=rp_article_footer&utm_content=python313-new-features"
+    },
+    {
+      "text": "Level Up Your Python Skills »",
+      "url": "/account/join/?utm_source=rp_article_footer&utm_content=python313-new-features"
+    },
+    {
+      "text": "LinkedIn",
+      "url": "https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F"
+    },
+    {
+      "text": "Twitter",
+      "url": "https://twitter.com/intent/tweet/?text=Interesting%20Python%20article%20on%20%40realpython%3A%20Python%203.13%3A%20Cool%20New%20Features%20for%20You%20to%20Try&url=https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F"
+    },
+    {
+      "text": "Bluesky",
+      "url": "https://bsky.app/intent/compose?text=Interesting%20Python%20article%20on%20%40realpython.com%3A%20Python%203.13%3A%20Cool%20New%20Features%20for%20You%20to%20Try%20https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F"
+    },
+    {
+      "text": "Facebook",
+      "url": "https://facebook.com/sharer/sharer.php?u=https%3A%2F%2Frealpython.com%2Fpython313-new-features%2F"
+    },
+    {
+      "text": "Email",
+      "url": "mailto:?subject=Python%20article%20for%20you&body=Python%203.13%3A%20Cool%20New%20Features%20for%20You%20to%20Try%20on%20Real%20Python%0A%0Ahttps%3A%2F%2Frealpython.com%2Fpython313-new-features%2F%0A"
+    },
+    {
+      "text": "Get tips for asking good questions",
+      "url": "https://realpython.com/python-beginner-tips/#tip-9-ask-good-questions"
+    },
+    {
+      "text": "get answers to common questions in our support portal",
+      "url": "https://support.realpython.com"
+    },
+    {
+      "text": "Real Python Community Chat",
+      "url": "/community/"
+    },
+    {
+      "text": "“Office Hours” Live Q&A Session",
+      "url": "/office-hours/"
+    },
+    {
+      "text": "intermediate",
+      "url": "/tutorials/intermediate/"
+    },
+    {
+      "text": "python",
+      "url": "/tutorials/python/"
+    },
+    {
+      "text": "What's New in Python 3.13",
+      "url": "/courses/new-features-python-313/?utm_source=realpython&utm_medium=web&utm_campaign=related-course&utm_content=python313-new-features"
+    },
+    {
+      "text": "Continue »",
+      "url": "/account/signup/?intent=continue_reading&utm_source=rp&utm_medium=web&utm_campaign=rwn&utm_content=v1&next=%2Fpython313-new-features%2F"
+    },
+    {
+      "text": "Sign-In",
+      "url": "/account/login/?intent=continue_reading&next=/python313-new-features/"
+    },
+    {
+      "text": "Start Here",
+      "url": "/start-here/"
+    },
+    {
+      "text": "Learning Resources",
+      "url": "/search"
+    },
+    {
+      "text": "Code Mentor",
+      "url": "/mentor/"
+    },
+    {
+      "text": "Python Reference",
+      "url": "/ref/"
+    },
+    {
+      "text": "Python Cheat Sheet",
+      "url": "/cheatsheets/python/"
+    },
+    {
+      "text": "Support Center",
+      "url": "https://support.realpython.com/"
+    },
+    {
+      "text": "Learning Paths",
+      "url": "/learning-paths/"
+    },
+    {
+      "text": "Quizzes & Exercises",
+      "url": "/quizzes/"
+    },
+    {
+      "text": "Browse Topics",
+      "url": "/tutorials/all/"
+    },
+    {
+      "text": "Live Courses",
+      "url": "/live/"
+    },
+    {
+      "text": "Books",
+      "url": "/books/"
+    },
+    {
+      "text": "Podcast",
+      "url": "/podcasts/rpp/"
+    },
+    {
+      "text": "Newsletter",
+      "url": "/newsletter/"
+    },
+    {
+      "text": "Community Chat",
+      "url": "/community/"
+    },
+    {
+      "text": "Office Hours",
+      "url": "/office-hours/"
+    },
+    {
+      "text": "Learner Stories",
+      "url": "/learner-stories/"
+    },
+    {
+      "text": "Plans & Pricing",
+      "url": "/account/join/"
+    },
+    {
+      "text": "Team Plans",
+      "url": "/account/join-team/"
+    },
+    {
+      "text": "For Business",
+      "url": "/account/join-team/inquiry/"
+    },
+    {
+      "text": "For Schools",
+      "url": "/account/join-team/education-inquiry/"
+    },
+    {
+      "text": "Reviews",
+      "url": "/learner-stories/"
+    },
+    {
+      "text": "About Us",
+      "url": "/about/"
+    },
+    {
+      "text": "Team",
+      "url": "/team/"
+    },
+    {
+      "text": "Mission & Values",
+      "url": "/mission/"
+    },
+    {
+      "text": "Editorial Guidelines",
+      "url": "/editorial-guidelines/"
+    },
+    {
+      "text": "Sponsorships",
+      "url": "/sponsorships/"
+    },
+    {
+      "text": "Careers",
+      "url": "https://realpython.workable.com"
+    },
+    {
+      "text": "Press Kit",
+      "url": "/media-kit/"
+    },
+    {
+      "text": "Merch",
+      "url": "/merch"
+    },
+    {
+      "text": "Privacy Policy",
+      "url": "/privacy-policy/"
+    },
+    {
+      "text": "Terms of Use",
+      "url": "/terms/"
+    },
+    {
+      "text": "Security",
+      "url": "/security/"
+    },
+    {
+      "text": "Contact",
+      "url": "/contact/"
+    }
+  ],
+  "error": null,
+  "status_code": 200
+}

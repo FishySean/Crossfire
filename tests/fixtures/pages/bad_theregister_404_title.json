@@ -1,0 +1,18 @@
+{
+  "url": "https://www.theregister.com/2024/10/07/python_313/",
+  "ok": true,
+  "title": "404 - The Register",
+  "markdown": "# Sorry, that page could not be found\n\nIt may have been retired, or you may have mistyped the address.\n\n[The Register](https://www.theregister.com) [Search](https://www.theregister.com/search/)",
+  "links": [
+    {
+      "text": "The Register",
+      "url": "https://www.theregister.com"
+    },
+    {
+      "text": "Search",
+      "url": "https://www.theregister.com/search/"
+    }
+  ],
+  "error": null,
+  "status_code": 200
+}

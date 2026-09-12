@@ -1,5 +1,9 @@
 const el = (id) => document.getElementById(id);
 const SVG_NS = "http://www.w3.org/2000/svg";
+const RELATION_CONTRADICT = "contradict";
+// Both claims are true but measure different things, so the numbers are not
+// comparable — drawn apart from real contradictions.
+const RELATION_SCOPE = "same_question_different_scope";
 
 const STRINGS = {
   en: {
@@ -30,7 +34,13 @@ const STRINGS = {
     sources: "Sources",
     sourceCount: (n) => `${n} sources`,
     conflicts: "Conflicts",
-    conflictCount: (n) => (n === 1 ? "1 conflict" : `${n} conflicts`),
+    relationCount: (n, m) =>
+      `${n} ${n === 1 ? "contradiction" : "contradictions"} / ${m} scope ${m === 1 ? "difference" : "differences"}`,
+    contradictGroup: "Contradictions",
+    scopeGroup: "Different scope",
+    legendContradict: "Contradiction — the two claims cannot both be true",
+    legendScope: "Different scope — both claims are true, but they measure different things and cannot be compared directly",
+    scopeWith: (id) => `different scope from ${id}`,
     verdict: "Verdict",
     claim: "Claim",
     evidence: "Evidence",
@@ -91,7 +101,12 @@ const STRINGS = {
     sources: "来源",
     sourceCount: (n) => `${n} 个来源`,
     conflicts: "冲突",
-    conflictCount: (n) => `${n} 处矛盾`,
+    relationCount: (n, m) => `${n} 个矛盾 / ${m} 个口径差异`,
+    contradictGroup: "真矛盾",
+    scopeGroup: "口径不同",
+    legendContradict: "矛盾 —— 两个说法不可能同时为真",
+    legendScope: "口径不同 —— 两个说法各自为真，但统计口径不同，不能直接比较",
+    scopeWith: (id) => `口径不同于 ${id}`,
     verdict: "结论",
     claim: "主张",
     evidence: "证据原文",
@@ -411,33 +426,47 @@ function renderSources(run) {
 function renderConflicts(run, cards) {
   const container = el("conflicts");
   container.innerHTML = "";
-  const pairs = (run.pairs || []).filter((p) => p.relation === "contradict");
-  const unresolved = (run.pairs || []).filter((p) => !p.relation).length;
-  el("conflict-count").textContent = t("conflictCount", pairs.length);
+  const all = run.pairs || [];
+  const contradictions = all.filter((p) => p.relation === RELATION_CONTRADICT);
+  const scoped = all.filter((p) => p.relation === RELATION_SCOPE);
+  const unresolved = all.filter((p) => !p.relation).length;
+  el("conflict-count").textContent = t("relationCount", contradictions.length, scoped.length);
+  renderLegend();
 
-  for (const { card } of cards.values()) card.classList.remove("conflicted");
+  for (const { card } of cards.values()) card.classList.remove("conflicted", "scoped");
 
-  if (!pairs.length) {
+  if (!contradictions.length) {
     const state = unresolved
       ? text("div", "empty-state partial", t("partialConflicts", unresolved))
       : text("div", "empty-state", t("noConflicts"));
     container.appendChild(state);
-    drawLinks([], cards);
-    return;
+  } else {
+    container.appendChild(conflictGroup(run, cards, contradictions, RELATION_CONTRADICT));
   }
+  if (scoped.length) {
+    container.appendChild(conflictGroup(run, cards, scoped, RELATION_SCOPE));
+  }
+
+  drawLinks([...contradictions, ...scoped], cards);
+}
+
+function conflictGroup(run, cards, pairs, relation) {
+  const scope = relation === RELATION_SCOPE;
+  const group = text("div", `conflict-group${scope ? " scope" : ""}`);
+  group.appendChild(text("div", "group-title", t(scope ? "scopeGroup" : "contradictGroup")));
 
   const claims = run.claims || [];
   pairs.forEach((pair, i) => {
-    const item = text("div", "conflict");
+    const item = text("div", `conflict${scope ? " scope" : ""}`);
     const aInfo = cards.get(pair.a);
     const bInfo = cards.get(pair.b);
-    if (aInfo) aInfo.card.classList.add("conflicted");
-    if (bInfo) bInfo.card.classList.add("conflicted");
+    if (aInfo) aInfo.card.classList.add(scope ? "scoped" : "conflicted");
+    if (bInfo) bInfo.card.classList.add(scope ? "scoped" : "conflicted");
 
     const head = text("div", "conflict-pair");
-    head.appendChild(text("span", null, `C${i + 1}`));
+    head.appendChild(text("span", null, `${scope ? "D" : "C"}${i + 1}`));
     head.appendChild(text("span", null, labelFor(pair.a, aInfo)));
-    head.appendChild(text("span", "vs", "VS"));
+    head.appendChild(text("span", "vs", scope ? "≠" : "VS"));
     head.appendChild(text("span", null, labelFor(pair.b, bInfo)));
     item.appendChild(head);
 
@@ -454,21 +483,35 @@ function renderConflicts(run, cards) {
 
     item.onmouseenter = () => spotlight([pair.a, pair.b], cards);
     item.onmouseleave = () => spotlight(null, cards);
-    container.appendChild(item);
+    group.appendChild(item);
 
-    markConflictPartner(aInfo, bInfo);
-    markConflictPartner(bInfo, aInfo);
+    markPartner(aInfo, bInfo, relation);
+    markPartner(bInfo, aInfo, relation);
   });
-
-  drawLinks(pairs, cards);
+  return group;
 }
 
-function markConflictPartner(target, partner) {
+function renderLegend() {
+  const legend = el("conflict-legend");
+  legend.innerHTML = "";
+  for (const [key, className] of [
+    ["legendContradict", "contradict"],
+    ["legendScope", "scope"],
+  ]) {
+    const row = text("span", `legend-item ${className}`);
+    row.appendChild(text("span", "legend-line"));
+    row.appendChild(text("span", null, t(key)));
+    legend.appendChild(row);
+  }
+}
+
+function markPartner(target, partner, relation) {
   if (!target || !partner) return;
   const tags = target.card.querySelector(".tags");
-  const label = t("conflictWith", `S${partner.index + 1}`);
+  const scope = relation === RELATION_SCOPE;
+  const label = t(scope ? "scopeWith" : "conflictWith", `S${partner.index + 1}`);
   if (!tags || [...tags.children].some((node) => node.textContent === label)) return;
-  tags.appendChild(text("span", "tag conflict-flag", label));
+  tags.appendChild(text("span", `tag ${scope ? "scope-flag" : "conflict-flag"}`, label));
 }
 
 function labelFor(url, info) {
@@ -486,6 +529,7 @@ function drawLinks(pairs, cards) {
   svg.innerHTML = "";
   const wrap = svg.parentElement.getBoundingClientRect();
   for (const pair of pairs) {
+    const kind = pair.relation === RELATION_SCOPE ? "scope" : "contradict";
     const a = cards.get(pair.a);
     const b = cards.get(pair.b);
     if (!a || !b) continue;
@@ -520,6 +564,7 @@ function drawLinks(pairs, cards) {
     }
 
     const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("class", `link-${kind}`);
     path.setAttribute("d", `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`);
     svg.appendChild(path);
     for (const [cx, cy] of [
@@ -527,6 +572,7 @@ function drawLinks(pairs, cards) {
       [x2, y2],
     ]) {
       const dot = document.createElementNS(SVG_NS, "circle");
+      dot.setAttribute("class", `link-${kind}`);
       dot.setAttribute("cx", String(cx));
       dot.setAttribute("cy", String(cy));
       dot.setAttribute("r", "3");
@@ -809,7 +855,7 @@ function onStart(event) {
   live.totalPairs = (live.totalSources * (live.totalSources - 1)) / 2;
   el("question").textContent = live.question || t("noQuestion");
   el("source-count").textContent = t("sourceCount", live.totalSources);
-  el("conflict-count").textContent = t("conflictCount", 0);
+  el("conflict-count").textContent = t("relationCount", 0, 0);
   buildSkeletons(live.totalSources);
   setStage("stageFetching", 0, live.totalSources);
   updateProgress();
@@ -823,7 +869,18 @@ function buildSkeletons(count) {
     const card = text("div", "card");
     card.dataset.index = String(index);
     container.appendChild(card);
-    const slot = { card, index, url: null, tier: null, claim: null, claimed: false, ok: null, chars: 0 };
+    const slot = {
+      card,
+      index,
+      url: null,
+      tier: null,
+      claim: null,
+      claimed: false,
+      ok: null,
+      chars: 0,
+      fetchCounted: false,
+      claimCounted: false,
+    };
     live.slots.push(slot);
     paintSlot(slot);
   }
@@ -912,10 +969,20 @@ function onFetchDone(event) {
   slot.chars = event.chars || 0;
   slot.card.dataset.url = event.url;
   live.cards.set(event.url, { card: slot.card, index: slot.index });
+  // A source that failed to fetch never produces a claim, so it is already in
+  // its final state.
+  if (!slot.ok) slot.claimed = true;
   paintSlot(slot);
   flash(slot.card);
 
-  live.fetched += 1;
+  if (!slot.fetchCounted) {
+    slot.fetchCounted = true;
+    live.fetched += 1;
+  }
+  if (!slot.ok && !slot.claimCounted) {
+    slot.claimCounted = true;
+    live.claimed += 1;
+  }
   setStage("stageFetching", live.fetched, live.totalSources);
   updateProgress();
 }
@@ -935,7 +1002,10 @@ function onClaimDone(event) {
   paintSlot(slot);
   flash(slot.card);
 
-  live.claimed += 1;
+  if (!slot.claimCounted) {
+    slot.claimCounted = true;
+    live.claimed += 1;
+  }
   setStage("stageExtracting", live.claimed, live.totalSources);
   updateProgress();
 }
@@ -970,8 +1040,6 @@ function orderedPairs() {
 }
 
 function renderLiveConflicts() {
-  const contradictions = orderedPairs().filter((pair) => pair.relation === "contradict");
-  el("conflict-count").textContent = t("conflictCount", contradictions.length);
   renderConflicts({ pairs: orderedPairs(), claims: claimRows() }, live.cards);
 }
 
@@ -1046,7 +1114,12 @@ window.addEventListener("resize", () => {
   if (!currentRun) return;
   const cards = new Map();
   document.querySelectorAll(".card").forEach((card, index) => cards.set(card.dataset.url, { card, index }));
-  drawLinks((currentRun.pairs || []).filter((p) => p.relation === "contradict"), cards);
+  drawLinks(
+    (currentRun.pairs || []).filter(
+      (p) => p.relation === RELATION_CONTRADICT || p.relation === RELATION_SCOPE,
+    ),
+    cards,
+  );
 });
 
 for (const button of document.querySelectorAll("#lang-toggle button")) {

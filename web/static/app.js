@@ -165,6 +165,7 @@ function setLang(next) {
   applyStaticStrings();
   if (currentError) showError(currentError.key, ...currentError.args);
   if (currentRun) render(currentRun);
+  repaintLive();
 }
 
 function domainOf(url) {
@@ -344,7 +345,7 @@ function sourceRows(run) {
       sourceType: claim.source_type || null,
       publishedDate: claim.published_date || null,
       confidence: claim.confidence,
-      fetchError: page.ok === false ? page.error : null,
+      fetchError: page.ok === false ? page.error || "" : null,
     };
   });
 }
@@ -376,6 +377,7 @@ function renderSources(run) {
     const tier = tierClass(row.tier);
     tags.appendChild(text("span", `tag ${tier}`, row.tier || "unknown"));
     if (row.sourceType) tags.appendChild(text("span", "tag plain", row.sourceType));
+    if (row.fetchError !== null) tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
     card.appendChild(tags);
 
     const claimNode = text("div", row.claim ? "claim" : "claim empty", row.claim || t("noClaim"));
@@ -632,6 +634,7 @@ const live = {
   fetched: 0,
   claimed: 0,
   judged: false,
+  judging: false,
   question: "",
   errors: [],
   stage: null,
@@ -709,6 +712,7 @@ function resetLive() {
   live.fetched = 0;
   live.claimed = 0;
   live.judged = false;
+  live.judging = false;
   live.question = "";
   live.errors = [];
   live.stage = null;
@@ -816,18 +820,57 @@ function buildSkeletons(count) {
   container.innerHTML = "";
   live.slots = [];
   for (let index = 0; index < count; index += 1) {
-    const card = text("div", "card card-skeleton");
+    const card = text("div", "card");
     card.dataset.index = String(index);
+    container.appendChild(card);
+    const slot = { card, index, url: null, tier: null, claim: null, claimed: false, ok: null, chars: 0 };
+    live.slots.push(slot);
+    paintSlot(slot);
+  }
+}
 
-    const head = text("div", "card-head");
-    head.appendChild(text("div", "domain", "—"));
-    head.appendChild(text("span", "card-index", `S${index + 1}`));
-    card.appendChild(head);
+// One place that turns a slot's current state into DOM, so every stage of the
+// run (and a mid-run language switch) renders from the same state.
+function paintSlot(slot) {
+  const card = slot.card;
+  card.innerHTML = "";
+  card.className = "card";
+  if (!slot.url) card.classList.add("card-skeleton");
+  else card.classList.add(slot.claimed ? "card-done" : "card-fetched");
+  if (slot.ok === false) card.classList.add("card-failed");
 
-    const tags = text("div", "tags");
+  const head = text("div", "card-head");
+  const domain = text("div", "domain");
+  if (slot.url) {
+    const link = document.createElement("a");
+    link.href = slot.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = domainOf(slot.url);
+    domain.appendChild(link);
+  } else {
+    domain.textContent = "—";
+  }
+  head.appendChild(domain);
+  head.appendChild(text("span", "card-index", `S${slot.index + 1}`));
+  card.appendChild(head);
+
+  const tags = text("div", "tags");
+  if (!slot.url) {
     tags.appendChild(text("span", "tag unknown", t("pendingSource")));
-    card.appendChild(tags);
+  } else if (slot.claimed) {
+    tags.appendChild(text("span", `tag ${tierClass(slot.tier)}`, slot.tier || "unknown"));
+  } else if (slot.ok !== false) {
+    tags.appendChild(text("span", "tag plain", t("fetchedChars", slot.chars)));
+  }
+  if (slot.ok === false) tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
+  card.appendChild(tags);
 
+  if (slot.claimed) {
+    const block = labeled(t("claim"), text("div", slot.claim ? "claim" : "claim empty", slot.claim || t("noClaim")));
+    block.className = "claim-block";
+    card.appendChild(block);
+  } else {
     const body = text("div", "skeleton-body");
     for (const width of ["92%", "78%", "60%"]) {
       const bar = text("div", "skeleton-bar");
@@ -835,9 +878,21 @@ function buildSkeletons(count) {
       body.appendChild(bar);
     }
     card.appendChild(body);
-    container.appendChild(card);
-    live.slots.push({ card, index, url: null, tier: null, claim: null, ok: null, chars: 0 });
   }
+}
+
+// A language switch during a run has to repaint everything already on screen.
+function repaintLive() {
+  if (!live.active) return;
+  el("question").textContent = live.question || t("noQuestion");
+  el("source-count").textContent = t("sourceCount", live.totalSources);
+  for (const slot of live.slots) paintSlot(slot);
+  if (live.pairs.size || !el("pair-progress").classList.contains("hidden")) {
+    el("pair-progress").textContent = t("pairProgress", live.pairs.size, live.totalPairs);
+  }
+  renderLiveConflicts();
+  if (live.errors.length) onStepErrorRender();
+  if (live.judging) onJudgeStart();
 }
 
 function slotAt(index) {
@@ -857,25 +912,7 @@ function onFetchDone(event) {
   slot.chars = event.chars || 0;
   slot.card.dataset.url = event.url;
   live.cards.set(event.url, { card: slot.card, index: slot.index });
-
-  const domain = slot.card.querySelector(".domain");
-  domain.textContent = "";
-  const link = document.createElement("a");
-  link.href = event.url;
-  link.target = "_blank";
-  link.rel = "noreferrer";
-  link.textContent = domainOf(event.url);
-  domain.appendChild(link);
-
-  const tags = slot.card.querySelector(".tags");
-  tags.innerHTML = "";
-  tags.appendChild(
-    text("span", slot.ok ? "tag plain" : "tag conflict-flag", slot.ok ? t("fetchedChars", slot.chars) : t("fetchFailed")),
-  );
-
-  slot.card.classList.remove("card-skeleton");
-  slot.card.classList.add("card-fetched");
-  if (!slot.ok) slot.card.classList.add("card-failed");
+  paintSlot(slot);
   flash(slot.card);
 
   live.fetched += 1;
@@ -894,21 +931,8 @@ function onClaimDone(event) {
     live.cards.set(event.url, { card: slot.card, index: slot.index });
   }
 
-  const tags = slot.card.querySelector(".tags");
-  tags.innerHTML = "";
-  tags.appendChild(text("span", `tag ${tierClass(slot.tier)}`, slot.tier || "unknown"));
-  if (slot.ok === false) tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
-
-  const body = slot.card.querySelector(".skeleton-body");
-  if (body) body.remove();
-  const existing = slot.card.querySelector(".claim-block");
-  if (existing) existing.remove();
-  const block = labeled(t("claim"), text("div", slot.claim ? "claim" : "claim empty", slot.claim || t("noClaim")));
-  block.className = "claim-block";
-  slot.card.appendChild(block);
-
-  slot.card.classList.remove("card-skeleton");
-  slot.card.classList.add("card-done");
+  slot.claimed = true;
+  paintSlot(slot);
   flash(slot.card);
 
   live.claimed += 1;
@@ -956,6 +980,7 @@ function claimRows() {
 }
 
 function onJudgeStart() {
+  live.judging = true;
   setStage("stageJudging");
   const container = el("judgment");
   container.innerHTML = "";
@@ -964,6 +989,7 @@ function onJudgeStart() {
 
 function onDone(event) {
   live.judged = true;
+  live.judging = false;
   updateProgress();
   setStage("stageDone");
   stopLive();
@@ -972,7 +998,7 @@ function onDone(event) {
     elapsed_seconds: event.elapsed,
     run_file: event.run_file,
     sources: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, tier: s.tier })),
-    pages: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, ok: s.ok !== false })),
+    pages: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, ok: s.ok !== false, error: "" })),
     claims: claimRows(),
     pairs: orderedPairs(),
     judgment: event.judgment || null,
@@ -984,6 +1010,10 @@ function onDone(event) {
 
 function onStepError(event) {
   live.errors.push({ step: event.step, detail: event.detail });
+  onStepErrorRender();
+}
+
+function onStepErrorRender() {
   renderFailures({ failures: live.errors.map((e) => ({ stage: e.step, error: e.detail })) });
 }
 

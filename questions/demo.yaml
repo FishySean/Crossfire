@@ -1,3 +1,4 @@
+# 矛盾类型：时间差型（旧文章仍称 3.13 为最新版）
 - id: python-latest-version
   question: Python 目前的最新稳定版本是哪一个？
   sources:
@@ -10,6 +11,13 @@
     - url: https://www.w3schools.com/python/python_intro.asp
       tier: aggregator
 
+# 反例，不要用于演示。
+# 实测 7 个来源、21 个配对全部 agree，置信度 0.99，没有任何可指的分歧。
+# 原因在 extract 而不在 pair：有争议的话题会让模型产出自我对冲的主张，
+# 例如「按 IAU 定义有 8 颗，但部分科学家主张超过 150 颗」。
+# 这种主张自己内部就同时包含了两种立场，因此跟任何主张都不矛盾——
+# 分歧被压进了单条主张内部，而不是存在于来源之间。
+# 留在库里是为了在 slides 里当反例讲。
 - id: solar-system-planet-count
   question: 太阳系有几颗行星？
   sources:
@@ -17,7 +25,72 @@
       tier: primary
     - url: https://science.nasa.gov/dwarf-planets/pluto/
       tier: primary
-    - url: https://www.space.com/how-many-planets-in-the-solar-system
+    - url: https://www.scientificamerican.com/article/how-many-planets-are-in-the-solar-system/
+      tier: news
+    - url: https://www.nbcnews.com/science/space/pluto-planet-debate-rages-rcna8848
+      tier: news
+    - url: https://earthsky.org/human-world/pluto-dwarf-planet-august-24-2006/
       tier: news
     - url: https://en.wikipedia.org/wiki/Planet
+      tier: aggregator
+    - url: https://www.enchantedlearning.com/subjects/astronomy/planets/
+      tier: aggregator
+
+# 矛盾类型：时间差型（2024 年的文章称 v22 为 Active LTS，现已是 v24）
+- id: nodejs-lts-version
+  question: Node.js 目前处于 Active LTS 的版本是哪一个？
+  sources:
+    - url: https://nodejs.org/en/about/previous-releases
+      tier: primary
+    - url: https://github.com/nodejs/release
+      tier: primary
+    - url: https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/
+      tier: news
+    - url: https://github.com/nodejs/node/releases/tag/v22.11.0
+      tier: news
+    - url: https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html
+      tier: news
+    - url: https://endoflife.date/nodejs
+      tier: aggregator
+    - url: https://www.w3schools.com/nodejs/nodejs_intro.asp
+      tier: aggregator
+    - url: https://www.geeksforgeeks.org/node-js/node-js-versions/
+      tier: aggregator
+
+# 矛盾类型：定义口径型（东京都 1425 万 vs 东京都市圈 3700 万）
+- id: tokyo-population
+  question: 东京的人口是多少？
+  sources:
+    - url: https://www.toukei.metro.tokyo.jp/jsuikei/js-index.htm
+      tier: primary
+    - url: https://www.metro.tokyo.lg.jp/information/press/2026/05/2026052914
+      tier: primary
+    - url: https://asia.nikkei.com/business/transportation/railway-development-drives-tokyo-s-growth-as-world-s-largest-metro-area
+      tier: news
+    - url: https://en.wikipedia.org/wiki/Demographics_of_Tokyo
+      tier: aggregator
+    - url: https://en.wikipedia.org/wiki/Greater_Tokyo_area
+      tier: aggregator
+    - url: https://www.citypopulation.de/en/japan/tokyo/
+      tier: aggregator
+    - url: https://www.storyfactory.org.au/story/tokyo-worlds-largest-city-by-joshua/
+      tier: aggregator
+
+# 矛盾类型：二手层抄错型（官方 8848.86 米，聚合站仍沿用 1954 年的 8848 米）
+- id: everest-height
+  question: 珠穆朗玛峰的官方高度是多少米？
+  sources:
+    - url: https://www.cma.gov.cn/en2014/news/News/202012/t20201209_568132.html
+      tier: primary
+    - url: https://www.nepjol.info/index.php/NJG/article/view/39479
+      tier: primary
+    - url: https://www.bbc.co.uk/news/world-asia-55218443
+      tier: news
+    - url: https://www.thehindu.com/news/international/nepal-china-announce-revised-height-of-mount-everest-as-884886-metres/article61938713.ece
+      tier: news
+    - url: https://en.wikipedia.org/wiki/Mount_Everest
+      tier: aggregator
+    - url: https://simple.wikipedia.org/wiki/Mount_Everest
+      tier: aggregator
+    - url: https://www.worldatlas.com/mountains/mount-everest.html
       tier: aggregator

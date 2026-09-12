@@ -1,0 +1,3994 @@
+{
+  "url": "https://www.python.org/downloads/",
+  "ok": true,
+  "title": "Download Python | Python.org",
+  "markdown": "Notice: This page displays a fallback because interactive scripts did not run. Possible causes include disabled JavaScript or failure to load scripts or stylesheets.\n\n[Skip to content](#content)\n\n[▼ Close](#python-network)\n\n[Python](/)\n\n[PSF](https://www.python.org/psf/)\n\n[Docs](https://docs.python.org)\n\n[PyPI](https://pypi.org/)\n\n[Jobs](/jobs/)\n\n[Community](/community/)\n\n[▲ The Python Network](#top)\n\n[Donate](https://donate.python.org/)\n\n[≡ Menu](#site-map)\n\nSearch This Site\n\nGO\n\n[A A](#)\n\n[Smaller](javascript:;)\n\n[Larger](javascript:;)\n\n[Reset](javascript:;)\n\n[Socialize](#)\n\n[LinkedIn](https://www.linkedin.com/company/python-software-foundation/)\n\n[Mastodon](https://fosstodon.org/@ThePSF)\n\n[Chat on IRC](/community/irc/)\n\n[Twitter](https://twitter.com/ThePSF)\n\n[About](/about/)\n\n[Applications](/about/apps/)\n\n[Quotes](/about/quotes/)\n\n[Getting Started](/about/gettingstarted/)\n\n[Help](/about/help/)\n\n[Downloads](/downloads/)\n\n[All releases](/downloads/)\n\n[Source code](/downloads/source/)\n\n[Windows](/downloads/windows/)\n\n[macOS](/downloads/macos/)\n\n[Android](/downloads/android/)\n\n[iOS](/downloads/ios/)\n\n[Other Platforms](/download/other/)\n\n[License](https://docs.python.org/3/license.html)\n\n[Alternative Implementations](/download/alternatives)\n\n[Documentation](/doc/)\n\n[Docs](/doc/)\n\n[Audio/Visual Talks](/doc/av)\n\n[Beginner's Guide](https://wiki.python.org/moin/BeginnersGuide)\n\n[FAQ](https://docs.python.org/3/faq/)\n\n[Non-English Docs](https://translations.python.org/)\n\n[PEP Index](https://peps.python.org)\n\n[Python Books](https://wiki.python.org/moin/PythonBooks)\n\n[Python Essays](/doc/essays/)\n\n[Community](/community/)\n\n[Diversity](/community/diversity/)\n\n[Mailing Lists](/community/lists/)\n\n[IRC](/community/irc/)\n\n[Forums](/community/forums/)\n\n[PSF Annual Impact Report](/psf/annual-report/2024/)\n\n[Python Conferences](/community/workshops/)\n\n[Special Interest Groups](/community/sigs/)\n\n[Python Logo](/community/logos/)\n\n[Python Wiki](https://wiki.python.org/moin/)\n\n[Code of Conduct](/psf/conduct/)\n\n[Community Awards](/community/awards)\n\n[Get Involved](/psf/get-involved/)\n\n[Shared Stories](/psf/community-stories/)\n\n[Success Stories](/success-stories/)\n\n[Arts](/success-stories/category/arts/)\n\n[Business](/success-stories/category/business/)\n\n[Education](/success-stories/category/education/)\n\n[Engineering](/success-stories/category/engineering/)\n\n[Government](/success-stories/category/government/)\n\n[Scientific](/success-stories/category/scientific/)\n\n[Software Development](/success-stories/category/software-development/)\n\n[News](/blogs/)\n\n[Python News](/blogs/)\n\n[PSF Newsletter](/psf/newsletter/)\n\n[PSF News](https://pyfound.blogspot.com)\n\n[PyCon US News](https://pycon.blogspot.com/)\n\n[Python Insider](https://blog.python.org)\n\n[News from the Community](https://planetpython.org/)\n\n[Events](/events/)\n\n[Python Events](/events/python-events/)\n\n[User Group Events](/events/python-user-group/)\n\n[Python Events Archive](/events/python-events/past/)\n\n[User Group Events Archive](/events/python-user-group/past/)\n\n[Submit an Event](https://wiki.python.org/moin/PythonEventsCalendar#Submitting_an_Event)\n\nDownload the latest version for Android\n\nDownload the latest source release\n\n[Download Python 3.14.7](https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz)\n\nDownload the latest version for Windows\n\n[Download Python install manager](https://www.python.org/ftp/python/pymanager/python-manager-26.3.msix)\n\nOr get the standalone installer for [Python 3.14.7](https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe)\n\nDownload the latest version for iOS\n\nDownload the latest version for macOS\n\n[Download Python 3.14.7](https://www.python.org/ftp/python/3.14.7/python-3.14.7-macos11.pkg)\n\nDownload the latest version of Python\n\n[Download Python 3.14.7](/downloads/release/python-3147/)\n\nLooking for Python with a different OS? Python for\r\n [Windows](/downloads/windows/),\r\n [Linux/Unix](/downloads/source/),\r\n [macOS](/downloads/macos/),\r\n [Android](/downloads/android/),\r\n [iOS](/downloads/ios/),\r\n [other](/download/other/)\r\n\nWant to help test development versions of Python 3.15?\r\n [Pre-releases](/downloads/latest/prerelease/),\r\n [Docker images](https://gitlab.com/python-devs/ci-images) \r\n\nActive Python releases\n\n[For more information visit the Python Developer's Guide](https://devguide.python.org/versions/#versions).\n\nPython version\n Maintenance status\n\nFirst released\n End of support\n Release schedule\n\n3.15\n pre-release\n [Download](/downloads/latest/python3.15/)\n 2026-10-01 (planned)\n 2031-10\n [PEP 790](https://peps.python.org/pep-0790/)\n\n3.14\n bugfix\n [Download](/downloads/latest/python3.14/)\n 2025-10-07\n 2030-10\n [PEP 745](https://peps.python.org/pep-0745/)\n\n3.13\n bugfix\n [Download](/downloads/latest/python3.13/)\n 2024-10-07\n 2029-10\n [PEP 719](https://peps.python.org/pep-0719/)\n\n3.12\n security\n [Download](/downloads/latest/python3.12/)\n 2023-10-02\n 2028-10\n [PEP 693](https://peps.python.org/pep-0693/)\n\n3.11\n security\n [Download](/downloads/latest/python3.11/)\n 2022-10-24\n 2027-10\n [PEP 664](https://peps.python.org/pep-0664/)\n\n3.10\n security\n [Download](/downloads/latest/python3.10/)\n 2021-10-04\n 2026-10\n [PEP 619](https://peps.python.org/pep-0619/)\n\n3.9\n end-of-life, last release was [3.9.25](/downloads/release/python-3925/)\n [Download](/downloads/latest/python3.9/)\n 2020-10-05\n 2025-10-31\n [PEP 596](https://peps.python.org/pep-0596/)\n\nLooking for a specific release?\n\nPython releases by version number:\n\nRelease version\n Release date\n\nClick for more\n\n[Python 3.14.7](/downloads/release/python-3147/)\n Aug. 5, 2026\n [Download](/downloads/release/python-3147/)\n [Release notes](https://docs.python.org/release/3.14.7/whatsnew/changelog.html)\n\n[Python 3.14.6](/downloads/release/python-3146/)\n June 10, 2026\n [Download](/downloads/release/python-3146/)\n [Release notes](https://docs.python.org/release/3.14.6/whatsnew/changelog.html)\n\n[Python 3.14.5](/downloads/release/python-3145/)\n May 10, 2026\n [Download](/downloads/release/python-3145/)\n [Release notes](https://docs.python.org/release/3.14.5/whatsnew/changelog.html)\n\n[Python 3.14.4](/downloads/release/python-3144/)\n April 7, 2026\n [Download](/downloads/release/python-3144/)\n [Release notes](https://docs.python.org/release/3.14.4/whatsnew/changelog.html)\n\n[Python 3.14.3](/downloads/release/python-3143/)\n Feb. 3, 2026\n [Download](/downloads/release/python-3143/)\n [Release notes](https://docs.python.org/release/3.14.3/whatsnew/changelog.html)\n\n[Python 3.14.2](/downloads/release/python-3142/)\n Dec. 5, 2025\n [Download](/downloads/release/python-3142/)\n [Release notes](https://docs.python.org/release/3.14.2/whatsnew/changelog.html)\n\n[Python 3.14.1](/downloads/release/python-3141/)\n Dec. 2, 2025\n [Download](/downloads/release/python-3141/)\n [Release notes](https://docs.python.org/release/3.14.1/whatsnew/changelog.html)\n\n[Python 3.14.0](/downloads/release/python-3140/)\n Oct. 7, 2025\n [Download](/downloads/release/python-3140/)\n [Release notes](https://docs.python.org/3.14/whatsnew/3.14.html)\n\n[Python 3.13.15](/downloads/release/python-31315/)\n Aug. 5, 2026\n [Download](/downloads/release/python-31315/)\n [Release notes](https://docs.python.org/release/3.13.15/whatsnew/changelog.html)\n\n[Python 3.13.14](/downloads/release/python-31314/)\n June 10, 2026\n [Download](/downloads/release/python-31314/)\n [Release notes](https://docs.python.org/release/3.13.14/whatsnew/changelog.html)\n\n[Python 3.13.13](/downloads/release/python-31313/)\n April 7, 2026\n [Download](/downloads/release/python-31313/)\n [Release notes](https://docs.python.org/release/3.13.13/whatsnew/changelog.html)\n\n[Python 3.13.12](/downloads/release/python-31312/)\n Feb. 3, 2026\n [Download](/downloads/release/python-31312/)\n [Release notes](https://docs.python.org/release/3.13.12/whatsnew/changelog.html)\n\n[Python 3.13.11](/downloads/release/python-31311/)\n Dec. 5, 2025\n [Download](/downloads/release/python-31311/)\n [Release notes](https://docs.python.org/release/3.13.11/whatsnew/changelog.html)\n\n[Python 3.13.10](/downloads/release/python-31310/)\n Dec. 2, 2025\n [Download](/downloads/release/python-31310/)\n [Release notes](https://docs.python.org/release/3.13.10/whatsnew/changelog.html)\n\n[Python 3.13.9](/downloads/release/python-3139/)\n Oct. 14, 2025\n [Download](/downloads/release/python-3139/)\n [Release notes](https://docs.python.org/release/3.13.9/whatsnew/changelog.html#python-3-13-9)\n\n[Python 3.13.8](/downloads/release/python-3138/)\n Oct. 7, 2025\n [Download](/downloads/release/python-3138/)\n [Release notes](https://docs.python.org/release/3.13.8/whatsnew/changelog.html#python-3-13-8)\n\n[Python 3.13.7](/downloads/release/python-3137/)\n Aug. 14, 2025\n [Download](/downloads/release/python-3137/)\n [Release notes](https://docs.python.org/release/3.13.7/whatsnew/changelog.html)\n\n[Python 3.13.6](/downloads/release/python-3136/)\n Aug. 6, 2025\n [Download](/downloads/release/python-3136/)\n [Release notes](https://docs.python.org/release/3.13.6/whatsnew/changelog.html#python-3-13-6)\n\n[Python 3.13.5](/downloads/release/python-3135/)\n June 11, 2025\n [Download](/downloads/release/python-3135/)\n [Release notes](https://docs.python.org/release/3.13.5/whatsnew/changelog.html#python-3-13-5)\n\n[Python 3.13.4](/downloads/release/python-3134/)\n June 3, 2025\n [Download](/downloads/release/python-3134/)\n [Release notes](https://docs.python.org/release/3.13.4/whatsnew/changelog.html#python-3-13-4)\n\n[Python 3.13.3](/downloads/release/python-3133/)\n April 8, 2025\n [Download](/downloads/release/python-3133/)\n [Release notes](https://docs.python.org/release/3.13.3/whatsnew/changelog.html#python-3-13-3)\n\n[Python 3.13.2](/downloads/release/python-3132/)\n Feb. 4, 2025\n [Download](/downloads/release/python-3132/)\n [Release notes](https://docs.python.org/release/3.13.2/whatsnew/changelog.html#python-3-13-2)\n\n[Python 3.13.1](/downloads/release/python-3131/)\n Dec. 3, 2024\n [Download](/downloads/release/python-3131/)\n [Release notes](https://docs.python.org/release/3.13.1/whatsnew/changelog.html#python-3-13-1)\n\n[Python 3.13.0](/downloads/release/python-3130/)\n Oct. 7, 2024\n [Download](/downloads/release/python-3130/)\n [Release notes](https://docs.python.org/release/3.13.0/whatsnew/changelog.html#python-3-13-0)\n\n[Python 3.12.14](/downloads/release/python-31214/)\n Aug. 12, 2026\n [Download](/downloads/release/python-31214/)\n [Release notes](https://docs.python.org/release/3.12.14/whatsnew/changelog.html)\n\n[Python 3.12.13](/downloads/release/python-31213/)\n March 3, 2026\n [Download](/downloads/release/python-31213/)\n [Release notes](https://docs.python.org/release/3.12.13/whatsnew/changelog.html#python-3-12-13)\n\n[Python 3.12.12](/downloads/release/python-31212/)\n Oct. 9, 2025\n [Download](/downloads/release/python-31212/)\n [Release notes](https://docs.python.org/release/3.12.12/whatsnew/changelog.html#python-3-12-12)\n\n[Python 3.12.11](/downloads/release/python-31211/)\n June 3, 2025\n [Download](/downloads/release/python-31211/)\n [Release notes](https://docs.python.org/release/3.12.11/whatsnew/changelog.html#python-3-12-11)\n\n[Python 3.12.10](/downloads/release/python-31210/)\n April 8, 2025\n [Download](/downloads/release/python-31210/)\n [Release notes](https://docs.python.org/release/3.12.10/whatsnew/changelog.html#python-3-12-10)\n\n[Python 3.12.9](/downloads/release/python-3129/)\n Feb. 4, 2025\n [Download](/downloads/release/python-3129/)\n [Release notes](https://docs.python.org/release/3.12.9/whatsnew/changelog.html#python-3-12-9)\n\n[Python 3.12.8](/downloads/release/python-3128/)\n Dec. 3, 2024\n [Download](/downloads/release/python-3128/)\n [Release notes](https://docs.python.org/release/3.12.8/whatsnew/changelog.html#python-3-12-8)\n\n[Python 3.12.7](/downloads/release/python-3127/)\n Oct. 1, 2024\n [Download](/downloads/release/python-3127/)\n [Release notes](https://docs.python.org/release/3.12.7/whatsnew/changelog.html#python-3-12-7)\n\n[Python 3.12.6](/downloads/release/python-3126/)\n Sept. 6, 2024\n [Download](/downloads/release/python-3126/)\n [Release notes](https://docs.python.org/release/3.12.6/whatsnew/changelog.html#python-3-12-6)\n\n[Python 3.12.5](/downloads/release/python-3125/)\n Aug. 6, 2024\n [Download](/downloads/release/python-3125/)\n [Release notes](https://docs.python.org/release/3.12.5/whatsnew/changelog.html#python-3-12-5)\n\n[Python 3.12.4](/downloads/release/python-3124/)\n June 6, 2024\n [Download](/downloads/release/python-3124/)\n [Release notes](https://docs.python.org/release/3.12.4/whatsnew/changelog.html#python-3-12-4)\n\n[Python 3.12.3](/downloads/release/python-3123/)\n April 9, 2024\n [Download](/downloads/release/python-3123/)\n [Release notes](https://docs.python.org/release/3.12.3/whatsnew/changelog.html#python-3-12-2)\n\n[Python 3.12.2](/downloads/release/python-3122/)\n Feb. 6, 2024\n [Download](/downloads/release/python-3122/)\n [Release notes](https://docs.python.org/release/3.12.2/whatsnew/changelog.html#python-3-12-2)\n\n[Python 3.12.1](/downloads/release/python-3121/)\n Dec. 8, 2023\n [Download](/downloads/release/python-3121/)\n [Release notes](https://docs.python.org/release/3.12.1/whatsnew/changelog.html#python-3-12-1)\n\n[Python 3.12.0](/downloads/release/python-3120/)\n Oct. 2, 2023\n [Download](/downloads/release/python-3120/)\n [Release notes](https://docs.python.org/release/3.12.0/whatsnew/changelog.html#python-3-12-0)\n\n[Python 3.11.16](/downloads/release/python-31116/)\n Aug. 12, 2026\n [Download](/downloads/release/python-31116/)\n [Release notes](https://docs.python.org/release/3.11.16/whatsnew/changelog.html)\n\n[Python 3.11.15](/downloads/release/python-31115/)\n March 3, 2026\n [Download](/downloads/release/python-31115/)\n [Release notes](https://docs.python.org/release/3.11.15/whatsnew/changelog.html)\n\n[Python 3.11.14](/downloads/release/python-31114/)\n Oct. 9, 2025\n [Download](/downloads/release/python-31114/)\n [Release notes](https://docs.python.org/release/3.11.14/whatsnew/changelog.html#python-3-11-14)\n\n[Python 3.11.13](/downloads/release/python-31113/)\n June 3, 2025\n [Download](/downloads/release/python-31113/)\n [Release notes](https://docs.python.org/release/3.11.13/whatsnew/changelog.html#python-3-11-13)\n\n[Python 3.11.12](/downloads/release/python-31112/)\n April 8, 2025\n [Download](/downloads/release/python-31112/)\n [Release notes](https://docs.python.org/release/3.11.12/whatsnew/changelog.html#python-3-11-12)\n\n[Python 3.11.11](/downloads/release/python-31111/)\n Dec. 3, 2024\n [Download](/downloads/release/python-31111/)\n [Release notes](https://docs.python.org/release/3.11.11/whatsnew/changelog.html#python-3-11-11)\n\n[Python 3.11.10](/downloads/release/python-31110/)\n Sept. 7, 2024\n [Download](/downloads/release/python-31110/)\n [Release notes](https://docs.python.org/release/3.11.10/whatsnew/changelog.html#python-3-11-10)\n\n[Python 3.11.9](/downloads/release/python-3119/)\n April 2, 2024\n [Download](/downloads/release/python-3119/)\n [Release notes](https://docs.python.org/release/3.11.9/whatsnew/changelog.html#python-3-11-9)\n\n[Python 3.11.8](/downloads/release/python-3118/)\n Feb. 6, 2024\n [Download](/downloads/release/python-3118/)\n [Release notes](https://docs.python.org/release/3.11.8/whatsnew/changelog.html#python-3-11-8)\n\n[Python 3.11.7](/downloads/release/python-3117/)\n Dec. 4, 2023\n [Download](/downloads/release/python-3117/)\n [Release notes](https://docs.python.org/release/3.11.7/whatsnew/changelog.html#python-3-11-7)\n\n[Python 3.11.6](/downloads/release/python-3116/)\n Oct. 2, 2023\n [Download](/downloads/release/python-3116/)\n [Release notes](https://docs.python.org/release/3.11.6/whatsnew/changelog.html#python-3-11-6)\n\n[Python 3.11.5](/downloads/release/python-3115/)\n Aug. 24, 2023\n [Download](/downloads/release/python-3115/)\n [Release notes](https://docs.python.org/release/3.11.5/whatsnew/changelog.html#python-3-11-5)\n\n[Python 3.11.4](/downloads/release/python-3114/)\n June 6, 2023\n [Download](/downloads/release/python-3114/)\n [Release notes](https://docs.python.org/release/3.11.4/whatsnew/changelog.html#python-3-11-4)\n\n[Python 3.11.3](/downloads/release/python-3113/)\n April 5, 2023\n [Download](/downloads/release/python-3113/)\n [Release notes](https://docs.python.org/release/3.11.3/whatsnew/changelog.html#python-3-11-3)\n\n[Python 3.11.2](/downloads/release/python-3112/)\n Feb. 8, 2023\n [Download](/downloads/release/python-3112/)\n [Release notes](https://docs.python.org/release/3.11.2/whatsnew/changelog.html#python-3-11-2)\n\n[Python 3.11.1](/downloads/release/python-3111/)\n Dec. 6, 2022\n [Download](/downloads/release/python-3111/)\n [Release notes](https://docs.python.org/release/3.11.1/whatsnew/changelog.html#python-3-11-1)\n\n[Python 3.11.0](/downloads/release/python-3110/)\n Oct. 24, 2022\n [Download](/downloads/release/python-3110/)\n [Release notes](https://docs.python.org/release/3.11.0/whatsnew/changelog.html#python-3-11-0-final)\n\n[Python 3.10.21](/downloads/release/python-31021/)\n Aug. 12, 2026\n [Download](/downloads/release/python-31021/)\n [Release notes](https://docs.python.org/release/3.10.21/whatsnew/changelog.html)\n\n[Python 3.10.20](/downloads/release/python-31020/)\n March 3, 2026\n [Download](/downloads/release/python-31020/)\n [Release notes](https://docs.python.org/release/3.10.20/whatsnew/changelog.html)\n\n[Python 3.10.19](/downloads/release/python-31019/)\n Oct. 9, 2025\n [Download](/downloads/release/python-31019/)\n [Release notes](https://docs.python.org/release/3.10.19/whatsnew/changelog.html)\n\n[Python 3.10.18](/downloads/release/python-31018/)\n June 3, 2025\n [Download](/downloads/release/python-31018/)\n [Release notes](https://docs.python.org/release/3.10.18/whatsnew/changelog.html)\n\n[Python 3.10.17](/downloads/release/python-31017/)\n April 8, 2025\n [Download](/downloads/release/python-31017/)\n [Release notes](https://docs.python.org/release/3.10.17/whatsnew/changelog.html)\n\n[Python 3.10.16](/downloads/release/python-31016/)\n Dec. 3, 2024\n [Download](/downloads/release/python-31016/)\n [Release notes](https://docs.python.org/release/3.10.16/whatsnew/changelog.html)\n\n[Python 3.10.15](/downloads/release/python-31015/)\n Sept. 7, 2024\n [Download](/downloads/release/python-31015/)\n [Release notes](https://docs.python.org/release/3.10.15/whatsnew/changelog.html)\n\n[Python 3.10.14](/downloads/release/python-31014/)\n March 19, 2024\n [Download](/downloads/release/python-31014/)\n [Release notes](https://docs.python.org/release/3.10.14/whatsnew/changelog.html)\n\n[Python 3.10.13](/downloads/release/python-31013/)\n Aug. 24, 2023\n [Download](/downloads/release/python-31013/)\n [Release notes](https://docs.python.org/release/3.10.13/whatsnew/changelog.html#python-3-10-13-final)\n\n[Python 3.10.12](/downloads/release/python-31012/)\n June 6, 2023\n [Download](/downloads/release/python-31012/)\n [Release notes](https://docs.python.org/release/3.10.12/whatsnew/changelog.html#python-3-10-12-final)\n\n[Python 3.10.11](/downloads/release/python-31011/)\n April 5, 2023\n [Download](/downloads/release/python-31011/)\n [Release notes](https://docs.python.org/release/3.10.11/whatsnew/changelog.html#python-3-10-11-final)\n\n[Python 3.10.10](/downloads/release/python-31010/)\n Feb. 8, 2023\n [Download](/downloads/release/python-31010/)\n [Release notes](https://docs.python.org/release/3.10.10/whatsnew/changelog.html#python-3-10-10-final)\n\n[Python 3.10.9](/downloads/release/python-3109/)\n Dec. 6, 2022\n [Download](/downloads/release/python-3109/)\n [Release notes](https://docs.python.org/release/3.10.9/whatsnew/changelog.html#python-3-10-9-final)\n\n[Python 3.10.8](/downloads/release/python-3108/)\n Oct. 11, 2022\n [Download](/downloads/release/python-3108/)\n [Release notes](https://docs.python.org/release/3.10.8/whatsnew/changelog.html#python-3-10-8-final)\n\n[Python 3.10.7](/downloads/release/python-3107/)\n Sept. 6, 2022\n [Download](/downloads/release/python-3107/)\n [Release notes](https://docs.python.org/release/3.10.7/whatsnew/changelog.html#python-3-10-7-final)\n\n[Python 3.10.6](/downloads/release/python-3106/)\n Aug. 2, 2022\n [Download](/downloads/release/python-3106/)\n [Release notes](https://docs.python.org/release/3.10.6/whatsnew/changelog.html#python-3-10-6-final)\n\n[Python 3.10.5](/downloads/release/python-3105/)\n June 6, 2022\n [Download](/downloads/release/python-3105/)\n [Release notes](https://docs.python.org/release/3.10.5/whatsnew/changelog.html#python-3-10-5-final)\n\n[Python 3.10.4](/downloads/release/python-3104/)\n March 24, 2022\n [Download](/downloads/release/python-3104/)\n [Release notes](https://docs.python.org/release/3.10.4/whatsnew/changelog.html#python-3-10-4-final)\n\n[Python 3.10.3](/downloads/release/python-3103/)\n March 16, 2022\n [Download](/downloads/release/python-3103/)\n [Release notes](https://docs.python.org/release/3.10.3/whatsnew/changelog.html#python-3-10-3-final)\n\n[Python 3.10.2](/downloads/release/python-3102/)\n Jan. 14, 2022\n [Download](/downloads/release/python-3102/)\n [Release notes](https://docs.python.org/release/3.10.2/whatsnew/changelog.html#python-3-10-2-final)\n\n[Python 3.10.1](/downloads/release/python-3101/)\n Dec. 6, 2021\n [Download](/downloads/release/python-3101/)\n [Release notes](https://docs.python.org/release/3.10.1/whatsnew/changelog.html#python-3-10-1-final)\n\n[Python 3.10.0](/downloads/release/python-3100/)\n Oct. 4, 2021\n [Download](/downloads/release/python-3100/)\n [Release notes](https://docs.python.org/release/3.10.0/whatsnew/changelog.html#python-3-10-0-final)\n\n[Python 3.9.25](/downloads/release/python-3925/)\n Oct. 31, 2025\n [Download](/downloads/release/python-3925/)\n [Release notes](https://docs.python.org/release/3.9.25/whatsnew/changelog.html)\n\n[Python 3.9.24](/downloads/release/python-3924/)\n Oct. 9, 2025\n [Download](/downloads/release/python-3924/)\n [Release notes](https://docs.python.org/release/3.9.24/whatsnew/changelog.html)\n\n[Python 3.9.23](/downloads/release/python-3923/)\n June 3, 2025\n [Download](/downloads/release/python-3923/)\n [Release notes](https://docs.python.org/release/3.9.23/whatsnew/changelog.html)\n\n[Python 3.9.22](/downloads/release/python-3922/)\n April 8, 2025\n [Download](/downloads/release/python-3922/)\n [Release notes](https://docs.python.org/release/3.9.22/whatsnew/changelog.html)\n\n[Python 3.9.21](/downloads/release/python-3921/)\n Dec. 3, 2024\n [Download](/downloads/release/python-3921/)\n [Release notes](https://docs.python.org/release/3.9.21/whatsnew/changelog.html)\n\n[Python 3.9.20](/downloads/release/python-3920/)\n Sept. 6, 2024\n [Download](/downloads/release/python-3920/)\n [Release notes](https://docs.python.org/release/3.9.20/whatsnew/changelog.html)\n\n[Python 3.9.19](/downloads/release/python-3919/)\n March 19, 2024\n [Download](/downloads/release/python-3919/)\n [Release notes](https://docs.python.org/release/3.9.19/whatsnew/changelog.html)\n\n[Python 3.9.18](/downloads/release/python-3918/)\n Aug. 24, 2023\n [Download](/downloads/release/python-3918/)\n [Release notes](https://docs.python.org/release/3.9.18/whatsnew/changelog.html#changelog)\n\n[Python 3.9.17](/downloads/release/python-3917/)\n June 6, 2023\n [Download](/downloads/release/python-3917/)\n [Release notes](https://docs.python.org/release/3.9.17/whatsnew/changelog.html#changelog)\n\n[Python 3.9.16](/downloads/release/python-3916/)\n Dec. 6, 2022\n [Download](/downloads/release/python-3916/)\n [Release notes](http://docs.python.org/release/3.9.16/whatsnew/changelog.html)\n\n[Python 3.9.15](/downloads/release/python-3915/)\n Oct. 11, 2022\n [Download](/downloads/release/python-3915/)\n [Release notes](http://docs.python.org/release/3.9.15/whatsnew/changelog.html)\n\n[Python 3.9.14](/downloads/release/python-3914/)\n Sept. 6, 2022\n [Download](/downloads/release/python-3914/)\n [Release notes](http://docs.python.org/release/3.9.14/whatsnew/changelog.html)\n\n[Python 3.9.13](/downloads/release/python-3913/)\n May 17, 2022\n [Download](/downloads/release/python-3913/)\n [Release notes](https://docs.python.org/release/3.9.13/whatsnew/changelog.html)\n\n[Python 3.9.12](/downloads/release/python-3912/)\n March 23, 2022\n [Download](/downloads/release/python-3912/)\n [Release notes](https://docs.python.org/release/3.9.12/whatsnew/changelog.html)\n\n[Python 3.9.11](/downloads/release/python-3911/)\n March 16, 2022\n [Download](/downloads/release/python-3911/)\n [Release notes](https://docs.python.org/release/3.9.11/whatsnew/changelog.html)\n\n[Python 3.9.10](/downloads/release/python-3910/)\n Jan. 14, 2022\n [Download](/downloads/release/python-3910/)\n [Release notes](https://docs.python.org/release/3.9.10/whatsnew/changelog.html)\n\n[Python 3.9.9](/downloads/release/python-399/)\n Nov. 15, 2021\n [Download](/downloads/release/python-399/)\n [Release notes](https://docs.python.org/release/3.9.9/whatsnew/changelog.html)\n\n[Python 3.9.8](/downloads/release/python-398/)\n Nov. 5, 2021\n [Download](/downloads/release/python-398/)\n [Release notes](https://docs.python.org/release/3.9.8/whatsnew/changelog.html)\n\n[Python 3.9.7](/downloads/release/python-397/)\n Aug. 30, 2021\n [Download](/downloads/release/python-397/)\n [Release notes](https://docs.python.org/release/3.9.7/whatsnew/changelog.html#changelog)\n\n[Python 3.9.6](/downloads/release/python-396/)\n June 28, 2021\n [Download](/downloads/release/python-396/)\n [Release notes](https://docs.python.org/release/3.9.6/whatsnew/changelog.html#changelog)\n\n[Python 3.9.5](/downloads/release/python-395/)\n May 3, 2021\n [Download](/downloads/release/python-395/)\n [Release notes](https://docs.python.org/release/3.9.5/whatsnew/changelog.html)\n\n[Python 3.9.4](/downloads/release/python-394/)\n April 4, 2021\n [Download](/downloads/release/python-394/)\n [Release notes](https://docs.python.org/release/3.9.4/whatsnew/changelog.html#changelog)\n\n[Python 3.9.2](/downloads/release/python-392/)\n Feb. 19, 2021\n [Download](/downloads/release/python-392/)\n [Release notes](https://docs.python.org/release/3.9.2/whatsnew/changelog.html#changelog)\n\n[Python 3.9.1](/downloads/release/python-391/)\n Dec. 7, 2020\n [Download](/downloads/release/python-391/)\n [Release notes](https://docs.python.org/release/3.9.1/whatsnew/changelog.html#changelog)\n\n[Python 3.9.0](/downloads/release/python-390/)\n Oct. 5, 2020\n [Download](/downloads/release/python-390/)\n [Release notes](https://docs.python.org/release/3.9.0/whatsnew/changelog.html#changelog)\n\n[Python 3.8.20](/downloads/release/python-3820/)\n Sept. 6, 2024\n [Download](/downloads/release/python-3820/)\n [Release notes](https://docs.python.org/release/3.8.20/whatsnew/changelog.html)\n\n[Python 3.8.19](/downloads/release/python-3819/)\n March 19, 2024\n [Download](/downloads/release/python-3819/)\n [Release notes](https://docs.python.org/release/3.8.19/whatsnew/changelog.html)\n\n[Python 3.8.18](/downloads/release/python-3818/)\n Aug. 24, 2023\n [Download](/downloads/release/python-3818/)\n [Release notes](https://docs.python.org/release/3.8.18/whatsnew/changelog.html#changelog)\n\n[Python 3.8.17](/downloads/release/python-3817/)\n June 6, 2023\n [Download](/downloads/release/python-3817/)\n [Release notes](http://docs.python.org/release/3.8.17/whatsnew/changelog.html)\n\n[Python 3.8.16](/downloads/release/python-3816/)\n Dec. 6, 2022\n [Download](/downloads/release/python-3816/)\n [Release notes](http://docs.python.org/release/3.8.16/whatsnew/changelog.html)\n\n[Python 3.8.15](/downloads/release/python-3815/)\n Oct. 11, 2022\n [Download](/downloads/release/python-3815/)\n [Release notes](http://docs.python.org/release/3.8.15/whatsnew/changelog.html)\n\n[Python 3.8.14](/downloads/release/python-3814/)\n Sept. 6, 2022\n [Download](/downloads/release/python-3814/)\n [Release notes](http://docs.python.org/release/3.8.14/whatsnew/changelog.html)\n\n[Python 3.8.13](/downloads/release/python-3813/)\n March 16, 2022\n [Download](/downloads/release/python-3813/)\n [Release notes](https://docs.python.org/release/3.8.13/whatsnew/changelog.html)\n\n[Python 3.8.12](/downloads/release/python-3812/)\n Aug. 30, 2021\n [Download](/downloads/release/python-3812/)\n [Release notes](https://docs.python.org/release/3.8.12/whatsnew/changelog.html#changelog)\n\n[Python 3.8.11](/downloads/release/python-3811/)\n June 28, 2021\n [Download](/downloads/release/python-3811/)\n [Release notes](https://docs.python.org/release/3.8.11/whatsnew/changelog.html#changelog)\n\n[Python 3.8.10](/downloads/release/python-3810/)\n May 3, 2021\n [Download](/downloads/release/python-3810/)\n [Release notes](https://docs.python.org/release/3.8.10/whatsnew/changelog.html)\n\n[Python 3.8.9](/downloads/release/python-389/)\n April 2, 2021\n [Download](/downloads/release/python-389/)\n [Release notes](https://docs.python.org/release/3.8.9/whatsnew/changelog.html#python-3-8-9)\n\n[Python 3.8.8](/downloads/release/python-388/)\n Feb. 19, 2021\n [Download](/downloads/release/python-388/)\n [Release notes](https://docs.python.org/release/3.8.8/whatsnew/changelog.html#changelog)\n\n[Python 3.8.7](/downloads/release/python-387/)\n Dec. 21, 2020\n [Download](/downloads/release/python-387/)\n [Release notes](https://docs.python.org/release/3.8.7/whatsnew/changelog.html)\n\n[Python 3.8.6](/downloads/release/python-386/)\n Sept. 24, 2020\n [Download](/downloads/release/python-386/)\n [Release notes](https://docs.python.org/release/3.8.6/whatsnew/changelog.html#changelog)\n\n[Python 3.8.5](/downloads/release/python-385/)\n July 20, 2020\n [Download](/downloads/release/python-385/)\n [Release notes](https://docs.python.org/release/3.8.5/whatsnew/changelog.html#changelog)\n\n[Python 3.8.4](/downloads/release/python-384/)\n July 13, 2020\n [Download](/downloads/release/python-384/)\n [Release notes](https://docs.python.org/release/3.8.4/whatsnew/changelog.html#changelog)\n\n[Python 3.8.3](/downloads/release/python-383/)\n May 13, 2020\n [Download](/downloads/release/python-383/)\n [Release notes](https://docs.python.org/release/3.8.3/whatsnew/changelog.html#changelog)\n\n[Python 3.8.2](/downloads/release/python-382/)\n Feb. 24, 2020\n [Download](/downloads/release/python-382/)\n [Release notes](https://docs.python.org/release/3.8.2/whatsnew/changelog.html#python-3-8-2-final)\n\n[Python 3.8.1](/downloads/release/python-381/)\n Dec. 18, 2019\n [Download](/downloads/release/python-381/)\n [Release notes](https://docs.python.org/3.8/whatsnew/changelog.html#python-3-8-1)\n\n[Python 3.8.0](/downloads/release/python-380/)\n Oct. 14, 2019\n [Download](/downloads/release/python-380/)\n [Release notes](https://docs.python.org/3.8/whatsnew/changelog.html#python-3-8-0-final)\n\n[Python 3.7.17](/downloads/release/python-3717/)\n June 6, 2023\n [Download](/downloads/release/python-3717/)\n [Release notes](https://docs.python.org/release/3.7.17/whatsnew/changelog.html#changelog)\n\n[Python 3.7.16](/downloads/release/python-3716/)\n Dec. 6, 2022\n [Download](/downloads/release/python-3716/)\n [Release notes](https://docs.python.org/release/3.7.16/whatsnew/changelog.html#changelog)\n\n[Python 3.7.15](/downloads/release/python-3715/)\n Oct. 11, 2022\n [Download](/downloads/release/python-3715/)\n [Release notes](https://docs.python.org/release/3.7.15/whatsnew/changelog.html#changelog)\n\n[Python 3.7.14](/downloads/release/python-3714/)\n Sept. 6, 2022\n [Download](/downloads/release/python-3714/)\n [Release notes](https://docs.python.org/release/3.7.14/whatsnew/changelog.html#changelog)\n\n[Python 3.7.13](/downloads/release/python-3713/)\n March 16, 2022\n [Download](/downloads/release/python-3713/)\n [Release notes](https://docs.python.org/release/3.7.13/whatsnew/changelog.html#changelog)\n\n[Python 3.7.12](/downloads/release/python-3712/)\n Sept. 4, 2021\n [Download](/downloads/release/python-3712/)\n [Release notes](https://docs.python.org/release/3.7.12/whatsnew/changelog.html#changelog)\n\n[Python 3.7.11](/downloads/release/python-3711/)\n June 28, 2021\n [Download](/downloads/release/python-3711/)\n [Release notes](https://docs.python.org/release/3.7.11/whatsnew/changelog.html#changelog)\n\n[Python 3.7.10](/downloads/release/python-3710/)\n Feb. 15, 2021\n [Download](/downloads/release/python-3710/)\n [Release notes](https://docs.python.org/release/3.7.10/whatsnew/changelog.html#changelog)\n\n[Python 3.7.9](/downloads/release/python-379/)\n Aug. 17, 2020\n [Download](/downloads/release/python-379/)\n [Release notes](https://docs.python.org/release/3.7.9/whatsnew/changelog.html#changelog)\n\n[Python 3.7.8](/downloads/release/python-378/)\n June 27, 2020\n [Download](/downloads/release/python-378/)\n [Release notes](https://docs.python.org/release/3.7.8/whatsnew/changelog.html#changelog)\n\n[Python 3.7.7](/downloads/release/python-377/)\n March 10, 2020\n [Download](/downloads/release/python-377/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-7-final)\n\n[Python 3.7.6](/downloads/release/python-376/)\n Dec. 18, 2019\n [Download](/downloads/release/python-376/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-6-final)\n\n[Python 3.7.5](/downloads/release/python-375/)\n Oct. 15, 2019\n [Download](/downloads/release/python-375/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-5-final)\n\n[Python 3.7.4](/downloads/release/python-374/)\n July 8, 2019\n [Download](/downloads/release/python-374/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-4-final)\n\n[Python 3.7.3](/downloads/release/python-373/)\n March 25, 2019\n [Download](/downloads/release/python-373/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-3-final)\n\n[Python 3.7.2](/downloads/release/python-372/)\n Dec. 24, 2018\n [Download](/downloads/release/python-372/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-2-final)\n\n[Python 3.7.1](/downloads/release/python-371/)\n Oct. 20, 2018\n [Download](/downloads/release/python-371/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-1-final)\n\n[Python 3.7.0](/downloads/release/python-370/)\n June 27, 2018\n [Download](/downloads/release/python-370/)\n [Release notes](https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-0-final)\n\n[Python 3.6.15](/downloads/release/python-3615/)\n Sept. 4, 2021\n [Download](/downloads/release/python-3615/)\n [Release notes](https://docs.python.org/release/3.6.15/whatsnew/changelog.html#changelog)\n\n[Python 3.6.14](/downloads/release/python-3614/)\n June 28, 2021\n [Download](/downloads/release/python-3614/)\n [Release notes](https://docs.python.org/release/3.6.14/whatsnew/changelog.html#changelog)\n\n[Python 3.6.13](/downloads/release/python-3613/)\n Feb. 15, 2021\n [Download](/downloads/release/python-3613/)\n [Release notes](https://docs.python.org/release/3.6.13/whatsnew/changelog.html#changelog)\n\n[Python 3.6.12](/downloads/release/python-3612/)\n Aug. 17, 2020\n [Download](/downloads/release/python-3612/)\n [Release notes](https://docs.python.org/release/3.6.12/whatsnew/changelog.html#changelog)\n\n[Python 3.6.11](/downloads/release/python-3611/)\n June 27, 2020\n [Download](/downloads/release/python-3611/)\n [Release notes](https://docs.python.org/release/3.6.11/whatsnew/changelog.html#changelog)\n\n[Python 3.6.10](/downloads/release/python-3610/)\n Dec. 18, 2019\n [Download](/downloads/release/python-3610/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-10-final)\n\n[Python 3.6.9](/downloads/release/python-369/)\n July 2, 2019\n [Download](/downloads/release/python-369/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-9-final)\n\n[Python 3.6.8](/downloads/release/python-368/)\n Dec. 24, 2018\n [Download](/downloads/release/python-368/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-8-final)\n\n[Python 3.6.7](/downloads/release/python-367/)\n Oct. 20, 2018\n [Download](/downloads/release/python-367/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-7-final)\n\n[Python 3.6.6](/downloads/release/python-366/)\n June 27, 2018\n [Download](/downloads/release/python-366/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-6-final)\n\n[Python 3.6.5](/downloads/release/python-365/)\n March 28, 2018\n [Download](/downloads/release/python-365/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-5-final)\n\n[Python 3.6.4](/downloads/release/python-364/)\n Dec. 19, 2017\n [Download](/downloads/release/python-364/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-4-final)\n\n[Python 3.6.3](/downloads/release/python-363/)\n Oct. 3, 2017\n [Download](/downloads/release/python-363/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-3-final)\n\n[Python 3.6.2](/downloads/release/python-362/)\n July 17, 2017\n [Download](/downloads/release/python-362/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-2-final)\n\n[Python 3.6.1](/downloads/release/python-361/)\n March 21, 2017\n [Download](/downloads/release/python-361/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-1-final)\n\n[Python 3.6.0](/downloads/release/python-360/)\n Dec. 23, 2016\n [Download](/downloads/release/python-360/)\n [Release notes](https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-0-final)\n\n[Python 3.5.10](/downloads/release/python-3510/)\n Sept. 5, 2020\n [Download](/downloads/release/python-3510/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-10)\n\n[Python 3.5.9](/downloads/release/python-359/)\n Nov. 2, 2019\n [Download](/downloads/release/python-359/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-9)\n\n[Python 3.5.8](/downloads/release/python-358/)\n Oct. 29, 2019\n [Download](/downloads/release/python-358/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-8)\n\n[Python 3.5.7](/downloads/release/python-357/)\n March 18, 2019\n [Download](/downloads/release/python-357/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-7)\n\n[Python 3.5.6](/downloads/release/python-356/)\n Aug. 2, 2018\n [Download](/downloads/release/python-356/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-6)\n\n[Python 3.5.5](/downloads/release/python-355/)\n Feb. 5, 2018\n [Download](/downloads/release/python-355/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-5-final)\n\n[Python 3.5.4](/downloads/release/python-354/)\n Aug. 8, 2017\n [Download](/downloads/release/python-354/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-4)\n\n[Python 3.5.3](/downloads/release/python-353/)\n Jan. 17, 2017\n [Download](/downloads/release/python-353/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-3)\n\n[Python 3.5.2](/downloads/release/python-352/)\n June 27, 2016\n [Download](/downloads/release/python-352/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-2)\n\n[Python 3.5.1](/downloads/release/python-351/)\n Dec. 7, 2015\n [Download](/downloads/release/python-351/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-1-final)\n\n[Python 3.5.0](/downloads/release/python-350/)\n Sept. 13, 2015\n [Download](/downloads/release/python-350/)\n [Release notes](https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-0-final)\n\n[Python 3.4.10](/downloads/release/python-3410/)\n March 18, 2019\n [Download](/downloads/release/python-3410/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-10)\n\n[Python 3.4.9](/downloads/release/python-349/)\n Aug. 2, 2018\n [Download](/downloads/release/python-349/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-9)\n\n[Python 3.4.8](/downloads/release/python-348/)\n Feb. 5, 2018\n [Download](/downloads/release/python-348/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-8-final)\n\n[Python 3.4.7](/downloads/release/python-347/)\n Aug. 9, 2017\n [Download](/downloads/release/python-347/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-7)\n\n[Python 3.4.6](/downloads/release/python-346/)\n Jan. 17, 2017\n [Download](/downloads/release/python-346/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-6)\n\n[Python 3.4.5](/downloads/release/python-345/)\n June 27, 2016\n [Download](/downloads/release/python-345/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-5)\n\n[Python 3.4.4](/downloads/release/python-344/)\n Dec. 21, 2015\n [Download](/downloads/release/python-344/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-4)\n\n[Python 3.4.3](/downloads/release/python-343/)\n Feb. 25, 2015\n [Download](/downloads/release/python-343/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-3)\n\n[Python 3.4.2](/downloads/release/python-342/)\n Oct. 13, 2014\n [Download](/downloads/release/python-342/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-2)\n\n[Python 3.4.1](/downloads/release/python-341/)\n May 19, 2014\n [Download](/downloads/release/python-341/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-1)\n\n[Python 3.4.0](/downloads/release/python-340/)\n March 17, 2014\n [Download](/downloads/release/python-340/)\n [Release notes](https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-0)\n\n[Python 3.3.7](/downloads/release/python-337/)\n Sept. 19, 2017\n [Download](/downloads/release/python-337/)\n [Release notes](https://docs.python.org/release/3.3.7/whatsnew/changelog.html)\n\n[Python 3.3.6](/downloads/release/python-336/)\n Oct. 12, 2014\n [Download](/downloads/release/python-336/)\n [Release notes](https://hg.python.org/cpython/file/v3.3.6/Misc/NEWS)\n\n[Python 3.3.5](/downloads/release/python-335/)\n March 9, 2014\n [Download](/downloads/release/python-335/)\n [Release notes](https://docs.python.org/release/3.3.5/whatsnew/changelog.html)\n\n[Python 3.3.4](/downloads/release/python-334/)\n Feb. 9, 2014\n [Download](/downloads/release/python-334/)\n [Release notes](https://docs.python.org/release/3.3.4/whatsnew/changelog.html)\n\n[Python 3.3.3](/downloads/release/python-333/)\n Nov. 17, 2013\n [Download](/downloads/release/python-333/)\n [Release notes](https://docs.python.org/release/3.3.3/whatsnew/changelog.html)\n\n[Python 3.3.2](/downloads/release/python-332/)\n May 15, 2013\n [Download](/downloads/release/python-332/)\n [Release notes](https://docs.python.org/release/3.3.2/whatsnew/changelog.html)\n\n[Python 3.3.1](/downloads/release/python-331/)\n April 6, 2013\n [Download](/downloads/release/python-331/)\n [Release notes](https://docs.python.org/release/3.3.1/whatsnew/changelog.html)\n\n[Python 3.3.0](/downloads/release/python-330/)\n Sept. 29, 2012\n [Download](/downloads/release/python-330/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.3.0/Misc/NEWS)\n\n[Python 3.2.6](/downloads/release/python-326/)\n Oct. 12, 2014\n [Download](/downloads/release/python-326/)\n [Release notes](https://hg.python.org/cpython/file/v3.2.6/Misc/NEWS)\n\n[Python 3.2.5](/downloads/release/python-325/)\n May 15, 2013\n [Download](/downloads/release/python-325/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.2.5/Misc/NEWS)\n\n[Python 3.2.4](/downloads/release/python-324/)\n April 6, 2013\n [Download](/downloads/release/python-324/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.2.4/Misc/NEWS)\n\n[Python 3.2.3](/downloads/release/python-323/)\n April 10, 2012\n [Download](/downloads/release/python-323/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.2.3/Misc/NEWS)\n\n[Python 3.2.2](/downloads/release/python-322/)\n Sept. 3, 2011\n [Download](/downloads/release/python-322/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.2.2/Misc/NEWS)\n\n[Python 3.2.1](/downloads/release/python-321/)\n July 9, 2011\n [Download](/downloads/release/python-321/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.2.1/Misc/NEWS)\n\n[Python 3.2.0](/downloads/release/python-320/)\n Feb. 20, 2011\n [Download](/downloads/release/python-320/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.2/Misc/NEWS)\n\n[Python 3.1.5](/downloads/release/python-315/)\n April 9, 2012\n [Download](/downloads/release/python-315/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.1.5/Misc/NEWS)\n\n[Python 3.1.4](/downloads/release/python-314/)\n June 11, 2011\n [Download](/downloads/release/python-314/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.1.4/Misc/NEWS)\n\n[Python 3.1.3](/downloads/release/python-313/)\n Nov. 27, 2010\n [Download](/downloads/release/python-313/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.1.3/Misc/NEWS)\n\n[Python 3.1.2](/downloads/release/python-312/)\n March 20, 2010\n [Download](/downloads/release/python-312/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.1.2/Misc/NEWS)\n\n[Python 3.1.1](/downloads/release/python-311/)\n Aug. 17, 2009\n [Download](/downloads/release/python-311/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.1.1/Misc/NEWS)\n\n[Python 3.1.0](/downloads/release/python-310/)\n June 26, 2009\n [Download](/downloads/release/python-310/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.1/Misc/NEWS)\n\n[Python 3.0.1](/downloads/release/python-301/)\n Feb. 13, 2009\n [Download](/downloads/release/python-301/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.0.1/Misc/NEWS)\n\n[Python 3.0.0](/downloads/release/python-300/)\n Dec. 3, 2008\n [Download](/downloads/release/python-300/)\n [Release notes](http://hg.python.org/cpython/raw-file/v3.0/Misc/NEWS)\n\n[Python 2.7.18](/downloads/release/python-2718/)\n April 20, 2020\n [Download](/downloads/release/python-2718/)\n [Release notes]()\n\n[Python 2.7.17](/downloads/release/python-2717/)\n Oct. 19, 2019\n [Download](/downloads/release/python-2717/)\n [Release notes](https://raw.githubusercontent.com/python/cpython/c2f86d86e6c8f5fd1ef602128b537a48f3f5c063/Misc/NEWS.d/2.7.17rc1.rst)\n\n[Python 2.7.16](/downloads/release/python-2716/)\n March 4, 2019\n [Download](/downloads/release/python-2716/)\n [Release notes](https://raw.githubusercontent.com/python/cpython/v2.7.16/Misc/NEWS.d/2.7.16.rst)\n\n[Python 2.7.15](/downloads/release/python-2715/)\n May 1, 2018\n [Download](/downloads/release/python-2715/)\n [Release notes]()\n\n[Python 2.7.14](/downloads/release/python-2714/)\n Sept. 16, 2017\n [Download](/downloads/release/python-2714/)\n [Release notes](https://raw.githubusercontent.com/python/cpython/84471935ed2f62b8c5758fd544c7d37076fe0fa5/Misc/NEWS)\n\n[Python 2.7.13](/downloads/release/python-2713/)\n Dec. 17, 2016\n [Download](/downloads/release/python-2713/)\n [Release notes](https://hg.python.org/cpython/raw-file/v2.7.13/Misc/NEWS)\n\n[Python 2.7.12](/downloads/release/python-2712/)\n June 25, 2016\n [Download](/downloads/release/python-2712/)\n [Release notes](https://hg.python.org/cpython/raw-file/v2.7.12/Misc/NEWS)\n\n[Python 2.7.11](/downloads/release/python-2711/)\n Dec. 5, 2015\n [Download](/downloads/release/python-2711/)\n [Release notes](https://hg.python.org/cpython/raw-file/53d30ab403f1/Misc/NEWS)\n\n[Python 2.7.10](/downloads/release/python-2710/)\n May 23, 2015\n [Download](/downloads/release/python-2710/)\n [Release notes](https://hg.python.org/cpython/raw-file/15c95b7d81dc/Misc/NEWS)\n\n[Python 2.7.9](/downloads/release/python-279/)\n Dec. 10, 2014\n [Download](/downloads/release/python-279/)\n [Release notes](https://hg.python.org/cpython/raw-file/v2.7.9/Misc/NEWS)\n\n[Python 2.7.8](/downloads/release/python-278/)\n July 2, 2014\n [Download](/downloads/release/python-278/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.8/Misc/NEWS)\n\n[Python 2.7.7](/downloads/release/python-277/)\n June 1, 2014\n [Download](/downloads/release/python-277/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.7/Misc/NEWS)\n\n[Python 2.7.6](/downloads/release/python-276/)\n Nov. 10, 2013\n [Download](/downloads/release/python-276/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.6/Misc/NEWS)\n\n[Python 2.7.5](/downloads/release/python-275/)\n May 12, 2013\n [Download](/downloads/release/python-275/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.5/Misc/NEWS)\n\n[Python 2.7.4](/downloads/release/python-274/)\n April 6, 2013\n [Download](/downloads/release/python-274/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.4/Misc/NEWS)\n\n[Python 2.7.3](/downloads/release/python-273/)\n April 9, 2012\n [Download](/downloads/release/python-273/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.3/Misc/NEWS)\n\n[Python 2.7.2](/downloads/release/python-272/)\n June 11, 2011\n [Download](/downloads/release/python-272/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.2/Misc/NEWS)\n\n[Python 2.7.1](/downloads/release/python-271/)\n Nov. 27, 2010\n [Download](/downloads/release/python-271/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7.1/Misc/NEWS)\n\n[Python 2.7.0](/downloads/release/python-270/)\n July 3, 2010\n [Download](/downloads/release/python-270/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.7/Misc/NEWS)\n\n[Python 2.6.9](/downloads/release/python-269/)\n Oct. 29, 2013\n [Download](/downloads/release/python-269/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.9/Misc/NEWS)\n\n[Python 2.6.8](/downloads/release/python-268/)\n April 10, 2012\n [Download](/downloads/release/python-268/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.8/Misc/NEWS)\n\n[Python 2.6.7](/downloads/release/python-267/)\n June 3, 2011\n [Download](/downloads/release/python-267/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.7/Misc/NEWS)\n\n[Python 2.6.6](/downloads/release/python-266/)\n Aug. 24, 2010\n [Download](/downloads/release/python-266/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.6/Misc/NEWS)\n\n[Python 2.6.5](/downloads/release/python-265/)\n March 18, 2010\n [Download](/downloads/release/python-265/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.5/Misc/NEWS)\n\n[Python 2.6.4](/downloads/release/python-264/)\n Oct. 26, 2009\n [Download](/downloads/release/python-264/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.4/Misc/NEWS)\n\n[Python 2.6.3](/downloads/release/python-263/)\n Oct. 2, 2009\n [Download](/downloads/release/python-263/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.3/Misc/NEWS)\n\n[Python 2.6.2](/downloads/release/python-262/)\n April 14, 2009\n [Download](/downloads/release/python-262/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.2/Misc/NEWS)\n\n[Python 2.6.1](/downloads/release/python-261/)\n Dec. 4, 2008\n [Download](/downloads/release/python-261/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6.1/Misc/NEWS)\n\n[Python 2.6.0](/downloads/release/python-260/)\n Oct. 2, 2008\n [Download](/downloads/release/python-260/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.6/Misc/NEWS)\n\n[Python 2.5.6](/downloads/release/python-256/)\n May 26, 2011\n [Download](/downloads/release/python-256/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5.6/Misc/NEWS)\n\n[Python 2.5.5](/downloads/release/python-255/)\n Jan. 31, 2010\n [Download](/downloads/release/python-255/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5.5/Misc/NEWS)\n\n[Python 2.5.4](/downloads/release/python-254/)\n Dec. 23, 2008\n [Download](/downloads/release/python-254/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5.4/Misc/NEWS)\n\n[Python 2.5.3](/downloads/release/python-253/)\n Dec. 19, 2008\n [Download](/downloads/release/python-253/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5.3/Misc/NEWS)\n\n[Python 2.5.2](/downloads/release/python-252/)\n Feb. 21, 2008\n [Download](/downloads/release/python-252/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5.2/Misc/NEWS)\n\n[Python 2.5.1](/downloads/release/python-251/)\n April 19, 2007\n [Download](/downloads/release/python-251/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5.1/Misc/NEWS)\n\n[Python 2.5.0](/downloads/release/python-250/)\n Sept. 19, 2006\n [Download](/downloads/release/python-250/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.5/Misc/NEWS)\n\n[Python 2.4.6](/downloads/release/python-246/)\n Dec. 19, 2008\n [Download](/downloads/release/python-246/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4.6/Misc/NEWS)\n\n[Python 2.4.5](/downloads/release/python-245/)\n March 11, 2008\n [Download](/downloads/release/python-245/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4.5/Misc/NEWS)\n\n[Python 2.4.4](/downloads/release/python-244/)\n Oct. 18, 2006\n [Download](/downloads/release/python-244/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4.4/Misc/NEWS)\n\n[Python 2.4.3](/downloads/release/python-243/)\n April 15, 2006\n [Download](/downloads/release/python-243/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4.3/Misc/NEWS)\n\n[Python 2.4.2](/downloads/release/python-242/)\n Sept. 27, 2005\n [Download](/downloads/release/python-242/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4.2/Misc/NEWS)\n\n[Python 2.4.1](/downloads/release/python-241/)\n March 30, 2005\n [Download](/downloads/release/python-241/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4.1/Misc/NEWS)\n\n[Python 2.4.0](/downloads/release/python-240/)\n Nov. 30, 2004\n [Download](/downloads/release/python-240/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.4/Misc/NEWS)\n\n[Python 2.3.7](/downloads/release/python-237/)\n March 11, 2008\n [Download](/downloads/release/python-237/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.7/Misc/NEWS)\n\n[Python 2.3.6](/downloads/release/python-236/)\n Nov. 1, 2006\n [Download](/downloads/release/python-236/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.6/Misc/NEWS)\n\n[Python 2.3.5](/downloads/release/python-235/)\n Feb. 8, 2005\n [Download](/downloads/release/python-235/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.5/Misc/NEWS)\n\n[Python 2.3.4](/downloads/release/python-234/)\n May 27, 2004\n [Download](/downloads/release/python-234/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.4/Misc/NEWS)\n\n[Python 2.3.3](/downloads/release/python-233/)\n Dec. 19, 2003\n [Download](/downloads/release/python-233/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.3/Misc/NEWS)\n\n[Python 2.3.2](/downloads/release/python-232/)\n Oct. 3, 2003\n [Download](/downloads/release/python-232/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.2/Misc/NEWS)\n\n[Python 2.3.1](/downloads/release/python-231/)\n Sept. 23, 2003\n [Download](/downloads/release/python-231/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.3.1/Misc/NEWS)\n\n[Python 2.3.0](/downloads/release/python-230/)\n July 29, 2003\n [Download](/downloads/release/python-230/)\n [Release notes](http://hg.python.org/cpython/raw-file/15fc83c505e3/Misc/NEWS)\n\n[Python 2.2.3](/downloads/release/python-223/)\n May 30, 2003\n [Download](/downloads/release/python-223/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.2.3/Misc/NEWS)\n\n[Python 2.2.2](/downloads/release/python-222/)\n Oct. 14, 2002\n [Download](/downloads/release/python-222/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.2.2/Misc/NEWS)\n\n[Python 2.2.1](/downloads/release/python-221/)\n April 10, 2002\n [Download](/downloads/release/python-221/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.2.1/Misc/NEWS)\n\n[Python 2.2.0](/downloads/release/python-220/)\n Dec. 21, 2001\n [Download](/downloads/release/python-220/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.2/Misc/NEWS)\n\n[Python 2.1.3](/downloads/release/python-213/)\n April 9, 2002\n [Download](/downloads/release/python-213/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.1.3/Misc/NEWS)\n\n[Python 2.0.1](/downloads/release/python-201/)\n June 22, 2001\n [Download](/downloads/release/python-201/)\n [Release notes](http://hg.python.org/cpython/raw-file/v2.0.1/Misc/NEWS)\n\n[View older releases](/download/releases/)\n\nSponsors\n\nVisionary sponsors help to host Python downloads.\n\nGoogle\n\nAnthropic, PBC\n\nBloomberg\n\nNVIDIA\n\nMeta\n\nFastly\n\nHudson River Trading\n\nLicenses\r\n\nAll Python releases are [Open Source](https://www.opensource.org/). Historically, most, but not all, Python releases have also been GPL-compatible. The Licenses page details GPL-compatibility and Terms and Conditions. \r\n\n[Read more](https://docs.python.org/3/license.html#terms-and-conditions-for-accessing-or-otherwise-using-python)\n\nSources\n\nFor most Unix systems, you must download and compile the source code. The same source code archive can also be used to build the Windows and Mac versions, and is the starting point for ports to all other platforms.\n\nDownload the latest [Python 3](https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz) source.\n\n[Read more](/download/source/)\n\nAlternative implementations\r\n\nThis site hosts the \"traditional\" implementation of Python (nicknamed CPython). A number of alternative implementations are available as well. \r\n\n[Read more](/download/alternatives/)\n\nHistory\r\n\nPython was created in the early 1990s by Guido van Rossum at Stichting Mathematisch Centrum in the Netherlands as a successor of a language called ABC. Guido remains Python’s principal author, although it includes many contributions from others. \r\n\n[Read more](https://docs.python.org/3/license.html)\n\nRelease schedules\r\n\n[Python 3.15 release schedule](https://peps.python.org/pep-0790/)\r\n\n[Python 3.14 release schedule](https://peps.python.org/pep-0745/)\r\n\n[Python 3.13 release schedule](https://peps.python.org/pep-0719/)\r\n\n[Python 3.12 release schedule](https://peps.python.org/pep-0693/)\r\n\n[Python 3.11 release schedule](https://peps.python.org/pep-0664/)\r\n\n[Python 3.10 release schedule](https://peps.python.org/pep-0619/)\r\n\n[Python 3.9 release schedule](https://peps.python.org/pep-0596/)\r\n\nSee [Status of Python versions](https://devguide.python.org/versions/) for all an overview of all versions, including unsupported.\n\nInformation about specific ports, and developer info\r\n\n[Windows](/downloads/windows/)\r\n\n[macOS](/downloads/macos/)\r\n\n[Android](/downloads/android/)\r\n\n[Other platforms](/download/other/)\r\n\n[Source](/downloads/source/)\r\n\n[Python developer's guide](https://devguide.python.org/)\r\n\n[Python issue tracker](https://github.com/python/cpython/issues)\r\n\nHow to verify your downloaded files are genuine\r\n\nSigstore verification\r\n\nStarting with the [Python 3.11.0](https://www.python.org/downloads/release/python-3110/), [Python 3.10.7](https://www.python.org/downloads/release/python-3107/), and [Python 3.9.14](https://www.python.org/downloads/release/python-3914/) releases, CPython release artifacts are signed with Sigstore. See our dedicated [Sigstore Information](/downloads/metadata/sigstore/) page for how it works.\r\n\nOpenPGP verification\r\n\nPython versions before 3.14 are also signed using OpenPGP private keys of the respective release manager. In this case, verification through the release manager's public key is also possible.\r\nSee our dedicated [OpenPGP Verification](/downloads/metadata/pgp/) page for how it works.\r\n\nSee [PEP 761](https://peps.python.org/pep-0761/) for why OpenPGP key verification was dropped in Python 3.14.\r\n\nWindows\r\n\n(Updated for Azure Trusted Signing, which applies for all releases chronologically from 3.14.0a1)\r\n\nThe Windows installers and all binaries produced as part of each Python release are signed using an Authenticode signing certificate issued to the Python Software Foundation. This can be verified by viewing the properties of any executable file, looking at the Digital Signatures tab, and confirming the name of the signer. Our full certificate subject is CN = Python Software Foundation, O = Python Software Foundation, L = Beaverton, S = Oregon, C = US and as of 14th October 2024 the certificate authority is Microsoft Identity Verification Root Certificate Authority. Our previous certificates were issued by DigiCert.\r\n\nNote that some executables may not be signed, notably, the default pip command. These are not built as part of Python, but are included from third-party libraries. Files that are intended to be modified before use cannot be signed and so will not have a signature.\r\n\nmacOS installer packages\r\n\nInstaller packages for Python on macOS downloadable from python.org are signed with\r\nwith an Apple Developer ID Installer certificate.\r\n\nAs of Python 3.11.4 and 3.12.0b1 (2023-05-23), release installer packages are signed with certificates issued to the Python Software Foundation (Apple Developer ID BMM5U3QVKW).\r\n\nInstaller packages for previous releases were signed with certificates issued to Ned Deily (DJ3H93M7VJ).\r\n\nOther useful items\r\n\nLooking for third-party Python modules? The\r\n[Python Package Index](https://pypi.org/) has many of them.\r\n\nYou can [view](https://docs.python.org/) the standard documentation\r\nonline, or you can [download](https://docs.python.org/3/download.html) it\r\nin HTML, EPUB and other formats. See the main\r\n[Documentation](/doc/) page.\r\n\nTip: even if you download a ready-made binary for your\r\nplatform, it makes sense to also download the [source](source).\r\nThis lets you browse the standard library (the subdirectory Lib)\r\nand the standard collections of tools\r\n(Tools) that come with it. There's a lot you can learn from the\r\nsource!\r\n\nWant to contribute?\r\n\nWant to contribute? See the [Python Developer's Guide](https://devguide.python.org/)\r\nto learn about how Python development is managed.\n\n[▲ Back to Top](#python-network)\n\n[About](/about/)\n\n[Applications](/about/apps/)\n\n[Quotes](/about/quotes/)\n\n[Getting Started](/about/gettingstarted/)\n\n[Help](/about/help/)\n\n[Downloads](/downloads/)\n\n[All releases](/downloads/)\n\n[Source code](/downloads/source/)\n\n[Windows](/downloads/windows/)\n\n[macOS](/downloads/macos/)\n\n[Android](/downloads/android/)\n\n[iOS](/downloads/ios/)\n\n[Other Platforms](/download/other/)\n\n[License](https://docs.python.org/3/license.html)\n\n[Alternative Implementations](/download/alternatives)\n\n[Documentation](/doc/)\n\n[Docs](/doc/)\n\n[Audio/Visual Talks](/doc/av)\n\n[Beginner's Guide](https://wiki.python.org/moin/BeginnersGuide)\n\n[FAQ](https://docs.python.org/3/faq/)\n\n[Non-English Docs](https://translations.python.org/)\n\n[PEP Index](https://peps.python.org)\n\n[Python Books](https://wiki.python.org/moin/PythonBooks)\n\n[Python Essays](/doc/essays/)\n\n[Community](/community/)\n\n[Diversity](/community/diversity/)\n\n[Mailing Lists](/community/lists/)\n\n[IRC](/community/irc/)\n\n[Forums](/community/forums/)\n\n[PSF Annual Impact Report](/psf/annual-report/2024/)\n\n[Python Conferences](/community/workshops/)\n\n[Special Interest Groups](/community/sigs/)\n\n[Python Logo](/community/logos/)\n\n[Python Wiki](https://wiki.python.org/moin/)\n\n[Code of Conduct](/psf/conduct/)\n\n[Community Awards](/community/awards)\n\n[Get Involved](/psf/get-involved/)\n\n[Shared Stories](/psf/community-stories/)\n\n[Success Stories](/success-stories/)\n\n[Arts](/success-stories/category/arts/)\n\n[Business](/success-stories/category/business/)\n\n[Education](/success-stories/category/education/)\n\n[Engineering](/success-stories/category/engineering/)\n\n[Government](/success-stories/category/government/)\n\n[Scientific](/success-stories/category/scientific/)\n\n[Software Development](/success-stories/category/software-development/)\n\n[News](/blogs/)\n\n[Python News](/blogs/)\n\n[PSF Newsletter](/psf/newsletter/)\n\n[PSF News](https://pyfound.blogspot.com)\n\n[PyCon US News](https://pycon.blogspot.com/)\n\n[Python Insider](https://blog.python.org)\n\n[News from the Community](https://planetpython.org/)\n\n[Events](/events/)\n\n[Python Events](/events/python-events/)\n\n[User Group Events](/events/python-user-group/)\n\n[Python Events Archive](/events/python-events/past/)\n\n[User Group Events Archive](/events/python-user-group/past/)\n\n[Submit an Event](https://wiki.python.org/moin/PythonEventsCalendar#Submitting_an_Event)\n\n[Contributing](/dev/)\n\n[Developer's Guide](https://devguide.python.org/)\n\n[Issue Tracker](https://github.com/python/cpython/issues)\n\n[python-dev list](https://mail.python.org/mailman/listinfo/python-dev)\n\n[Core Mentorship](/dev/core-mentorship/)\n\n[Report a Security Issue](/dev/security/)\n\n[▲ Back to Top](#python-network)\n\n[Help & General Contact](/about/help/)\n\n[Diversity Initiatives](/community/diversity/)\n\n[Submit Website Bug](https://github.com/python/pythondotorg/issues)\n\n[Status](https://status.python.org/)\n\nCopyright ©2001-2026.\n  [Python Software Foundation](/psf-landing/)\n  [Legal Statements](/about/legal/)\n  [Privacy Notice](https://policies.python.org/python.org/Privacy-Notice/)",
+  "links": [
+    {
+      "text": "Skip to content",
+      "url": "#content"
+    },
+    {
+      "text": "▼ Close",
+      "url": "#python-network"
+    },
+    {
+      "text": "Python",
+      "url": "/"
+    },
+    {
+      "text": "PSF",
+      "url": "https://www.python.org/psf/"
+    },
+    {
+      "text": "Docs",
+      "url": "https://docs.python.org"
+    },
+    {
+      "text": "PyPI",
+      "url": "https://pypi.org/"
+    },
+    {
+      "text": "Jobs",
+      "url": "/jobs/"
+    },
+    {
+      "text": "Community",
+      "url": "/community/"
+    },
+    {
+      "text": "▲ The Python Network",
+      "url": "#top"
+    },
+    {
+      "text": "Donate",
+      "url": "https://donate.python.org/"
+    },
+    {
+      "text": "≡ Menu",
+      "url": "#site-map"
+    },
+    {
+      "text": "A A",
+      "url": "#"
+    },
+    {
+      "text": "Smaller",
+      "url": "javascript:;"
+    },
+    {
+      "text": "Larger",
+      "url": "javascript:;"
+    },
+    {
+      "text": "Reset",
+      "url": "javascript:;"
+    },
+    {
+      "text": "Socialize",
+      "url": "#"
+    },
+    {
+      "text": "LinkedIn",
+      "url": "https://www.linkedin.com/company/python-software-foundation/"
+    },
+    {
+      "text": "Mastodon",
+      "url": "https://fosstodon.org/@ThePSF"
+    },
+    {
+      "text": "Chat on IRC",
+      "url": "/community/irc/"
+    },
+    {
+      "text": "Twitter",
+      "url": "https://twitter.com/ThePSF"
+    },
+    {
+      "text": "About",
+      "url": "/about/"
+    },
+    {
+      "text": "Applications",
+      "url": "/about/apps/"
+    },
+    {
+      "text": "Quotes",
+      "url": "/about/quotes/"
+    },
+    {
+      "text": "Getting Started",
+      "url": "/about/gettingstarted/"
+    },
+    {
+      "text": "Help",
+      "url": "/about/help/"
+    },
+    {
+      "text": "Downloads",
+      "url": "/downloads/"
+    },
+    {
+      "text": "All releases",
+      "url": "/downloads/"
+    },
+    {
+      "text": "Source code",
+      "url": "/downloads/source/"
+    },
+    {
+      "text": "Windows",
+      "url": "/downloads/windows/"
+    },
+    {
+      "text": "macOS",
+      "url": "/downloads/macos/"
+    },
+    {
+      "text": "Android",
+      "url": "/downloads/android/"
+    },
+    {
+      "text": "iOS",
+      "url": "/downloads/ios/"
+    },
+    {
+      "text": "Other Platforms",
+      "url": "/download/other/"
+    },
+    {
+      "text": "License",
+      "url": "https://docs.python.org/3/license.html"
+    },
+    {
+      "text": "Alternative Implementations",
+      "url": "/download/alternatives"
+    },
+    {
+      "text": "Documentation",
+      "url": "/doc/"
+    },
+    {
+      "text": "Docs",
+      "url": "/doc/"
+    },
+    {
+      "text": "Audio/Visual Talks",
+      "url": "/doc/av"
+    },
+    {
+      "text": "Beginner's Guide",
+      "url": "https://wiki.python.org/moin/BeginnersGuide"
+    },
+    {
+      "text": "FAQ",
+      "url": "https://docs.python.org/3/faq/"
+    },
+    {
+      "text": "Non-English Docs",
+      "url": "https://translations.python.org/"
+    },
+    {
+      "text": "PEP Index",
+      "url": "https://peps.python.org"
+    },
+    {
+      "text": "Python Books",
+      "url": "https://wiki.python.org/moin/PythonBooks"
+    },
+    {
+      "text": "Python Essays",
+      "url": "/doc/essays/"
+    },
+    {
+      "text": "Community",
+      "url": "/community/"
+    },
+    {
+      "text": "Diversity",
+      "url": "/community/diversity/"
+    },
+    {
+      "text": "Mailing Lists",
+      "url": "/community/lists/"
+    },
+    {
+      "text": "IRC",
+      "url": "/community/irc/"
+    },
+    {
+      "text": "Forums",
+      "url": "/community/forums/"
+    },
+    {
+      "text": "PSF Annual Impact Report",
+      "url": "/psf/annual-report/2024/"
+    },
+    {
+      "text": "Python Conferences",
+      "url": "/community/workshops/"
+    },
+    {
+      "text": "Special Interest Groups",
+      "url": "/community/sigs/"
+    },
+    {
+      "text": "Python Logo",
+      "url": "/community/logos/"
+    },
+    {
+      "text": "Python Wiki",
+      "url": "https://wiki.python.org/moin/"
+    },
+    {
+      "text": "Code of Conduct",
+      "url": "/psf/conduct/"
+    },
+    {
+      "text": "Community Awards",
+      "url": "/community/awards"
+    },
+    {
+      "text": "Get Involved",
+      "url": "/psf/get-involved/"
+    },
+    {
+      "text": "Shared Stories",
+      "url": "/psf/community-stories/"
+    },
+    {
+      "text": "Success Stories",
+      "url": "/success-stories/"
+    },
+    {
+      "text": "Arts",
+      "url": "/success-stories/category/arts/"
+    },
+    {
+      "text": "Business",
+      "url": "/success-stories/category/business/"
+    },
+    {
+      "text": "Education",
+      "url": "/success-stories/category/education/"
+    },
+    {
+      "text": "Engineering",
+      "url": "/success-stories/category/engineering/"
+    },
+    {
+      "text": "Government",
+      "url": "/success-stories/category/government/"
+    },
+    {
+      "text": "Scientific",
+      "url": "/success-stories/category/scientific/"
+    },
+    {
+      "text": "Software Development",
+      "url": "/success-stories/category/software-development/"
+    },
+    {
+      "text": "News",
+      "url": "/blogs/"
+    },
+    {
+      "text": "Python News",
+      "url": "/blogs/"
+    },
+    {
+      "text": "PSF Newsletter",
+      "url": "/psf/newsletter/"
+    },
+    {
+      "text": "PSF News",
+      "url": "https://pyfound.blogspot.com"
+    },
+    {
+      "text": "PyCon US News",
+      "url": "https://pycon.blogspot.com/"
+    },
+    {
+      "text": "Python Insider",
+      "url": "https://blog.python.org"
+    },
+    {
+      "text": "News from the Community",
+      "url": "https://planetpython.org/"
+    },
+    {
+      "text": "Events",
+      "url": "/events/"
+    },
+    {
+      "text": "Python Events",
+      "url": "/events/python-events/"
+    },
+    {
+      "text": "User Group Events",
+      "url": "/events/python-user-group/"
+    },
+    {
+      "text": "Python Events Archive",
+      "url": "/events/python-events/past/"
+    },
+    {
+      "text": "User Group Events Archive",
+      "url": "/events/python-user-group/past/"
+    },
+    {
+      "text": "Submit an Event",
+      "url": "https://wiki.python.org/moin/PythonEventsCalendar#Submitting_an_Event"
+    },
+    {
+      "text": "Download Python 3.14.7",
+      "url": "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz"
+    },
+    {
+      "text": "Download Python install manager",
+      "url": "https://www.python.org/ftp/python/pymanager/python-manager-26.3.msix"
+    },
+    {
+      "text": "Python 3.14.7",
+      "url": "https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe"
+    },
+    {
+      "text": "Download Python 3.14.7",
+      "url": "https://www.python.org/ftp/python/3.14.7/python-3.14.7-macos11.pkg"
+    },
+    {
+      "text": "Download Python 3.14.7",
+      "url": "/downloads/release/python-3147/"
+    },
+    {
+      "text": "Windows",
+      "url": "/downloads/windows/"
+    },
+    {
+      "text": "Linux/Unix",
+      "url": "/downloads/source/"
+    },
+    {
+      "text": "macOS",
+      "url": "/downloads/macos/"
+    },
+    {
+      "text": "Android",
+      "url": "/downloads/android/"
+    },
+    {
+      "text": "iOS",
+      "url": "/downloads/ios/"
+    },
+    {
+      "text": "other",
+      "url": "/download/other/"
+    },
+    {
+      "text": "Pre-releases",
+      "url": "/downloads/latest/prerelease/"
+    },
+    {
+      "text": "Docker images",
+      "url": "https://gitlab.com/python-devs/ci-images"
+    },
+    {
+      "text": "For more information visit the Python Developer's Guide",
+      "url": "https://devguide.python.org/versions/#versions"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.15/"
+    },
+    {
+      "text": "PEP 790",
+      "url": "https://peps.python.org/pep-0790/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.14/"
+    },
+    {
+      "text": "PEP 745",
+      "url": "https://peps.python.org/pep-0745/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.13/"
+    },
+    {
+      "text": "PEP 719",
+      "url": "https://peps.python.org/pep-0719/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.12/"
+    },
+    {
+      "text": "PEP 693",
+      "url": "https://peps.python.org/pep-0693/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.11/"
+    },
+    {
+      "text": "PEP 664",
+      "url": "https://peps.python.org/pep-0664/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.10/"
+    },
+    {
+      "text": "PEP 619",
+      "url": "https://peps.python.org/pep-0619/"
+    },
+    {
+      "text": "3.9.25",
+      "url": "/downloads/release/python-3925/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/latest/python3.9/"
+    },
+    {
+      "text": "PEP 596",
+      "url": "https://peps.python.org/pep-0596/"
+    },
+    {
+      "text": "Python 3.14.7",
+      "url": "/downloads/release/python-3147/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3147/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.7/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.6",
+      "url": "/downloads/release/python-3146/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3146/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.6/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.5",
+      "url": "/downloads/release/python-3145/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3145/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.5/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.4",
+      "url": "/downloads/release/python-3144/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3144/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.4/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.3",
+      "url": "/downloads/release/python-3143/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3143/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.3/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.2",
+      "url": "/downloads/release/python-3142/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3142/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.2/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.1",
+      "url": "/downloads/release/python-3141/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3141/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.14.1/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.14.0",
+      "url": "/downloads/release/python-3140/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3140/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.14/whatsnew/3.14.html"
+    },
+    {
+      "text": "Python 3.13.15",
+      "url": "/downloads/release/python-31315/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31315/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.15/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.14",
+      "url": "/downloads/release/python-31314/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31314/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.14/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.13",
+      "url": "/downloads/release/python-31313/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31313/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.13/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.12",
+      "url": "/downloads/release/python-31312/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31312/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.12/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.11",
+      "url": "/downloads/release/python-31311/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31311/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.11/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.10",
+      "url": "/downloads/release/python-31310/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31310/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.10/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.9",
+      "url": "/downloads/release/python-3139/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3139/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.9/whatsnew/changelog.html#python-3-13-9"
+    },
+    {
+      "text": "Python 3.13.8",
+      "url": "/downloads/release/python-3138/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3138/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.8/whatsnew/changelog.html#python-3-13-8"
+    },
+    {
+      "text": "Python 3.13.7",
+      "url": "/downloads/release/python-3137/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3137/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.7/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.13.6",
+      "url": "/downloads/release/python-3136/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3136/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.6/whatsnew/changelog.html#python-3-13-6"
+    },
+    {
+      "text": "Python 3.13.5",
+      "url": "/downloads/release/python-3135/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3135/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.5/whatsnew/changelog.html#python-3-13-5"
+    },
+    {
+      "text": "Python 3.13.4",
+      "url": "/downloads/release/python-3134/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3134/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.4/whatsnew/changelog.html#python-3-13-4"
+    },
+    {
+      "text": "Python 3.13.3",
+      "url": "/downloads/release/python-3133/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3133/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.3/whatsnew/changelog.html#python-3-13-3"
+    },
+    {
+      "text": "Python 3.13.2",
+      "url": "/downloads/release/python-3132/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3132/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.2/whatsnew/changelog.html#python-3-13-2"
+    },
+    {
+      "text": "Python 3.13.1",
+      "url": "/downloads/release/python-3131/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3131/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.1/whatsnew/changelog.html#python-3-13-1"
+    },
+    {
+      "text": "Python 3.13.0",
+      "url": "/downloads/release/python-3130/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3130/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.13.0/whatsnew/changelog.html#python-3-13-0"
+    },
+    {
+      "text": "Python 3.12.14",
+      "url": "/downloads/release/python-31214/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31214/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.14/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.12.13",
+      "url": "/downloads/release/python-31213/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31213/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.13/whatsnew/changelog.html#python-3-12-13"
+    },
+    {
+      "text": "Python 3.12.12",
+      "url": "/downloads/release/python-31212/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31212/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.12/whatsnew/changelog.html#python-3-12-12"
+    },
+    {
+      "text": "Python 3.12.11",
+      "url": "/downloads/release/python-31211/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31211/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.11/whatsnew/changelog.html#python-3-12-11"
+    },
+    {
+      "text": "Python 3.12.10",
+      "url": "/downloads/release/python-31210/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31210/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.10/whatsnew/changelog.html#python-3-12-10"
+    },
+    {
+      "text": "Python 3.12.9",
+      "url": "/downloads/release/python-3129/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3129/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.9/whatsnew/changelog.html#python-3-12-9"
+    },
+    {
+      "text": "Python 3.12.8",
+      "url": "/downloads/release/python-3128/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3128/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.8/whatsnew/changelog.html#python-3-12-8"
+    },
+    {
+      "text": "Python 3.12.7",
+      "url": "/downloads/release/python-3127/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3127/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.7/whatsnew/changelog.html#python-3-12-7"
+    },
+    {
+      "text": "Python 3.12.6",
+      "url": "/downloads/release/python-3126/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3126/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.6/whatsnew/changelog.html#python-3-12-6"
+    },
+    {
+      "text": "Python 3.12.5",
+      "url": "/downloads/release/python-3125/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3125/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.5/whatsnew/changelog.html#python-3-12-5"
+    },
+    {
+      "text": "Python 3.12.4",
+      "url": "/downloads/release/python-3124/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3124/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.4/whatsnew/changelog.html#python-3-12-4"
+    },
+    {
+      "text": "Python 3.12.3",
+      "url": "/downloads/release/python-3123/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3123/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.3/whatsnew/changelog.html#python-3-12-2"
+    },
+    {
+      "text": "Python 3.12.2",
+      "url": "/downloads/release/python-3122/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3122/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.2/whatsnew/changelog.html#python-3-12-2"
+    },
+    {
+      "text": "Python 3.12.1",
+      "url": "/downloads/release/python-3121/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3121/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.1/whatsnew/changelog.html#python-3-12-1"
+    },
+    {
+      "text": "Python 3.12.0",
+      "url": "/downloads/release/python-3120/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3120/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.12.0/whatsnew/changelog.html#python-3-12-0"
+    },
+    {
+      "text": "Python 3.11.16",
+      "url": "/downloads/release/python-31116/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31116/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.16/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.11.15",
+      "url": "/downloads/release/python-31115/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31115/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.15/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.11.14",
+      "url": "/downloads/release/python-31114/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31114/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.14/whatsnew/changelog.html#python-3-11-14"
+    },
+    {
+      "text": "Python 3.11.13",
+      "url": "/downloads/release/python-31113/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31113/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.13/whatsnew/changelog.html#python-3-11-13"
+    },
+    {
+      "text": "Python 3.11.12",
+      "url": "/downloads/release/python-31112/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31112/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.12/whatsnew/changelog.html#python-3-11-12"
+    },
+    {
+      "text": "Python 3.11.11",
+      "url": "/downloads/release/python-31111/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31111/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.11/whatsnew/changelog.html#python-3-11-11"
+    },
+    {
+      "text": "Python 3.11.10",
+      "url": "/downloads/release/python-31110/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31110/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.10/whatsnew/changelog.html#python-3-11-10"
+    },
+    {
+      "text": "Python 3.11.9",
+      "url": "/downloads/release/python-3119/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3119/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.9/whatsnew/changelog.html#python-3-11-9"
+    },
+    {
+      "text": "Python 3.11.8",
+      "url": "/downloads/release/python-3118/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3118/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.8/whatsnew/changelog.html#python-3-11-8"
+    },
+    {
+      "text": "Python 3.11.7",
+      "url": "/downloads/release/python-3117/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3117/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.7/whatsnew/changelog.html#python-3-11-7"
+    },
+    {
+      "text": "Python 3.11.6",
+      "url": "/downloads/release/python-3116/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3116/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.6/whatsnew/changelog.html#python-3-11-6"
+    },
+    {
+      "text": "Python 3.11.5",
+      "url": "/downloads/release/python-3115/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3115/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.5/whatsnew/changelog.html#python-3-11-5"
+    },
+    {
+      "text": "Python 3.11.4",
+      "url": "/downloads/release/python-3114/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3114/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.4/whatsnew/changelog.html#python-3-11-4"
+    },
+    {
+      "text": "Python 3.11.3",
+      "url": "/downloads/release/python-3113/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3113/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.3/whatsnew/changelog.html#python-3-11-3"
+    },
+    {
+      "text": "Python 3.11.2",
+      "url": "/downloads/release/python-3112/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3112/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.2/whatsnew/changelog.html#python-3-11-2"
+    },
+    {
+      "text": "Python 3.11.1",
+      "url": "/downloads/release/python-3111/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3111/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.1/whatsnew/changelog.html#python-3-11-1"
+    },
+    {
+      "text": "Python 3.11.0",
+      "url": "/downloads/release/python-3110/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3110/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.11.0/whatsnew/changelog.html#python-3-11-0-final"
+    },
+    {
+      "text": "Python 3.10.21",
+      "url": "/downloads/release/python-31021/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31021/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.21/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.20",
+      "url": "/downloads/release/python-31020/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31020/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.20/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.19",
+      "url": "/downloads/release/python-31019/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31019/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.19/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.18",
+      "url": "/downloads/release/python-31018/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31018/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.18/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.17",
+      "url": "/downloads/release/python-31017/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31017/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.17/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.16",
+      "url": "/downloads/release/python-31016/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31016/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.16/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.15",
+      "url": "/downloads/release/python-31015/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31015/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.15/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.14",
+      "url": "/downloads/release/python-31014/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31014/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.14/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.10.13",
+      "url": "/downloads/release/python-31013/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31013/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.13/whatsnew/changelog.html#python-3-10-13-final"
+    },
+    {
+      "text": "Python 3.10.12",
+      "url": "/downloads/release/python-31012/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31012/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.12/whatsnew/changelog.html#python-3-10-12-final"
+    },
+    {
+      "text": "Python 3.10.11",
+      "url": "/downloads/release/python-31011/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31011/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.11/whatsnew/changelog.html#python-3-10-11-final"
+    },
+    {
+      "text": "Python 3.10.10",
+      "url": "/downloads/release/python-31010/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-31010/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.10/whatsnew/changelog.html#python-3-10-10-final"
+    },
+    {
+      "text": "Python 3.10.9",
+      "url": "/downloads/release/python-3109/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3109/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.9/whatsnew/changelog.html#python-3-10-9-final"
+    },
+    {
+      "text": "Python 3.10.8",
+      "url": "/downloads/release/python-3108/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3108/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.8/whatsnew/changelog.html#python-3-10-8-final"
+    },
+    {
+      "text": "Python 3.10.7",
+      "url": "/downloads/release/python-3107/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3107/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.7/whatsnew/changelog.html#python-3-10-7-final"
+    },
+    {
+      "text": "Python 3.10.6",
+      "url": "/downloads/release/python-3106/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3106/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.6/whatsnew/changelog.html#python-3-10-6-final"
+    },
+    {
+      "text": "Python 3.10.5",
+      "url": "/downloads/release/python-3105/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3105/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.5/whatsnew/changelog.html#python-3-10-5-final"
+    },
+    {
+      "text": "Python 3.10.4",
+      "url": "/downloads/release/python-3104/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3104/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.4/whatsnew/changelog.html#python-3-10-4-final"
+    },
+    {
+      "text": "Python 3.10.3",
+      "url": "/downloads/release/python-3103/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3103/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.3/whatsnew/changelog.html#python-3-10-3-final"
+    },
+    {
+      "text": "Python 3.10.2",
+      "url": "/downloads/release/python-3102/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3102/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.2/whatsnew/changelog.html#python-3-10-2-final"
+    },
+    {
+      "text": "Python 3.10.1",
+      "url": "/downloads/release/python-3101/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3101/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.1/whatsnew/changelog.html#python-3-10-1-final"
+    },
+    {
+      "text": "Python 3.10.0",
+      "url": "/downloads/release/python-3100/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3100/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.10.0/whatsnew/changelog.html#python-3-10-0-final"
+    },
+    {
+      "text": "Python 3.9.25",
+      "url": "/downloads/release/python-3925/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3925/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.25/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.24",
+      "url": "/downloads/release/python-3924/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3924/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.24/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.23",
+      "url": "/downloads/release/python-3923/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3923/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.23/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.22",
+      "url": "/downloads/release/python-3922/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3922/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.22/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.21",
+      "url": "/downloads/release/python-3921/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3921/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.21/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.20",
+      "url": "/downloads/release/python-3920/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3920/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.20/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.19",
+      "url": "/downloads/release/python-3919/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3919/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.19/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.18",
+      "url": "/downloads/release/python-3918/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3918/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.18/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.17",
+      "url": "/downloads/release/python-3917/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3917/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.17/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.16",
+      "url": "/downloads/release/python-3916/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3916/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.9.16/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.15",
+      "url": "/downloads/release/python-3915/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3915/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.9.15/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.14",
+      "url": "/downloads/release/python-3914/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3914/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.9.14/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.13",
+      "url": "/downloads/release/python-3913/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3913/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.13/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.12",
+      "url": "/downloads/release/python-3912/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3912/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.12/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.11",
+      "url": "/downloads/release/python-3911/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3911/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.11/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.10",
+      "url": "/downloads/release/python-3910/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3910/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.10/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.9",
+      "url": "/downloads/release/python-399/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-399/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.9/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.8",
+      "url": "/downloads/release/python-398/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-398/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.8/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.7",
+      "url": "/downloads/release/python-397/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-397/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.7/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.6",
+      "url": "/downloads/release/python-396/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-396/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.6/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.5",
+      "url": "/downloads/release/python-395/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-395/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.5/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.9.4",
+      "url": "/downloads/release/python-394/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-394/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.4/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.2",
+      "url": "/downloads/release/python-392/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-392/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.2/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.1",
+      "url": "/downloads/release/python-391/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-391/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.1/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.9.0",
+      "url": "/downloads/release/python-390/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-390/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.9.0/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.20",
+      "url": "/downloads/release/python-3820/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3820/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.20/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.19",
+      "url": "/downloads/release/python-3819/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3819/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.19/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.18",
+      "url": "/downloads/release/python-3818/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3818/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.18/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.17",
+      "url": "/downloads/release/python-3817/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3817/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.8.17/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.16",
+      "url": "/downloads/release/python-3816/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3816/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.8.16/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.15",
+      "url": "/downloads/release/python-3815/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3815/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.8.15/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.14",
+      "url": "/downloads/release/python-3814/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3814/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://docs.python.org/release/3.8.14/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.13",
+      "url": "/downloads/release/python-3813/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3813/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.13/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.12",
+      "url": "/downloads/release/python-3812/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3812/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.12/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.11",
+      "url": "/downloads/release/python-3811/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3811/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.11/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.10",
+      "url": "/downloads/release/python-3810/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3810/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.10/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.9",
+      "url": "/downloads/release/python-389/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-389/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.9/whatsnew/changelog.html#python-3-8-9"
+    },
+    {
+      "text": "Python 3.8.8",
+      "url": "/downloads/release/python-388/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-388/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.8/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.7",
+      "url": "/downloads/release/python-387/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-387/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.7/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.8.6",
+      "url": "/downloads/release/python-386/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-386/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.6/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.5",
+      "url": "/downloads/release/python-385/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-385/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.5/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.4",
+      "url": "/downloads/release/python-384/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-384/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.4/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.3",
+      "url": "/downloads/release/python-383/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-383/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.3/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.8.2",
+      "url": "/downloads/release/python-382/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-382/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.8.2/whatsnew/changelog.html#python-3-8-2-final"
+    },
+    {
+      "text": "Python 3.8.1",
+      "url": "/downloads/release/python-381/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-381/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.8/whatsnew/changelog.html#python-3-8-1"
+    },
+    {
+      "text": "Python 3.8.0",
+      "url": "/downloads/release/python-380/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-380/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.8/whatsnew/changelog.html#python-3-8-0-final"
+    },
+    {
+      "text": "Python 3.7.17",
+      "url": "/downloads/release/python-3717/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3717/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.17/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.16",
+      "url": "/downloads/release/python-3716/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3716/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.16/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.15",
+      "url": "/downloads/release/python-3715/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3715/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.15/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.14",
+      "url": "/downloads/release/python-3714/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3714/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.14/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.13",
+      "url": "/downloads/release/python-3713/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3713/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.13/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.12",
+      "url": "/downloads/release/python-3712/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3712/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.12/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.11",
+      "url": "/downloads/release/python-3711/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3711/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.11/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.10",
+      "url": "/downloads/release/python-3710/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3710/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.10/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.9",
+      "url": "/downloads/release/python-379/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-379/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.9/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.8",
+      "url": "/downloads/release/python-378/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-378/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.7.8/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.7.7",
+      "url": "/downloads/release/python-377/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-377/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-7-final"
+    },
+    {
+      "text": "Python 3.7.6",
+      "url": "/downloads/release/python-376/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-376/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-6-final"
+    },
+    {
+      "text": "Python 3.7.5",
+      "url": "/downloads/release/python-375/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-375/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-5-final"
+    },
+    {
+      "text": "Python 3.7.4",
+      "url": "/downloads/release/python-374/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-374/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-4-final"
+    },
+    {
+      "text": "Python 3.7.3",
+      "url": "/downloads/release/python-373/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-373/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-3-final"
+    },
+    {
+      "text": "Python 3.7.2",
+      "url": "/downloads/release/python-372/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-372/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-2-final"
+    },
+    {
+      "text": "Python 3.7.1",
+      "url": "/downloads/release/python-371/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-371/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-1-final"
+    },
+    {
+      "text": "Python 3.7.0",
+      "url": "/downloads/release/python-370/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-370/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.7/whatsnew/changelog.html#python-3-7-0-final"
+    },
+    {
+      "text": "Python 3.6.15",
+      "url": "/downloads/release/python-3615/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3615/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.6.15/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.6.14",
+      "url": "/downloads/release/python-3614/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3614/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.6.14/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.6.13",
+      "url": "/downloads/release/python-3613/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3613/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.6.13/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.6.12",
+      "url": "/downloads/release/python-3612/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3612/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.6.12/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.6.11",
+      "url": "/downloads/release/python-3611/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3611/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.6.11/whatsnew/changelog.html#changelog"
+    },
+    {
+      "text": "Python 3.6.10",
+      "url": "/downloads/release/python-3610/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3610/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-10-final"
+    },
+    {
+      "text": "Python 3.6.9",
+      "url": "/downloads/release/python-369/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-369/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-9-final"
+    },
+    {
+      "text": "Python 3.6.8",
+      "url": "/downloads/release/python-368/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-368/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-8-final"
+    },
+    {
+      "text": "Python 3.6.7",
+      "url": "/downloads/release/python-367/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-367/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-7-final"
+    },
+    {
+      "text": "Python 3.6.6",
+      "url": "/downloads/release/python-366/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-366/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-6-final"
+    },
+    {
+      "text": "Python 3.6.5",
+      "url": "/downloads/release/python-365/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-365/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-5-final"
+    },
+    {
+      "text": "Python 3.6.4",
+      "url": "/downloads/release/python-364/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-364/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-4-final"
+    },
+    {
+      "text": "Python 3.6.3",
+      "url": "/downloads/release/python-363/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-363/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-3-final"
+    },
+    {
+      "text": "Python 3.6.2",
+      "url": "/downloads/release/python-362/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-362/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-2-final"
+    },
+    {
+      "text": "Python 3.6.1",
+      "url": "/downloads/release/python-361/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-361/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-1-final"
+    },
+    {
+      "text": "Python 3.6.0",
+      "url": "/downloads/release/python-360/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-360/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.6/whatsnew/changelog.html#python-3-6-0-final"
+    },
+    {
+      "text": "Python 3.5.10",
+      "url": "/downloads/release/python-3510/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3510/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-10"
+    },
+    {
+      "text": "Python 3.5.9",
+      "url": "/downloads/release/python-359/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-359/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-9"
+    },
+    {
+      "text": "Python 3.5.8",
+      "url": "/downloads/release/python-358/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-358/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-8"
+    },
+    {
+      "text": "Python 3.5.7",
+      "url": "/downloads/release/python-357/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-357/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-7"
+    },
+    {
+      "text": "Python 3.5.6",
+      "url": "/downloads/release/python-356/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-356/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-6"
+    },
+    {
+      "text": "Python 3.5.5",
+      "url": "/downloads/release/python-355/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-355/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-5-final"
+    },
+    {
+      "text": "Python 3.5.4",
+      "url": "/downloads/release/python-354/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-354/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-4"
+    },
+    {
+      "text": "Python 3.5.3",
+      "url": "/downloads/release/python-353/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-353/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-3"
+    },
+    {
+      "text": "Python 3.5.2",
+      "url": "/downloads/release/python-352/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-352/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-2"
+    },
+    {
+      "text": "Python 3.5.1",
+      "url": "/downloads/release/python-351/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-351/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-1-final"
+    },
+    {
+      "text": "Python 3.5.0",
+      "url": "/downloads/release/python-350/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-350/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.5/whatsnew/changelog.html#python-3-5-0-final"
+    },
+    {
+      "text": "Python 3.4.10",
+      "url": "/downloads/release/python-3410/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-3410/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-10"
+    },
+    {
+      "text": "Python 3.4.9",
+      "url": "/downloads/release/python-349/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-349/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-9"
+    },
+    {
+      "text": "Python 3.4.8",
+      "url": "/downloads/release/python-348/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-348/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-8-final"
+    },
+    {
+      "text": "Python 3.4.7",
+      "url": "/downloads/release/python-347/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-347/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-7"
+    },
+    {
+      "text": "Python 3.4.6",
+      "url": "/downloads/release/python-346/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-346/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-6"
+    },
+    {
+      "text": "Python 3.4.5",
+      "url": "/downloads/release/python-345/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-345/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-5"
+    },
+    {
+      "text": "Python 3.4.4",
+      "url": "/downloads/release/python-344/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-344/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-4"
+    },
+    {
+      "text": "Python 3.4.3",
+      "url": "/downloads/release/python-343/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-343/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-3"
+    },
+    {
+      "text": "Python 3.4.2",
+      "url": "/downloads/release/python-342/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-342/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-2"
+    },
+    {
+      "text": "Python 3.4.1",
+      "url": "/downloads/release/python-341/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-341/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-1"
+    },
+    {
+      "text": "Python 3.4.0",
+      "url": "/downloads/release/python-340/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-340/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/3.4/whatsnew/changelog.html#python-3-4-0"
+    },
+    {
+      "text": "Python 3.3.7",
+      "url": "/downloads/release/python-337/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-337/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.3.7/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.3.6",
+      "url": "/downloads/release/python-336/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-336/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/file/v3.3.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.3.5",
+      "url": "/downloads/release/python-335/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-335/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.3.5/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.3.4",
+      "url": "/downloads/release/python-334/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-334/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.3.4/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.3.3",
+      "url": "/downloads/release/python-333/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-333/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.3.3/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.3.2",
+      "url": "/downloads/release/python-332/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-332/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.3.2/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.3.1",
+      "url": "/downloads/release/python-331/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-331/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://docs.python.org/release/3.3.1/whatsnew/changelog.html"
+    },
+    {
+      "text": "Python 3.3.0",
+      "url": "/downloads/release/python-330/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-330/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.3.0/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.6",
+      "url": "/downloads/release/python-326/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-326/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/file/v3.2.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.5",
+      "url": "/downloads/release/python-325/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-325/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.2.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.4",
+      "url": "/downloads/release/python-324/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-324/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.2.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.3",
+      "url": "/downloads/release/python-323/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-323/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.2.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.2",
+      "url": "/downloads/release/python-322/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-322/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.2.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.1",
+      "url": "/downloads/release/python-321/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-321/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.2.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.2.0",
+      "url": "/downloads/release/python-320/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-320/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.1.5",
+      "url": "/downloads/release/python-315/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-315/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.1.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.1.4",
+      "url": "/downloads/release/python-314/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-314/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.1.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.1.3",
+      "url": "/downloads/release/python-313/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-313/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.1.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.1.2",
+      "url": "/downloads/release/python-312/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-312/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.1.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.1.1",
+      "url": "/downloads/release/python-311/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-311/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.1.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.1.0",
+      "url": "/downloads/release/python-310/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-310/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.0.1",
+      "url": "/downloads/release/python-301/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-301/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.0.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 3.0.0",
+      "url": "/downloads/release/python-300/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-300/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v3.0/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.18",
+      "url": "/downloads/release/python-2718/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2718/"
+    },
+    {
+      "text": "Release notes",
+      "url": ""
+    },
+    {
+      "text": "Python 2.7.17",
+      "url": "/downloads/release/python-2717/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2717/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://raw.githubusercontent.com/python/cpython/c2f86d86e6c8f5fd1ef602128b537a48f3f5c063/Misc/NEWS.d/2.7.17rc1.rst"
+    },
+    {
+      "text": "Python 2.7.16",
+      "url": "/downloads/release/python-2716/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2716/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://raw.githubusercontent.com/python/cpython/v2.7.16/Misc/NEWS.d/2.7.16.rst"
+    },
+    {
+      "text": "Python 2.7.15",
+      "url": "/downloads/release/python-2715/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2715/"
+    },
+    {
+      "text": "Release notes",
+      "url": ""
+    },
+    {
+      "text": "Python 2.7.14",
+      "url": "/downloads/release/python-2714/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2714/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://raw.githubusercontent.com/python/cpython/84471935ed2f62b8c5758fd544c7d37076fe0fa5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.13",
+      "url": "/downloads/release/python-2713/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2713/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/raw-file/v2.7.13/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.12",
+      "url": "/downloads/release/python-2712/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2712/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/raw-file/v2.7.12/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.11",
+      "url": "/downloads/release/python-2711/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2711/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/raw-file/53d30ab403f1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.10",
+      "url": "/downloads/release/python-2710/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-2710/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/raw-file/15c95b7d81dc/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.9",
+      "url": "/downloads/release/python-279/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-279/"
+    },
+    {
+      "text": "Release notes",
+      "url": "https://hg.python.org/cpython/raw-file/v2.7.9/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.8",
+      "url": "/downloads/release/python-278/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-278/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.8/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.7",
+      "url": "/downloads/release/python-277/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-277/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.7/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.6",
+      "url": "/downloads/release/python-276/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-276/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.5",
+      "url": "/downloads/release/python-275/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-275/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.4",
+      "url": "/downloads/release/python-274/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-274/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.3",
+      "url": "/downloads/release/python-273/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-273/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.2",
+      "url": "/downloads/release/python-272/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-272/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.1",
+      "url": "/downloads/release/python-271/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-271/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.7.0",
+      "url": "/downloads/release/python-270/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-270/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.7/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.9",
+      "url": "/downloads/release/python-269/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-269/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.9/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.8",
+      "url": "/downloads/release/python-268/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-268/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.8/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.7",
+      "url": "/downloads/release/python-267/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-267/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.7/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.6",
+      "url": "/downloads/release/python-266/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-266/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.5",
+      "url": "/downloads/release/python-265/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-265/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.4",
+      "url": "/downloads/release/python-264/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-264/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.3",
+      "url": "/downloads/release/python-263/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-263/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.2",
+      "url": "/downloads/release/python-262/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-262/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.1",
+      "url": "/downloads/release/python-261/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-261/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.6.0",
+      "url": "/downloads/release/python-260/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-260/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.6",
+      "url": "/downloads/release/python-256/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-256/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.5",
+      "url": "/downloads/release/python-255/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-255/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.4",
+      "url": "/downloads/release/python-254/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-254/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.3",
+      "url": "/downloads/release/python-253/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-253/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.2",
+      "url": "/downloads/release/python-252/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-252/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.1",
+      "url": "/downloads/release/python-251/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-251/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.5.0",
+      "url": "/downloads/release/python-250/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-250/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.6",
+      "url": "/downloads/release/python-246/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-246/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.5",
+      "url": "/downloads/release/python-245/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-245/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.4",
+      "url": "/downloads/release/python-244/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-244/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.3",
+      "url": "/downloads/release/python-243/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-243/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.2",
+      "url": "/downloads/release/python-242/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-242/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.1",
+      "url": "/downloads/release/python-241/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-241/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.4.0",
+      "url": "/downloads/release/python-240/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-240/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.7",
+      "url": "/downloads/release/python-237/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-237/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.7/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.6",
+      "url": "/downloads/release/python-236/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-236/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.6/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.5",
+      "url": "/downloads/release/python-235/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-235/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.5/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.4",
+      "url": "/downloads/release/python-234/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-234/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.4/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.3",
+      "url": "/downloads/release/python-233/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-233/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.2",
+      "url": "/downloads/release/python-232/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-232/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.1",
+      "url": "/downloads/release/python-231/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-231/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.3.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.3.0",
+      "url": "/downloads/release/python-230/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-230/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/15fc83c505e3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.2.3",
+      "url": "/downloads/release/python-223/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-223/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.2.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.2.2",
+      "url": "/downloads/release/python-222/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-222/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.2.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.2.1",
+      "url": "/downloads/release/python-221/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-221/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.2.1/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.2.0",
+      "url": "/downloads/release/python-220/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-220/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.2/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.1.3",
+      "url": "/downloads/release/python-213/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-213/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.1.3/Misc/NEWS"
+    },
+    {
+      "text": "Python 2.0.1",
+      "url": "/downloads/release/python-201/"
+    },
+    {
+      "text": "Download",
+      "url": "/downloads/release/python-201/"
+    },
+    {
+      "text": "Release notes",
+      "url": "http://hg.python.org/cpython/raw-file/v2.0.1/Misc/NEWS"
+    },
+    {
+      "text": "View older releases",
+      "url": "/download/releases/"
+    },
+    {
+      "text": "Open Source",
+      "url": "https://www.opensource.org/"
+    },
+    {
+      "text": "Read more",
+      "url": "https://docs.python.org/3/license.html#terms-and-conditions-for-accessing-or-otherwise-using-python"
+    },
+    {
+      "text": "Python 3",
+      "url": "https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz"
+    },
+    {
+      "text": "Read more",
+      "url": "/download/source/"
+    },
+    {
+      "text": "Read more",
+      "url": "/download/alternatives/"
+    },
+    {
+      "text": "Read more",
+      "url": "https://docs.python.org/3/license.html"
+    },
+    {
+      "text": "Python 3.15 release schedule",
+      "url": "https://peps.python.org/pep-0790/"
+    },
+    {
+      "text": "Python 3.14 release schedule",
+      "url": "https://peps.python.org/pep-0745/"
+    },
+    {
+      "text": "Python 3.13 release schedule",
+      "url": "https://peps.python.org/pep-0719/"
+    },
+    {
+      "text": "Python 3.12 release schedule",
+      "url": "https://peps.python.org/pep-0693/"
+    },
+    {
+      "text": "Python 3.11 release schedule",
+      "url": "https://peps.python.org/pep-0664/"
+    },
+    {
+      "text": "Python 3.10 release schedule",
+      "url": "https://peps.python.org/pep-0619/"
+    },
+    {
+      "text": "Python 3.9 release schedule",
+      "url": "https://peps.python.org/pep-0596/"
+    },
+    {
+      "text": "Status of Python versions",
+      "url": "https://devguide.python.org/versions/"
+    },
+    {
+      "text": "Windows",
+      "url": "/downloads/windows/"
+    },
+    {
+      "text": "macOS",
+      "url": "/downloads/macos/"
+    },
+    {
+      "text": "Android",
+      "url": "/downloads/android/"
+    },
+    {
+      "text": "Other platforms",
+      "url": "/download/other/"
+    },
+    {
+      "text": "Source",
+      "url": "/downloads/source/"
+    },
+    {
+      "text": "Python developer's guide",
+      "url": "https://devguide.python.org/"
+    },
+    {
+      "text": "Python issue tracker",
+      "url": "https://github.com/python/cpython/issues"
+    },
+    {
+      "text": "Python 3.11.0",
+      "url": "https://www.python.org/downloads/release/python-3110/"
+    },
+    {
+      "text": "Python 3.10.7",
+      "url": "https://www.python.org/downloads/release/python-3107/"
+    },
+    {
+      "text": "Python 3.9.14",
+      "url": "https://www.python.org/downloads/release/python-3914/"
+    },
+    {
+      "text": "Sigstore Information",
+      "url": "/downloads/metadata/sigstore/"
+    },
+    {
+      "text": "OpenPGP Verification",
+      "url": "/downloads/metadata/pgp/"
+    },
+    {
+      "text": "PEP 761",
+      "url": "https://peps.python.org/pep-0761/"
+    },
+    {
+      "text": "Python Package Index",
+      "url": "https://pypi.org/"
+    },
+    {
+      "text": "view",
+      "url": "https://docs.python.org/"
+    },
+    {
+      "text": "download",
+      "url": "https://docs.python.org/3/download.html"
+    },
+    {
+      "text": "Documentation",
+      "url": "/doc/"
+    },
+    {
+      "text": "source",
+      "url": "source"
+    },
+    {
+      "text": "Python Developer's Guide",
+      "url": "https://devguide.python.org/"
+    },
+    {
+      "text": "▲ Back to Top",
+      "url": "#python-network"
+    },
+    {
+      "text": "About",
+      "url": "/about/"
+    },
+    {
+      "text": "Applications",
+      "url": "/about/apps/"
+    },
+    {
+      "text": "Quotes",
+      "url": "/about/quotes/"
+    },
+    {
+      "text": "Getting Started",
+      "url": "/about/gettingstarted/"
+    },
+    {
+      "text": "Help",
+      "url": "/about/help/"
+    },
+    {
+      "text": "Downloads",
+      "url": "/downloads/"
+    },
+    {
+      "text": "All releases",
+      "url": "/downloads/"
+    },
+    {
+      "text": "Source code",
+      "url": "/downloads/source/"
+    },
+    {
+      "text": "Windows",
+      "url": "/downloads/windows/"
+    },
+    {
+      "text": "macOS",
+      "url": "/downloads/macos/"
+    },
+    {
+      "text": "Android",
+      "url": "/downloads/android/"
+    },
+    {
+      "text": "iOS",
+      "url": "/downloads/ios/"
+    },
+    {
+      "text": "Other Platforms",
+      "url": "/download/other/"
+    },
+    {
+      "text": "License",
+      "url": "https://docs.python.org/3/license.html"
+    },
+    {
+      "text": "Alternative Implementations",
+      "url": "/download/alternatives"
+    },
+    {
+      "text": "Documentation",
+      "url": "/doc/"
+    },
+    {
+      "text": "Docs",
+      "url": "/doc/"
+    },
+    {
+      "text": "Audio/Visual Talks",
+      "url": "/doc/av"
+    },
+    {
+      "text": "Beginner's Guide",
+      "url": "https://wiki.python.org/moin/BeginnersGuide"
+    },
+    {
+      "text": "FAQ",
+      "url": "https://docs.python.org/3/faq/"
+    },
+    {
+      "text": "Non-English Docs",
+      "url": "https://translations.python.org/"
+    },
+    {
+      "text": "PEP Index",
+      "url": "https://peps.python.org"
+    },
+    {
+      "text": "Python Books",
+      "url": "https://wiki.python.org/moin/PythonBooks"
+    },
+    {
+      "text": "Python Essays",
+      "url": "/doc/essays/"
+    },
+    {
+      "text": "Community",
+      "url": "/community/"
+    },
+    {
+      "text": "Diversity",
+      "url": "/community/diversity/"
+    },
+    {
+      "text": "Mailing Lists",
+      "url": "/community/lists/"
+    },
+    {
+      "text": "IRC",
+      "url": "/community/irc/"
+    },
+    {
+      "text": "Forums",
+      "url": "/community/forums/"
+    },
+    {
+      "text": "PSF Annual Impact Report",
+      "url": "/psf/annual-report/2024/"
+    },
+    {
+      "text": "Python Conferences",
+      "url": "/community/workshops/"
+    },
+    {
+      "text": "Special Interest Groups",
+      "url": "/community/sigs/"
+    },
+    {
+      "text": "Python Logo",
+      "url": "/community/logos/"
+    },
+    {
+      "text": "Python Wiki",
+      "url": "https://wiki.python.org/moin/"
+    },
+    {
+      "text": "Code of Conduct",
+      "url": "/psf/conduct/"
+    },
+    {
+      "text": "Community Awards",
+      "url": "/community/awards"
+    },
+    {
+      "text": "Get Involved",
+      "url": "/psf/get-involved/"
+    },
+    {
+      "text": "Shared Stories",
+      "url": "/psf/community-stories/"
+    },
+    {
+      "text": "Success Stories",
+      "url": "/success-stories/"
+    },
+    {
+      "text": "Arts",
+      "url": "/success-stories/category/arts/"
+    },
+    {
+      "text": "Business",
+      "url": "/success-stories/category/business/"
+    },
+    {
+      "text": "Education",
+      "url": "/success-stories/category/education/"
+    },
+    {
+      "text": "Engineering",
+      "url": "/success-stories/category/engineering/"
+    },
+    {
+      "text": "Government",
+      "url": "/success-stories/category/government/"
+    },
+    {
+      "text": "Scientific",
+      "url": "/success-stories/category/scientific/"
+    },
+    {
+      "text": "Software Development",
+      "url": "/success-stories/category/software-development/"
+    },
+    {
+      "text": "News",
+      "url": "/blogs/"
+    },
+    {
+      "text": "Python News",
+      "url": "/blogs/"
+    },
+    {
+      "text": "PSF Newsletter",
+      "url": "/psf/newsletter/"
+    },
+    {
+      "text": "PSF News",
+      "url": "https://pyfound.blogspot.com"
+    },
+    {
+      "text": "PyCon US News",
+      "url": "https://pycon.blogspot.com/"
+    },
+    {
+      "text": "Python Insider",
+      "url": "https://blog.python.org"
+    },
+    {
+      "text": "News from the Community",
+      "url": "https://planetpython.org/"
+    },
+    {
+      "text": "Events",
+      "url": "/events/"
+    },
+    {
+      "text": "Python Events",
+      "url": "/events/python-events/"
+    },
+    {
+      "text": "User Group Events",
+      "url": "/events/python-user-group/"
+    },
+    {
+      "text": "Python Events Archive",
+      "url": "/events/python-events/past/"
+    },
+    {
+      "text": "User Group Events Archive",
+      "url": "/events/python-user-group/past/"
+    },
+    {
+      "text": "Submit an Event",
+      "url": "https://wiki.python.org/moin/PythonEventsCalendar#Submitting_an_Event"
+    },
+    {
+      "text": "Contributing",
+      "url": "/dev/"
+    },
+    {
+      "text": "Developer's Guide",
+      "url": "https://devguide.python.org/"
+    },
+    {
+      "text": "Issue Tracker",
+      "url": "https://github.com/python/cpython/issues"
+    },
+    {
+      "text": "python-dev list",
+      "url": "https://mail.python.org/mailman/listinfo/python-dev"
+    },
+    {
+      "text": "Core Mentorship",
+      "url": "/dev/core-mentorship/"
+    },
+    {
+      "text": "Report a Security Issue",
+      "url": "/dev/security/"
+    },
+    {
+      "text": "▲ Back to Top",
+      "url": "#python-network"
+    },
+    {
+      "text": "Help & General Contact",
+      "url": "/about/help/"
+    },
+    {
+      "text": "Diversity Initiatives",
+      "url": "/community/diversity/"
+    },
+    {
+      "text": "Submit Website Bug",
+      "url": "https://github.com/python/pythondotorg/issues"
+    },
+    {
+      "text": "Status",
+      "url": "https://status.python.org/"
+    },
+    {
+      "text": "Python Software Foundation",
+      "url": "/psf-landing/"
+    },
+    {
+      "text": "Legal Statements",
+      "url": "/about/legal/"
+    },
+    {
+      "text": "Privacy Notice",
+      "url": "https://policies.python.org/python.org/Privacy-Notice/"
+    }
+  ],
+  "error": null,
+  "status_code": 200
+}

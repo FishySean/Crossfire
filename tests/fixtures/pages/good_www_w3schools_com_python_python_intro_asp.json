@@ -1,0 +1,2174 @@
+{
+  "url": "https://www.w3schools.com/python/python_intro.asp",
+  "ok": true,
+  "title": "Introduction to Python",
+  "markdown": "[Tutorials](#)\n [References](#)\n [Exercises](#)\n [Certificates](#)\n\n[Menu](#)\n\nSearch field\n\n×\n\n[See More](#)\n\n[NEW W3Schools app iOS & Android Start the adventure](/adventure/index.php)\n\nSign In\n\n[★ +1](https://profile.w3schools.com/log-in)\n\n[Get Certified](https://campus.w3schools.com/collections/course-catalog)\n\n[Get Certified](https://campus.w3schools.com/collections/course-catalog)\n\n\n\n[My W3Schools](https://pathfinder.w3schools.com)\n\nTutorials\n\nReferences\n\nExercises\n\nCertificates\n\n[W3Schools app iOS & Android NEW](/adventure/index.php)\n [Spaces](/spaces/index.php)\n [Get Certified](https://campus.w3schools.com/collections/course-catalog)\n [Plus](https://order.w3schools.com/plans)\n [Practice](/practice/index.php)\n [Academy](/academy/index.php)\n\nAll our Services\n\n[Logout](https://profile.w3schools.com/logout)\n\n[](https://www.linkedin.com/company/w3schools.com/)\n [](https://discord.com/invite/w3schools)\n [](https://www.facebook.com/w3schoolscom/)\n [](https://www.instagram.com/w3schools.com_official/)\n\n×\n\n×\n\nTutorials\n\nTutorials\n\nLearn web development, programming, data science, and more.\n\nW3SCHOOLS TUTORIALS:\n\n×\n\n← All Topics\n\n×\n\nReferences\n\nW3SCHOOLS REFERENCES:\n\n×\n\nHTML\n\nTag reference\n\nCSS\n\nReference\n\nJavaScript\n\nReference\n\nSQL\n\nKeyword reference\n\nPython\n\nReference\n\nJava\n\nReference\n\nC\n\nReference\n\nC++\n\nReference\n\nColors\n\nColor names\n\nPHP\n\nReference\n\nHTML DOM\n\nReference\n\nMySQL\n\nReference\n\nW3.CSS\n\nReference\n\nBootstrap 3\n\nReference\n\nBootstrap 4\n\nReference\n\nNode.js\n\nReference\n\nDjango\n\nReference\n\njQuery\n\nReference\n\nVue\n\nAttributes\n\nAngular\n\nReference\n\nSass\n\nReference\n\nXML\n\nReference\n\nJSON\n\nReference\n\nASP\n\nReference\n\nIcons\n\nReference\n\nSVG\n\nReference\n\nCanvas\n\nReference\n\nCharsets\n\nReference\n\nEmojis\n\nReference\n\nAppML\n\nReference\n\nW3.JS\n\nReference\n\n×\n\nExercises\n\nPractice and test your skills with different exercises.\n\nTip:\n [Sign in](https://profile.w3schools.com/signup)\n to track your progress.\n\nSelect another topic:\n\n×\n\nHTML\n\nExercises\n\nCSS\n\nExercises\n\nJavaScript\n\nExercises\n\nSQL\n\nExercises\n\nPython\n\nExercises\n\nJava\n\nExercises\n\nC\n\nExercises\n\nC++\n\nExercises\n\nC#\n\nExercises\n\nPHP\n\nExercises\n\nReact\n\nExercises\n\nMySQL\n\nExercises\n\nExcel\n\nExercises\n\nDSA\n\nExercises\n\nBootstrap 3\n\nExercises\n\nBootstrap 4\n\nExercises\n\nBootstrap 5\n\nExercises\n\nNode.js\n\nExercises\n\nTypeScript\n\nExercises\n\nDjango\n\nExercises\n\nPostgreSQL\n\nExercises\n\njQuery\n\nExercises\n\nNumPy\n\nExercises\n\nPandas\n\nExercises\n\nAngular\n\nExercises\n\nGit\n\nExercises\n\nMongoDB\n\nExercises\n\nR\n\nExercises\n\nGo\n\nExercises\n\nKotlin\n\nExercises\n\nSwift\n\nExercises\n\nVue\n\nExercises\n\nSciPy\n\nExercises\n\nBash\n\nExercises\n\nChoose an activity\n\n← Back to topics\n\nTip:\n [Sign in](https://profile.w3schools.com/signup)\n to track your progress.\n\n×\n\nGet Certified\n\nW3SCHOOLS CERTIFICATES:\n\n×\n\n[HTML](https://campus.w3schools.com/collections/course-catalog/products/html-course)\n\n[CSS](https://campus.w3schools.com/collections/course-catalog/products/css-course)\n\n[JavaScript](https://campus.w3schools.com/collections/course-catalog/products/javascript-course)\n\n[SQL](https://campus.w3schools.com/collections/course-catalog/products/sql-course)\n\n[Python](https://campus.w3schools.com/collections/course-catalog/products/python-course)\n\n[Java](https://campus.w3schools.com/collections/course-catalog/products/java-course)\n\n[C](https://campus.w3schools.com/collections/course-catalog/products/learn-c)\n\n[C++](https://campus.w3schools.com/collections/course-catalog/products/cpp-course)\n\n[C#](https://campus.w3schools.com/collections/course-catalog/products/c-course)\n\n[PHP](https://campus.w3schools.com/collections/course-catalog/products/php-course)\n\n[React](https://campus.w3schools.com/collections/course-catalog/products/react-js-course)\n\n[MySQL](https://campus.w3schools.com/collections/course-catalog/products/learn-mysql-1)\n\n[Excel](https://campus.w3schools.com/collections/course-catalog/products/learn-excel)\n\n[DSA](https://campus.w3schools.com/collections/course-catalog/products/learn-data-structures-and-algorithms)\n\n[W3.CSS](https://campus.w3schools.com/collections/certifications/products/w3-css-certificate)\n\n[Bootstrap 3](https://campus.w3schools.com/collections/course-catalog/products/bootstrap-course)\n\n[Bootstrap 4](https://campus.w3schools.com/collections/course-catalog/products/bootstrap-4-course)\n\n[Bootstrap 5](https://campus.w3schools.com/collections/course-catalog/products/learn-bootstrap-5)\n\n[Node.js](https://campus.w3schools.com/collections/course-catalog/products/learn-node-js)\n\n[TypeScript](https://campus.w3schools.com/collections/course-catalog/products/learn-typescript)\n\n[Django](https://campus.w3schools.com/collections/course-catalog/products/learn-django)\n\n[PostgreSQL](https://campus.w3schools.com/collections/course-catalog/products/learn-postgresql)\n\n[jQuery](https://campus.w3schools.com/collections/course-catalog/products/jquery-course)\n\n[Vue](https://campus.w3schools.com/collections/course-catalog/products/learn-vue-js)\n\n[NumPy](https://campus.w3schools.com/collections/course-catalog/products/numpy-course)\n\n[Pandas](https://campus.w3schools.com/collections/course-catalog/products/pandas-course)\n\n[XML](https://campus.w3schools.com/collections/course-catalog/products/xml-course)\n\n[Cyber Security](https://campus.w3schools.com/collections/course-catalog/products/cyber-security-course)\n\n[Accessibility](https://campus.w3schools.com/collections/course-catalog/products/accessibility-course)\n\n[AngularJS](https://campus.w3schools.com/collections/certifications/products/angularjs-certificate)\n\n[Git](https://campus.w3schools.com/collections/course-catalog/products/learn-git)\n\n[MongoDB](https://campus.w3schools.com/collections/course-catalog/products/learn-mongodb)\n\n[R](https://campus.w3schools.com/collections/course-catalog/products/r-course)\n\n[Go](https://campus.w3schools.com/collections/certifications/products/go-certificate)\n\n[Kotlin](https://campus.w3schools.com/collections/course-catalog/products/learn-kotlin)\n\n[SASS](https://campus.w3schools.com/collections/certifications/products/sass-certificate)\n\n[SciPy](https://campus.w3schools.com/collections/course-catalog/products/learn-scipy)\n\n[BASH](https://campus.w3schools.com/collections/certifications/products/bash-certification-exam)\n\n[Rust](https://campus.w3schools.com/collections/certifications/products/rust-certification-exam)\n\nAll Our Services\n\nDark mode\n\n\n\nServices filter input\n\n×\n\nW3Schools offers a wide range of services and products for beginners and professionals,\n\nhelping millions of people everyday to learn and master new skills.\n\n[Free Tutorials Enjoy our free tutorials like millions of other internet users since 1999](/tutorials/index.php)\n\n[References Explore our selection of references covering all popular coding languages](/references/index.php)\n\n[W3Schools app NEW For iOS & Android, start a new learning adventure.](/adventure/index.php)\n\n[Create a Website Create your own website with W3Schools Spaces - no setup required](/spaces/index.php)\n\n[Exercises Test your skills with different exercises](/exercises/index.php)\n\n[Quizzes Test yourself with multiple choice questions](/quiztest/default.asp)\n\n[Code Challenges Test your skills with interactive code challenges](/challenges/index.php)\n\n[Get Certified Document your knowledge](https://campus.w3schools.com/collections/certifications)\n\n[Log in / Sign Up Create an account to track your progress](https://profile.w3schools.com/sign-up)\n\n[League Earn XP and climb the ranks with different challenges](/league/)\n\n[Upgrade Become a PLUS user and unlock powerful features (ad-free, hosting, support,..)](https://order.w3schools.com/plans)\n\n[Where To Start Not sure where you want to start? Follow our guided path](/where_to_start.asp)\n\n[Code Editor (Try it) With our online code editor, you can edit code and view the result in your browser](/tryit/default.asp)\n\n[Templates We have created a bunch of responsive website templates you can use - for free!](/w3css/w3css_templates.asp)\n\n[Web Hosting Host your own website, and share it to the world with W3Schools Spaces](/spaces/index.php)\n\n[Create a Server Create your own server using Python, PHP, React.js, Node.js, Java, C#, etc.](/spaces/index.php)\n\n[How To's Large collection of code snippets for HTML, CSS and JavaScript](/howto/default.asp)\n\n[CSS Framework Build fast and responsive sites using our free W3.CSS framework](/w3css/default.asp)\n\n[Videos Learn the basics of HTML in a fun and engaging video tutorial](/videos/index.php)\n\n[Browser Statistics Read long term trends of browser usage](/browsers/default.asp)\n\n[Typing Speed Test your typing speed](/typingspeed/default.asp)\n\n[Color Picker Use our color picker to find different RGB, HEX and HSL colors.](/colors/colors_picker.asp)\n\n[Newsletter Join our newsletter and get access to exclusive content every month](https://campus.w3schools.com/pages/newsletter)\n\n[Emojis Reference Check out our refererence page with all the emojis supported in HTML 😊](/charsets/ref_emoji_intro.asp)\n\n[Code Game W3Schools Coding Game! Help the lynx collect pine cones](/codegame/index.html)\n\n[UTF-8 Reference Check out our full UTF-8 Character reference](/charsets/default.asp)\n\n[Community Chat, Learn and Connect with Us on Discord](https://discord.com/invite/w3schools)\n\n[Academy Contact us about W3Schools Academy for educational institutions](/academy/index.php)\n\n[For Businesses Contact us about W3Schools Academy for your organization](/academy/index.php)\n\nContact Us\n\nAbout sales:\n sales@w3schools.com\n\nAbout errors:\n help@w3schools.com\n\n[](https://www.linkedin.com/company/w3schools.com/)\n [](https://discord.com/invite/w3schools)\n [](https://www.facebook.com/w3schoolscom/)\n [](https://www.instagram.com/w3schools.com_official/)\n\n×\n\n❮     \n\n❯   \n\n[HTML](/html/default.asp)\n [CSS](/css/default.asp)\n [JAVASCRIPT](/js/default.asp)\n [SQL](/sql/default.asp)\n [PYTHON](/python/default.asp)\n [JAVA](/java/default.asp)\n [PHP](/php/default.asp)\n [C](/c/index.php)\n [C++](/cpp/default.asp)\n [C#](/cs/index.php)\n [AWS](/aws/index.php)\n [W3.CSS](/w3css/default.asp)\n [HOW TO](/howto/default.asp)\n [BOOTSTRAP](/bootstrap/bootstrap_ver.asp)\n [REACT](/react/default.asp)\n [MYSQL](/mysql/default.asp)\n [JQUERY](/jquery/default.asp)\n [EXCEL](/excel/index.php)\n [XML](/xml/default.asp)\n [DJANGO](/django/index.php)\n [NUMPY](/python/numpy/default.asp)\n [PANDAS](/python/pandas/default.asp)\n [NODEJS](/nodejs/default.asp)\n [DSA](/dsa/index.php)\n [TYPESCRIPT](/typescript/index.php)\n [ANGULAR](/angular/default.asp)\n [ANGULARJS](/angularjs/default.asp)\n [GIT](/git/default.asp)\n [POSTGRESQL](/postgresql/index.php)\n [MONGODB](/mongodb/index.php)\n [ASP](/asp/default.asp)\n [AI](/ai/default.asp)\n [R](/r/default.asp)\n [GO](/go/index.php)\n [KOTLIN](/kotlin/index.php)\n [SWIFT](/swift/default.asp)\n [SASS](/sass/default.asp)\n [VUE](/vue/index.php)\n [GEN AI](/gen_ai/index.php)\n [SCIPY](/python/scipy/index.php)\n [CYBERSECURITY](/cybersecurity/index.php)\n [DATA SCIENCE](/datascience/default.asp)\n [INTRO TO PROGRAMMING](/programming/index.php)\n [INTRO TO HTML & CSS](/htmlcss/default.asp)\n [BASH](/bash/index.php)\n [RUST](/rust/index.php)\n [TOOLS](/tools/index.php)\n\nPython Tutorial\n[Python HOME](default.asp)\n[Python Intro](python_intro.asp)\n[Python Get Started](python_getstarted.asp)\n[Python Syntax](python_syntax.asp)\n\n[Syntax](python_syntax.asp)\n[Statements](python_statements.asp)\n[Code Challenge](python_challenges_statements.asp)\n\n[Python Output](python_output.asp)\n\n[Print Text](python_output.asp)\n[Print Numbers](python_output_numbers.asp)\n[Code Challenge](python_challenges_output.asp)\n\n[Python Comments](python_comments.asp)\n\n[Comments](python_comments.asp)\n[Code Challenge](python_challenges_comments.asp)\n\n[Python Variables](python_variables.asp)\n\n[Python Variables](python_variables.asp)\n [Variable Names](python_variables_names.asp)\n [Assign Multiple Values](python_variables_multiple.asp)\n [Output Variables](python_variables_output.asp)\n [Global Variables](python_variables_global.asp)\n [Variable Exercises](python_variables_exercises.asp)\n [Code Challenge](python_challenges_variables.asp)\n\n[Python Data Types](python_datatypes.asp)\n\n[Data Types](python_datatypes.asp)\n [Code Challenge](python_challenges_datatypes.asp)\n\n[Python Numbers](python_numbers.asp)\n\n[Numbers](python_numbers.asp)\n [Code Challenge](python_challenges_numbers.asp)\n\n[Python Casting](python_casting.asp)\n\n[Casting](python_casting.asp)\n [Code Challenge](python_challenges_casting.asp)\n\n[Python Strings](python_strings.asp)\n\n[Python Strings](python_strings.asp)\n [Slicing Strings](python_strings_slicing.asp)\n [Modify Strings](python_strings_modify.asp)\n [Concatenate Strings](python_strings_concatenate.asp)\n [Format Strings](python_strings_format.asp)\n [Escape Characters](python_strings_escape.asp)\n [String Methods](python_strings_methods.asp)\n [String Exercises](python_strings_exercises.asp)\n [Code Challenge](python_challenges_strings_basics.asp)\n\n[Python Booleans](python_booleans.asp)\n\n[Booleans](python_booleans.asp)\n [Code Challenge](python_challenges_booleans.asp)\n\n[Python Operators](python_operators.asp)\n\n[Python Operators](python_operators.asp)\n [Arithmetic Operators](python_operators_arithmetic.asp)\n [Assignment Operators](python_operators_assign.asp)\n [Ternary Operator](python_ternary_operator.asp) \n [Comparison Operators](python_operators_comparison.asp)\n [Logical Operators](python_operators_logical.asp)\n [Identity Operators](python_operators_identity.asp)\n [Membership Operators](python_operators_membership.asp)\n [Bitwise Operators](python_operators_bitwise.asp)\n [Operator Precedence](python_operators_precedence.asp)\n [Code Challenge](python_challenges_operators_basics.asp)\n\n[Python Lists](python_lists.asp)\n\n[Python Lists](python_lists.asp)\n [Access List Items](python_lists_access.asp)\n [Change List Items](python_lists_change.asp)\n [Add List Items](python_lists_add.asp)\n [Remove List Items](python_lists_remove.asp)\n [Loop Lists](python_lists_loop.asp)\n [List Comprehension](python_lists_comprehension.asp)\n [Sort Lists](python_lists_sort.asp)\n [Copy Lists](python_lists_copy.asp)\n [Join Lists](python_lists_join.asp)\n [List Methods](python_lists_methods.asp)\n [List Exercises](python_lists_exercises.asp)\n [Code Challenge](python_challenges_lists_basics.asp)\n\n[Python Tuples](python_tuples.asp)\n\n[Python Tuples](python_tuples.asp)\n [Access Tuples](python_tuples_access.asp)\n [Update Tuples](python_tuples_update.asp)\n [Unpack Tuples](python_tuples_unpack.asp)\n [Loop Tuples](python_tuples_loop.asp)\n [Join Tuples](python_tuples_join.asp)\n [Tuple Methods](python_tuples_methods.asp)\n [Tuple Exercises](python_tuples_exercises.asp)\n [Code Challenge](python_challenges_tuples_basics.asp)\n\n[Python Sets](python_sets.asp)\n\n[Python Sets](python_sets.asp)\n [Access Set Items](python_sets_access.asp)\n [Add Set Items](python_sets_add.asp)\n [Remove Set Items](python_sets_remove.asp)\n [Loop Sets](python_sets_loop.asp)\n [Join Sets](python_sets_join.asp)\n [Frozenset](python_frozenset.asp)\n [Set Methods](python_sets_methods.asp)\n [Set Exercises](python_sets_exercises.asp)\n [Code Challenge](python_challenges_sets_basics.asp)\n\n[Python Dictionaries](python_dictionaries.asp)\n\n[Python Dictionaries](python_dictionaries.asp)\n [Access Items](python_dictionaries_access.asp)\n [Change Items](python_dictionaries_change.asp)\n [Add Items](python_dictionaries_add.asp)\n [Remove Items](python_dictionaries_remove.asp)\n [Loop Dictionaries](python_dictionaries_loop.asp)\n [Copy Dictionaries](python_dictionaries_copy.asp)\n [Nested Dictionaries](python_dictionaries_nested.asp)\n [Dictionary Methods](python_dictionaries_methods.asp)\n [Dictionary Exercises](python_dictionaries_exercises.asp)\n [Code Challenge](python_challenges_dictionaries_basics.asp)\n\n[Python If...Else](python_conditions.asp)\n\n[Python If](python_conditions.asp)\n [Python Elif](python_if_elif.asp)\n [Python Else](python_if_else.asp)\n [Shorthand If](python_if_shorthand.asp)\n [Logical Operators](python_if_logical.asp)\n [Nested If](python_if_nested_if.asp)\n [Pass Statement](python_if_pass.asp)\n [Code Challenge](python_challenges_if_basics.asp)\n\n[Python Match](python_match.asp)\n\n[Match](python_match.asp)\n [Code Challenge](python_challenges_match.asp)\n\n[Python While Loops](python_while_loops.asp)\n\n[While Loops](python_while_loops.asp)\n [Code Challenge](python_challenges_while_loops.asp)\n\n[Python For Loops](python_for_loops.asp)\n\n[For Loops](python_for_loops.asp)\n [Code Challenge](python_challenges_for_loops.asp)\n\n[Python Functions](python_functions.asp)\n\n[Python Functions](python_functions.asp)\n [Python Arguments](python_arguments.asp)\n [Python *args / **kwargs](python_args_kwargs.asp)\n [Python Scope](python_scope.asp)\n [Python Decorators](python_decorators.asp)\n [Python Lambda](python_lambda.asp)\n [Python Recursion](python_recursion.asp)\n [Python Generators](python_generators.asp)\n [Code Challenge](python_challenges_functions_basics.asp)\n\n[Python Range](python_range.asp)\n\n[Range](python_range.asp)\n [Code Challenge](python_challenges_range.asp)\n\n[Python Arrays](python_arrays.asp)\n\n[Arrays](python_arrays.asp)\n [Code Challenge](python_challenges_arrays.asp)\n\n[Python Iterators](python_iterators.asp)\n\n[Iterators](python_iterators.asp)\n [Code Challenge](python_challenges_iterators.asp)\n\n[Python Modules](python_modules.asp)\n\n[Modules](python_modules.asp)\n [Code Challenge](python_challenges_modules.asp)\n\n[Python Dates](python_datetime.asp)\n\n[Dates](python_datetime.asp)\n [Code Challenge](python_challenges_datetime.asp)\n\n[Python Math](python_math.asp)\n\n[Math](python_math.asp)\n [Code Challenge](python_challenges_math.asp)\n\n[Python JSON](python_json.asp)\n\n[JSON](python_json.asp)\n [Code Challenge](python_challenges_json.asp)\n\n[Python RegEx](python_regex.asp)\n\n[RegEx](python_regex.asp)\n [Code Challenge](python_challenges_regex.asp)\n\n[Python PIP](python_pip.asp)\n[Python Try...Except](python_try_except.asp)\n\n[Try...Except](python_try_except.asp)\n [Code Challenge](python_challenges_try_except.asp)\n\n[Python String Formatting](python_string_formatting.asp)\n\n[String Formatting](python_string_formatting.asp)\n [Code Challenge](python_challenges_string_formatting.asp)\n\n[Python None](python_none.asp)\n\n[None](python_none.asp)\n [Code Challenge](python_challenges_none.asp)\n\n[Python User Input](python_user_input.asp)\n\n[Python VirtualEnv](python_virtualenv.asp)\n\nPython Classes\n[Python OOP](python_oop.asp)\n[Python Classes/Objects](python_classes.asp)\n\n[Classes/Objects](python_classes.asp)\n [Code Challenge](python_challenges_classes.asp)\n\n[Python __init__ Method](python_class_init.asp)\n\n[__init__ Method](python_class_init.asp)\n [Code Challenge](python_challenges_classes_basics.asp)\n\n[Python self Parameter](python_class_self.asp)\n\n[self Parameter](python_class_self.asp)\n [Code Challenge](python_challenges_class_self.asp)\n\n[Python Class Properties](python_class_properties.asp)\n\n[Class Properties](python_class_properties.asp)\n [Code Challenge](python_challenges_class_properties.asp)\n\n[Python Class Methods](python_class_methods.asp)\n\n[Class Methods](python_class_methods.asp)\n [Code Challenge](python_challenges_class_methods.asp)\n\n[Python Magic Methods](python_magic_methods.asp)\n\n[Magic Methods](python_magic_methods.asp)\n [__str__](python_magic_str.asp)\n [__repr__](python_magic_repr.asp)\n [__eq__](python_magic_eq.asp)\n [__add__](python_magic_add.asp)\n [__len__](python_magic_len.asp)\n [__lt__](python_magic_lt.asp)\n [__contains__](python_magic_contains.asp)\n [__call__](python_magic_call.asp)\n [Code Challenge](python_challenges_magic_methods.asp)\n\n[Python Inheritance](python_inheritance.asp)\n\n[Inheritance](python_inheritance.asp)\n [Code Challenge](python_challenges_inheritance.asp)\n\n[Python Polymorphism](python_polymorphism.asp)\n\n[Polymorphism](python_polymorphism.asp)\n [Code Challenge](python_challenges_polymorphism.asp)\n\n[Python Encapsulation](python_encapsulation.asp)\n\n[Encapsulation](python_encapsulation.asp)\n [Code Challenge](python_challenges_encapsulation.asp)\n\n[Python Inner Classes](python_class_inner.asp)\n\nFile Handling\n[Python File Handling](python_file_handling.asp)\n[Python Read Files](python_file_open.asp)\n[Python Write/Create Files](python_file_write.asp)\n[Python Delete Files](python_file_remove.asp)\n\nPython Modules\n[NumPy Tutorial](numpy/default.asp)\n[Pandas Tutorial](pandas/default.asp)\n[SciPy Tutorial](scipy/index.php)\n[Django Tutorial](/django/index.php)\n\nPython Matplotlib\n[Matplotlib Intro](matplotlib_intro.asp)\n[Matplotlib Get Started](matplotlib_getting_started.asp)\n[Matplotlib Pyplot](matplotlib_pyplot.asp)\n[Matplotlib Plotting](matplotlib_plotting.asp)\n[Matplotlib Markers](matplotlib_markers.asp)\n[Matplotlib Line](matplotlib_line.asp)\n[Matplotlib Labels](matplotlib_labels.asp)\n[Matplotlib Grid](matplotlib_grid.asp)\n[Matplotlib Subplot](matplotlib_subplot.asp)\n[Matplotlib Scatter](matplotlib_scatter.asp)\n[Matplotlib Bars](matplotlib_bars.asp)\n[Matplotlib Histograms](matplotlib_histograms.asp)\n[Matplotlib Pie Charts](matplotlib_pie_charts.asp)\n\nMachine Learning\n[Getting Started](python_ml_getting_started.asp)\n[Mean Median Mode](python_ml_mean_median_mode.asp)\n[Standard Deviation](python_ml_standard_deviation.asp)\n[Percentile](python_ml_percentile.asp)\n[Data Distribution](python_ml_data_distribution.asp)\n[Normal Data Distribution](python_ml_normal_data_distribution.asp)\n[Scatter Plot](python_ml_scatterplot.asp)\n[Linear Regression](python_ml_linear_regression.asp)\n[Polynomial Regression](python_ml_polynomial_regression.asp)\n[Multiple Regression](python_ml_multiple_regression.asp)\n[Scale](python_ml_scale.asp)\n[Train/Test](python_ml_train_test.asp)\n[Decision Tree](python_ml_decision_tree.asp)\n\n[Confusion Matrix](python_ml_confusion_matrix.asp)\n[Hierarchical Clustering](python_ml_hierarchial_clustering.asp)\n[Logistic Regression](python_ml_logistic_regression.asp)\n[Grid Search](python_ml_grid_search.asp)\n[Categorical Data](python_ml_preprocessing.asp)\n[K-means](python_ml_k-means.asp)\n[Bootstrap Aggregation](python_ml_bagging.asp)\n[Cross Validation](python_ml_cross_validation.asp)\n[AUC - ROC Curve](python_ml_auc_roc.asp)\n[K-nearest neighbors](python_ml_knn.asp)\n\nPython DSA\n[Python DSA](python_dsa.asp)\n[Lists and Arrays](python_dsa_lists.asp)\n[Stacks](python_dsa_stacks.asp)\n[Queues](python_dsa_queues.asp)\n[Linked Lists](python_dsa_linkedlists.asp)\n[Hash Tables](python_dsa_hashtables.asp)\n[Trees](python_dsa_trees.asp)\n[Binary Trees](python_dsa_binarytrees.asp)\n[Binary Search Trees](python_dsa_binarysearchtrees.asp)\n[AVL Trees](python_dsa_avltrees.asp)\n[Graphs](python_dsa_graphs.asp)\n[Linear Search](python_dsa_linearsearch.asp)\n[Binary Search](python_dsa_binarysearch.asp)\n[Bubble Sort](python_dsa_bubblesort.asp)\n[Selection Sort](python_dsa_selectionsort.asp)\n[Insertion Sort](python_dsa_insertionsort.asp)\n[Quick Sort](python_dsa_quicksort.asp)\n[Counting Sort](python_dsa_countingsort.asp)\n[Radix Sort](python_dsa_radixsort.asp)\n[Merge Sort](python_dsa_mergesort.asp)\n\nPython MySQL\n[MySQL Get Started](python_mysql_getstarted.asp)\n[MySQL Create Database](python_mysql_create_db.asp)\n[MySQL Create Table](python_mysql_create_table.asp)\n[MySQL Insert](python_mysql_insert.asp)\n[MySQL Select](python_mysql_select.asp)\n[MySQL Where](python_mysql_where.asp)\n[MySQL Order By](python_mysql_orderby.asp)\n[MySQL Delete](python_mysql_delete.asp)\n[MySQL Drop Table](python_mysql_drop_table.asp)\n[MySQL Update](python_mysql_update.asp)\n[MySQL Limit](python_mysql_limit.asp)\n[MySQL Join](python_mysql_join.asp)\n\nPython MongoDB\n[MongoDB Get Started](python_mongodb_getstarted.asp)\n[MongoDB Create DB](python_mongodb_create_db.asp)\n[MongoDB Collection](python_mongodb_create_collection.asp)\n[MongoDB Insert](python_mongodb_insert.asp)\n[MongoDB Find](python_mongodb_find.asp)\n[MongoDB Query](python_mongodb_query.asp)\n[MongoDB Sort](python_mongodb_sort.asp)\n[MongoDB Delete](python_mongodb_delete.asp)\n[MongoDB Drop Collection](python_mongodb_drop_collection.asp)\n[MongoDB Update](python_mongodb_update.asp)\n[MongoDB Limit](python_mongodb_limit.asp)\n\nPython Cert\n[Python Certificate](python_exam.asp)\n\nPython Reference\n[Python Overview](python_reference.asp)\n[Python Built-in Functions](python_ref_functions.asp)\n[Python String Methods](python_ref_string.asp)\n[Python List Methods](python_ref_list.asp)\n[Python Dictionary Methods](python_ref_dictionary.asp)\n[Python Tuple Methods](python_ref_tuple.asp)\n[Python Set Methods](python_ref_set.asp)\n[Python File Methods](python_ref_file.asp)\n[Python Keywords](python_ref_keywords.asp)\n[Python Exceptions](python_ref_exceptions.asp)\n[Python Glossary](python_ref_glossary.asp)\n\nModule Reference\n[Built-in Modules](python_ref_modules.asp)\n[Random Module](module_random.asp)\n[Requests Module](module_requests.asp)\n[Statistics Module](module_statistics.asp)\n[Math Module](module_math.asp)\n[cMath Module](module_cmath.asp)\n\nPython How To\n[Remove List Duplicates](python_howto_remove_duplicates.asp)\n[Reverse a String](python_howto_reverse_string.asp)\n[Add Two Numbers](python_howto_add_two_numbers.asp)\n\nPython Examples\n[Python Examples](python_examples.asp)\n[Python Compiler](python_compiler.asp)\n[Python Exercises](python_exercises.asp)\n[Python Quiz](python_quiz.asp)\n[Python Challenges](python_challenges.asp)\n[Python Practice Problems](python_practice.php)\n[Python Server](python_server.asp)\n[Python Syllabus](python_syllabus.asp)\n[Python Study Plan](python_study_plan.asp)\n[Python Interview Q&A](python_interview_questions.asp)\n[Python Training](python_training.asp)\n\nPython Introduction\n\n[❮ Previous](default.asp)\n[Next ❯](python_getstarted.asp)\n\nShare\n\nLink Copied\n\nWhat is Python?\n\nPython is a popular programming language. It was created by Guido van Rossum, \nand released in 1991.\n\nIt is used for:\n\nweb development (server-side), \n\nsoftware development, \n\nmathematics,\n\nsystem scripting.\n\nWhat can Python do?\n\nPython can be used on a server to create web applications.\n\nPython can be used alongside software to create workflows.\n\nPython can connect to database systems. It can also read and modify files.\n\nPython can be used to handle big data and perform complex mathematics.\n\nPython can be used for rapid prototyping, or for production-ready software development.\n\nWhy Python?\n\nPython works on different platforms (Windows, Mac, Linux, Raspberry Pi, etc).\n\nPython has a simple syntax similar to the English language.\n\nPython has syntax that allows developers to write programs with fewer lines than some other programming languages.\n\nPython runs on an interpreter system, meaning that code can be executed as soon as it is written. This means that prototyping can be very quick.\n\nPython can be treated in a procedural way, an object-oriented way or a functional way.\n\nGood to know\n\nThe most recent major version of Python is Python 3, which we shall be using in this tutorial.\n\nIn this tutorial Python will be written in a text editor. It is possible to write Python in an Integrated Development Environment, such as Thonny, Pycharm, Netbeans or Eclipse which are particularly useful when managing larger collections of Python files.\n\nPython Syntax compared to other programming languages\n\nPython was designed for readability, and has some similarities to the English language with influence from mathematics.\n\nPython uses new lines to complete a command, as opposed to other programming languages which often use semicolons or parentheses.\n\nPython relies on indentation, using whitespace, to define scope; such as the scope of loops, functions and classes. Other programming languages often use curly-brackets for this purpose.\n\nExample\n\nprint(\"Hello, World!\")\n\n[Try it Yourself »](trypython.asp?filename=demo_default)\n\nVideo: Python Introduction\n\n[❮ Previous](default.asp)\n[Next ❯](python_getstarted.asp)\n\n[★ +1](https://profile.w3schools.com/log-in?redirect_url=https%3A%2F%2Fmy-learning.w3schools.com)\n\n[Sign in to track progress](https://profile.w3schools.com/log-in?redirect_url=https%3A%2F%2Fpathfinder.w3schools.com)\n\n[REMOVE ADS](https://order.w3schools.com/plans)\n\nNew\n\nW3Schools Adventure App\n\nCoding fundamentals as a game. Bite-sized lessons and challenges.\n\n[Learn more »](/adventure/)\n\nReady to start your journey?\n\nYour streak is waiting.\n\n+60 XP\n\n[PLUS](https://order.w3schools.com/plans)\n\n[SPACES](/spaces/index.php)\n\n[GET CERTIFIED](https://campus.w3schools.com/collections/certifications)\n\n[FOR TEACHERS](/academy/index.php)\n\n[PRACTICE](/practice/index.php)\n\n[CONTACT US](javascript:void(0);)\n\n×\n\nContact Sales\n\nIf you want to use W3Schools services as an educational institution, team or enterprise, send us an e-mail:\nsales@w3schools.com\n\nReport Error\n\nIf you want to report an error, or if you want to make a suggestion, send us an e-mail:\nhelp@w3schools.com\n\nTop Tutorials\n [HTML Tutorial](/html/default.asp)\n\n[CSS Tutorial](/css/default.asp)\n\n[JavaScript Tutorial](/js/default.asp)\n\n[How To Tutorial](/howto/default.asp)\n\n[SQL Tutorial](/sql/default.asp)\n\n[Python Tutorial](/python/default.asp)\n\n[W3.CSS Tutorial](/w3css/default.asp)\n\n[Bootstrap Tutorial](/bootstrap/bootstrap_ver.asp)\n\n[PHP Tutorial](/php/default.asp)\n\n[Java Tutorial](/java/default.asp)\n\n[C++ Tutorial](/cpp/default.asp)\n\n[jQuery Tutorial](/jquery/default.asp)\n\nTop References\n [HTML Reference](/tags/default.asp)\n\n[CSS Reference](/cssref/index.php)\n\n[JavaScript Reference](/jsref/default.asp)\n\n[SQL Reference](/sql/sql_ref_keywords.asp)\n\n[Python Reference](/python/python_reference.asp)\n\n[W3.CSS Reference](/w3css/w3css_references.asp)\n\n[Bootstrap Reference](/bootstrap/bootstrap_ref_all_classes.asp)\n\n[PHP Reference](/php/php_ref_overview.asp)\n\n[HTML Colors](/colors/colors_names.asp)\n\n[Java Reference](/java/java_ref_keywords.asp)\n\n[AngularJS Reference](/angularjs/angularjs_ref_directives.asp)\n\n[jQuery Reference](/jquery/jquery_ref_overview.asp)\n\nTop Examples\n [HTML Examples](/html/html_examples.asp)\n\n[CSS Examples](/css/css_examples.asp)\n\n[JavaScript Examples](/js/js_examples.asp)\n\n[How To Examples](/howto/default.asp)\n\n[SQL Examples](/sql/sql_examples.asp)\n\n[Python Examples](/python/python_examples.asp)\n\n[W3.CSS Examples](/w3css/w3css_examples.asp)\n\n[Bootstrap Examples](/bootstrap/bootstrap_examples.asp)\n\n[PHP Examples](/php/php_examples.asp)\n\n[Java Examples](/java/java_examples.asp)\n\n[XML Examples](/xml/xml_examples.asp)\n\n[jQuery Examples](/jquery/jquery_examples.asp)\n\n[Get Certified](https://campus.w3schools.com/collections/course-catalog)\n [HTML Certificate](https://campus.w3schools.com/collections/certifications/products/html-certificate)\n\n[CSS Certificate](https://campus.w3schools.com/collections/certifications/products/css-certificate)\n\n[JavaScript Certificate](https://campus.w3schools.com/collections/certifications/products/javascript-certificate)\n\n[Front End Certificate](https://campus.w3schools.com/collections/certifications/products/front-end-certificate)\n\n[SQL Certificate](https://campus.w3schools.com/collections/certifications/products/sql-certificate)\n\n[Python Certificate](https://campus.w3schools.com/collections/certifications/products/python-certificate)\n\n[PHP Certificate](https://campus.w3schools.com/collections/certifications/products/php-certificate)\n\n[jQuery Certificate](https://campus.w3schools.com/collections/certifications/products/jquery-certificate)\n\n[Java Certificate](https://campus.w3schools.com/collections/certifications/products/java-certificate)\n\n[C++ Certificate](https://campus.w3schools.com/collections/certifications/products/c-certificate)\n\n[C# Certificate](https://campus.w3schools.com/collections/certifications/products/c-certificate-1)\n\n[XML Certificate](https://campus.w3schools.com/collections/certifications/products/xml-certificate)\n\n[](https://www.linkedin.com/company/w3schools.com/)\n [](https://discord.com/invite/w3schools)\n [](https://www.facebook.com/w3schoolscom/)\n [](https://www.instagram.com/w3schools.com_official/)\n\n[FORUM](/forum/index.php)\n [ABOUT](/about/default.asp)\n [ACADEMY](/academy/index.php)\n\nW3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.\n\nTutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness\n\nof all content. While using W3Schools, you agree to have read and accepted our [terms of use](/about/about_copyright.asp),\ncookies and \n[privacy policy](/about/about_privacy.asp).\n\n[Copyright 1999-2026](/about/about_copyright.asp) by Refsnes Data. All Rights Reserved.\n[W3Schools is Powered by W3.CSS](//www.w3schools.com/w3css/default.asp).",
+  "links": [
+    {
+      "text": "Tutorials",
+      "url": "#"
+    },
+    {
+      "text": "References",
+      "url": "#"
+    },
+    {
+      "text": "Exercises",
+      "url": "#"
+    },
+    {
+      "text": "Certificates",
+      "url": "#"
+    },
+    {
+      "text": "Menu",
+      "url": "#"
+    },
+    {
+      "text": "See More",
+      "url": "#"
+    },
+    {
+      "text": "NEW W3Schools app iOS & Android Start the adventure",
+      "url": "/adventure/index.php"
+    },
+    {
+      "text": "★ +1",
+      "url": "https://profile.w3schools.com/log-in"
+    },
+    {
+      "text": "Get Certified",
+      "url": "https://campus.w3schools.com/collections/course-catalog"
+    },
+    {
+      "text": "Get Certified",
+      "url": "https://campus.w3schools.com/collections/course-catalog"
+    },
+    {
+      "text": "My W3Schools",
+      "url": "https://pathfinder.w3schools.com"
+    },
+    {
+      "text": "W3Schools app iOS & Android NEW",
+      "url": "/adventure/index.php"
+    },
+    {
+      "text": "Spaces",
+      "url": "/spaces/index.php"
+    },
+    {
+      "text": "Get Certified",
+      "url": "https://campus.w3schools.com/collections/course-catalog"
+    },
+    {
+      "text": "Plus",
+      "url": "https://order.w3schools.com/plans"
+    },
+    {
+      "text": "Practice",
+      "url": "/practice/index.php"
+    },
+    {
+      "text": "Academy",
+      "url": "/academy/index.php"
+    },
+    {
+      "text": "Logout",
+      "url": "https://profile.w3schools.com/logout"
+    },
+    {
+      "text": "",
+      "url": "https://www.linkedin.com/company/w3schools.com/"
+    },
+    {
+      "text": "",
+      "url": "https://discord.com/invite/w3schools"
+    },
+    {
+      "text": "",
+      "url": "https://www.facebook.com/w3schoolscom/"
+    },
+    {
+      "text": "",
+      "url": "https://www.instagram.com/w3schools.com_official/"
+    },
+    {
+      "text": "Sign in",
+      "url": "https://profile.w3schools.com/signup"
+    },
+    {
+      "text": "Sign in",
+      "url": "https://profile.w3schools.com/signup"
+    },
+    {
+      "text": "HTML",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/html-course"
+    },
+    {
+      "text": "CSS",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/css-course"
+    },
+    {
+      "text": "JavaScript",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/javascript-course"
+    },
+    {
+      "text": "SQL",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/sql-course"
+    },
+    {
+      "text": "Python",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/python-course"
+    },
+    {
+      "text": "Java",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/java-course"
+    },
+    {
+      "text": "C",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-c"
+    },
+    {
+      "text": "C++",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/cpp-course"
+    },
+    {
+      "text": "C#",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/c-course"
+    },
+    {
+      "text": "PHP",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/php-course"
+    },
+    {
+      "text": "React",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/react-js-course"
+    },
+    {
+      "text": "MySQL",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-mysql-1"
+    },
+    {
+      "text": "Excel",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-excel"
+    },
+    {
+      "text": "DSA",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-data-structures-and-algorithms"
+    },
+    {
+      "text": "W3.CSS",
+      "url": "https://campus.w3schools.com/collections/certifications/products/w3-css-certificate"
+    },
+    {
+      "text": "Bootstrap 3",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/bootstrap-course"
+    },
+    {
+      "text": "Bootstrap 4",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/bootstrap-4-course"
+    },
+    {
+      "text": "Bootstrap 5",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-bootstrap-5"
+    },
+    {
+      "text": "Node.js",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-node-js"
+    },
+    {
+      "text": "TypeScript",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-typescript"
+    },
+    {
+      "text": "Django",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-django"
+    },
+    {
+      "text": "PostgreSQL",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-postgresql"
+    },
+    {
+      "text": "jQuery",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/jquery-course"
+    },
+    {
+      "text": "Vue",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-vue-js"
+    },
+    {
+      "text": "NumPy",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/numpy-course"
+    },
+    {
+      "text": "Pandas",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/pandas-course"
+    },
+    {
+      "text": "XML",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/xml-course"
+    },
+    {
+      "text": "Cyber Security",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/cyber-security-course"
+    },
+    {
+      "text": "Accessibility",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/accessibility-course"
+    },
+    {
+      "text": "AngularJS",
+      "url": "https://campus.w3schools.com/collections/certifications/products/angularjs-certificate"
+    },
+    {
+      "text": "Git",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-git"
+    },
+    {
+      "text": "MongoDB",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-mongodb"
+    },
+    {
+      "text": "R",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/r-course"
+    },
+    {
+      "text": "Go",
+      "url": "https://campus.w3schools.com/collections/certifications/products/go-certificate"
+    },
+    {
+      "text": "Kotlin",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-kotlin"
+    },
+    {
+      "text": "SASS",
+      "url": "https://campus.w3schools.com/collections/certifications/products/sass-certificate"
+    },
+    {
+      "text": "SciPy",
+      "url": "https://campus.w3schools.com/collections/course-catalog/products/learn-scipy"
+    },
+    {
+      "text": "BASH",
+      "url": "https://campus.w3schools.com/collections/certifications/products/bash-certification-exam"
+    },
+    {
+      "text": "Rust",
+      "url": "https://campus.w3schools.com/collections/certifications/products/rust-certification-exam"
+    },
+    {
+      "text": "Free Tutorials Enjoy our free tutorials like millions of other internet users since 1999",
+      "url": "/tutorials/index.php"
+    },
+    {
+      "text": "References Explore our selection of references covering all popular coding languages",
+      "url": "/references/index.php"
+    },
+    {
+      "text": "W3Schools app NEW For iOS & Android, start a new learning adventure.",
+      "url": "/adventure/index.php"
+    },
+    {
+      "text": "Create a Website Create your own website with W3Schools Spaces - no setup required",
+      "url": "/spaces/index.php"
+    },
+    {
+      "text": "Exercises Test your skills with different exercises",
+      "url": "/exercises/index.php"
+    },
+    {
+      "text": "Quizzes Test yourself with multiple choice questions",
+      "url": "/quiztest/default.asp"
+    },
+    {
+      "text": "Code Challenges Test your skills with interactive code challenges",
+      "url": "/challenges/index.php"
+    },
+    {
+      "text": "Get Certified Document your knowledge",
+      "url": "https://campus.w3schools.com/collections/certifications"
+    },
+    {
+      "text": "Log in / Sign Up Create an account to track your progress",
+      "url": "https://profile.w3schools.com/sign-up"
+    },
+    {
+      "text": "League Earn XP and climb the ranks with different challenges",
+      "url": "/league/"
+    },
+    {
+      "text": "Upgrade Become a PLUS user and unlock powerful features (ad-free, hosting, support,..)",
+      "url": "https://order.w3schools.com/plans"
+    },
+    {
+      "text": "Where To Start Not sure where you want to start? Follow our guided path",
+      "url": "/where_to_start.asp"
+    },
+    {
+      "text": "Code Editor (Try it) With our online code editor, you can edit code and view the result in your browser",
+      "url": "/tryit/default.asp"
+    },
+    {
+      "text": "Templates We have created a bunch of responsive website templates you can use - for free!",
+      "url": "/w3css/w3css_templates.asp"
+    },
+    {
+      "text": "Web Hosting Host your own website, and share it to the world with W3Schools Spaces",
+      "url": "/spaces/index.php"
+    },
+    {
+      "text": "Create a Server Create your own server using Python, PHP, React.js, Node.js, Java, C#, etc.",
+      "url": "/spaces/index.php"
+    },
+    {
+      "text": "How To's Large collection of code snippets for HTML, CSS and JavaScript",
+      "url": "/howto/default.asp"
+    },
+    {
+      "text": "CSS Framework Build fast and responsive sites using our free W3.CSS framework",
+      "url": "/w3css/default.asp"
+    },
+    {
+      "text": "Videos Learn the basics of HTML in a fun and engaging video tutorial",
+      "url": "/videos/index.php"
+    },
+    {
+      "text": "Browser Statistics Read long term trends of browser usage",
+      "url": "/browsers/default.asp"
+    },
+    {
+      "text": "Typing Speed Test your typing speed",
+      "url": "/typingspeed/default.asp"
+    },
+    {
+      "text": "Color Picker Use our color picker to find different RGB, HEX and HSL colors.",
+      "url": "/colors/colors_picker.asp"
+    },
+    {
+      "text": "Newsletter Join our newsletter and get access to exclusive content every month",
+      "url": "https://campus.w3schools.com/pages/newsletter"
+    },
+    {
+      "text": "Emojis Reference Check out our refererence page with all the emojis supported in HTML 😊",
+      "url": "/charsets/ref_emoji_intro.asp"
+    },
+    {
+      "text": "Code Game W3Schools Coding Game! Help the lynx collect pine cones",
+      "url": "/codegame/index.html"
+    },
+    {
+      "text": "UTF-8 Reference Check out our full UTF-8 Character reference",
+      "url": "/charsets/default.asp"
+    },
+    {
+      "text": "Community Chat, Learn and Connect with Us on Discord",
+      "url": "https://discord.com/invite/w3schools"
+    },
+    {
+      "text": "Academy Contact us about W3Schools Academy for educational institutions",
+      "url": "/academy/index.php"
+    },
+    {
+      "text": "For Businesses Contact us about W3Schools Academy for your organization",
+      "url": "/academy/index.php"
+    },
+    {
+      "text": "",
+      "url": "https://www.linkedin.com/company/w3schools.com/"
+    },
+    {
+      "text": "",
+      "url": "https://discord.com/invite/w3schools"
+    },
+    {
+      "text": "",
+      "url": "https://www.facebook.com/w3schoolscom/"
+    },
+    {
+      "text": "",
+      "url": "https://www.instagram.com/w3schools.com_official/"
+    },
+    {
+      "text": "HTML",
+      "url": "/html/default.asp"
+    },
+    {
+      "text": "CSS",
+      "url": "/css/default.asp"
+    },
+    {
+      "text": "JAVASCRIPT",
+      "url": "/js/default.asp"
+    },
+    {
+      "text": "SQL",
+      "url": "/sql/default.asp"
+    },
+    {
+      "text": "PYTHON",
+      "url": "/python/default.asp"
+    },
+    {
+      "text": "JAVA",
+      "url": "/java/default.asp"
+    },
+    {
+      "text": "PHP",
+      "url": "/php/default.asp"
+    },
+    {
+      "text": "C",
+      "url": "/c/index.php"
+    },
+    {
+      "text": "C++",
+      "url": "/cpp/default.asp"
+    },
+    {
+      "text": "C#",
+      "url": "/cs/index.php"
+    },
+    {
+      "text": "AWS",
+      "url": "/aws/index.php"
+    },
+    {
+      "text": "W3.CSS",
+      "url": "/w3css/default.asp"
+    },
+    {
+      "text": "HOW TO",
+      "url": "/howto/default.asp"
+    },
+    {
+      "text": "BOOTSTRAP",
+      "url": "/bootstrap/bootstrap_ver.asp"
+    },
+    {
+      "text": "REACT",
+      "url": "/react/default.asp"
+    },
+    {
+      "text": "MYSQL",
+      "url": "/mysql/default.asp"
+    },
+    {
+      "text": "JQUERY",
+      "url": "/jquery/default.asp"
+    },
+    {
+      "text": "EXCEL",
+      "url": "/excel/index.php"
+    },
+    {
+      "text": "XML",
+      "url": "/xml/default.asp"
+    },
+    {
+      "text": "DJANGO",
+      "url": "/django/index.php"
+    },
+    {
+      "text": "NUMPY",
+      "url": "/python/numpy/default.asp"
+    },
+    {
+      "text": "PANDAS",
+      "url": "/python/pandas/default.asp"
+    },
+    {
+      "text": "NODEJS",
+      "url": "/nodejs/default.asp"
+    },
+    {
+      "text": "DSA",
+      "url": "/dsa/index.php"
+    },
+    {
+      "text": "TYPESCRIPT",
+      "url": "/typescript/index.php"
+    },
+    {
+      "text": "ANGULAR",
+      "url": "/angular/default.asp"
+    },
+    {
+      "text": "ANGULARJS",
+      "url": "/angularjs/default.asp"
+    },
+    {
+      "text": "GIT",
+      "url": "/git/default.asp"
+    },
+    {
+      "text": "POSTGRESQL",
+      "url": "/postgresql/index.php"
+    },
+    {
+      "text": "MONGODB",
+      "url": "/mongodb/index.php"
+    },
+    {
+      "text": "ASP",
+      "url": "/asp/default.asp"
+    },
+    {
+      "text": "AI",
+      "url": "/ai/default.asp"
+    },
+    {
+      "text": "R",
+      "url": "/r/default.asp"
+    },
+    {
+      "text": "GO",
+      "url": "/go/index.php"
+    },
+    {
+      "text": "KOTLIN",
+      "url": "/kotlin/index.php"
+    },
+    {
+      "text": "SWIFT",
+      "url": "/swift/default.asp"
+    },
+    {
+      "text": "SASS",
+      "url": "/sass/default.asp"
+    },
+    {
+      "text": "VUE",
+      "url": "/vue/index.php"
+    },
+    {
+      "text": "GEN AI",
+      "url": "/gen_ai/index.php"
+    },
+    {
+      "text": "SCIPY",
+      "url": "/python/scipy/index.php"
+    },
+    {
+      "text": "CYBERSECURITY",
+      "url": "/cybersecurity/index.php"
+    },
+    {
+      "text": "DATA SCIENCE",
+      "url": "/datascience/default.asp"
+    },
+    {
+      "text": "INTRO TO PROGRAMMING",
+      "url": "/programming/index.php"
+    },
+    {
+      "text": "INTRO TO HTML & CSS",
+      "url": "/htmlcss/default.asp"
+    },
+    {
+      "text": "BASH",
+      "url": "/bash/index.php"
+    },
+    {
+      "text": "RUST",
+      "url": "/rust/index.php"
+    },
+    {
+      "text": "TOOLS",
+      "url": "/tools/index.php"
+    },
+    {
+      "text": "Python HOME",
+      "url": "default.asp"
+    },
+    {
+      "text": "Python Intro",
+      "url": "python_intro.asp"
+    },
+    {
+      "text": "Python Get Started",
+      "url": "python_getstarted.asp"
+    },
+    {
+      "text": "Python Syntax",
+      "url": "python_syntax.asp"
+    },
+    {
+      "text": "Syntax",
+      "url": "python_syntax.asp"
+    },
+    {
+      "text": "Statements",
+      "url": "python_statements.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_statements.asp"
+    },
+    {
+      "text": "Python Output",
+      "url": "python_output.asp"
+    },
+    {
+      "text": "Print Text",
+      "url": "python_output.asp"
+    },
+    {
+      "text": "Print Numbers",
+      "url": "python_output_numbers.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_output.asp"
+    },
+    {
+      "text": "Python Comments",
+      "url": "python_comments.asp"
+    },
+    {
+      "text": "Comments",
+      "url": "python_comments.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_comments.asp"
+    },
+    {
+      "text": "Python Variables",
+      "url": "python_variables.asp"
+    },
+    {
+      "text": "Python Variables",
+      "url": "python_variables.asp"
+    },
+    {
+      "text": "Variable Names",
+      "url": "python_variables_names.asp"
+    },
+    {
+      "text": "Assign Multiple Values",
+      "url": "python_variables_multiple.asp"
+    },
+    {
+      "text": "Output Variables",
+      "url": "python_variables_output.asp"
+    },
+    {
+      "text": "Global Variables",
+      "url": "python_variables_global.asp"
+    },
+    {
+      "text": "Variable Exercises",
+      "url": "python_variables_exercises.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_variables.asp"
+    },
+    {
+      "text": "Python Data Types",
+      "url": "python_datatypes.asp"
+    },
+    {
+      "text": "Data Types",
+      "url": "python_datatypes.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_datatypes.asp"
+    },
+    {
+      "text": "Python Numbers",
+      "url": "python_numbers.asp"
+    },
+    {
+      "text": "Numbers",
+      "url": "python_numbers.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_numbers.asp"
+    },
+    {
+      "text": "Python Casting",
+      "url": "python_casting.asp"
+    },
+    {
+      "text": "Casting",
+      "url": "python_casting.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_casting.asp"
+    },
+    {
+      "text": "Python Strings",
+      "url": "python_strings.asp"
+    },
+    {
+      "text": "Python Strings",
+      "url": "python_strings.asp"
+    },
+    {
+      "text": "Slicing Strings",
+      "url": "python_strings_slicing.asp"
+    },
+    {
+      "text": "Modify Strings",
+      "url": "python_strings_modify.asp"
+    },
+    {
+      "text": "Concatenate Strings",
+      "url": "python_strings_concatenate.asp"
+    },
+    {
+      "text": "Format Strings",
+      "url": "python_strings_format.asp"
+    },
+    {
+      "text": "Escape Characters",
+      "url": "python_strings_escape.asp"
+    },
+    {
+      "text": "String Methods",
+      "url": "python_strings_methods.asp"
+    },
+    {
+      "text": "String Exercises",
+      "url": "python_strings_exercises.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_strings_basics.asp"
+    },
+    {
+      "text": "Python Booleans",
+      "url": "python_booleans.asp"
+    },
+    {
+      "text": "Booleans",
+      "url": "python_booleans.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_booleans.asp"
+    },
+    {
+      "text": "Python Operators",
+      "url": "python_operators.asp"
+    },
+    {
+      "text": "Python Operators",
+      "url": "python_operators.asp"
+    },
+    {
+      "text": "Arithmetic Operators",
+      "url": "python_operators_arithmetic.asp"
+    },
+    {
+      "text": "Assignment Operators",
+      "url": "python_operators_assign.asp"
+    },
+    {
+      "text": "Ternary Operator",
+      "url": "python_ternary_operator.asp"
+    },
+    {
+      "text": "Comparison Operators",
+      "url": "python_operators_comparison.asp"
+    },
+    {
+      "text": "Logical Operators",
+      "url": "python_operators_logical.asp"
+    },
+    {
+      "text": "Identity Operators",
+      "url": "python_operators_identity.asp"
+    },
+    {
+      "text": "Membership Operators",
+      "url": "python_operators_membership.asp"
+    },
+    {
+      "text": "Bitwise Operators",
+      "url": "python_operators_bitwise.asp"
+    },
+    {
+      "text": "Operator Precedence",
+      "url": "python_operators_precedence.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_operators_basics.asp"
+    },
+    {
+      "text": "Python Lists",
+      "url": "python_lists.asp"
+    },
+    {
+      "text": "Python Lists",
+      "url": "python_lists.asp"
+    },
+    {
+      "text": "Access List Items",
+      "url": "python_lists_access.asp"
+    },
+    {
+      "text": "Change List Items",
+      "url": "python_lists_change.asp"
+    },
+    {
+      "text": "Add List Items",
+      "url": "python_lists_add.asp"
+    },
+    {
+      "text": "Remove List Items",
+      "url": "python_lists_remove.asp"
+    },
+    {
+      "text": "Loop Lists",
+      "url": "python_lists_loop.asp"
+    },
+    {
+      "text": "List Comprehension",
+      "url": "python_lists_comprehension.asp"
+    },
+    {
+      "text": "Sort Lists",
+      "url": "python_lists_sort.asp"
+    },
+    {
+      "text": "Copy Lists",
+      "url": "python_lists_copy.asp"
+    },
+    {
+      "text": "Join Lists",
+      "url": "python_lists_join.asp"
+    },
+    {
+      "text": "List Methods",
+      "url": "python_lists_methods.asp"
+    },
+    {
+      "text": "List Exercises",
+      "url": "python_lists_exercises.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_lists_basics.asp"
+    },
+    {
+      "text": "Python Tuples",
+      "url": "python_tuples.asp"
+    },
+    {
+      "text": "Python Tuples",
+      "url": "python_tuples.asp"
+    },
+    {
+      "text": "Access Tuples",
+      "url": "python_tuples_access.asp"
+    },
+    {
+      "text": "Update Tuples",
+      "url": "python_tuples_update.asp"
+    },
+    {
+      "text": "Unpack Tuples",
+      "url": "python_tuples_unpack.asp"
+    },
+    {
+      "text": "Loop Tuples",
+      "url": "python_tuples_loop.asp"
+    },
+    {
+      "text": "Join Tuples",
+      "url": "python_tuples_join.asp"
+    },
+    {
+      "text": "Tuple Methods",
+      "url": "python_tuples_methods.asp"
+    },
+    {
+      "text": "Tuple Exercises",
+      "url": "python_tuples_exercises.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_tuples_basics.asp"
+    },
+    {
+      "text": "Python Sets",
+      "url": "python_sets.asp"
+    },
+    {
+      "text": "Python Sets",
+      "url": "python_sets.asp"
+    },
+    {
+      "text": "Access Set Items",
+      "url": "python_sets_access.asp"
+    },
+    {
+      "text": "Add Set Items",
+      "url": "python_sets_add.asp"
+    },
+    {
+      "text": "Remove Set Items",
+      "url": "python_sets_remove.asp"
+    },
+    {
+      "text": "Loop Sets",
+      "url": "python_sets_loop.asp"
+    },
+    {
+      "text": "Join Sets",
+      "url": "python_sets_join.asp"
+    },
+    {
+      "text": "Frozenset",
+      "url": "python_frozenset.asp"
+    },
+    {
+      "text": "Set Methods",
+      "url": "python_sets_methods.asp"
+    },
+    {
+      "text": "Set Exercises",
+      "url": "python_sets_exercises.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_sets_basics.asp"
+    },
+    {
+      "text": "Python Dictionaries",
+      "url": "python_dictionaries.asp"
+    },
+    {
+      "text": "Python Dictionaries",
+      "url": "python_dictionaries.asp"
+    },
+    {
+      "text": "Access Items",
+      "url": "python_dictionaries_access.asp"
+    },
+    {
+      "text": "Change Items",
+      "url": "python_dictionaries_change.asp"
+    },
+    {
+      "text": "Add Items",
+      "url": "python_dictionaries_add.asp"
+    },
+    {
+      "text": "Remove Items",
+      "url": "python_dictionaries_remove.asp"
+    },
+    {
+      "text": "Loop Dictionaries",
+      "url": "python_dictionaries_loop.asp"
+    },
+    {
+      "text": "Copy Dictionaries",
+      "url": "python_dictionaries_copy.asp"
+    },
+    {
+      "text": "Nested Dictionaries",
+      "url": "python_dictionaries_nested.asp"
+    },
+    {
+      "text": "Dictionary Methods",
+      "url": "python_dictionaries_methods.asp"
+    },
+    {
+      "text": "Dictionary Exercises",
+      "url": "python_dictionaries_exercises.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_dictionaries_basics.asp"
+    },
+    {
+      "text": "Python If...Else",
+      "url": "python_conditions.asp"
+    },
+    {
+      "text": "Python If",
+      "url": "python_conditions.asp"
+    },
+    {
+      "text": "Python Elif",
+      "url": "python_if_elif.asp"
+    },
+    {
+      "text": "Python Else",
+      "url": "python_if_else.asp"
+    },
+    {
+      "text": "Shorthand If",
+      "url": "python_if_shorthand.asp"
+    },
+    {
+      "text": "Logical Operators",
+      "url": "python_if_logical.asp"
+    },
+    {
+      "text": "Nested If",
+      "url": "python_if_nested_if.asp"
+    },
+    {
+      "text": "Pass Statement",
+      "url": "python_if_pass.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_if_basics.asp"
+    },
+    {
+      "text": "Python Match",
+      "url": "python_match.asp"
+    },
+    {
+      "text": "Match",
+      "url": "python_match.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_match.asp"
+    },
+    {
+      "text": "Python While Loops",
+      "url": "python_while_loops.asp"
+    },
+    {
+      "text": "While Loops",
+      "url": "python_while_loops.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_while_loops.asp"
+    },
+    {
+      "text": "Python For Loops",
+      "url": "python_for_loops.asp"
+    },
+    {
+      "text": "For Loops",
+      "url": "python_for_loops.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_for_loops.asp"
+    },
+    {
+      "text": "Python Functions",
+      "url": "python_functions.asp"
+    },
+    {
+      "text": "Python Functions",
+      "url": "python_functions.asp"
+    },
+    {
+      "text": "Python Arguments",
+      "url": "python_arguments.asp"
+    },
+    {
+      "text": "Python *args / **kwargs",
+      "url": "python_args_kwargs.asp"
+    },
+    {
+      "text": "Python Scope",
+      "url": "python_scope.asp"
+    },
+    {
+      "text": "Python Decorators",
+      "url": "python_decorators.asp"
+    },
+    {
+      "text": "Python Lambda",
+      "url": "python_lambda.asp"
+    },
+    {
+      "text": "Python Recursion",
+      "url": "python_recursion.asp"
+    },
+    {
+      "text": "Python Generators",
+      "url": "python_generators.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_functions_basics.asp"
+    },
+    {
+      "text": "Python Range",
+      "url": "python_range.asp"
+    },
+    {
+      "text": "Range",
+      "url": "python_range.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_range.asp"
+    },
+    {
+      "text": "Python Arrays",
+      "url": "python_arrays.asp"
+    },
+    {
+      "text": "Arrays",
+      "url": "python_arrays.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_arrays.asp"
+    },
+    {
+      "text": "Python Iterators",
+      "url": "python_iterators.asp"
+    },
+    {
+      "text": "Iterators",
+      "url": "python_iterators.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_iterators.asp"
+    },
+    {
+      "text": "Python Modules",
+      "url": "python_modules.asp"
+    },
+    {
+      "text": "Modules",
+      "url": "python_modules.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_modules.asp"
+    },
+    {
+      "text": "Python Dates",
+      "url": "python_datetime.asp"
+    },
+    {
+      "text": "Dates",
+      "url": "python_datetime.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_datetime.asp"
+    },
+    {
+      "text": "Python Math",
+      "url": "python_math.asp"
+    },
+    {
+      "text": "Math",
+      "url": "python_math.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_math.asp"
+    },
+    {
+      "text": "Python JSON",
+      "url": "python_json.asp"
+    },
+    {
+      "text": "JSON",
+      "url": "python_json.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_json.asp"
+    },
+    {
+      "text": "Python RegEx",
+      "url": "python_regex.asp"
+    },
+    {
+      "text": "RegEx",
+      "url": "python_regex.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_regex.asp"
+    },
+    {
+      "text": "Python PIP",
+      "url": "python_pip.asp"
+    },
+    {
+      "text": "Python Try...Except",
+      "url": "python_try_except.asp"
+    },
+    {
+      "text": "Try...Except",
+      "url": "python_try_except.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_try_except.asp"
+    },
+    {
+      "text": "Python String Formatting",
+      "url": "python_string_formatting.asp"
+    },
+    {
+      "text": "String Formatting",
+      "url": "python_string_formatting.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_string_formatting.asp"
+    },
+    {
+      "text": "Python None",
+      "url": "python_none.asp"
+    },
+    {
+      "text": "None",
+      "url": "python_none.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_none.asp"
+    },
+    {
+      "text": "Python User Input",
+      "url": "python_user_input.asp"
+    },
+    {
+      "text": "Python VirtualEnv",
+      "url": "python_virtualenv.asp"
+    },
+    {
+      "text": "Python OOP",
+      "url": "python_oop.asp"
+    },
+    {
+      "text": "Python Classes/Objects",
+      "url": "python_classes.asp"
+    },
+    {
+      "text": "Classes/Objects",
+      "url": "python_classes.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_classes.asp"
+    },
+    {
+      "text": "Python __init__ Method",
+      "url": "python_class_init.asp"
+    },
+    {
+      "text": "__init__ Method",
+      "url": "python_class_init.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_classes_basics.asp"
+    },
+    {
+      "text": "Python self Parameter",
+      "url": "python_class_self.asp"
+    },
+    {
+      "text": "self Parameter",
+      "url": "python_class_self.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_class_self.asp"
+    },
+    {
+      "text": "Python Class Properties",
+      "url": "python_class_properties.asp"
+    },
+    {
+      "text": "Class Properties",
+      "url": "python_class_properties.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_class_properties.asp"
+    },
+    {
+      "text": "Python Class Methods",
+      "url": "python_class_methods.asp"
+    },
+    {
+      "text": "Class Methods",
+      "url": "python_class_methods.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_class_methods.asp"
+    },
+    {
+      "text": "Python Magic Methods",
+      "url": "python_magic_methods.asp"
+    },
+    {
+      "text": "Magic Methods",
+      "url": "python_magic_methods.asp"
+    },
+    {
+      "text": "__str__",
+      "url": "python_magic_str.asp"
+    },
+    {
+      "text": "__repr__",
+      "url": "python_magic_repr.asp"
+    },
+    {
+      "text": "__eq__",
+      "url": "python_magic_eq.asp"
+    },
+    {
+      "text": "__add__",
+      "url": "python_magic_add.asp"
+    },
+    {
+      "text": "__len__",
+      "url": "python_magic_len.asp"
+    },
+    {
+      "text": "__lt__",
+      "url": "python_magic_lt.asp"
+    },
+    {
+      "text": "__contains__",
+      "url": "python_magic_contains.asp"
+    },
+    {
+      "text": "__call__",
+      "url": "python_magic_call.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_magic_methods.asp"
+    },
+    {
+      "text": "Python Inheritance",
+      "url": "python_inheritance.asp"
+    },
+    {
+      "text": "Inheritance",
+      "url": "python_inheritance.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_inheritance.asp"
+    },
+    {
+      "text": "Python Polymorphism",
+      "url": "python_polymorphism.asp"
+    },
+    {
+      "text": "Polymorphism",
+      "url": "python_polymorphism.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_polymorphism.asp"
+    },
+    {
+      "text": "Python Encapsulation",
+      "url": "python_encapsulation.asp"
+    },
+    {
+      "text": "Encapsulation",
+      "url": "python_encapsulation.asp"
+    },
+    {
+      "text": "Code Challenge",
+      "url": "python_challenges_encapsulation.asp"
+    },
+    {
+      "text": "Python Inner Classes",
+      "url": "python_class_inner.asp"
+    },
+    {
+      "text": "Python File Handling",
+      "url": "python_file_handling.asp"
+    },
+    {
+      "text": "Python Read Files",
+      "url": "python_file_open.asp"
+    },
+    {
+      "text": "Python Write/Create Files",
+      "url": "python_file_write.asp"
+    },
+    {
+      "text": "Python Delete Files",
+      "url": "python_file_remove.asp"
+    },
+    {
+      "text": "NumPy Tutorial",
+      "url": "numpy/default.asp"
+    },
+    {
+      "text": "Pandas Tutorial",
+      "url": "pandas/default.asp"
+    },
+    {
+      "text": "SciPy Tutorial",
+      "url": "scipy/index.php"
+    },
+    {
+      "text": "Django Tutorial",
+      "url": "/django/index.php"
+    },
+    {
+      "text": "Matplotlib Intro",
+      "url": "matplotlib_intro.asp"
+    },
+    {
+      "text": "Matplotlib Get Started",
+      "url": "matplotlib_getting_started.asp"
+    },
+    {
+      "text": "Matplotlib Pyplot",
+      "url": "matplotlib_pyplot.asp"
+    },
+    {
+      "text": "Matplotlib Plotting",
+      "url": "matplotlib_plotting.asp"
+    },
+    {
+      "text": "Matplotlib Markers",
+      "url": "matplotlib_markers.asp"
+    },
+    {
+      "text": "Matplotlib Line",
+      "url": "matplotlib_line.asp"
+    },
+    {
+      "text": "Matplotlib Labels",
+      "url": "matplotlib_labels.asp"
+    },
+    {
+      "text": "Matplotlib Grid",
+      "url": "matplotlib_grid.asp"
+    },
+    {
+      "text": "Matplotlib Subplot",
+      "url": "matplotlib_subplot.asp"
+    },
+    {
+      "text": "Matplotlib Scatter",
+      "url": "matplotlib_scatter.asp"
+    },
+    {
+      "text": "Matplotlib Bars",
+      "url": "matplotlib_bars.asp"
+    },
+    {
+      "text": "Matplotlib Histograms",
+      "url": "matplotlib_histograms.asp"
+    },
+    {
+      "text": "Matplotlib Pie Charts",
+      "url": "matplotlib_pie_charts.asp"
+    },
+    {
+      "text": "Getting Started",
+      "url": "python_ml_getting_started.asp"
+    },
+    {
+      "text": "Mean Median Mode",
+      "url": "python_ml_mean_median_mode.asp"
+    },
+    {
+      "text": "Standard Deviation",
+      "url": "python_ml_standard_deviation.asp"
+    },
+    {
+      "text": "Percentile",
+      "url": "python_ml_percentile.asp"
+    },
+    {
+      "text": "Data Distribution",
+      "url": "python_ml_data_distribution.asp"
+    },
+    {
+      "text": "Normal Data Distribution",
+      "url": "python_ml_normal_data_distribution.asp"
+    },
+    {
+      "text": "Scatter Plot",
+      "url": "python_ml_scatterplot.asp"
+    },
+    {
+      "text": "Linear Regression",
+      "url": "python_ml_linear_regression.asp"
+    },
+    {
+      "text": "Polynomial Regression",
+      "url": "python_ml_polynomial_regression.asp"
+    },
+    {
+      "text": "Multiple Regression",
+      "url": "python_ml_multiple_regression.asp"
+    },
+    {
+      "text": "Scale",
+      "url": "python_ml_scale.asp"
+    },
+    {
+      "text": "Train/Test",
+      "url": "python_ml_train_test.asp"
+    },
+    {
+      "text": "Decision Tree",
+      "url": "python_ml_decision_tree.asp"
+    },
+    {
+      "text": "Confusion Matrix",
+      "url": "python_ml_confusion_matrix.asp"
+    },
+    {
+      "text": "Hierarchical Clustering",
+      "url": "python_ml_hierarchial_clustering.asp"
+    },
+    {
+      "text": "Logistic Regression",
+      "url": "python_ml_logistic_regression.asp"
+    },
+    {
+      "text": "Grid Search",
+      "url": "python_ml_grid_search.asp"
+    },
+    {
+      "text": "Categorical Data",
+      "url": "python_ml_preprocessing.asp"
+    },
+    {
+      "text": "K-means",
+      "url": "python_ml_k-means.asp"
+    },
+    {
+      "text": "Bootstrap Aggregation",
+      "url": "python_ml_bagging.asp"
+    },
+    {
+      "text": "Cross Validation",
+      "url": "python_ml_cross_validation.asp"
+    },
+    {
+      "text": "AUC - ROC Curve",
+      "url": "python_ml_auc_roc.asp"
+    },
+    {
+      "text": "K-nearest neighbors",
+      "url": "python_ml_knn.asp"
+    },
+    {
+      "text": "Python DSA",
+      "url": "python_dsa.asp"
+    },
+    {
+      "text": "Lists and Arrays",
+      "url": "python_dsa_lists.asp"
+    },
+    {
+      "text": "Stacks",
+      "url": "python_dsa_stacks.asp"
+    },
+    {
+      "text": "Queues",
+      "url": "python_dsa_queues.asp"
+    },
+    {
+      "text": "Linked Lists",
+      "url": "python_dsa_linkedlists.asp"
+    },
+    {
+      "text": "Hash Tables",
+      "url": "python_dsa_hashtables.asp"
+    },
+    {
+      "text": "Trees",
+      "url": "python_dsa_trees.asp"
+    },
+    {
+      "text": "Binary Trees",
+      "url": "python_dsa_binarytrees.asp"
+    },
+    {
+      "text": "Binary Search Trees",
+      "url": "python_dsa_binarysearchtrees.asp"
+    },
+    {
+      "text": "AVL Trees",
+      "url": "python_dsa_avltrees.asp"
+    },
+    {
+      "text": "Graphs",
+      "url": "python_dsa_graphs.asp"
+    },
+    {
+      "text": "Linear Search",
+      "url": "python_dsa_linearsearch.asp"
+    },
+    {
+      "text": "Binary Search",
+      "url": "python_dsa_binarysearch.asp"
+    },
+    {
+      "text": "Bubble Sort",
+      "url": "python_dsa_bubblesort.asp"
+    },
+    {
+      "text": "Selection Sort",
+      "url": "python_dsa_selectionsort.asp"
+    },
+    {
+      "text": "Insertion Sort",
+      "url": "python_dsa_insertionsort.asp"
+    },
+    {
+      "text": "Quick Sort",
+      "url": "python_dsa_quicksort.asp"
+    },
+    {
+      "text": "Counting Sort",
+      "url": "python_dsa_countingsort.asp"
+    },
+    {
+      "text": "Radix Sort",
+      "url": "python_dsa_radixsort.asp"
+    },
+    {
+      "text": "Merge Sort",
+      "url": "python_dsa_mergesort.asp"
+    },
+    {
+      "text": "MySQL Get Started",
+      "url": "python_mysql_getstarted.asp"
+    },
+    {
+      "text": "MySQL Create Database",
+      "url": "python_mysql_create_db.asp"
+    },
+    {
+      "text": "MySQL Create Table",
+      "url": "python_mysql_create_table.asp"
+    },
+    {
+      "text": "MySQL Insert",
+      "url": "python_mysql_insert.asp"
+    },
+    {
+      "text": "MySQL Select",
+      "url": "python_mysql_select.asp"
+    },
+    {
+      "text": "MySQL Where",
+      "url": "python_mysql_where.asp"
+    },
+    {
+      "text": "MySQL Order By",
+      "url": "python_mysql_orderby.asp"
+    },
+    {
+      "text": "MySQL Delete",
+      "url": "python_mysql_delete.asp"
+    },
+    {
+      "text": "MySQL Drop Table",
+      "url": "python_mysql_drop_table.asp"
+    },
+    {
+      "text": "MySQL Update",
+      "url": "python_mysql_update.asp"
+    },
+    {
+      "text": "MySQL Limit",
+      "url": "python_mysql_limit.asp"
+    },
+    {
+      "text": "MySQL Join",
+      "url": "python_mysql_join.asp"
+    },
+    {
+      "text": "MongoDB Get Started",
+      "url": "python_mongodb_getstarted.asp"
+    },
+    {
+      "text": "MongoDB Create DB",
+      "url": "python_mongodb_create_db.asp"
+    },
+    {
+      "text": "MongoDB Collection",
+      "url": "python_mongodb_create_collection.asp"
+    },
+    {
+      "text": "MongoDB Insert",
+      "url": "python_mongodb_insert.asp"
+    },
+    {
+      "text": "MongoDB Find",
+      "url": "python_mongodb_find.asp"
+    },
+    {
+      "text": "MongoDB Query",
+      "url": "python_mongodb_query.asp"
+    },
+    {
+      "text": "MongoDB Sort",
+      "url": "python_mongodb_sort.asp"
+    },
+    {
+      "text": "MongoDB Delete",
+      "url": "python_mongodb_delete.asp"
+    },
+    {
+      "text": "MongoDB Drop Collection",
+      "url": "python_mongodb_drop_collection.asp"
+    },
+    {
+      "text": "MongoDB Update",
+      "url": "python_mongodb_update.asp"
+    },
+    {
+      "text": "MongoDB Limit",
+      "url": "python_mongodb_limit.asp"
+    },
+    {
+      "text": "Python Certificate",
+      "url": "python_exam.asp"
+    },
+    {
+      "text": "Python Overview",
+      "url": "python_reference.asp"
+    },
+    {
+      "text": "Python Built-in Functions",
+      "url": "python_ref_functions.asp"
+    },
+    {
+      "text": "Python String Methods",
+      "url": "python_ref_string.asp"
+    },
+    {
+      "text": "Python List Methods",
+      "url": "python_ref_list.asp"
+    },
+    {
+      "text": "Python Dictionary Methods",
+      "url": "python_ref_dictionary.asp"
+    },
+    {
+      "text": "Python Tuple Methods",
+      "url": "python_ref_tuple.asp"
+    },
+    {
+      "text": "Python Set Methods",
+      "url": "python_ref_set.asp"
+    },
+    {
+      "text": "Python File Methods",
+      "url": "python_ref_file.asp"
+    },
+    {
+      "text": "Python Keywords",
+      "url": "python_ref_keywords.asp"
+    },
+    {
+      "text": "Python Exceptions",
+      "url": "python_ref_exceptions.asp"
+    },
+    {
+      "text": "Python Glossary",
+      "url": "python_ref_glossary.asp"
+    },
+    {
+      "text": "Built-in Modules",
+      "url": "python_ref_modules.asp"
+    },
+    {
+      "text": "Random Module",
+      "url": "module_random.asp"
+    },
+    {
+      "text": "Requests Module",
+      "url": "module_requests.asp"
+    },
+    {
+      "text": "Statistics Module",
+      "url": "module_statistics.asp"
+    },
+    {
+      "text": "Math Module",
+      "url": "module_math.asp"
+    },
+    {
+      "text": "cMath Module",
+      "url": "module_cmath.asp"
+    },
+    {
+      "text": "Remove List Duplicates",
+      "url": "python_howto_remove_duplicates.asp"
+    },
+    {
+      "text": "Reverse a String",
+      "url": "python_howto_reverse_string.asp"
+    },
+    {
+      "text": "Add Two Numbers",
+      "url": "python_howto_add_two_numbers.asp"
+    },
+    {
+      "text": "Python Examples",
+      "url": "python_examples.asp"
+    },
+    {
+      "text": "Python Compiler",
+      "url": "python_compiler.asp"
+    },
+    {
+      "text": "Python Exercises",
+      "url": "python_exercises.asp"
+    },
+    {
+      "text": "Python Quiz",
+      "url": "python_quiz.asp"
+    },
+    {
+      "text": "Python Challenges",
+      "url": "python_challenges.asp"
+    },
+    {
+      "text": "Python Practice Problems",
+      "url": "python_practice.php"
+    },
+    {
+      "text": "Python Server",
+      "url": "python_server.asp"
+    },
+    {
+      "text": "Python Syllabus",
+      "url": "python_syllabus.asp"
+    },
+    {
+      "text": "Python Study Plan",
+      "url": "python_study_plan.asp"
+    },
+    {
+      "text": "Python Interview Q&A",
+      "url": "python_interview_questions.asp"
+    },
+    {
+      "text": "Python Training",
+      "url": "python_training.asp"
+    },
+    {
+      "text": "❮ Previous",
+      "url": "default.asp"
+    },
+    {
+      "text": "Next ❯",
+      "url": "python_getstarted.asp"
+    },
+    {
+      "text": "Try it Yourself »",
+      "url": "trypython.asp?filename=demo_default"
+    },
+    {
+      "text": "❮ Previous",
+      "url": "default.asp"
+    },
+    {
+      "text": "Next ❯",
+      "url": "python_getstarted.asp"
+    },
+    {
+      "text": "★ +1",
+      "url": "https://profile.w3schools.com/log-in?redirect_url=https%3A%2F%2Fmy-learning.w3schools.com"
+    },
+    {
+      "text": "Sign in to track progress",
+      "url": "https://profile.w3schools.com/log-in?redirect_url=https%3A%2F%2Fpathfinder.w3schools.com"
+    },
+    {
+      "text": "REMOVE ADS",
+      "url": "https://order.w3schools.com/plans"
+    },
+    {
+      "text": "Learn more »",
+      "url": "/adventure/"
+    },
+    {
+      "text": "PLUS",
+      "url": "https://order.w3schools.com/plans"
+    },
+    {
+      "text": "SPACES",
+      "url": "/spaces/index.php"
+    },
+    {
+      "text": "GET CERTIFIED",
+      "url": "https://campus.w3schools.com/collections/certifications"
+    },
+    {
+      "text": "FOR TEACHERS",
+      "url": "/academy/index.php"
+    },
+    {
+      "text": "PRACTICE",
+      "url": "/practice/index.php"
+    },
+    {
+      "text": "CONTACT US",
+      "url": "javascript:void(0);"
+    },
+    {
+      "text": "HTML Tutorial",
+      "url": "/html/default.asp"
+    },
+    {
+      "text": "CSS Tutorial",
+      "url": "/css/default.asp"
+    },
+    {
+      "text": "JavaScript Tutorial",
+      "url": "/js/default.asp"
+    },
+    {
+      "text": "How To Tutorial",
+      "url": "/howto/default.asp"
+    },
+    {
+      "text": "SQL Tutorial",
+      "url": "/sql/default.asp"
+    },
+    {
+      "text": "Python Tutorial",
+      "url": "/python/default.asp"
+    },
+    {
+      "text": "W3.CSS Tutorial",
+      "url": "/w3css/default.asp"
+    },
+    {
+      "text": "Bootstrap Tutorial",
+      "url": "/bootstrap/bootstrap_ver.asp"
+    },
+    {
+      "text": "PHP Tutorial",
+      "url": "/php/default.asp"
+    },
+    {
+      "text": "Java Tutorial",
+      "url": "/java/default.asp"
+    },
+    {
+      "text": "C++ Tutorial",
+      "url": "/cpp/default.asp"
+    },
+    {
+      "text": "jQuery Tutorial",
+      "url": "/jquery/default.asp"
+    },
+    {
+      "text": "HTML Reference",
+      "url": "/tags/default.asp"
+    },
+    {
+      "text": "CSS Reference",
+      "url": "/cssref/index.php"
+    },
+    {
+      "text": "JavaScript Reference",
+      "url": "/jsref/default.asp"
+    },
+    {
+      "text": "SQL Reference",
+      "url": "/sql/sql_ref_keywords.asp"
+    },
+    {
+      "text": "Python Reference",
+      "url": "/python/python_reference.asp"
+    },
+    {
+      "text": "W3.CSS Reference",
+      "url": "/w3css/w3css_references.asp"
+    },
+    {
+      "text": "Bootstrap Reference",
+      "url": "/bootstrap/bootstrap_ref_all_classes.asp"
+    },
+    {
+      "text": "PHP Reference",
+      "url": "/php/php_ref_overview.asp"
+    },
+    {
+      "text": "HTML Colors",
+      "url": "/colors/colors_names.asp"
+    },
+    {
+      "text": "Java Reference",
+      "url": "/java/java_ref_keywords.asp"
+    },
+    {
+      "text": "AngularJS Reference",
+      "url": "/angularjs/angularjs_ref_directives.asp"
+    },
+    {
+      "text": "jQuery Reference",
+      "url": "/jquery/jquery_ref_overview.asp"
+    },
+    {
+      "text": "HTML Examples",
+      "url": "/html/html_examples.asp"
+    },
+    {
+      "text": "CSS Examples",
+      "url": "/css/css_examples.asp"
+    },
+    {
+      "text": "JavaScript Examples",
+      "url": "/js/js_examples.asp"
+    },
+    {
+      "text": "How To Examples",
+      "url": "/howto/default.asp"
+    },
+    {
+      "text": "SQL Examples",
+      "url": "/sql/sql_examples.asp"
+    },
+    {
+      "text": "Python Examples",
+      "url": "/python/python_examples.asp"
+    },
+    {
+      "text": "W3.CSS Examples",
+      "url": "/w3css/w3css_examples.asp"
+    },
+    {
+      "text": "Bootstrap Examples",
+      "url": "/bootstrap/bootstrap_examples.asp"
+    },
+    {
+      "text": "PHP Examples",
+      "url": "/php/php_examples.asp"
+    },
+    {
+      "text": "Java Examples",
+      "url": "/java/java_examples.asp"
+    },
+    {
+      "text": "XML Examples",
+      "url": "/xml/xml_examples.asp"
+    },
+    {
+      "text": "jQuery Examples",
+      "url": "/jquery/jquery_examples.asp"
+    },
+    {
+      "text": "Get Certified",
+      "url": "https://campus.w3schools.com/collections/course-catalog"
+    },
+    {
+      "text": "HTML Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/html-certificate"
+    },
+    {
+      "text": "CSS Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/css-certificate"
+    },
+    {
+      "text": "JavaScript Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/javascript-certificate"
+    },
+    {
+      "text": "Front End Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/front-end-certificate"
+    },
+    {
+      "text": "SQL Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/sql-certificate"
+    },
+    {
+      "text": "Python Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/python-certificate"
+    },
+    {
+      "text": "PHP Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/php-certificate"
+    },
+    {
+      "text": "jQuery Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/jquery-certificate"
+    },
+    {
+      "text": "Java Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/java-certificate"
+    },
+    {
+      "text": "C++ Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/c-certificate"
+    },
+    {
+      "text": "C# Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/c-certificate-1"
+    },
+    {
+      "text": "XML Certificate",
+      "url": "https://campus.w3schools.com/collections/certifications/products/xml-certificate"
+    },
+    {
+      "text": "",
+      "url": "https://www.linkedin.com/company/w3schools.com/"
+    },
+    {
+      "text": "",
+      "url": "https://discord.com/invite/w3schools"
+    },
+    {
+      "text": "",
+      "url": "https://www.facebook.com/w3schoolscom/"
+    },
+    {
+      "text": "",
+      "url": "https://www.instagram.com/w3schools.com_official/"
+    },
+    {
+      "text": "FORUM",
+      "url": "/forum/index.php"
+    },
+    {
+      "text": "ABOUT",
+      "url": "/about/default.asp"
+    },
+    {
+      "text": "ACADEMY",
+      "url": "/academy/index.php"
+    },
+    {
+      "text": "terms of use",
+      "url": "/about/about_copyright.asp"
+    },
+    {
+      "text": "privacy policy",
+      "url": "/about/about_privacy.asp"
+    },
+    {
+      "text": "Copyright 1999-2026",
+      "url": "/about/about_copyright.asp"
+    },
+    {
+      "text": "W3Schools is Powered by W3.CSS",
+      "url": "//www.w3schools.com/w3css/default.asp"
+    }
+  ],
+  "error": null,
+  "status_code": 200
+}

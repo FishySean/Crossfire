@@ -1,0 +1,422 @@
+{
+  "url": "https://devguide.python.org/versions/",
+  "ok": true,
+  "title": "Status of Python versionsContentsMenuExpandLight modeDark modeAuto light/dark, in light modeAuto light/dark, in dark mode",
+  "markdown": "[Skip to content](#furo-main-content)\n\n[Python Developer's Guide](../)\n\n[Python Developer's Guide](../)\n\n[Getting started](../getting-started/)\n\n[Quick reference](../getting-started/quick-reference/)\n\n[Setup and building](../getting-started/setup-building/)\n\n[Fixing “easy” issues (and beyond)](../getting-started/fixing-issues/)\n\n[Git bootcamp and cheat sheet](../getting-started/git-boot-camp/)\n\n[Lifecycle of a pull request](../getting-started/pull-request-lifecycle/)\n\n[Where to get help](../getting-started/getting-help/)\n\n[Guidelines for using AI tools](../getting-started/ai-tools/)\n\n[Development workflow](../developer-workflow/)\n\n[Following Python’s development](../developer-workflow/communication-channels/)\n\n[Changing Python](../developer-workflow/lang-changes/)\n\n[Development cycle](../developer-workflow/development-cycle/)\n\n[Adding to the stdlib](../developer-workflow/stdlib/)\n\n[Standard library extension modules](../developer-workflow/extension-modules/)\n\n[Changing Python’s C API](../developer-workflow/c-api/)\n\n[Changing CPython’s grammar](../developer-workflow/grammar/)\n\n[Porting and platform support](../developer-workflow/porting/)\n\n[Issues and triaging](../triage/)\n\n[Using the issue tracker](../triage/issue-tracker/)\n\n[Triaging an issue](../triage/triaging/)\n\n[GitHub labels](../triage/labels/)\n\n[Triage Team](../triage/triage-team/)\n\n[Documentation](../documentation/)\n\n[Getting started](../documentation/start-documenting/)\n\n[Helping with documentation](../documentation/help-documenting/)\n\n[Style guide](../documentation/style-guide/)\n\n[reStructuredText markup](../documentation/markup/)\n\n[Translations](../documentation/translations/)\n\n[Translating](../documentation/translations/translating/)\n\n[Coordinating](../documentation/translations/coordinating/)\n\n[Helping with the Developer’s Guide](../documentation/devguide/)\n\n[Testing and buildbots](../testing/)\n\n[Running and writing tests](../testing/run-write-tests/)\n\n[Silence warnings from the test suite](../testing/silence-warnings/)\n\n[Increase test coverage](../testing/coverage/)\n\n[OSS-Fuzz for CPython](../testing/oss-fuzz/)\n\n[Working with buildbots](../testing/buildbots/)\n\n[New buildbot workers](../testing/new-buildbot-worker/)\n\n[Development tools](../development-tools/)\n\n[Argument Clinic](../development-tools/clinic/)\n\n[Tutorial](../development-tools/clinic/tutorial/)\n\n[How-to guides](../development-tools/clinic/howto/)\n\n[GDB support](../development-tools/gdb/)\n\n[Dynamic analysis with Clang](../development-tools/clang/)\n\n[Tools for tracking compiler warnings](../development-tools/warnings/)\n\n[Core team](../core-team/)\n\n[Responsibilities](../core-team/responsibilities/)\n\n[Accepting pull requests](../core-team/committing/)\n\n[Experts index](../core-team/experts/)\n\n[Team log](../core-team/team-log/)\n\n[Motivations and affiliations](../core-team/motivations/)\n\n[How to join the core team](../core-team/join-team/)\n\n[Memorialization](../core-team/memorialization/)\n\n[Security](../security/)\n\n[Security policy](../security/policy/)\n\n[Python Security Response Team (PSRT)](../security/psrt/)\n\n[Software Bill-of-Materials (SBOM)](../security/sbom/)\n\n[CPython’s internals](../internals/)\n\n[Status of Python versions](#)\n\n[Back to top](#)\n\n[View this page](https://github.com/python/devguide/blob/main/versions.rst?plain=true)\n\n[Edit this page](https://github.com/python/devguide/edit/main/versions.rst)\n\nStatus of Python versions[¶](#status-of-python-versions)\n\nThe main branch is currently the future Python 3.16, and is the only\nbranch that accepts new features. The latest release for each Python\nversion can be found on the [download page](https://www.python.org/downloads/).\n\n(See [below](#full-chart) for a chart with older versions.\nAnother useful visualization is [endoflife.date/python](https://endoflife.date/python).)\n\nSupported versions[¶](#supported-versions)\n\nDates shown in italic are scheduled and can be adjusted.\n\nBranch\n\nSchedule\n\nStatus\n\nFirst release\n\nEnd of life\n\nRelease manager\n\nmain\n\n[PEP 826](https://peps.python.org/pep-0826/)\n\nfeature\n\n2027-10-06\n\n2032-10\n\nSavannah Ostrowski\n\n3.15\n\n[PEP 790](https://peps.python.org/pep-0790/)\n\nprerelease\n\n2026-10-01\n\n2031-10\n\nHugo van Kemenade\n\n3.14\n\n[PEP 745](https://peps.python.org/pep-0745/)\n\nbugfix\n\n2025-10-07\n\n2030-10\n\nHugo van Kemenade\n\n3.13\n\n[PEP 719](https://peps.python.org/pep-0719/)\n\nbugfix\n\n2024-10-07\n\n2029-10\n\nThomas Wouters\n\n3.12\n\n[PEP 693](https://peps.python.org/pep-0693/)\n\nsecurity\n\n2023-10-02\n\n2028-10\n\nThomas Wouters\n\n3.11\n\n[PEP 664](https://peps.python.org/pep-0664/)\n\nsecurity\n\n2022-10-24\n\n2027-10\n\nPablo Galindo Salgado\n\n3.10\n\n[PEP 619](https://peps.python.org/pep-0619/)\n\nsecurity\n\n2021-10-04\n\n2026-10\n\nPablo Galindo Salgado\n\nUnsupported versions[¶](#unsupported-versions)\n\nBranch\n\nSchedule\n\nStatus\n\nFirst release\n\nEnd of life\n\nRelease manager\n\n3.9\n\n[PEP 596](https://peps.python.org/pep-0596/)\n\nend-of-life\n\n2020-10-05\n\n2025-10-31\n\nŁukasz Langa\n\n3.8\n\n[PEP 569](https://peps.python.org/pep-0569/)\n\nend-of-life\n\n2019-10-14\n\n2024-10-07\n\nŁukasz Langa\n\n3.7\n\n[PEP 537](https://peps.python.org/pep-0537/)\n\nend-of-life\n\n2018-06-27\n\n2023-06-27\n\nNed Deily\n\n3.6\n\n[PEP 494](https://peps.python.org/pep-0494/)\n\nend-of-life\n\n2016-12-23\n\n2021-12-23\n\nNed Deily\n\n3.5\n\n[PEP 478](https://peps.python.org/pep-0478/)\n\nend-of-life\n\n2015-09-13\n\n2020-09-30\n\nLarry Hastings\n\n3.4\n\n[PEP 429](https://peps.python.org/pep-0429/)\n\nend-of-life\n\n2014-03-16\n\n2019-03-18\n\nLarry Hastings\n\n3.3\n\n[PEP 398](https://peps.python.org/pep-0398/)\n\nend-of-life\n\n2012-09-29\n\n2017-09-29\n\nGeorg Brandl & Ned Deily (3.3.7)\n\n3.2\n\n[PEP 392](https://peps.python.org/pep-0392/)\n\nend-of-life\n\n2011-02-20\n\n2016-02-20\n\nGeorg Brandl\n\n3.1\n\n[PEP 375](https://peps.python.org/pep-0375/)\n\nend-of-life\n\n2009-06-27\n\n2012-04-09\n\nBenjamin Peterson\n\n3.0\n\n[PEP 361](https://peps.python.org/pep-0361/)\n\nend-of-life\n\n2008-12-03\n\n2009-06-27\n\nBarry Warsaw\n\n2.7\n\n[PEP 373](https://peps.python.org/pep-0373/)\n\nend-of-life\n\n2010-07-03\n\n2020-01-01\n\nBenjamin Peterson\n\n2.6\n\n[PEP 361](https://peps.python.org/pep-0361/)\n\nend-of-life\n\n2008-10-01\n\n2013-10-29\n\nBarry Warsaw\n\nFull chart[¶](#full-chart)\n\nStatus key[¶](#status-key)\n\nPython releases go through five phases, as described in [PEP 602](https://peps.python.org/pep-0602/). Release\nmanagers can adjust specific dates as needed.\n\nfeature:\n\nBefore the first beta, the next full release can accept new features,\nbug fixes, and security fixes.\n\nprerelease:\n\nAfter the first beta, no new features can go in, but feature fixes\n(including significant changes to new features), bug fixes, and security fixes\nare accepted for the upcoming feature release.\n\nbugfix:\n\nOnce a version has been fully released, bug fixes and security fixes are\naccepted. New binaries are built and released roughly every two months. This\nphase is also called maintenance mode or stable release.\n\nsecurity:\n\nAfter two years (18 months for versions before 3.13), only security\nfixes are accepted and no more binaries are released. New source-only versions\ncan be released as needed.\n\nend-of-life:\n\nFive years after a release, support ends. The release cycle is\nfrozen; no further changes are allowed.\n\nSee also the [Development cycle](../developer-workflow/development-cycle/#devcycle) page for more information about branches and backporting.\n\n[Previous CPython’s internals](../internals/)\n\nCopyright © 2011 Python Software Foundation\n\nMade with [Sphinx](https://www.sphinx-doc.org/) and [@pradyunsg](https://pradyunsg.me)'s\n\n[Furo](https://github.com/pradyunsg/furo)\n\nLast updated on May 27, 2026\n\nOn this page\n\n[Status of Python versions](#)\n\n[Supported versions](#supported-versions)\n\n[Unsupported versions](#unsupported-versions)\n\n[Full chart](#full-chart)\n\n[Status key](#status-key)",
+  "links": [
+    {
+      "text": "Skip to content",
+      "url": "#furo-main-content"
+    },
+    {
+      "text": "Python Developer's Guide",
+      "url": "../"
+    },
+    {
+      "text": "Python Developer's Guide",
+      "url": "../"
+    },
+    {
+      "text": "Getting started",
+      "url": "../getting-started/"
+    },
+    {
+      "text": "Quick reference",
+      "url": "../getting-started/quick-reference/"
+    },
+    {
+      "text": "Setup and building",
+      "url": "../getting-started/setup-building/"
+    },
+    {
+      "text": "Fixing “easy” issues (and beyond)",
+      "url": "../getting-started/fixing-issues/"
+    },
+    {
+      "text": "Git bootcamp and cheat sheet",
+      "url": "../getting-started/git-boot-camp/"
+    },
+    {
+      "text": "Lifecycle of a pull request",
+      "url": "../getting-started/pull-request-lifecycle/"
+    },
+    {
+      "text": "Where to get help",
+      "url": "../getting-started/getting-help/"
+    },
+    {
+      "text": "Guidelines for using AI tools",
+      "url": "../getting-started/ai-tools/"
+    },
+    {
+      "text": "Development workflow",
+      "url": "../developer-workflow/"
+    },
+    {
+      "text": "Following Python’s development",
+      "url": "../developer-workflow/communication-channels/"
+    },
+    {
+      "text": "Changing Python",
+      "url": "../developer-workflow/lang-changes/"
+    },
+    {
+      "text": "Development cycle",
+      "url": "../developer-workflow/development-cycle/"
+    },
+    {
+      "text": "Adding to the stdlib",
+      "url": "../developer-workflow/stdlib/"
+    },
+    {
+      "text": "Standard library extension modules",
+      "url": "../developer-workflow/extension-modules/"
+    },
+    {
+      "text": "Changing Python’s C API",
+      "url": "../developer-workflow/c-api/"
+    },
+    {
+      "text": "Changing CPython’s grammar",
+      "url": "../developer-workflow/grammar/"
+    },
+    {
+      "text": "Porting and platform support",
+      "url": "../developer-workflow/porting/"
+    },
+    {
+      "text": "Issues and triaging",
+      "url": "../triage/"
+    },
+    {
+      "text": "Using the issue tracker",
+      "url": "../triage/issue-tracker/"
+    },
+    {
+      "text": "Triaging an issue",
+      "url": "../triage/triaging/"
+    },
+    {
+      "text": "GitHub labels",
+      "url": "../triage/labels/"
+    },
+    {
+      "text": "Triage Team",
+      "url": "../triage/triage-team/"
+    },
+    {
+      "text": "Documentation",
+      "url": "../documentation/"
+    },
+    {
+      "text": "Getting started",
+      "url": "../documentation/start-documenting/"
+    },
+    {
+      "text": "Helping with documentation",
+      "url": "../documentation/help-documenting/"
+    },
+    {
+      "text": "Style guide",
+      "url": "../documentation/style-guide/"
+    },
+    {
+      "text": "reStructuredText markup",
+      "url": "../documentation/markup/"
+    },
+    {
+      "text": "Translations",
+      "url": "../documentation/translations/"
+    },
+    {
+      "text": "Translating",
+      "url": "../documentation/translations/translating/"
+    },
+    {
+      "text": "Coordinating",
+      "url": "../documentation/translations/coordinating/"
+    },
+    {
+      "text": "Helping with the Developer’s Guide",
+      "url": "../documentation/devguide/"
+    },
+    {
+      "text": "Testing and buildbots",
+      "url": "../testing/"
+    },
+    {
+      "text": "Running and writing tests",
+      "url": "../testing/run-write-tests/"
+    },
+    {
+      "text": "Silence warnings from the test suite",
+      "url": "../testing/silence-warnings/"
+    },
+    {
+      "text": "Increase test coverage",
+      "url": "../testing/coverage/"
+    },
+    {
+      "text": "OSS-Fuzz for CPython",
+      "url": "../testing/oss-fuzz/"
+    },
+    {
+      "text": "Working with buildbots",
+      "url": "../testing/buildbots/"
+    },
+    {
+      "text": "New buildbot workers",
+      "url": "../testing/new-buildbot-worker/"
+    },
+    {
+      "text": "Development tools",
+      "url": "../development-tools/"
+    },
+    {
+      "text": "Argument Clinic",
+      "url": "../development-tools/clinic/"
+    },
+    {
+      "text": "Tutorial",
+      "url": "../development-tools/clinic/tutorial/"
+    },
+    {
+      "text": "How-to guides",
+      "url": "../development-tools/clinic/howto/"
+    },
+    {
+      "text": "GDB support",
+      "url": "../development-tools/gdb/"
+    },
+    {
+      "text": "Dynamic analysis with Clang",
+      "url": "../development-tools/clang/"
+    },
+    {
+      "text": "Tools for tracking compiler warnings",
+      "url": "../development-tools/warnings/"
+    },
+    {
+      "text": "Core team",
+      "url": "../core-team/"
+    },
+    {
+      "text": "Responsibilities",
+      "url": "../core-team/responsibilities/"
+    },
+    {
+      "text": "Accepting pull requests",
+      "url": "../core-team/committing/"
+    },
+    {
+      "text": "Experts index",
+      "url": "../core-team/experts/"
+    },
+    {
+      "text": "Team log",
+      "url": "../core-team/team-log/"
+    },
+    {
+      "text": "Motivations and affiliations",
+      "url": "../core-team/motivations/"
+    },
+    {
+      "text": "How to join the core team",
+      "url": "../core-team/join-team/"
+    },
+    {
+      "text": "Memorialization",
+      "url": "../core-team/memorialization/"
+    },
+    {
+      "text": "Security",
+      "url": "../security/"
+    },
+    {
+      "text": "Security policy",
+      "url": "../security/policy/"
+    },
+    {
+      "text": "Python Security Response Team (PSRT)",
+      "url": "../security/psrt/"
+    },
+    {
+      "text": "Software Bill-of-Materials (SBOM)",
+      "url": "../security/sbom/"
+    },
+    {
+      "text": "CPython’s internals",
+      "url": "../internals/"
+    },
+    {
+      "text": "Status of Python versions",
+      "url": "#"
+    },
+    {
+      "text": "Back to top",
+      "url": "#"
+    },
+    {
+      "text": "View this page",
+      "url": "https://github.com/python/devguide/blob/main/versions.rst?plain=true"
+    },
+    {
+      "text": "Edit this page",
+      "url": "https://github.com/python/devguide/edit/main/versions.rst"
+    },
+    {
+      "text": "¶",
+      "url": "#status-of-python-versions"
+    },
+    {
+      "text": "download page",
+      "url": "https://www.python.org/downloads/"
+    },
+    {
+      "text": "below",
+      "url": "#full-chart"
+    },
+    {
+      "text": "endoflife.date/python",
+      "url": "https://endoflife.date/python"
+    },
+    {
+      "text": "¶",
+      "url": "#supported-versions"
+    },
+    {
+      "text": "PEP 826",
+      "url": "https://peps.python.org/pep-0826/"
+    },
+    {
+      "text": "PEP 790",
+      "url": "https://peps.python.org/pep-0790/"
+    },
+    {
+      "text": "PEP 745",
+      "url": "https://peps.python.org/pep-0745/"
+    },
+    {
+      "text": "PEP 719",
+      "url": "https://peps.python.org/pep-0719/"
+    },
+    {
+      "text": "PEP 693",
+      "url": "https://peps.python.org/pep-0693/"
+    },
+    {
+      "text": "PEP 664",
+      "url": "https://peps.python.org/pep-0664/"
+    },
+    {
+      "text": "PEP 619",
+      "url": "https://peps.python.org/pep-0619/"
+    },
+    {
+      "text": "¶",
+      "url": "#unsupported-versions"
+    },
+    {
+      "text": "PEP 596",
+      "url": "https://peps.python.org/pep-0596/"
+    },
+    {
+      "text": "PEP 569",
+      "url": "https://peps.python.org/pep-0569/"
+    },
+    {
+      "text": "PEP 537",
+      "url": "https://peps.python.org/pep-0537/"
+    },
+    {
+      "text": "PEP 494",
+      "url": "https://peps.python.org/pep-0494/"
+    },
+    {
+      "text": "PEP 478",
+      "url": "https://peps.python.org/pep-0478/"
+    },
+    {
+      "text": "PEP 429",
+      "url": "https://peps.python.org/pep-0429/"
+    },
+    {
+      "text": "PEP 398",
+      "url": "https://peps.python.org/pep-0398/"
+    },
+    {
+      "text": "PEP 392",
+      "url": "https://peps.python.org/pep-0392/"
+    },
+    {
+      "text": "PEP 375",
+      "url": "https://peps.python.org/pep-0375/"
+    },
+    {
+      "text": "PEP 361",
+      "url": "https://peps.python.org/pep-0361/"
+    },
+    {
+      "text": "PEP 373",
+      "url": "https://peps.python.org/pep-0373/"
+    },
+    {
+      "text": "PEP 361",
+      "url": "https://peps.python.org/pep-0361/"
+    },
+    {
+      "text": "¶",
+      "url": "#full-chart"
+    },
+    {
+      "text": "¶",
+      "url": "#status-key"
+    },
+    {
+      "text": "PEP 602",
+      "url": "https://peps.python.org/pep-0602/"
+    },
+    {
+      "text": "Development cycle",
+      "url": "../developer-workflow/development-cycle/#devcycle"
+    },
+    {
+      "text": "Previous CPython’s internals",
+      "url": "../internals/"
+    },
+    {
+      "text": "Sphinx",
+      "url": "https://www.sphinx-doc.org/"
+    },
+    {
+      "text": "@pradyunsg",
+      "url": "https://pradyunsg.me"
+    },
+    {
+      "text": "Furo",
+      "url": "https://github.com/pradyunsg/furo"
+    },
+    {
+      "text": "Status of Python versions",
+      "url": "#"
+    },
+    {
+      "text": "Supported versions",
+      "url": "#supported-versions"
+    },
+    {
+      "text": "Unsupported versions",
+      "url": "#unsupported-versions"
+    },
+    {
+      "text": "Full chart",
+      "url": "#full-chart"
+    },
+    {
+      "text": "Status key",
+      "url": "#status-key"
+    }
+  ],
+  "error": null,
+  "status_code": 200
+}

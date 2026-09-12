@@ -1,0 +1,18 @@
+{
+  "url": "https://thenewstack.io/python-3-13-whats-new/",
+  "ok": true,
+  "title": "Page not found",
+  "markdown": "# Page not found\n\nThe page you were looking for does not exist. It may have been moved, or removed altogether.\n\n[Home](https://thenewstack.io) [Latest](https://thenewstack.io/latest)",
+  "links": [
+    {
+      "text": "Home",
+      "url": "https://thenewstack.io"
+    },
+    {
+      "text": "Latest",
+      "url": "https://thenewstack.io/latest"
+    }
+  ],
+  "error": null,
+  "status_code": 200
+}

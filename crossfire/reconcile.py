@@ -92,6 +92,9 @@ JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是�
 
 请通过 record 工具返回结果。"""
 
+# judge 要复述每条冲突，输出长度随来源数增长，8 来源时 1000 已经会被截断。
+JUDGE_MAX_TOKENS = 2500
+
 JUDGE_SCHEMA = {
     "type": "object",
     "properties": {
@@ -167,7 +170,7 @@ def judge(question: str, claims: list[dict], pairs: list[dict]) -> dict:
         claims=json.dumps(claims, ensure_ascii=False, indent=2),
         pairs=json.dumps(pairs, ensure_ascii=False, indent=2),
     )
-    data = call_structured(prompt, JUDGE_SCHEMA, "judge")
+    data = call_structured(prompt, JUDGE_SCHEMA, "judge", max_tokens=JUDGE_MAX_TOKENS)
 
     result = {
         "answer": data.get("answer"),

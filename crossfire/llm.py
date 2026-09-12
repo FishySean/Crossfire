@@ -18,7 +18,7 @@ RETRY_NOTE = """
 请重新作答，必须通过 {tool} 工具返回结果，每个必填字段都要给值。"""
 
 
-def call_structured(prompt: str, schema: dict, step: str) -> dict:
+def call_structured(prompt: str, schema: dict, step: str, max_tokens: int = MAX_TOKENS) -> dict:
     """调用 Claude 并用 tool use 强制结构化输出。
 
     返回工具入参本身，外加两个保留键：`_usage` 始终存在，`_failure` 仅在重试后仍失败时存在。
@@ -40,7 +40,7 @@ def call_structured(prompt: str, schema: dict, step: str) -> dict:
         text = prompt if attempt == 0 else prompt + RETRY_NOTE.format(error=detail, tool=TOOL_NAME)
         message = client.messages.create(
             model=MODEL,
-            max_tokens=MAX_TOKENS,
+            max_tokens=max_tokens,
             tools=tools,
             tool_choice={"type": "tool", "name": TOOL_NAME},
             messages=[{"role": "user", "content": text}],
@@ -51,7 +51,7 @@ def call_structured(prompt: str, schema: dict, step: str) -> dict:
 
         tool_blocks = [block for block in message.content if block.type == "tool_use"]
         if message.stop_reason == "max_tokens":
-            detail = f"输出被 max_tokens={MAX_TOKENS} 截断"
+            detail = f"输出被 max_tokens={max_tokens} 截断"
         elif not tool_blocks:
             detail = f"响应里没有 tool_use 块（stop_reason={message.stop_reason}）"
         else:

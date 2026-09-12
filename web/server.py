@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -7,6 +8,8 @@ from fastapi.staticfiles import StaticFiles
 
 RUNS_DIR = Path(__file__).resolve().parents[1] / "out" / "runs"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+READ_RETRIES = 3
+RETRY_DELAY_SECONDS = 0.15
 
 app = FastAPI(title="Crossfire Viewer")
 
@@ -26,10 +29,15 @@ def get_run(name: str) -> dict:
     path = (RUNS_DIR / name).resolve()
     if path.parent != RUNS_DIR.resolve() or path.suffix != ".json" or not path.is_file():
         raise HTTPException(status_code=404, detail="run not found")
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as e:
-        raise HTTPException(status_code=422, detail=f"invalid JSON: {e}") from e
+    error: json.JSONDecodeError | None = None
+    for attempt in range(READ_RETRIES):
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as e:
+            error = e
+            if attempt < READ_RETRIES - 1:
+                time.sleep(RETRY_DELAY_SECONDS)
+    raise HTTPException(status_code=422, detail=f"invalid or partially written JSON: {error}")
 
 
 @app.get("/")

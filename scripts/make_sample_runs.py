@@ -144,14 +144,17 @@ def pair(a, b, relation, nature):
 def all_agree_run():
     run = base_run()
     run["question_id"] = "sample-all-agree"
-    run["question"] = "太阳系有几颗行星？"
     run["started_at"] = "2026-09-12T21:02:00+00:00"
+    run["claims"][3]["claim"] = "Python 当前的最新稳定版本是 3.13。"
+    run["claims"][3]["evidence"] = "Python 3.13 is the latest stable release"
+    run["claims"][3]["published_date"] = "2025-10-14"
     for p in run["pairs"]:
         p["relation"] = "agree"
-        p["nature"] = "两者一致认为答案相同。"
-    run["judgment"]["answer"] = "太阳系有 8 颗行星。"
+        p["nature"] = "两者一致认为 3.13 是当前最新稳定版本。"
     run["judgment"]["confidence"] = 0.97
+    run["judgment"]["reasoning"] = "四个来源全部指向 3.13，两个一手源与新闻、聚合站互相印证，没有需要调和的分歧。"
     run["judgment"]["conflicts"] = []
+    run["judgment"]["trusted_sources"] = [url for url, _ in PY_SOURCES]
     return run
 
 

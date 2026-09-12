@@ -2,7 +2,6 @@
 """Steel.dev 可用性探测：基础抓取 / 内容格式对比 / 并发 session 上限。"""
 
 import argparse
-import json
 import os
 import traceback
 from pathlib import Path
@@ -46,17 +45,15 @@ def test_2(url: str) -> None:
     out_dir = ROOT / "out"
     out_dir.mkdir(exist_ok=True)
 
+    readability = result.content.readability or {}
+    # Steel 把 readability 的 HTML 串按字符下标序列化成了对象，需按数字键顺序拼回来。
     formats = {
         "markdown": result.content.markdown or "",
         "cleaned_html": result.content.cleaned_html or "",
-        "readability": result.content.readability,
+        "readability": "".join(str(readability[k]) for k in sorted(readability, key=int)),
     }
 
-    for name, value in formats.items():
-        if name == "readability":
-            text = json.dumps(value, ensure_ascii=False, indent=2) if value is not None else ""
-        else:
-            text = value
+    for name, text in formats.items():
         path = out_dir / f"{name}.txt"
         path.write_text(text, encoding="utf-8")
         print(f"{name}: {len(text)} chars -> {path}")

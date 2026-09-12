@@ -1,8 +1,9 @@
 import json
 import os
 import sys
+import time
 
-from anthropic import Anthropic
+from anthropic import Anthropic, APIConnectionError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -11,11 +12,34 @@ MODEL = "claude-sonnet-4-6"
 MAX_TOKENS = 1000
 TOOL_NAME = "record"
 MAX_ATTEMPTS = 2
+NETWORK_RETRIES = 2
 
 RETRY_NOTE = """
 
 注意：上一次调用没有返回合法的结构化结果，失败原因是「{error}」。
 请重新作答，必须通过 {tool} 工具返回结果，每个必填字段都要给值。"""
+
+
+def _create(client: Anthropic, step: str, **kwargs):
+    """只对超时和连接这类临时性网络错误重试。
+
+    APITimeoutError 继承自 APIConnectionError，所以捕获后者即可覆盖两者；
+    RateLimitError、AuthenticationError、BadRequestError 都在 APIStatusError 分支上，
+    不会被这里捕获，仍然照原样往上抛——那些是代码或配置问题，重试只会掩盖 bug。
+    """
+    for attempt in range(NETWORK_RETRIES + 1):
+        try:
+            return client.messages.create(**kwargs)
+        except APIConnectionError as e:
+            if attempt == NETWORK_RETRIES:
+                raise
+            delay = 2**attempt
+            print(
+                f"⚠️  [llm] {step} 遇到网络临时错误 {type(e).__name__}，"
+                f"退避 {delay}s 后第 {attempt + 1}/{NETWORK_RETRIES} 次重试",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
 
 
 def call_structured(prompt: str, schema: dict, step: str, max_tokens: int = MAX_TOKENS) -> dict:
@@ -38,7 +62,9 @@ def call_structured(prompt: str, schema: dict, step: str, max_tokens: int = MAX_
 
     for attempt in range(MAX_ATTEMPTS):
         text = prompt if attempt == 0 else prompt + RETRY_NOTE.format(error=detail, tool=TOOL_NAME)
-        message = client.messages.create(
+        message = _create(
+            client,
+            step,
             model=MODEL,
             max_tokens=max_tokens,
             tools=tools,

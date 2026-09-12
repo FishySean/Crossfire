@@ -87,6 +87,7 @@ const STRINGS = {
 
 let lang = localStorage.getItem("crossfire-lang") === "zh" ? "zh" : "en";
 let currentRun = null;
+let currentError = null;
 let requestId = 0;
 
 const t = (key, ...args) => {
@@ -112,6 +113,7 @@ function setLang(next) {
   lang = next;
   localStorage.setItem("crossfire-lang", lang);
   applyStaticStrings();
+  if (currentError) showError(currentError.key, ...currentError.args);
   if (currentRun) render(currentRun);
 }
 
@@ -147,7 +149,7 @@ async function loadRuns() {
   const select = el("run-select");
   select.innerHTML = "";
   if (!runs.length) {
-    showError(t("emptyRuns"));
+    showError("emptyRuns");
     el("content").classList.add("hidden");
     return;
   }
@@ -182,18 +184,20 @@ async function loadRun(name) {
     if (id !== requestId) return;
     currentRun = null;
     renderFailures({});
-    showError(t("loadFailed", name, e.message));
+    showError("loadFailed", name, e.message);
     el("content").classList.add("hidden");
   }
 }
 
-function showError(message) {
+function showError(key, ...args) {
+  currentError = { key, args };
   const banner = el("error-banner");
-  banner.textContent = message;
+  banner.textContent = t(key, ...args);
   banner.classList.remove("hidden");
 }
 
 function hideError() {
+  currentError = null;
   el("error-banner").classList.add("hidden");
 }
 
@@ -567,4 +571,4 @@ for (const button of document.querySelectorAll("#lang-toggle button")) {
 }
 
 applyStaticStrings();
-loadRuns().catch((e) => showError(t("listFailed", e.message)));
+loadRuns().catch((e) => showError("listFailed", e.message));

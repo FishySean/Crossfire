@@ -51,7 +51,13 @@ def print_report(result: dict) -> None:
     else:
         print("未发现相互矛盾的来源。")
 
-    others = [p for p in result["pairs"] if p.get("relation") != "contradict"]
+    scoped = [p for p in result["pairs"] if p.get("relation") == "same_question_different_scope"]
+    for pair in scoped:
+        print(f"  ~~~ [口径不同] {pair['nature']}")
+        print(f"      A: {pair['a']}")
+        print(f"      B: {pair['b']}")
+
+    others = [p for p in result["pairs"] if p.get("relation") not in ("contradict", "same_question_different_scope")]
     for pair in others:
         print(f"    [{pair.get('relation')}] {pair.get('nature')}")
         print(f"      {pair['a']}")

@@ -49,6 +49,23 @@ body {
 .brand-name { font-size: 19px; font-weight: 650; letter-spacing: 0.04em; }
 .brand-sub { color: var(--text-dim); font-size: 12px; letter-spacing: 0.08em; }
 
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+
+.lang-toggle { display: flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.lang-toggle button {
+  border: none;
+  background: var(--bg-raised);
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+.lang-toggle button + button { border-left: 1px solid var(--line); }
+.lang-toggle button:hover { color: var(--text); }
+.lang-toggle button.active { background: rgba(90, 200, 250, 0.16); color: var(--accent); }
+
 .run-picker { display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 12px; }
 .run-picker select {
   appearance: none;
@@ -185,6 +202,7 @@ body {
 .conflict-nature { margin-top: 8px; color: #d7dfec; font-size: 13px; }
 .conflict-claims { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .conflict-claims > div { border: 1px solid var(--line); border-radius: 7px; padding: 9px 11px; font-size: 12.5px; color: #c6d0e0; }
+.empty-state.partial { color: var(--warn); border-color: rgba(255, 179, 71, 0.5); background: rgba(255, 179, 71, 0.07); }
 .empty-state { color: var(--ok); border: 1px dashed rgba(74, 222, 128, 0.45); border-radius: 9px; padding: 18px; text-align: center; font-size: 14px; background: rgba(74, 222, 128, 0.06); }
 
 .judgment { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 22px; align-items: start; }

@@ -1,4 +1,4 @@
-"""生成本地样例结果文件，供 web 界面开发与验收使用（不调用任何外部 API）。"""
+"""Generate local sample result files for developing and checking the viewer (no external API calls)."""
 
 import json
 from pathlib import Path
@@ -31,7 +31,7 @@ def page(url, title):
         "url": url,
         "ok": True,
         "title": title,
-        "markdown": f"# {title}\n\n(样例内容)",
+        "markdown": f"# {title}\n\n(sample content)",
         "links": [],
         "error": None,
         "status_code": 200,
@@ -43,7 +43,7 @@ def base_run():
         claim(
             PY_SOURCES[0][0],
             "primary",
-            "Python 当前的最新稳定版本是 3.13.1。",
+            "The latest stable Python release is 3.13.1.",
             "Download the latest version for Windows — Python 3.13.1",
             "official_documentation",
             0.95,
@@ -52,7 +52,7 @@ def base_run():
         claim(
             PY_SOURCES[1][0],
             "primary",
-            "3.13 是当前的 bugfix 分支，即最新稳定版本。",
+            "3.13 is the current bugfix branch, i.e. the latest stable release.",
             "3.13 bugfix security 2024-10-07 2029-10",
             "official_documentation",
             0.92,
@@ -61,7 +61,7 @@ def base_run():
         claim(
             PY_SOURCES[2][0],
             "news",
-            "Python 3.13 已发布，是目前可用的最新版本。",
+            "Python 3.13 has shipped and is the newest available release.",
             "Python 3.13 is now available with a new REPL and free-threaded mode",
             "news_article",
             0.8,
@@ -70,7 +70,7 @@ def base_run():
         claim(
             PY_SOURCES[3][0],
             "aggregator",
-            "最新的 Python 主版本是 3.11。",
+            "The most recent major Python version is 3.11.",
             "The most recent major version of Python is Python 3",
             "encyclopedia",
             0.6,
@@ -78,43 +78,45 @@ def base_run():
         ),
     ]
     pairs = [
-        pair(PY_SOURCES[0][0], PY_SOURCES[1][0], "agree", "两者一致认为 3.13 系列是当前稳定分支。"),
-        pair(PY_SOURCES[0][0], PY_SOURCES[2][0], "agree", "都指向 3.13，只是精确到的小版本粒度不同。"),
+        pair(PY_SOURCES[0][0], PY_SOURCES[1][0], "agree", "Both treat the 3.13 series as the current stable branch."),
+        pair(PY_SOURCES[0][0], PY_SOURCES[2][0], "agree", "Both point at 3.13; only the patch-level granularity differs."),
         pair(
             PY_SOURCES[0][0],
             PY_SOURCES[3][0],
             "contradict",
-            "数字不同：python.org 给出 3.13.1，w3schools 仍写 3.11，后者页面陈旧。",
+            "Different numbers: python.org says 3.13.1 while w3schools still says 3.11 (stale page).",
         ),
-        pair(PY_SOURCES[1][0], PY_SOURCES[2][0], "agree", "一致在 3.13 为当前 bugfix 分支这一点上。"),
+        pair(PY_SOURCES[1][0], PY_SOURCES[2][0], "agree", "Both agree 3.13 is the current bugfix branch."),
         pair(
             PY_SOURCES[1][0],
             PY_SOURCES[3][0],
             "contradict",
-            "时间不同：devguide 反映当前状态，w3schools 未标日期且停留在旧版本。",
+            "Different timing: devguide reflects the current state, w3schools is undated and stuck on an older version.",
         ),
         pair(
             PY_SOURCES[2][0],
             PY_SOURCES[3][0],
             "contradict",
-            "数字不同：3.13 与 3.11 不能同时是最新版本。",
+            "Different numbers: 3.13 and 3.11 cannot both be the latest release.",
         ),
     ]
     judgment = {
-        "answer": "Python 目前的最新稳定版本是 3.13 系列，具体到 3.13.1。",
+        "answer": "The latest stable Python release is the 3.13 series, specifically 3.13.1.",
         "confidence": 0.86,
-        "reasoning": "两个一手源（python.org 下载页与官方 devguide）互相印证 3.13 为当前稳定分支，"
-        "新闻源与之一致。w3schools 给出的 3.11 没有发布日期，属于页面长期未更新造成的陈旧信息，"
-        "不构成口径差异，因此不予采信。",
+        "reasoning": "Two primary sources (the python.org downloads page and the official devguide) corroborate "
+        "3.13 as the current stable branch, and the news source agrees. The 3.11 figure from w3schools carries "
+        "no publication date and reflects a long-unmaintained page rather than a difference in definition, "
+        "so it is not trusted.",
         "conflicts": [
-            "w3schools 声称最新为 3.11，与一手源的 3.13 冲突，性质是页面陈旧而非统计口径差异。",
+            "w3schools claims 3.11 is the latest, conflicting with the primary sources' 3.13; "
+            "the cause is a stale page, not a difference in scope or definition.",
         ],
         "trusted_sources": [PY_SOURCES[0][0], PY_SOURCES[1][0], PY_SOURCES[2][0]],
         "usage": {"input_tokens": 3100, "output_tokens": 420},
     }
     return {
         "question_id": "python-latest-version",
-        "question": "Python 目前的最新稳定版本是哪一个？",
+        "question": "Which Python version is currently the latest stable release?",
         "started_at": "2026-09-12T20:18:18+00:00",
         "elapsed_seconds": 41.7,
         "sources": [{"url": url, "tier": tier} for url, tier in PY_SOURCES],
@@ -145,14 +147,17 @@ def all_agree_run():
     run = base_run()
     run["question_id"] = "sample-all-agree"
     run["started_at"] = "2026-09-12T21:02:00+00:00"
-    run["claims"][3]["claim"] = "Python 当前的最新稳定版本是 3.13。"
+    run["claims"][3]["claim"] = "The latest stable Python release is 3.13."
     run["claims"][3]["evidence"] = "Python 3.13 is the latest stable release"
     run["claims"][3]["published_date"] = "2025-10-14"
     for p in run["pairs"]:
         p["relation"] = "agree"
-        p["nature"] = "两者一致认为 3.13 是当前最新稳定版本。"
+        p["nature"] = "Both agree that 3.13 is the current latest stable release."
     run["judgment"]["confidence"] = 0.97
-    run["judgment"]["reasoning"] = "四个来源全部指向 3.13，两个一手源与新闻、聚合站互相印证，没有需要调和的分歧。"
+    run["judgment"]["reasoning"] = (
+        "All four sources point at 3.13; the two primary sources, the news article and the aggregator "
+        "corroborate each other, so there is no disagreement to reconcile."
+    )
     run["judgment"]["conflicts"] = []
     run["judgment"]["trusted_sources"] = [url for url, _ in PY_SOURCES]
     return run
@@ -166,8 +171,10 @@ def failures_run():
     run["judgment"]["confidence"] = 0.42
     run["failures"] = [
         {"stage": "fetch", "url": "https://devguide.python.org/versions/", "error": "Steel 429 Too Many Requests"},
-        {"stage": "pair", "url": None, "error": "Claude 响应不是合法 JSON，已跳过该配对"},
     ]
+    run["pairs"][1]["relation"] = None
+    run["pairs"][1]["nature"] = None
+    run["pairs"][1]["parse_error"] = "Expecting value: line 1 column 1 (char 0)"
     return run
 
 

@@ -1,7 +1,121 @@
 const el = (id) => document.getElementById(id);
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+const STRINGS = {
+  en: {
+    tagline: "verification results viewer",
+    runLabel: "Run",
+    question: "Question",
+    noQuestion: "(no question recorded)",
+    sources: "Sources",
+    sourceCount: (n) => `${n} sources`,
+    conflicts: "Conflicts",
+    conflictCount: (n) => (n === 1 ? "1 conflict" : `${n} conflicts`),
+    verdict: "Verdict",
+    claim: "Claim",
+    evidence: "Evidence",
+    fetchFailed: "Fetch failed",
+    noClaim: "This source makes no claim about the question",
+    published: (date) => `Published ${date}`,
+    unknown: "unknown",
+    sourceConfidence: (pct) => `Source confidence ${pct}%`,
+    conflictWith: (id) => `conflicts with ${id}`,
+    noNature: "(difference not described)",
+    noConflicts: "No contradictions found — no source contradicts another",
+    partialConflicts: (n) =>
+      `No contradictions found, but ${n} pairwise comparison(s) failed, so the check is incomplete`,
+    noVerdict: "(this run produced no verdict)",
+    reasoning: "Reasoning",
+    recordedConflicts: "Disagreements recorded in the verdict",
+    trusted: "Trusted sources",
+    noTrusted: "No trusted sources recorded",
+    confidence: "Confidence",
+    startedAt: (v) => `Started ${v}`,
+    elapsed: (v) => `Took ${v}s`,
+    fetched: (v) => `Fetched ${v}`,
+    fetchFailedCount: (v) => `Failed ${v}`,
+    failureHead: (n) => `${n} call(s) failed in this run — the results may be incomplete.`,
+    parseFailure: (stage, target) => `${stage} — ${target} — model response was not valid JSON`,
+    stageExtract: "extract",
+    stagePair: "pair",
+    stageJudge: "judge",
+    emptyRuns: "No JSON result files found under out/runs/.",
+    loadFailed: (name, msg) => `Failed to load ${name}: ${msg}`,
+    listFailed: (msg) => `Failed to load the run list: ${msg}`,
+  },
+  zh: {
+    tagline: "查证结果查看器",
+    runLabel: "运行结果",
+    question: "问题",
+    noQuestion: "（无问题原文）",
+    sources: "来源",
+    sourceCount: (n) => `${n} 个来源`,
+    conflicts: "冲突",
+    conflictCount: (n) => `${n} 处矛盾`,
+    verdict: "结论",
+    claim: "主张",
+    evidence: "证据原文",
+    fetchFailed: "抓取失败",
+    noClaim: "该来源未就此问题给出主张",
+    published: (date) => `发布日期 ${date}`,
+    unknown: "unknown",
+    sourceConfidence: (pct) => `来源置信度 ${pct}%`,
+    conflictWith: (id) => `矛盾于 ${id}`,
+    noNature: "（未说明差异所在）",
+    noConflicts: "未发现矛盾 — 各来源之间没有互相抵触的主张",
+    partialConflicts: (n) => `未发现矛盾，但有 ${n} 次两两比对失败，本次检查并不完整`,
+    noVerdict: "（本次运行没有给出结论）",
+    reasoning: "判断理由",
+    recordedConflicts: "结论中记录的分歧",
+    trusted: "采信来源",
+    noTrusted: "未记录采信来源",
+    confidence: "置信度",
+    startedAt: (v) => `开始于 ${v}`,
+    elapsed: (v) => `耗时 ${v}s`,
+    fetched: (v) => `抓取成功 ${v}`,
+    fetchFailedCount: (v) => `抓取失败 ${v}`,
+    failureHead: (n) => `本次运行有 ${n} 次调用失败，结果可能不完整。`,
+    parseFailure: (stage, target) => `${stage} — ${target} — 模型返回不是合法 JSON`,
+    stageExtract: "提取",
+    stagePair: "比对",
+    stageJudge: "裁决",
+    emptyRuns: "out/runs/ 下没有找到任何 JSON 结果文件。",
+    loadFailed: (name, msg) => `读取 ${name} 失败：${msg}`,
+    listFailed: (msg) => `加载运行列表失败：${msg}`,
+  },
+};
+
+let lang = localStorage.getItem("crossfire-lang") === "zh" ? "zh" : "en";
 let currentRun = null;
+let currentError = null;
+let requestId = 0;
+
+const t = (key, ...args) => {
+  const value = STRINGS[lang][key];
+  return typeof value === "function" ? value(...args) : value;
+};
+
+function applyStaticStrings() {
+  document.documentElement.lang = lang === "zh" ? "zh" : "en";
+  el("tagline").textContent = t("tagline");
+  el("run-label").textContent = t("runLabel");
+  el("question-eyebrow").textContent = t("question");
+  el("sources-title").textContent = t("sources");
+  el("conflicts-title").textContent = t("conflicts");
+  el("judgment-title").textContent = t("verdict");
+  for (const button of document.querySelectorAll("#lang-toggle button")) {
+    button.classList.toggle("active", button.dataset.lang === lang);
+  }
+}
+
+function setLang(next) {
+  if (next === lang) return;
+  lang = next;
+  localStorage.setItem("crossfire-lang", lang);
+  applyStaticStrings();
+  if (currentError) showError(currentError.key, ...currentError.args);
+  if (currentRun) render(currentRun);
+}
 
 function domainOf(url) {
   try {
@@ -35,7 +149,7 @@ async function loadRuns() {
   const select = el("run-select");
   select.innerHTML = "";
   if (!runs.length) {
-    showError("out/runs/ 下没有找到任何 JSON 结果文件。");
+    showError("emptyRuns");
     el("content").classList.add("hidden");
     return;
   }
@@ -59,23 +173,31 @@ async function fetchJSON(url) {
 }
 
 async function loadRun(name) {
+  const id = ++requestId;
   try {
-    currentRun = await fetchJSON(`/api/runs/${encodeURIComponent(name)}`);
+    const run = await fetchJSON(`/api/runs/${encodeURIComponent(name)}`);
+    if (id !== requestId) return;
+    currentRun = run;
     hideError();
-    render(currentRun);
+    render(run);
   } catch (e) {
-    showError(`读取 ${name} 失败：${e.message}`);
+    if (id !== requestId) return;
+    currentRun = null;
+    renderFailures({});
+    showError("loadFailed", name, e.message);
     el("content").classList.add("hidden");
   }
 }
 
-function showError(message) {
+function showError(key, ...args) {
+  currentError = { key, args };
   const banner = el("error-banner");
-  banner.textContent = message;
+  banner.textContent = t(key, ...args);
   banner.classList.remove("hidden");
 }
 
 function hideError() {
+  currentError = null;
   el("error-banner").classList.add("hidden");
 }
 
@@ -88,9 +210,26 @@ function render(run) {
   renderJudgment(run);
 }
 
+function parseFailures(run) {
+  const failures = [];
+  for (const claim of run.claims || []) {
+    if (claim.parse_error) failures.push({ stage: t("stageExtract"), url: claim.url, parse: true });
+  }
+  for (const pair of run.pairs || []) {
+    if (pair.parse_error) {
+      failures.push({ stage: t("stagePair"), url: `${domainOf(pair.a)} / ${domainOf(pair.b)}`, parse: true });
+    }
+  }
+  if (run.judgment && run.judgment.parse_error) {
+    failures.push({ stage: t("stageJudge"), url: run.question_id || "", parse: true });
+  }
+  return failures;
+}
+
 function renderFailures(run) {
   const banner = el("failure-banner");
-  const failures = Array.isArray(run.failures) ? run.failures : run.failures ? [run.failures] : [];
+  const declared = Array.isArray(run.failures) ? run.failures : run.failures ? [run.failures] : [];
+  const failures = [...declared, ...parseFailures(run)];
   if (!failures.length) {
     banner.classList.add("hidden");
     banner.innerHTML = "";
@@ -98,10 +237,14 @@ function renderFailures(run) {
   }
   banner.innerHTML = "";
   const head = text("div", null);
-  head.appendChild(text("strong", null, `本次运行有 ${failures.length} 次调用失败，结果可能不完整。`));
+  head.appendChild(text("strong", null, t("failureHead", failures.length)));
   banner.appendChild(head);
   const list = document.createElement("ul");
   for (const failure of failures) {
+    if (failure && failure.parse) {
+      list.appendChild(text("li", null, t("parseFailure", failure.stage, failure.url)));
+      continue;
+    }
     const parts =
       typeof failure === "string"
         ? [failure]
@@ -113,15 +256,15 @@ function renderFailures(run) {
 }
 
 function renderQuestion(run) {
-  el("question").textContent = run.question || "(无问题原文)";
+  el("question").textContent = run.question || t("noQuestion");
   const meta = el("run-meta");
   meta.innerHTML = "";
   const bits = [];
   if (run.question_id) bits.push(`ID ${run.question_id}`);
-  if (run.started_at) bits.push(`开始于 ${run.started_at}`);
-  if (run.elapsed_seconds !== undefined) bits.push(`耗时 ${run.elapsed_seconds}s`);
-  if (run.pages_fetched !== undefined) bits.push(`抓取成功 ${run.pages_fetched}`);
-  if (run.pages_failed) bits.push(`抓取失败 ${run.pages_failed}`);
+  if (run.started_at) bits.push(t("startedAt", run.started_at));
+  if (run.elapsed_seconds !== undefined) bits.push(t("elapsed", run.elapsed_seconds));
+  if (run.pages_fetched !== undefined) bits.push(t("fetched", run.pages_fetched));
+  if (run.pages_failed) bits.push(t("fetchFailedCount", run.pages_failed));
   for (const bit of bits) meta.appendChild(text("span", null, bit));
 }
 
@@ -157,7 +300,7 @@ function renderSources(run) {
   const container = el("sources");
   container.innerHTML = "";
   const rows = sourceRows(run);
-  el("source-count").textContent = `${rows.length} 个来源`;
+  el("source-count").textContent = t("sourceCount", rows.length);
 
   const cards = new Map();
   rows.forEach((row, index) => {
@@ -182,25 +325,25 @@ function renderSources(run) {
     if (row.sourceType) tags.appendChild(text("span", "tag plain", row.sourceType));
     card.appendChild(tags);
 
-    const claimNode = text("div", row.claim ? "claim" : "claim empty", row.claim || "该来源未就此问题给出主张");
-    card.appendChild(labeled("主张", claimNode));
+    const claimNode = text("div", row.claim ? "claim" : "claim empty", row.claim || t("noClaim"));
+    card.appendChild(labeled(t("claim"), claimNode));
 
     if (row.evidence) {
-      card.appendChild(labeled("证据原文", text("blockquote", "evidence", row.evidence)));
+      card.appendChild(labeled(t("evidence"), text("blockquote", "evidence", row.evidence)));
     }
     if (row.fetchError) {
-      card.appendChild(labeled("抓取失败", text("div", "claim empty", row.fetchError)));
+      card.appendChild(labeled(t("fetchFailed"), text("div", "claim empty", row.fetchError)));
     }
 
     const foot = text("div", "card-foot");
     const dateNode = text(
       "span",
       row.publishedDate ? null : "unknown-date",
-      `发布日期 ${row.publishedDate || "unknown"}`,
+      t("published", row.publishedDate || t("unknown")),
     );
     foot.appendChild(dateNode);
     if (typeof row.confidence === "number") {
-      foot.appendChild(text("span", null, `来源置信度 ${Math.round(row.confidence * 100)}%`));
+      foot.appendChild(text("span", null, t("sourceConfidence", Math.round(row.confidence * 100))));
     }
     card.appendChild(foot);
 
@@ -214,12 +357,16 @@ function renderConflicts(run, cards) {
   const container = el("conflicts");
   container.innerHTML = "";
   const pairs = (run.pairs || []).filter((p) => p.relation === "contradict");
-  el("conflict-count").textContent = pairs.length ? `${pairs.length} 处矛盾` : "0 处矛盾";
+  const unresolved = (run.pairs || []).filter((p) => !p.relation).length;
+  el("conflict-count").textContent = t("conflictCount", pairs.length);
 
   for (const { card } of cards.values()) card.classList.remove("conflicted");
 
   if (!pairs.length) {
-    container.appendChild(text("div", "empty-state", "未发现矛盾 — 各来源之间没有互相抵触的主张"));
+    const state = unresolved
+      ? text("div", "empty-state partial", t("partialConflicts", unresolved))
+      : text("div", "empty-state", t("noConflicts"));
+    container.appendChild(state);
     drawLinks([], cards);
     return;
   }
@@ -239,14 +386,14 @@ function renderConflicts(run, cards) {
     head.appendChild(text("span", null, labelFor(pair.b, bInfo)));
     item.appendChild(head);
 
-    item.appendChild(text("div", "conflict-nature", pair.nature || "（未说明差异所在）"));
+    item.appendChild(text("div", "conflict-nature", pair.nature || t("noNature")));
 
     const claimA = claims.find((c) => c.url === pair.a);
     const claimB = claims.find((c) => c.url === pair.b);
     if (claimA || claimB) {
       const grid = text("div", "conflict-claims");
-      grid.appendChild(text("div", null, `${domainOf(pair.a)}：${(claimA && claimA.claim) || "—"}`));
-      grid.appendChild(text("div", null, `${domainOf(pair.b)}：${(claimB && claimB.claim) || "—"}`));
+      grid.appendChild(text("div", null, `${domainOf(pair.a)}: ${(claimA && claimA.claim) || "—"}`));
+      grid.appendChild(text("div", null, `${domainOf(pair.b)}: ${(claimB && claimB.claim) || "—"}`));
       item.appendChild(grid);
     }
 
@@ -264,8 +411,8 @@ function renderConflicts(run, cards) {
 function markConflictPartner(target, partner) {
   if (!target || !partner) return;
   const tags = target.card.querySelector(".tags");
-  const label = `矛盾于 S${partner.index + 1}`;
-  if (!tags || [...tags.children].some((t) => t.textContent === label)) return;
+  const label = t("conflictWith", `S${partner.index + 1}`);
+  if (!tags || [...tags.children].some((node) => node.textContent === label)) return;
   tags.appendChild(text("span", "tag conflict-flag", label));
 }
 
@@ -339,15 +486,15 @@ function renderJudgment(run) {
   const judgment = run.judgment || {};
 
   const main = text("div", null);
-  main.appendChild(text("div", "answer", judgment.answer || "（本次运行没有给出结论）"));
+  main.appendChild(text("div", "answer", judgment.answer || t("noVerdict")));
   if (judgment.reasoning) {
-    main.appendChild(labeled("判断理由", text("div", "reasoning", judgment.reasoning)));
+    main.appendChild(labeled(t("reasoning"), text("div", "reasoning", judgment.reasoning)));
   }
   if (Array.isArray(judgment.conflicts) && judgment.conflicts.length) {
     const list = document.createElement("ul");
     list.className = "judge-conflicts";
     for (const conflict of judgment.conflicts) list.appendChild(text("li", null, conflict));
-    main.appendChild(labeled("结论中记录的分歧", list));
+    main.appendChild(labeled(t("recordedConflicts"), list));
   }
   const trusted = text("div", "trusted");
   const sources = Array.isArray(judgment.trusted_sources) ? judgment.trusted_sources : [];
@@ -364,9 +511,9 @@ function renderJudgment(run) {
       trusted.appendChild(row);
     });
   } else {
-    trusted.appendChild(text("div", "claim empty", "未记录采信来源"));
+    trusted.appendChild(text("div", "claim empty", t("noTrusted")));
   }
-  main.appendChild(labeled("采信来源", trusted));
+  main.appendChild(labeled(t("trusted"), trusted));
   container.appendChild(main);
   container.appendChild(confidenceRing(judgment.confidence));
 }
@@ -408,7 +555,7 @@ function confidenceRing(confidence) {
   svg.appendChild(label);
 
   wrap.appendChild(svg);
-  wrap.appendChild(text("div", "ring-label", "置信度"));
+  wrap.appendChild(text("div", "ring-label", t("confidence")));
   return wrap;
 }
 
@@ -419,4 +566,9 @@ window.addEventListener("resize", () => {
   drawLinks((currentRun.pairs || []).filter((p) => p.relation === "contradict"), cards);
 });
 
-loadRuns().catch((e) => showError(`加载运行列表失败：${e.message}`));
+for (const button of document.querySelectorAll("#lang-toggle button")) {
+  button.onclick = () => setLang(button.dataset.lang);
+}
+
+applyStaticStrings();
+loadRuns().catch((e) => showError("listFailed", e.message));

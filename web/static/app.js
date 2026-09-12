@@ -253,9 +253,20 @@ function renderConflicts(run, cards) {
     item.onmouseenter = () => spotlight([pair.a, pair.b], cards);
     item.onmouseleave = () => spotlight(null, cards);
     container.appendChild(item);
+
+    markConflictPartner(aInfo, bInfo);
+    markConflictPartner(bInfo, aInfo);
   });
 
   drawLinks(pairs, cards);
+}
+
+function markConflictPartner(target, partner) {
+  if (!target || !partner) return;
+  const tags = target.card.querySelector(".tags");
+  const label = `矛盾于 S${partner.index + 1}`;
+  if (!tags || [...tags.children].some((t) => t.textContent === label)) return;
+  tags.appendChild(text("span", "tag conflict-flag", label));
 }
 
 function labelFor(url, info) {
@@ -278,17 +289,47 @@ function drawLinks(pairs, cards) {
     if (!a || !b) continue;
     const ra = a.card.getBoundingClientRect();
     const rb = b.card.getBoundingClientRect();
-    const x1 = ra.left + ra.width / 2 - wrap.left;
-    const y1 = ra.top - wrap.top;
-    const x2 = rb.left + rb.width / 2 - wrap.left;
-    const y2 = rb.top - wrap.top;
-    const lift = Math.min(46, 14 + Math.abs(x2 - x1) / 8);
+    const sameRow = Math.abs(ra.top - rb.top) < 4;
+    const [left, right] = ra.left <= rb.left ? [ra, rb] : [rb, ra];
+    const [upper, lower] = ra.top <= rb.top ? [ra, rb] : [rb, ra];
+
+    let x1;
+    let y1;
+    let x2;
+    let y2;
+    let c1x;
+    let c1y;
+    let c2x;
+    let c2y;
+    if (sameRow) {
+      x1 = left.right - wrap.left;
+      y1 = left.top + left.height / 2 - wrap.top;
+      x2 = right.left - wrap.left;
+      y2 = right.top + right.height / 2 - wrap.top;
+      const bow = Math.min(30, (x2 - x1) / 2 + 6);
+      [c1x, c1y, c2x, c2y] = [x1 + bow, y1, x2 - bow, y2];
+    } else {
+      x1 = upper.left + upper.width / 2 - wrap.left;
+      y1 = upper.bottom - wrap.top;
+      x2 = lower.left + lower.width / 2 - wrap.left;
+      y2 = lower.top - wrap.top;
+      const drop = Math.max(10, (y2 - y1) / 2);
+      [c1x, c1y, c2x, c2y] = [x1, y1 + drop, x2, y2 - drop];
+    }
+
     const path = document.createElementNS(SVG_NS, "path");
-    path.setAttribute(
-      "d",
-      `M ${x1} ${y1} C ${x1} ${y1 - lift}, ${x2} ${y2 - lift}, ${x2} ${y2}`,
-    );
+    path.setAttribute("d", `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`);
     svg.appendChild(path);
+    for (const [cx, cy] of [
+      [x1, y1],
+      [x2, y2],
+    ]) {
+      const dot = document.createElementNS(SVG_NS, "circle");
+      dot.setAttribute("cx", String(cx));
+      dot.setAttribute("cy", String(cy));
+      dot.setAttribute("r", "3");
+      svg.appendChild(dot);
+    }
   }
 }
 

@@ -92,8 +92,9 @@ JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是�
 
 请通过 record 工具返回结果。"""
 
-# judge 要复述每条冲突，输出长度随来源数增长，8 来源时 1000 已经会被截断。
-JUDGE_MAX_TOKENS = 2500
+# 只有 judge 需要长篇说理，它要复述每条冲突，输出长度随来源数增长，8 来源时 1000 会被截断。
+# extract 和 pair 仍用 llm.MAX_TOKENS=1000，小上限能防止模型啰嗦。judge 每次运行只调一次，成本可忽略。
+JUDGE_MAX_TOKENS = 3000
 
 JUDGE_SCHEMA = {
     "type": "object",

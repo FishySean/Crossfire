@@ -1,0 +1,23 @@
+- id: python-latest-version
+  question: Python 目前的最新稳定版本是哪一个？
+  sources:
+    - url: https://www.python.org/downloads/
+      tier: primary
+    - url: https://devguide.python.org/versions/
+      tier: primary
+    - url: https://realpython.com/python313-new-features/
+      tier: news
+    - url: https://www.w3schools.com/python/python_intro.asp
+      tier: aggregator
+
+- id: solar-system-planet-count
+  question: 太阳系有几颗行星？
+  sources:
+    - url: https://science.nasa.gov/solar-system/planets/
+      tier: primary
+    - url: https://science.nasa.gov/dwarf-planets/pluto/
+      tier: primary
+    - url: https://www.space.com/how-many-planets-in-the-solar-system
+      tier: news
+    - url: https://en.wikipedia.org/wiki/Planet
+      tier: aggregator

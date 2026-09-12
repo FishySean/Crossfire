@@ -4,7 +4,27 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const STRINGS = {
   en: {
     tagline: "verification results viewer",
-    runLabel: "Run",
+    runLabel: "History",
+    questionLabel: "Question",
+    runButton: "Run",
+    runningButton: "Running…",
+    modeCached: "Cached",
+    modeLive: "Live",
+    stageConnecting: "Connecting…",
+    stageFetching: (done, total) => `Fetching sources ${done}/${total}`,
+    stageExtracting: (done, total) => `Extracting claims ${done}/${total}`,
+    stageComparing: (done, total) => `Comparing ${done}/${total}`,
+    stageJudging: "Weighing the sources…",
+    stageDone: "Run complete",
+    pairProgress: (done, total) => `comparing ${done}/${total}`,
+    pendingSource: "waiting",
+    fetchedChars: (n) => `${n.toLocaleString()} chars`,
+    thinking: "Reading the evidence…",
+    stallWarning: "No events for 15s — the live run may be stuck.",
+    switchToCached: "Switch to cached",
+    streamFailed: "The live stream dropped. Switch to cached mode for the demo.",
+    stepError: (step, detail) => `${step} — ${detail}`,
+    noQuestions: "No questions found in questions/demo.yaml.",
     question: "Question",
     noQuestion: "(no question recorded)",
     sources: "Sources",
@@ -45,7 +65,27 @@ const STRINGS = {
   },
   zh: {
     tagline: "查证结果查看器",
-    runLabel: "运行结果",
+    runLabel: "历史结果",
+    questionLabel: "问题",
+    runButton: "开始查证",
+    runningButton: "运行中…",
+    modeCached: "回放",
+    modeLive: "实时",
+    stageConnecting: "连接中…",
+    stageFetching: (done, total) => `抓取来源 ${done}/${total}`,
+    stageExtracting: (done, total) => `提取主张 ${done}/${total}`,
+    stageComparing: (done, total) => `比对中 ${done}/${total}`,
+    stageJudging: "正在权衡各来源…",
+    stageDone: "本次运行完成",
+    pairProgress: (done, total) => `比对中 ${done}/${total}`,
+    pendingSource: "等待中",
+    fetchedChars: (n) => `${n.toLocaleString()} 字符`,
+    thinking: "正在阅读证据…",
+    stallWarning: "已有 15 秒没有收到任何事件，实时运行可能卡住了。",
+    switchToCached: "切换到回放",
+    streamFailed: "实时事件流中断了，演示请切到回放模式。",
+    stepError: (step, detail) => `${step} — ${detail}`,
+    noQuestions: "questions/demo.yaml 里没有找到任何问题。",
     question: "问题",
     noQuestion: "（无问题原文）",
     sources: "来源",
@@ -99,6 +139,16 @@ function applyStaticStrings() {
   document.documentElement.lang = lang === "zh" ? "zh" : "en";
   el("tagline").textContent = t("tagline");
   el("run-label").textContent = t("runLabel");
+  el("question-label").textContent = t("questionLabel");
+  el("run-button").textContent = live.active ? t("runningButton") : t("runButton");
+  for (const button of document.querySelectorAll("#mode-toggle button")) {
+    button.textContent = button.dataset.mode === "live" ? t("modeLive") : t("modeCached");
+  }
+  if (live.stage) el("progress-stage").textContent = t(live.stage.key, ...live.stage.args);
+  if (!el("stall-banner").classList.contains("hidden")) {
+    el("stall-text").textContent = t("stallWarning");
+    el("stall-switch").textContent = t("switchToCached");
+  }
   el("question-eyebrow").textContent = t("question");
   el("sources-title").textContent = t("sources");
   el("conflicts-title").textContent = t("conflicts");
@@ -174,6 +224,9 @@ async function fetchJSON(url) {
 
 async function loadRun(name) {
   const id = ++requestId;
+  stopLive();
+  el("progress-strip").classList.add("hidden");
+  el("pair-progress").classList.add("hidden");
   try {
     const run = await fetchJSON(`/api/runs/${encodeURIComponent(name)}`);
     if (id !== requestId) return;
@@ -559,6 +612,406 @@ function confidenceRing(confidence) {
   return wrap;
 }
 
+// ---------------------------------------------------------------- live run --
+
+const STALL_TIMEOUT_MS = 15000;
+const FLASH_MS = 220;
+const FAKE_SCENARIO = new URLSearchParams(location.search).get("fake");
+const FAKE_SPEED = new URLSearchParams(location.search).get("speed") || "1";
+
+let mode = "cached";
+
+const live = {
+  active: false,
+  stream: null,
+  slots: [],
+  cards: new Map(),
+  pairs: new Map(),
+  totalSources: 0,
+  totalPairs: 0,
+  fetched: 0,
+  claimed: 0,
+  judged: false,
+  question: "",
+  errors: [],
+  stage: null,
+  startedAt: 0,
+  timer: null,
+  stall: null,
+};
+
+function setMode(next) {
+  mode = next === "live" ? "live" : "cached";
+  for (const button of document.querySelectorAll("#mode-toggle button")) {
+    button.classList.toggle("active", button.dataset.mode === mode);
+  }
+}
+
+function setStage(key, ...args) {
+  live.stage = { key, args };
+  el("progress-stage").textContent = t(key, ...args);
+}
+
+function updateProgress() {
+  const total = live.totalSources * 2 + live.totalPairs + 1;
+  const done = live.fetched + live.claimed + live.pairs.size + (live.judged ? 1 : 0);
+  const pct = total ? Math.min(100, Math.round((done / total) * 100)) : 0;
+  el("progress-fill").style.width = `${pct}%`;
+}
+
+function startTimer() {
+  live.startedAt = performance.now();
+  const tick = () => {
+    el("progress-timer").textContent = `${((performance.now() - live.startedAt) / 1000).toFixed(1)}s`;
+  };
+  tick();
+  live.timer = setInterval(tick, 100);
+}
+
+function stopTimer() {
+  if (live.timer) clearInterval(live.timer);
+  live.timer = null;
+}
+
+function armStall() {
+  clearStall();
+  if (mode !== "live") return;
+  live.stall = setTimeout(() => {
+    el("stall-text").textContent = t("stallWarning");
+    el("stall-switch").textContent = t("switchToCached");
+    el("stall-banner").classList.remove("hidden");
+  }, STALL_TIMEOUT_MS);
+}
+
+function clearStall() {
+  if (live.stall) clearTimeout(live.stall);
+  live.stall = null;
+  el("stall-banner").classList.add("hidden");
+}
+
+function stopLive() {
+  if (live.stream) live.stream.close();
+  live.stream = null;
+  live.active = false;
+  stopTimer();
+  clearStall();
+  el("run-button").textContent = t("runButton");
+  el("run-button").classList.remove("running");
+}
+
+function resetLive() {
+  stopLive();
+  live.slots = [];
+  live.cards = new Map();
+  live.pairs = new Map();
+  live.totalSources = 0;
+  live.totalPairs = 0;
+  live.fetched = 0;
+  live.claimed = 0;
+  live.judged = false;
+  live.question = "";
+  live.errors = [];
+  live.stage = null;
+  currentRun = null;
+  hideError();
+  el("failure-banner").classList.add("hidden");
+  el("failure-banner").innerHTML = "";
+  el("sources").innerHTML = "";
+  el("conflicts").innerHTML = "";
+  el("judgment").innerHTML = "";
+  el("conflict-links").innerHTML = "";
+  el("run-meta").innerHTML = "";
+  el("question").textContent = "";
+  el("source-count").textContent = "";
+  el("conflict-count").textContent = "";
+  el("pair-progress").classList.add("hidden");
+  el("progress-fill").style.width = "0%";
+  el("progress-timer").textContent = "0.0s";
+}
+
+function streamUrl(questionId) {
+  if (FAKE_SCENARIO) {
+    return `/api/fake-run/${encodeURIComponent(FAKE_SCENARIO)}?speed=${encodeURIComponent(FAKE_SPEED)}`;
+  }
+  return `/api/run/${encodeURIComponent(questionId)}?mode=${mode}`;
+}
+
+function startRun() {
+  const questionId = el("question-select").value;
+  if (!questionId && !FAKE_SCENARIO) return;
+  resetLive();
+  live.active = true;
+  el("content").classList.remove("hidden");
+  el("progress-strip").classList.remove("hidden");
+  el("run-button").textContent = t("runningButton");
+  el("run-button").classList.add("running");
+  setStage("stageConnecting");
+  startTimer();
+  armStall();
+
+  const stream = new EventSource(streamUrl(questionId));
+  live.stream = stream;
+  stream.onmessage = (message) => {
+    armStall();
+    let event;
+    try {
+      event = JSON.parse(message.data);
+    } catch {
+      return;
+    }
+    handleEvent(event);
+  };
+  stream.onerror = () => {
+    if (!live.active) return;
+    stopLive();
+    showError("streamFailed");
+  };
+}
+
+function handleEvent(event) {
+  switch (event.type) {
+    case "start":
+      onStart(event);
+      break;
+    case "fetch_done":
+      onFetchDone(event);
+      break;
+    case "claim_done":
+      onClaimDone(event);
+      break;
+    case "pair_start":
+      onPairStart(event);
+      break;
+    case "pair_done":
+      onPairDone(event);
+      break;
+    case "judge_start":
+      onJudgeStart();
+      break;
+    case "done":
+      onDone(event);
+      break;
+    case "error":
+      onStepError(event);
+      break;
+    default:
+      break;
+  }
+}
+
+function onStart(event) {
+  live.question = event.question || "";
+  live.totalSources = event.total_sources || 0;
+  live.totalPairs = (live.totalSources * (live.totalSources - 1)) / 2;
+  el("question").textContent = live.question || t("noQuestion");
+  el("source-count").textContent = t("sourceCount", live.totalSources);
+  el("conflict-count").textContent = t("conflictCount", 0);
+  buildSkeletons(live.totalSources);
+  setStage("stageFetching", 0, live.totalSources);
+  updateProgress();
+}
+
+function buildSkeletons(count) {
+  const container = el("sources");
+  container.innerHTML = "";
+  live.slots = [];
+  for (let index = 0; index < count; index += 1) {
+    const card = text("div", "card card-skeleton");
+    card.dataset.index = String(index);
+
+    const head = text("div", "card-head");
+    head.appendChild(text("div", "domain", "—"));
+    head.appendChild(text("span", "card-index", `S${index + 1}`));
+    card.appendChild(head);
+
+    const tags = text("div", "tags");
+    tags.appendChild(text("span", "tag unknown", t("pendingSource")));
+    card.appendChild(tags);
+
+    const body = text("div", "skeleton-body");
+    for (const width of ["92%", "78%", "60%"]) {
+      const bar = text("div", "skeleton-bar");
+      bar.style.width = width;
+      body.appendChild(bar);
+    }
+    card.appendChild(body);
+    container.appendChild(card);
+    live.slots.push({ card, index, url: null, tier: null, claim: null, ok: null, chars: 0 });
+  }
+}
+
+function slotAt(index) {
+  return live.slots[index] || null;
+}
+
+function flash(card) {
+  card.classList.add("flash");
+  setTimeout(() => card.classList.remove("flash"), FLASH_MS);
+}
+
+function onFetchDone(event) {
+  const slot = slotAt(event.index);
+  if (!slot) return;
+  slot.url = event.url;
+  slot.ok = event.ok !== false;
+  slot.chars = event.chars || 0;
+  slot.card.dataset.url = event.url;
+  live.cards.set(event.url, { card: slot.card, index: slot.index });
+
+  const domain = slot.card.querySelector(".domain");
+  domain.textContent = "";
+  const link = document.createElement("a");
+  link.href = event.url;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.textContent = domainOf(event.url);
+  domain.appendChild(link);
+
+  const tags = slot.card.querySelector(".tags");
+  tags.innerHTML = "";
+  tags.appendChild(
+    text("span", slot.ok ? "tag plain" : "tag conflict-flag", slot.ok ? t("fetchedChars", slot.chars) : t("fetchFailed")),
+  );
+
+  slot.card.classList.remove("card-skeleton");
+  slot.card.classList.add("card-fetched");
+  if (!slot.ok) slot.card.classList.add("card-failed");
+  flash(slot.card);
+
+  live.fetched += 1;
+  setStage("stageFetching", live.fetched, live.totalSources);
+  updateProgress();
+}
+
+function onClaimDone(event) {
+  const slot = slotAt(event.index);
+  if (!slot) return;
+  slot.claim = event.claim || null;
+  slot.tier = event.tier || null;
+  if (!slot.url) {
+    slot.url = event.url;
+    slot.card.dataset.url = event.url;
+    live.cards.set(event.url, { card: slot.card, index: slot.index });
+  }
+
+  const tags = slot.card.querySelector(".tags");
+  tags.innerHTML = "";
+  tags.appendChild(text("span", `tag ${tierClass(slot.tier)}`, slot.tier || "unknown"));
+  if (slot.ok === false) tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
+
+  const body = slot.card.querySelector(".skeleton-body");
+  if (body) body.remove();
+  const existing = slot.card.querySelector(".claim-block");
+  if (existing) existing.remove();
+  const block = labeled(t("claim"), text("div", slot.claim ? "claim" : "claim empty", slot.claim || t("noClaim")));
+  block.className = "claim-block";
+  slot.card.appendChild(block);
+
+  slot.card.classList.remove("card-skeleton");
+  slot.card.classList.add("card-done");
+  flash(slot.card);
+
+  live.claimed += 1;
+  setStage("stageExtracting", live.claimed, live.totalSources);
+  updateProgress();
+}
+
+function onPairStart(event) {
+  live.totalPairs = event.total_pairs || 0;
+  el("pair-progress").classList.remove("hidden");
+  el("pair-progress").textContent = t("pairProgress", 0, live.totalPairs);
+  setStage("stageComparing", 0, live.totalPairs);
+  renderLiveConflicts();
+  updateProgress();
+}
+
+function onPairDone(event) {
+  // index is authoritative: events arrive out of order.
+  live.pairs.set(event.index, {
+    index: event.index,
+    a: event.a_url,
+    b: event.b_url,
+    relation: event.relation,
+    nature: event.nature,
+  });
+  if (event.total) live.totalPairs = event.total;
+  el("pair-progress").textContent = t("pairProgress", live.pairs.size, live.totalPairs);
+  setStage("stageComparing", live.pairs.size, live.totalPairs);
+  renderLiveConflicts();
+  updateProgress();
+}
+
+function orderedPairs() {
+  return [...live.pairs.values()].sort((a, b) => a.index - b.index);
+}
+
+function renderLiveConflicts() {
+  const contradictions = orderedPairs().filter((pair) => pair.relation === "contradict");
+  el("conflict-count").textContent = t("conflictCount", contradictions.length);
+  renderConflicts({ pairs: orderedPairs(), claims: claimRows() }, live.cards);
+}
+
+function claimRows() {
+  return live.slots.filter((slot) => slot.url).map((slot) => ({ url: slot.url, claim: slot.claim, tier: slot.tier }));
+}
+
+function onJudgeStart() {
+  setStage("stageJudging");
+  const container = el("judgment");
+  container.innerHTML = "";
+  container.appendChild(text("div", "thinking", t("thinking")));
+}
+
+function onDone(event) {
+  live.judged = true;
+  updateProgress();
+  setStage("stageDone");
+  stopLive();
+  currentRun = {
+    question: live.question,
+    elapsed_seconds: event.elapsed,
+    run_file: event.run_file,
+    sources: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, tier: s.tier })),
+    pages: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, ok: s.ok !== false })),
+    claims: claimRows(),
+    pairs: orderedPairs(),
+    judgment: event.judgment || null,
+    failures: live.errors.map((e) => ({ stage: e.step, error: e.detail })),
+  };
+  render(currentRun);
+  el("pair-progress").classList.add("hidden");
+}
+
+function onStepError(event) {
+  live.errors.push({ step: event.step, detail: event.detail });
+  renderFailures({ failures: live.errors.map((e) => ({ stage: e.step, error: e.detail })) });
+}
+
+function switchToCached() {
+  setMode("cached");
+  clearStall();
+  if (live.active) {
+    stopLive();
+    startRun();
+  }
+}
+
+async function loadQuestions() {
+  const questions = await fetchJSON("/api/questions");
+  const select = el("question-select");
+  select.innerHTML = "";
+  if (!questions.length) {
+    showError("noQuestions");
+    return;
+  }
+  for (const question of questions) {
+    const option = document.createElement("option");
+    option.value = question.id;
+    option.textContent = question.question || question.id;
+    select.appendChild(option);
+  }
+}
+
 window.addEventListener("resize", () => {
   if (!currentRun) return;
   const cards = new Map();
@@ -569,6 +1022,21 @@ window.addEventListener("resize", () => {
 for (const button of document.querySelectorAll("#lang-toggle button")) {
   button.onclick = () => setLang(button.dataset.lang);
 }
+for (const button of document.querySelectorAll("#mode-toggle button")) {
+  button.onclick = () => setMode(button.dataset.mode);
+}
+el("run-button").onclick = startRun;
+el("stall-switch").onclick = switchToCached;
 
+// Demo escape hatch: Ctrl+Alt+C drops back to cached mode mid-run.
+window.addEventListener("keydown", (event) => {
+  if (event.ctrlKey && event.altKey && event.code === "KeyC") {
+    event.preventDefault();
+    switchToCached();
+  }
+});
+
+setMode("cached");
 applyStaticStrings();
+loadQuestions().catch(() => {});
 loadRuns().catch((e) => showError("listFailed", e.message));

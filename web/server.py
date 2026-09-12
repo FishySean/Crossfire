@@ -1,12 +1,18 @@
+import asyncio
 import json
 import time
 from pathlib import Path
 
+import yaml
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-RUNS_DIR = Path(__file__).resolve().parents[1] / "out" / "runs"
+from web.fake_events import SCENARIOS, scenario_events
+
+ROOT = Path(__file__).resolve().parents[1]
+RUNS_DIR = ROOT / "out" / "runs"
+QUESTIONS_FILE = ROOT / "questions" / "demo.yaml"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 READ_RETRIES = 3
 RETRY_DELAY_SECONDS = 0.15
@@ -38,6 +44,48 @@ def get_run(name: str) -> dict:
             if attempt < READ_RETRIES - 1:
                 time.sleep(RETRY_DELAY_SECONDS)
     raise HTTPException(status_code=422, detail=f"invalid or partially written JSON: {error}")
+
+
+@app.get("/api/questions")
+def list_questions() -> list[dict]:
+    if not QUESTIONS_FILE.is_file():
+        return []
+    config = yaml.safe_load(QUESTIONS_FILE.read_text(encoding="utf-8")) or []
+    return [
+        {
+            "id": item["id"],
+            "question": item.get("question", ""),
+            "total_sources": len(item.get("sources", [])),
+        }
+        for item in config
+    ]
+
+
+@app.get("/api/fake-run/{scenario}")
+async def fake_run(scenario: str, speed: float = 1.0) -> StreamingResponse:
+    """Scripted event stream used to develop and rehearse the live view.
+
+    Mirrors the agreed /api/run/{question_id} protocol so the frontend can be
+    exercised end to end without the real pipeline.
+    """
+    if scenario not in SCENARIOS:
+        raise HTTPException(status_code=404, detail=f"unknown scenario: {scenario}")
+
+    async def stream():
+        events = scenario_events(scenario)
+        for delay, event in events:
+            await asyncio.sleep(delay / max(speed, 0.01))
+            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        while not events:
+            # "stall": hold the connection open without ever emitting an event.
+            await asyncio.sleep(5)
+            yield ": waiting\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.get("/")

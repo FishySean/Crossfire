@@ -15,6 +15,15 @@
     </div>
     <div class="topbar-right">
       <label class="run-picker">
+        <span id="question-label">Question</span>
+        <select id="question-select"></select>
+      </label>
+      <div class="mode-toggle" id="mode-toggle">
+        <button type="button" data-mode="cached">Cached</button>
+        <button type="button" data-mode="live">Live</button>
+      </div>
+      <button type="button" id="run-button" class="run-button">Run</button>
+      <label class="run-picker">
         <span id="run-label">Run</span>
         <select id="run-select"></select>
       </label>
@@ -25,6 +34,18 @@
     </div>
   </header>
 
+  <div id="progress-strip" class="progress-strip hidden">
+    <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+    <div class="progress-meta">
+      <span id="progress-stage"></span>
+      <span id="progress-timer" class="timer">0.0s</span>
+    </div>
+  </div>
+
+  <div id="stall-banner" class="banner hidden">
+    <span id="stall-text"></span>
+    <button type="button" id="stall-switch" class="inline-button"></button>
+  </div>
   <div id="failure-banner" class="banner hidden"></div>
   <div id="error-banner" class="banner error hidden"></div>
 
@@ -50,6 +71,7 @@
       <div class="panel-head">
         <h2 id="conflicts-title">Conflicts</h2>
         <span id="conflict-count" class="count"></span>
+        <span id="pair-progress" class="count pair-progress hidden"></span>
       </div>
       <div id="conflicts" class="conflicts"></div>
     </section>

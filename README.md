@@ -8,7 +8,18 @@
 
 ```bash
 uv sync
-uv run uvicorn web.server:app --reload   # 打开 http://127.0.0.1:8000
+python app.py            # 自检 → 选端口 → 就绪后自动开浏览器（uv 环境里用 uv run python app.py）
+python app.py --no-browser
+```
+
+`app.py` 会在启动前检查工作目录（不在项目根目录会自动切过去）、`.env` 里的
+`ANTHROPIC_API_KEY` / `STEEL_API_KEY`、依赖、以及 `out/cache/` 里有没有抓取缓存，
+并从 8765 开始挑一个没被占用的端口（最多试到 8775）。
+
+进阶：自己控制参数时直接起 uvicorn。
+
+```bash
+uv run uvicorn web.server:app --reload --port 8765
 ```
 
 没有真实结果时，可生成样例数据：`uv run python scripts/make_sample_runs.py`。

@@ -545,6 +545,26 @@ function spotlight(urls, cards, focus) {
   }
 }
 
+// Straight segments through the waypoints with rounded corners, so a routed
+// link hugs the gutters instead of bulging back over the cards.
+function elbowPath(points) {
+  const r = 8;
+  let d = `M ${points[0][0]} ${points[0][1]}`;
+  for (let i = 1; i < points.length - 1; i += 1) {
+    const [px, py] = points[i - 1];
+    const [cx, cy] = points[i];
+    const [nx, ny] = points[i + 1];
+    const inLen = Math.hypot(cx - px, cy - py) || 1;
+    const outLen = Math.hypot(nx - cx, ny - cy) || 1;
+    const back = Math.min(r, inLen / 2);
+    const ahead = Math.min(r, outLen / 2);
+    d += ` L ${cx + ((px - cx) / inLen) * back} ${cy + ((py - cy) / inLen) * back}`;
+    d += ` Q ${cx} ${cy}, ${cx + ((nx - cx) / outLen) * ahead} ${cy + ((ny - cy) / outLen) * ahead}`;
+  }
+  const last = points[points.length - 1];
+  return `${d} L ${last[0]} ${last[1]}`;
+}
+
 function drawLinks(pairs, cards) {
   const svg = el("conflict-links");
   svg.innerHTML = "";
@@ -598,15 +618,20 @@ function drawLinks(pairs, cards) {
       const y2 = lower.top - wrap.top;
       if (lower.top - upper.bottom > 60) {
         // Rows that are not neighbours have a whole row of cards in between,
-        // so the link travels down the empty margin beside the grid.
-        const g1 = y1 + 16;
-        const g2 = y2 - 16;
+        // so the link runs along the gutters and down the margin beside the
+        // grid rather than straight through those cards.
+        const g1 = y1 + 18;
+        const g2 = y2 - 18;
         const step = (order % 3) * 4;
-        const lane =
-          x1 + x2 < wrap.width ? -9 - step : wrap.width + 9 + step;
-        d =
-          `M ${x1} ${y1} C ${x1} ${g1}, ${lane} ${g1}, ${lane} ${(g1 + g2) / 2}` +
-          ` C ${lane} ${g2}, ${x2} ${g2}, ${x2} ${y2}`;
+        const lane = x1 + x2 < wrap.width ? -9 - step : wrap.width + 9 + step;
+        d = elbowPath([
+          [x1, y1],
+          [x1, g1],
+          [lane, g1],
+          [lane, g2],
+          [x2, g2],
+          [x2, y2],
+        ]);
       } else {
         const drop = Math.max(10, (y2 - y1) / 2);
         d = `M ${x1} ${y1} C ${x1 + fan} ${y1 + drop}, ${x2 + fan} ${y2 - drop}, ${x2} ${y2}`;

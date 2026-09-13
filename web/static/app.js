@@ -4,6 +4,9 @@ const RELATION_CONTRADICT = "contradict";
 // Both claims are true but measure different things, so the numbers are not
 // comparable — drawn apart from real contradictions.
 const RELATION_SCOPE = "same_question_different_scope";
+// Past this many links the graph braids into an unreadable bundle, so scope
+// links go quiet and only surface for the card or pair being pointed at.
+const LINK_CROWD_LIMIT = 8;
 
 const STRINGS = {
   en: {
@@ -40,6 +43,7 @@ const STRINGS = {
     scopeGroup: "Different scope",
     legendContradict: "Contradiction — the two claims cannot both be true",
     legendScope: "Different scope — both claims are true, but they measure different things and cannot be compared directly",
+    legendCrowded: "Too many links to read at once — point at a source or a pair to trace its scope links",
     scopeWith: (id) => `different scope from ${id}`,
     verdict: "Verdict",
     claim: "Claim",
@@ -106,6 +110,7 @@ const STRINGS = {
     scopeGroup: "口径不同",
     legendContradict: "矛盾 —— 两个说法不可能同时为真",
     legendScope: "口径不同 —— 两个说法各自为真，但统计口径不同，不能直接比较",
+    legendCrowded: "连线太多看不清 —— 把鼠标移到某个来源或某条差异上，单独看它的连线",
     scopeWith: (id) => `口径不同于 ${id}`,
     verdict: "结论",
     claim: "主张",
@@ -431,7 +436,7 @@ function renderConflicts(run, cards) {
   const scoped = all.filter((p) => p.relation === RELATION_SCOPE);
   const unresolved = all.filter((p) => !p.relation).length;
   el("conflict-count").textContent = t("relationCount", contradictions.length, scoped.length);
-  renderLegend();
+  renderLegend(contradictions.length + scoped.length > LINK_CROWD_LIMIT);
 
   for (const { card } of cards.values()) card.classList.remove("conflicted", "scoped");
 
@@ -447,7 +452,8 @@ function renderConflicts(run, cards) {
     container.appendChild(conflictGroup(run, cards, scoped, RELATION_SCOPE));
   }
 
-  drawLinks([...contradictions, ...scoped], cards);
+  // Scope links go down first so the red contradictions sit on top of them.
+  drawLinks([...scoped, ...contradictions], cards);
 }
 
 function conflictGroup(run, cards, pairs, relation) {
@@ -491,7 +497,7 @@ function conflictGroup(run, cards, pairs, relation) {
   return group;
 }
 
-function renderLegend() {
+function renderLegend(crowded) {
   const legend = el("conflict-legend");
   legend.innerHTML = "";
   for (const [key, className] of [
@@ -503,6 +509,7 @@ function renderLegend() {
     row.appendChild(text("span", null, t(key)));
     legend.appendChild(row);
   }
+  if (crowded) legend.appendChild(text("span", "legend-item hint", t("legendCrowded")));
 }
 
 function markPartner(target, partner, relation) {
@@ -518,59 +525,85 @@ function labelFor(url, info) {
   return info ? `S${info.index + 1} ${domainOf(url)}` : domainOf(url);
 }
 
-function spotlight(urls, cards) {
+function spotlight(urls, cards, focus) {
   for (const [url, { card }] of cards) {
     card.classList.toggle("dimmed", Boolean(urls) && !urls.includes(url));
+  }
+  const svg = el("conflict-links");
+  svg.classList.toggle("tracing", Boolean(urls));
+  for (const path of svg.querySelectorAll("path")) {
+    const { a, b } = path.dataset;
+    const traced =
+      Boolean(urls) &&
+      urls.includes(a) &&
+      urls.includes(b) &&
+      (!focus || a === focus || b === focus);
+    path.classList.toggle("traced", traced);
   }
 }
 
 function drawLinks(pairs, cards) {
   const svg = el("conflict-links");
   svg.innerHTML = "";
+  // Every link drawn at full strength turns into a braid, so above the limit
+  // they stay faint until a card or a pair is pointed at.
+  svg.classList.toggle("crowded", pairs.length > LINK_CROWD_LIMIT);
   const wrap = svg.parentElement.getBoundingClientRect();
-  for (const pair of pairs) {
+
+  pairs.forEach((pair, order) => {
     const kind = pair.relation === RELATION_SCOPE ? "scope" : "contradict";
     const a = cards.get(pair.a);
     const b = cards.get(pair.b);
-    if (!a || !b) continue;
+    if (!a || !b) return;
     const ra = a.card.getBoundingClientRect();
     const rb = b.card.getBoundingClientRect();
     const sameRow = Math.abs(ra.top - rb.top) < 4;
     const [left, right] = ra.left <= rb.left ? [ra, rb] : [rb, ra];
     const [upper, lower] = ra.top <= rb.top ? [ra, rb] : [rb, ra];
+    // Fan the curves apart so links between the same two rows stay separable.
+    const fan = ((order % 5) - 2) * 9;
 
-    let x1;
-    let y1;
-    let x2;
-    let y2;
-    let c1x;
-    let c1y;
-    let c2x;
-    let c2y;
-    if (sameRow) {
-      x1 = left.right - wrap.left;
-      y1 = left.top + left.height / 2 - wrap.top;
-      x2 = right.left - wrap.left;
-      y2 = right.top + right.height / 2 - wrap.top;
+    let d;
+    let ends;
+    const neighbours = sameRow && right.left - left.right < 40;
+    if (neighbours) {
+      const x1 = left.right - wrap.left;
+      const y1 = left.top + left.height / 2 - wrap.top;
+      const x2 = right.left - wrap.left;
+      const y2 = right.top + right.height / 2 - wrap.top;
       const bow = Math.min(30, (x2 - x1) / 2 + 6);
-      [c1x, c1y, c2x, c2y] = [x1 + bow, y1, x2 - bow, y2];
+      d = `M ${x1} ${y1} C ${x1 + bow} ${y1}, ${x2 - bow} ${y2}, ${x2} ${y2}`;
+      ends = [[x1, y1], [x2, y2]];
+    } else if (sameRow) {
+      // Going straight across would run behind the cards in between, so dip
+      // into the empty gutter under the row instead.
+      const x1 = left.left + left.width / 2 - wrap.left;
+      const x2 = right.left + right.width / 2 - wrap.left;
+      const y = left.bottom - wrap.top;
+      const dip = Math.min(32, 16 + Math.abs(fan));
+      d = `M ${x1} ${y} C ${x1} ${y + dip}, ${x2} ${y + dip}, ${x2} ${y}`;
+      ends = [[x1, y], [x2, y]];
     } else {
-      x1 = upper.left + upper.width / 2 - wrap.left;
-      y1 = upper.bottom - wrap.top;
-      x2 = lower.left + lower.width / 2 - wrap.left;
-      y2 = lower.top - wrap.top;
+      const x1 = upper.left + upper.width / 2 - wrap.left;
+      const y1 = upper.bottom - wrap.top;
+      const x2 = lower.left + lower.width / 2 - wrap.left;
+      const y2 = lower.top - wrap.top;
       const drop = Math.max(10, (y2 - y1) / 2);
-      [c1x, c1y, c2x, c2y] = [x1, y1 + drop, x2, y2 - drop];
+      d = `M ${x1} ${y1} C ${x1 + fan} ${y1 + drop}, ${x2 + fan} ${y2 - drop}, ${x2} ${y2}`;
+      ends = [[x1, y1], [x2, y2]];
     }
 
     const path = document.createElementNS(SVG_NS, "path");
     path.setAttribute("class", `link-${kind}`);
-    path.setAttribute("d", `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`);
+    path.setAttribute("d", d);
+    path.dataset.a = pair.a;
+    path.dataset.b = pair.b;
     svg.appendChild(path);
-    for (const [cx, cy] of [
-      [x1, y1],
-      [x2, y2],
-    ]) {
+    for (const info of [a, b]) {
+      info.card.onmouseenter = () => traceFromCard(info.card.dataset.url, cards);
+      info.card.onmouseleave = () => spotlight(null, cards);
+    }
+    for (const [cx, cy] of ends) {
       const dot = document.createElementNS(SVG_NS, "circle");
       dot.setAttribute("class", `link-${kind}`);
       dot.setAttribute("cx", String(cx));
@@ -578,7 +611,17 @@ function drawLinks(pairs, cards) {
       dot.setAttribute("r", "3");
       svg.appendChild(dot);
     }
+  });
+}
+
+function traceFromCard(url, cards) {
+  const svg = el("conflict-links");
+  const partners = new Set([url]);
+  for (const path of svg.querySelectorAll("path")) {
+    if (path.dataset.a === url) partners.add(path.dataset.b);
+    if (path.dataset.b === url) partners.add(path.dataset.a);
   }
+  spotlight(partners.size > 1 ? [...partners] : null, cards, url);
 }
 
 function renderJudgment(run) {

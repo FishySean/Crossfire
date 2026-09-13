@@ -203,8 +203,10 @@ body {
 .conflict-links.crowded path.link-scope { opacity: 0.22; }
 .conflict-links.crowded path.link-contradict { stroke-width: 2.4; opacity: 1; }
 .conflict-links.crowded circle.link-scope { opacity: 0.35; }
-.conflict-links.tracing path { opacity: 0.08; }
-.conflict-links.tracing path.traced { opacity: 1; stroke-width: 2.6; }
+.conflict-links.tracing path.link-scope,
+.conflict-links.tracing path.link-contradict { opacity: 0.08; }
+.conflict-links.tracing path.traced.link-scope,
+.conflict-links.tracing path.traced.link-contradict { opacity: 1; stroke-width: 2.6; }
 .conflict-links circle.link-contradict { fill: var(--danger); }
 .conflict-links circle.link-scope { fill: var(--scope); }
 

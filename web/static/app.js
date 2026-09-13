@@ -452,8 +452,7 @@ function renderConflicts(run, cards) {
     container.appendChild(conflictGroup(run, cards, scoped, RELATION_SCOPE));
   }
 
-  // Scope links go down first so the red contradictions sit on top of them.
-  drawLinks([...scoped, ...contradictions], cards);
+  drawLinks([...contradictions, ...scoped], cards);
 }
 
 function conflictGroup(run, cards, pairs, relation) {
@@ -525,7 +524,11 @@ function labelFor(url, info) {
   return info ? `S${info.index + 1} ${domainOf(url)}` : domainOf(url);
 }
 
+// The card whose links are being traced, so a redraw can restore the trace.
+let tracedCard = null;
+
 function spotlight(urls, cards, focus) {
+  tracedCard = urls ? focus || null : null;
   for (const [url, { card }] of cards) {
     card.classList.toggle("dimmed", Boolean(urls) && !urls.includes(url));
   }
@@ -548,9 +551,14 @@ function drawLinks(pairs, cards) {
   // Every link drawn at full strength turns into a braid, so above the limit
   // they stay faint until a card or a pair is pointed at.
   svg.classList.toggle("crowded", pairs.length > LINK_CROWD_LIMIT);
+  svg.classList.remove("tracing");
   const wrap = svg.parentElement.getBoundingClientRect();
 
-  pairs.forEach((pair, order) => {
+  // Contradictions are painted last so they stay on top of the scope links.
+  const ordered = [...pairs].sort(
+    (p, q) => (p.relation === RELATION_CONTRADICT) - (q.relation === RELATION_CONTRADICT),
+  );
+  ordered.forEach((pair, order) => {
     const kind = pair.relation === RELATION_SCOPE ? "scope" : "contradict";
     const a = cards.get(pair.a);
     const b = cards.get(pair.b);
@@ -588,8 +596,21 @@ function drawLinks(pairs, cards) {
       const y1 = upper.bottom - wrap.top;
       const x2 = lower.left + lower.width / 2 - wrap.left;
       const y2 = lower.top - wrap.top;
-      const drop = Math.max(10, (y2 - y1) / 2);
-      d = `M ${x1} ${y1} C ${x1 + fan} ${y1 + drop}, ${x2 + fan} ${y2 - drop}, ${x2} ${y2}`;
+      if (lower.top - upper.bottom > 60) {
+        // Rows that are not neighbours have a whole row of cards in between,
+        // so the link travels down the empty margin beside the grid.
+        const g1 = y1 + 16;
+        const g2 = y2 - 16;
+        const step = (order % 3) * 4;
+        const lane =
+          x1 + x2 < wrap.width ? -9 - step : wrap.width + 9 + step;
+        d =
+          `M ${x1} ${y1} C ${x1} ${g1}, ${lane} ${g1}, ${lane} ${(g1 + g2) / 2}` +
+          ` C ${lane} ${g2}, ${x2} ${g2}, ${x2} ${y2}`;
+      } else {
+        const drop = Math.max(10, (y2 - y1) / 2);
+        d = `M ${x1} ${y1} C ${x1 + fan} ${y1 + drop}, ${x2 + fan} ${y2 - drop}, ${x2} ${y2}`;
+      }
       ends = [[x1, y1], [x2, y2]];
     }
 
@@ -612,6 +633,9 @@ function drawLinks(pairs, cards) {
       svg.appendChild(dot);
     }
   });
+
+  // A redraw while the pointer sits on a card gets no fresh mouseenter.
+  if (tracedCard && cards.has(tracedCard)) traceFromCard(tracedCard, cards);
 }
 
 function traceFromCard(url, cards) {

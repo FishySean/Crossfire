@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,6 +11,7 @@ from crossfire.reconcile import DEFAULT_PAIR_CONCURRENCY, judge, pair_claims
 from crossfire.steel_client import CACHE_ROOT, fetch_pages
 
 RUNS_DIR = Path(__file__).resolve().parents[1] / "out" / "runs"
+HEARTBEAT_SECONDS = 5
 
 
 def _step_usage(records: list[dict], seconds: float) -> dict:
@@ -110,7 +112,30 @@ def run(
 
     emit({"type": "judge_start"})
     judge_started = time.monotonic()
-    judgment = judge(question, claims, pairs)
+
+    # judge 是一次阻塞调用，中间没有任何可报告的进度，实测能跑到 27 秒。
+    # 心跳只说明「还在跑、跑了多久」，不编造进度，让前端的超时计时器有东西可重置。
+    stop_beating = threading.Event()
+
+    def beat() -> None:
+        while not stop_beating.wait(HEARTBEAT_SECONDS):
+            emit(
+                {
+                    "type": "heartbeat",
+                    "step": "judge",
+                    "elapsed": round(time.monotonic() - judge_started, 2),
+                }
+            )
+
+    heartbeat = threading.Thread(target=beat, daemon=True) if on_event else None
+    if heartbeat:
+        heartbeat.start()
+    try:
+        judgment = judge(question, claims, pairs)
+    finally:
+        stop_beating.set()
+        if heartbeat:
+            heartbeat.join()
     judge_seconds = round(time.monotonic() - judge_started, 2)
     if judgment.get("failure"):
         emit({"type": "error", "step": "judge", "detail": judgment["failure"]["detail"]})

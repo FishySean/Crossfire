@@ -27,7 +27,7 @@ const STRINGS = {
     pendingSource: "waiting",
     fetchedChars: (n) => `${n.toLocaleString()} chars`,
     thinking: "Reading the evidence…",
-    stallWarning: "No events for 15s — the live run may be stuck.",
+    stallWarning: "No events for 30s — the live run may be stuck.",
     switchToCached: "Switch to cached",
     streamFailed: "The live stream dropped. Switch to cached mode for the demo.",
     stepError: (step, detail) => `${step} — ${detail}`,
@@ -95,7 +95,7 @@ const STRINGS = {
     pendingSource: "等待中",
     fetchedChars: (n) => `${n.toLocaleString()} 字符`,
     thinking: "正在阅读证据…",
-    stallWarning: "已有 15 秒没有收到任何事件，实时运行可能卡住了。",
+    stallWarning: "已有 30 秒没有收到任何事件，实时运行可能卡住了。",
     switchToCached: "切换到回放",
     streamFailed: "实时事件流中断了，演示请切到回放模式。",
     stepError: (step, detail) => `${step} — ${detail}`,
@@ -754,7 +754,7 @@ function confidenceRing(confidence) {
 
 // ---------------------------------------------------------------- live run --
 
-const STALL_TIMEOUT_MS = 15000;
+const STALL_TIMEOUT_MS = 30000;
 const FLASH_MS = 220;
 const FAKE_SCENARIO = new URLSearchParams(location.search).get("fake");
 const FAKE_SPEED = new URLSearchParams(location.search).get("speed") || "1";
@@ -929,6 +929,9 @@ function handleEvent(event) {
       break;
     case "judge_start":
       onJudgeStart();
+      break;
+    case "heartbeat":
+      // Keeps the stall timer alive through the long judge call; nothing to draw.
       break;
     case "done":
       onDone(event);

@@ -9,6 +9,12 @@ from itertools import combinations
 
 SCENARIOS = ("normal", "shuffled", "with-error", "stall", "scope", "dense")
 
+# The real judge step is one long call that emits nothing else for 15-27s, so the
+# scripted runs reproduce that gap along with the heartbeats that keep the
+# frontend's stall warning from firing in the middle of it.
+JUDGE_SECONDS = 17.0
+HEARTBEAT_SECONDS = 5.0
+
 QUESTION = "What is the latest stable version of Python?"
 
 SOURCES = [
@@ -305,8 +311,27 @@ def _run_events(*, question, sources, relation_of, judgment, run_file, elapsed):
             )
         )
 
-    events.append((0.4, {"type": "judge_start"}))
-    events.append((1.2, {"type": "done", "judgment": judgment, "run_file": run_file, "elapsed": elapsed}))
+    events.extend(_judge_events(judgment=judgment, run_file=run_file, elapsed=elapsed))
+    return events
+
+
+def _judge_events(*, judgment, run_file, elapsed):
+    """judge_start, a heartbeat every HEARTBEAT_SECONDS, then done."""
+    events = [(0.4, {"type": "judge_start"})]
+    beats = int(JUDGE_SECONDS // HEARTBEAT_SECONDS)
+    for beat in range(1, beats + 1):
+        events.append(
+            (
+                HEARTBEAT_SECONDS,
+                {"type": "heartbeat", "step": "judge", "elapsed": round(beat * HEARTBEAT_SECONDS, 1)},
+            )
+        )
+    events.append(
+        (
+            JUDGE_SECONDS - beats * HEARTBEAT_SECONDS,
+            {"type": "done", "judgment": judgment, "run_file": run_file, "elapsed": elapsed},
+        )
+    )
     return events
 
 
@@ -365,16 +390,11 @@ def _base_events(*, error_steps=()):
             )
         )
 
-    events.append((0.4, {"type": "judge_start"}))
-    events.append(
-        (
-            1.2,
-            {
-                "type": "done",
-                "judgment": JUDGMENT,
-                "run_file": "out/runs/python-latest-version_fake.json",
-                "elapsed": 8.4,
-            },
+    events.extend(
+        _judge_events(
+            judgment=JUDGMENT,
+            run_file="out/runs/python-latest-version_fake.json",
+            elapsed=8.4,
         )
     )
     return events

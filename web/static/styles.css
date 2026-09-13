@@ -194,9 +194,26 @@ body {
 
 .sources-wrap { position: relative; }
 .conflict-links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
-.conflict-links path { fill: none; stroke-width: 1.6; opacity: 0.8; }
+.conflict-links path { fill: none; stroke-width: 1.6; opacity: 0.8; transition: opacity 0.18s ease, stroke-width 0.18s ease; }
 .conflict-links path.link-contradict { stroke: var(--danger); stroke-dasharray: 5 4; }
 .conflict-links path.link-scope { stroke: var(--scope); stroke-dasharray: 2 5; stroke-linecap: round; }
+/* Too many links at once read as a braid: the scope ones recede so the red
+   contradictions stay findable, and pointing at a card or a pair brings the
+   relevant ones back. */
+.conflict-links.crowded path.link-scope { opacity: 0.22; }
+.conflict-links.crowded path.link-contradict { stroke-width: 2.4; opacity: 1; }
+.conflict-links.crowded circle.link-scope { opacity: 0.35; }
+.conflict-links.tracing path.link-scope,
+.conflict-links.tracing path.link-contradict { opacity: 0.08; }
+.conflict-links.tracing path.traced.link-scope,
+.conflict-links.tracing path.traced.link-contradict {
+  opacity: 1;
+  stroke-width: 2.6;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.85));
+}
+/* While tracing, the highlighted link is drawn over the cards so it stays
+   visible even where it would otherwise pass behind one. */
+.conflict-links.tracing { z-index: 2; }
 .conflict-links circle.link-contradict { fill: var(--danger); }
 .conflict-links circle.link-scope { fill: var(--scope); }
 
@@ -205,7 +222,8 @@ body {
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 14px;
+  /* The row gutter is where links between distant cards are routed. */
+  gap: 36px 14px;
 }
 
 .card {
@@ -306,6 +324,7 @@ body {
 .legend-item.contradict { color: var(--danger); }
 .legend-item.scope { color: var(--scope); }
 .legend-item.scope .legend-line { border-top-style: dotted; }
+.legend-item.hint { flex-basis: 100%; font-style: italic; }
 
 .conflicts { display: flex; flex-direction: column; gap: 18px; }
 .conflict-group { display: flex; flex-direction: column; gap: 12px; }

@@ -7,7 +7,7 @@ without the pipeline, and so odd orderings can be reproduced on demand.
 
 from itertools import combinations
 
-SCENARIOS = ("normal", "shuffled", "with-error", "stall", "scope")
+SCENARIOS = ("normal", "shuffled", "with-error", "stall", "scope", "dense")
 
 QUESTION = "What is the latest stable version of Python?"
 
@@ -149,17 +149,118 @@ def _scope_relation(a, b):
     return found or ("unrelated", "The failed source makes no claim to compare.")
 
 
-def _scope_events():
-    """A run with scope differences, a real contradiction and a failed fetch.
+# The worst case the demo can hit: seven sources means 21 pairs, and almost all
+# of them are scope differences, so the conflict panel has to stay readable with
+# 17 orange links crossing the source grid at once.
+DENSE_QUESTION = "How many people live in Tokyo?"
 
-    The failed source emits no claim_done at all, so claim indices are 0, 2, 3 —
-    the shape that catches a claim index based on claim order instead of source
-    order.
+DENSE_SOURCES = [
+    {
+        "url": "https://www.metro.tokyo.lg.jp/english/about/statistics.html",
+        "tier": "primary",
+        "chars": 9214,
+        "claim": "Tokyo Metropolis has about 14.2 million residents.",
+    },
+    {
+        "url": "https://www.stat.go.jp/english/data/jinsui/index.html",
+        "tier": "primary",
+        "chars": 6480,
+        "claim": "The Tokyo prefecture population estimate is 14,183,000.",
+    },
+    {
+        "url": "https://en.wikipedia.org/wiki/Greater_Tokyo_Area",
+        "tier": "aggregator",
+        "chars": 48120,
+        "claim": "The Greater Tokyo Area is home to roughly 37 million people.",
+    },
+    {
+        "url": "https://www.citypopulation.de/en/japan/tokyo/",
+        "tier": "aggregator",
+        "chars": 12608,
+        "claim": "Tokyo's 23 special wards hold about 9.7 million people.",
+    },
+    {
+        "url": "https://worldpopulationreview.com/world-cities/tokyo-population",
+        "tier": "aggregator",
+        "chars": 8102,
+        "claim": "Tokyo's population is 37.4 million.",
+    },
+    {
+        "url": "https://www.macrotrends.net/cities/21671/tokyo/population",
+        "tier": "aggregator",
+        "chars": 5321,
+        "claim": "The Tokyo metro area population is 37,115,000.",
+    },
+    {
+        "url": "https://www.bbc.com/news/world-asia-tokyo-population",
+        "tier": "news",
+        "chars": 14770,
+        "claim": "Tokyo's daytime population swells to 16.4 million on a working day.",
+    },
+]
+
+# Sources grouped by what they actually measure; pairs across groups are scope
+# differences, and two same-scope pairs really do disagree.
+DENSE_SCOPES = {
+    0: "prefecture",
+    1: "prefecture",
+    2: "metro area",
+    3: "23 wards",
+    4: "metro area",
+    5: "metro area",
+    6: "daytime population",
+}
+
+DENSE_CONTRADICTS = {
+    (2, 4): "Both say 'Greater Tokyo' but give roughly 37M and 37.4M with no year attached.",
+    (4, 5): "Same metro area, same year: 37.4M against 37,115,000.",
+}
+
+DENSE_JUDGMENT = {
+    "answer": "9.7M in the 23 wards, 14.2M in Tokyo Metropolis, ~37M in the Greater Tokyo Area.",
+    "confidence": 0.81,
+    "reasoning": (
+        "Seventeen of the twenty-one pairs disagree only because they measure different "
+        "boundaries, which is why the raw numbers range from 9.7M to 37.4M. Only two pairs "
+        "use the same boundary and still disagree, and both of those involve the same "
+        "aggregator's 37.4M figure."
+    ),
+    "conflicts": [
+        "37.4M against roughly 37M for the same metro area",
+        "37.4M against 37,115,000 for the same metro area and year",
+    ],
+    "trusted_sources": [
+        "https://www.metro.tokyo.lg.jp/english/about/statistics.html",
+        "https://www.stat.go.jp/english/data/jinsui/index.html",
+    ],
+}
+
+
+def _dense_relation(a, b):
+    ia = next(i for i, s in enumerate(DENSE_SOURCES) if s["url"] == a)
+    ib = next(i for i, s in enumerate(DENSE_SOURCES) if s["url"] == b)
+    nature = DENSE_CONTRADICTS.get((ia, ib)) or DENSE_CONTRADICTS.get((ib, ia))
+    if nature:
+        return "contradict", nature
+    if DENSE_SCOPES[ia] != DENSE_SCOPES[ib]:
+        return (
+            "same_question_different_scope",
+            f"One counts the {DENSE_SCOPES[ia]}, the other the {DENSE_SCOPES[ib]} — both are correct.",
+        )
+    return "agree", f"Both report the {DENSE_SCOPES[ia]} and land on the same figure."
+
+
+def _run_events(*, question, sources, relation_of, judgment, run_file, elapsed):
+    """Events for one scripted run over the given sources.
+
+    A source with fetch_ok False emits no claim_done at all, so claim indices
+    skip a slot — the shape that catches a claim index based on claim order
+    instead of source order.
     """
-    pairs = _pairs(SCOPE_SOURCES)
-    events = [(0.0, {"type": "start", "question": SCOPE_QUESTION, "total_sources": len(SCOPE_SOURCES)})]
+    pairs = _pairs(sources)
+    events = [(0.0, {"type": "start", "question": question, "total_sources": len(sources)})]
 
-    for index, source in enumerate(SCOPE_SOURCES):
+    for index, source in enumerate(sources):
         ok = source.get("fetch_ok", True)
         if not ok:
             events.append((0.4, {"type": "error", "step": "fetch", "detail": f"timeout after 30s on {source['url']}"}))
@@ -170,7 +271,7 @@ def _scope_events():
             )
         )
 
-    for index, source in enumerate(SCOPE_SOURCES):
+    for index, source in enumerate(sources):
         if not source.get("fetch_ok", True):
             continue
         events.append(
@@ -188,7 +289,7 @@ def _scope_events():
 
     events.append((0.3, {"type": "pair_start", "total_pairs": len(pairs)}))
     for index, (a, b) in enumerate(pairs):
-        relation, nature = _scope_relation(a, b)
+        relation, nature = relation_of(a, b)
         events.append(
             (
                 0.3,
@@ -205,17 +306,7 @@ def _scope_events():
         )
 
     events.append((0.4, {"type": "judge_start"}))
-    events.append(
-        (
-            1.2,
-            {
-                "type": "done",
-                "judgment": SCOPE_JUDGMENT,
-                "run_file": "out/runs/tokyo-population_fake.json",
-                "elapsed": 9.1,
-            },
-        )
-    )
+    events.append((1.2, {"type": "done", "judgment": judgment, "run_file": run_file, "elapsed": elapsed}))
     return events
 
 
@@ -304,7 +395,23 @@ def scenario_events(scenario):
     if scenario == "stall":
         return []
     if scenario == "scope":
-        return _scope_events()
+        return _run_events(
+            question=SCOPE_QUESTION,
+            sources=SCOPE_SOURCES,
+            relation_of=_scope_relation,
+            judgment=SCOPE_JUDGMENT,
+            run_file="out/runs/tokyo-population_fake.json",
+            elapsed=9.1,
+        )
+    if scenario == "dense":
+        return _run_events(
+            question=DENSE_QUESTION,
+            sources=DENSE_SOURCES,
+            relation_of=_dense_relation,
+            judgment=DENSE_JUDGMENT,
+            run_file="out/runs/tokyo-population-dense_fake.json",
+            elapsed=21.6,
+        )
     if scenario == "with-error":
         return _base_events(error_steps=("fetch", "pair"))
     if scenario == "shuffled":

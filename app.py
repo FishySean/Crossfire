@@ -181,21 +181,20 @@ def main():
     thread.start()
 
     url = f"http://{HOST}:{port}"
-    if wait_until_ready(port, server):
+    # Ctrl+C 在等待就绪期间也要走同一条收尾路径，否则会甩一段原始堆栈出来。
+    try:
+        if not wait_until_ready(port, server):
+            print(f"\n{READY_TIMEOUT_SECONDS:.0f} 秒内服务没有应答，已放弃等待。")
+            print(f"手动确认：`uv run uvicorn web.server:app --port {port}`，看它报什么错。")
+            return 1
+
         print(f"\n界面已就绪：{url}")
         print("  历史结果、实时运行都在这个页面上")
         print("  没有密钥时可以用 " + f"{url}/?fake=dense 彩排整条流程")
         print("  停止：按 Ctrl+C")
         if not args.no_browser:
             webbrowser.open(url)
-    else:
-        print(f"\n{READY_TIMEOUT_SECONDS:.0f} 秒内服务没有应答，已放弃等待。")
-        print(f"手动确认：`uv run uvicorn web.server:app --port {port}`，看它报什么错。")
-        server.should_exit = True
-        thread.join(timeout=5)
-        return 1
 
-    try:
         while thread.is_alive():
             thread.join(timeout=0.5)
     except KeyboardInterrupt:
@@ -208,4 +207,9 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        # 服务还没起来时按 Ctrl+C（自检、加载依赖阶段），也不该甩堆栈。
+        print("\n已取消。")
+        sys.exit(130)

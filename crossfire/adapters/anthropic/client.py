@@ -26,7 +26,7 @@ INVALID_STRUCTURE = (KeyError, TypeError, ValueError)
 
 @dataclass(frozen=True)
 class Structured[T]:
-    """一次结构化调用的结果。value 和 failure 恰好有一个非空；usage 累计了所有尝试。"""
+    """一次结构化调用的结果。value 和 failure 恰好有一个非空；usage 累计了所有尝试，含请求次数。"""
 
     value: T | None
     usage: Usage
@@ -69,13 +69,13 @@ class ClaudeClient:
             }
         ]
 
-        input_tokens = output_tokens = 0
+        input_tokens = output_tokens = requests = 0
         detail = ""
         raw = None
 
         for attempt in range(MAX_ATTEMPTS):
             text = prompt if attempt == 0 else prompt + RETRY_NOTE.format(error=detail, tool=TOOL_NAME)
-            message = self._create(
+            message, sent = self._create(
                 step,
                 model=self.model,
                 max_tokens=max_tokens,
@@ -83,6 +83,7 @@ class ClaudeClient:
                 tool_choice={"type": "tool", "name": TOOL_NAME},
                 messages=[{"role": "user", "content": text}],
             )
+            requests += sent
             input_tokens += message.usage.input_tokens
             output_tokens += message.usage.output_tokens
             raw = json.dumps([block.model_dump() for block in message.content], ensure_ascii=False, default=str)
@@ -98,7 +99,7 @@ class ClaudeClient:
                 except INVALID_STRUCTURE as e:
                     detail = f"返回的结构不合法：{type(e).__name__}: {e}"
                 else:
-                    return Structured(value=value, usage=Usage(input_tokens, output_tokens), failure=None)
+                    return Structured(value=value, usage=Usage(input_tokens, output_tokens, requests), failure=None)
 
             print(f"[llm] {step} 第 {attempt + 1}/{MAX_ATTEMPTS} 次调用失败：{detail}", file=sys.stderr)
 
@@ -107,12 +108,12 @@ class ClaudeClient:
         print(f"❌   原始输出：{raw}", file=sys.stderr)
         return Structured(
             value=None,
-            usage=Usage(input_tokens, output_tokens),
+            usage=Usage(input_tokens, output_tokens, requests),
             failure=Failure(step=step, detail=detail, raw=raw),
         )
 
-    def _create(self, step: str, **kwargs: Any) -> Any:
-        """只对超时和连接这类临时性网络错误重试。
+    def _create(self, step: str, **kwargs: Any) -> tuple[Any, int]:
+        """只对超时和连接这类临时性网络错误重试。返回响应和为它实际发出的请求数。
 
         APITimeoutError 继承自 APIConnectionError，所以捕获后者即可覆盖两者；
         RateLimitError、AuthenticationError、BadRequestError 都在 APIStatusError 分支上，
@@ -120,7 +121,7 @@ class ClaudeClient:
         """
         for attempt in range(NETWORK_RETRIES + 1):
             try:
-                return self._client.messages.create(**kwargs)
+                return self._client.messages.create(**kwargs), attempt + 1
             except APIConnectionError as e:
                 if attempt == NETWORK_RETRIES:
                     raise

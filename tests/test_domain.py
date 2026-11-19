@@ -16,6 +16,7 @@ import pytest
 
 from crossfire.domain import (
     Claim,
+    Failure,
     Judgment,
     Mode,
     Page,
@@ -204,7 +205,9 @@ def test_entities_are_immutable():
 
 # ---- 序列化：键名和结构与现有结果文件逐字一致 ----
 
-USAGE = {"input_tokens": 10, "output_tokens": 2}
+# requests 是第 3 步新加的键：实际发出的请求数。失败的记录都重试过一次，所以是 2。
+USAGE = {"input_tokens": 10, "output_tokens": 2, "requests": 1}
+RETRIED = {"input_tokens": 10, "output_tokens": 2, "requests": 2}
 FAILURE = {"step": "pair", "detail": "输出被 max_tokens=1000 截断", "raw": "[]"}
 CLAIM = {
     "url": "https://a.example/",
@@ -224,11 +227,11 @@ FAILED_CLAIM = {
     "source_type": None,
     "confidence": None,
     "published_date": None,
-    "usage": USAGE,
+    "usage": RETRIED,
     "failure": {**FAILURE, "step": "extract"},
 }
 PAIR = {"a": "https://a.example/", "b": "https://c.example/", "relation": "agree", "nature": "粒度不同", "usage": USAGE}
-FAILED_PAIR = {**PAIR, "relation": None, "nature": None, "failure": FAILURE}
+FAILED_PAIR = {**PAIR, "relation": None, "nature": None, "usage": RETRIED, "failure": FAILURE}
 JUDGMENT = {
     "answer": "3.14.7",
     "confidence": 0.9,
@@ -246,6 +249,7 @@ PAGE = {
     "error": None,
     "status_code": 200,
 }
+FETCH_FAILURE = {"step": "fetch", "detail": "HTTP 503", "raw": None}
 RUN = {
     "question_id": "q",
     "question": "?",
@@ -255,17 +259,21 @@ RUN = {
     "sources": [{"url": s.url, "tier": s.tier.value} for s in QUESTION.sources],
     "pages_fetched": 2,
     "pages_failed": 1,
-    "claude_calls": 4,
-    "failures": [FAILED_CLAIM["failure"], FAILURE],
+    "claude_calls": 6,
+    "failures": [FETCH_FAILURE, FAILED_CLAIM["failure"], FAILURE],
     "steps": {
         "fetch": {"calls": 3, "seconds": 1.0},
-        "extract": {"calls": 2, "input_tokens": 20, "output_tokens": 4, "seconds": 2.0},
-        "pair": {"calls": 1, "input_tokens": 10, "output_tokens": 2, "seconds": 3.0},
-        "judge": {"calls": 1, "input_tokens": 10, "output_tokens": 2, "seconds": 4.0},
+        "extract": {"calls": 2, "input_tokens": 20, "output_tokens": 4, "seconds": 2.0, "requests": 3},
+        "pair": {"calls": 1, "input_tokens": 10, "output_tokens": 2, "seconds": 3.0, "requests": 2},
+        "judge": {"calls": 1, "input_tokens": 10, "output_tokens": 2, "seconds": 4.0, "requests": 1},
     },
     "total_input_tokens": 40,
     "total_output_tokens": 8,
-    "pages": [PAGE, {**PAGE, "url": "https://b.example/"}, {**PAGE, "url": "https://c.example/", "ok": False}],
+    "pages": [
+        PAGE,
+        {**PAGE, "url": "https://b.example/"},
+        {**PAGE, "url": "https://c.example/", "ok": False, "error": "HTTP 503"},
+    ],
     "claims": [CLAIM, FAILED_CLAIM],
     "pairs": [FAILED_PAIR],
     "judgment": JUDGMENT,
@@ -317,13 +325,56 @@ def test_run_result_derived_fields():
     assert run.total_input_tokens == 40
 
 
-def test_locked_failures_exclude_fetch_failures():
-    """锁住现状：有一页抓取失败，failures 里却只有 LLM 的失败。backlog 最高优先级那条。"""
+def test_failures_include_fetch_failures():
     run = RunResult.from_dict(RUN)
     assert run.pages_failed == 1
-    assert {failure.step for failure in run.failures} == {"extract", "pair"}
+    # 第 3 步有意修改：failures 只有 LLM 的失败 {"extract", "pair"} → 抓取失败也以 step="fetch" 排在最前，
+    # 原因：backlog「【最高优先级】抓取失败不进 failures」
+    assert [failure.step for failure in run.failures] == ["fetch", "extract", "pair"]
+    assert run.failures[0] == Failure(step="fetch", detail="HTTP 503", raw=None)
 
 
-def test_locked_claude_calls_ignores_retries():
-    """锁住现状：claude_calls 只是条数之和加一，不含任何重试。"""
-    assert RunResult.from_dict(RUN).claude_calls == len(RUN["claims"]) + len(RUN["pairs"]) + 1
+def test_every_failed_page_is_a_failure_even_without_an_error_message():
+    pages = [{**PAGE, "url": url, "ok": False, "error": None} for url in ("https://a.example/", "https://b.example/")]
+    run = RunResult.from_dict({**RUN, "pages": pages, "claims": [], "pairs": [], "judgment": JUDGMENT})
+    assert [(f.step, f.raw) for f in run.failures] == [("fetch", None), ("fetch", None)]
+    assert all(f.detail for f in run.failures)
+
+
+def test_claude_calls_counts_every_request_including_retries():
+    # 第 3 步有意修改：claude_calls == 条数之和 + 1 → 各记录 usage.requests 之和（1 + 2 + 2 + 1），
+    # 原因：backlog「claude_calls 少算重试」
+    assert RunResult.from_dict(RUN).claude_calls == 6
+    assert RunResult.from_dict(RUN).steps["extract"].requests == 3
+
+
+@pytest.mark.parametrize(
+    ("entity", "data", "key", "value"),
+    [
+        (Claim, CLAIM, "confidence", "0.9"),
+        (Claim, CLAIM, "confidence", True),
+        (Claim, CLAIM, "claim", 3.14),
+        (Claim, CLAIM, "published_date", 20260901),
+        (Judgment, JUDGMENT, "confidence", "0.9"),
+        (Judgment, JUDGMENT, "answer", 1.0),
+        (Pair, PAIR, "nature", ["粒度不同"]),
+        (Page, PAGE, "ok", "true"),
+        (Page, PAGE, "status_code", "200"),
+    ],
+    ids=lambda v: v if isinstance(v, str) else None,
+)
+def test_scalars_of_the_wrong_type_are_rejected(entity, data, key, value):
+    with pytest.raises(TypeError, match=key):
+        entity.from_dict({**data, key: value})
+
+
+def test_usage_requests_must_be_an_integer():
+    with pytest.raises(TypeError, match="requests"):
+        Claim.from_dict({**CLAIM, "usage": {**USAGE, "requests": "1"}})
+    with pytest.raises(KeyError):
+        Claim.from_dict({**CLAIM, "usage": {"input_tokens": 10, "output_tokens": 2}})
+
+
+def test_integer_confidence_is_kept_as_is():
+    """真实结果文件里有整数 1 的 confidence。"""
+    assert Claim.from_dict({**CLAIM, "confidence": 1}).to_dict()["confidence"] == 1

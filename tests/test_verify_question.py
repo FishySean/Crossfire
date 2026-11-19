@@ -1,6 +1,7 @@
 """VerifyQuestion 用例：全部依赖都是 tests/fakes.py 里的假实现，时钟也是假的，不碰文件、线程、网络。"""
 
 from collections.abc import Sequence
+from dataclasses import replace
 
 import pytest
 
@@ -8,7 +9,7 @@ import crossfire.pipeline as pipeline
 from crossfire.application.events import Done, Error
 from crossfire.application.records import run_record
 from crossfire.application.use_cases import VerifyQuestion
-from crossfire.domain import Claim, Judgment, Mode, Pair, Question
+from crossfire.domain import Claim, Judgment, Mode, Pair, Question, Usage
 from tests.fakes import (
     CallLog,
     FakeClock,
@@ -138,6 +139,11 @@ def test_same_record_and_events_as_pipeline_run_apart_from_timing(build, monkeyp
     use_case, parts = build(fetcher=FakeFetcher(failing_urls=failing))
     new = run_record(use_case.execute(QUESTION))
 
+    # 旧 pipeline 还没有第 3 步的两处修复，按修复的内容把它补上再比：抓取失败进 failures，LLM 步骤多一个 requests。
+    fetch_failures = [{"step": "fetch", "detail": p["error"], "raw": None} for p in old["pages"] if not p["ok"]]
+    old = {**old, "failures": fetch_failures + old["failures"]}
+    for name in ("extract", "pair", "judge"):
+        old["steps"][name]["requests"] = old["steps"][name]["calls"]
     assert _without_timing(new) == _without_timing(old)
     new_events = [event.to_dict() for event in parts["events"].events]
     untimed = {"run_file", "elapsed"}
@@ -153,3 +159,52 @@ def test_step_stats(build):
     assert {name: stats.calls for name, stats in steps.items()} == {"fetch": 4, "extract": 4, "pair": 6, "judge": 1}
     assert steps["fetch"].input_tokens is None
     assert (steps["pair"].input_tokens, steps["pair"].output_tokens) == (60, 12)
+
+
+EIGHT = Question.from_dict(
+    {
+        "id": "eight",
+        "question": "当前版本是多少？",
+        "sources": [{"url": f"https://s{i}.example/", "tier": "news"} for i in range(8)],
+    }
+)
+
+
+def test_eight_sources_three_fetch_failures_give_exactly_three_fetch_failures(build):
+    failing = {"https://s1.example/", "https://s4.example/", "https://s6.example/"}
+    use_case, _ = build(fetcher=FakeFetcher(failing_urls=failing))
+    result = use_case.execute(EIGHT)
+
+    fetch_failures = [f for f in result.failures if f.step == "fetch"]
+    assert len(fetch_failures) == 3
+    assert [f.detail for f in fetch_failures] == [f"假的抓取失败 {url}" for url in sorted(failing)]
+    assert all(f.raw is None for f in fetch_failures)
+    assert len(result.failures) == 3
+    assert result.to_dict()["failures"] == [f.to_dict() for f in fetch_failures]
+
+
+def test_all_pages_failing_is_still_loud(build):
+    use_case, _ = build(fetcher=FakeFetcher(failing_urls=set(URLS)))
+    result = use_case.execute(QUESTION)
+
+    assert result.claims == () and result.pairs == ()
+    assert [f.step for f in result.failures] == ["fetch"] * 4
+
+
+class RetryingExtractor(FakeExtractor):
+    """第一个来源的提取重试过一次：两次请求。"""
+
+    def extract(self, question, page):
+        claim = super().extract(question, page)
+        if page.url == URLS[0]:
+            return replace(claim, usage=Usage(20, 4, requests=2))
+        return claim
+
+
+def test_claude_calls_counts_retried_requests(build):
+    _, parts = build()
+    result = VerifyQuestion(**{**parts, "extractor": RetryingExtractor(CallLog())}).execute(QUESTION)
+
+    assert result.claude_calls == 4 + 6 + 1 + 1
+    assert result.steps["extract"].calls == 4
+    assert result.steps["extract"].requests == 5

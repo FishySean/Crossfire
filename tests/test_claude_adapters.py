@@ -76,7 +76,7 @@ def claim(url, text, tier=Tier.PRIMARY):
         source_type=None,
         published_date=None,
         confidence=0.9,
-        usage=Usage(0, 0),
+        usage=Usage(0, 0, 0),
     )
 
 
@@ -91,7 +91,8 @@ def test_judge_retries_when_conflicts_come_back_as_a_string():
     assert judgment.conflicts == ("时间不同",)
     assert len(messages.prompts) == 2
     assert "conflicts 应为数组" in messages.prompts[1]
-    assert judgment.usage == Usage(20, 4)
+    # 第 3 步有意修改：Usage(输入, 输出) → Usage(输入, 输出, 请求数)，原因：backlog「claude_calls 少算重试」
+    assert judgment.usage == Usage(20, 4, 2)
 
 
 def test_judge_reports_failure_when_conflicts_stay_a_string(capsys):
@@ -138,7 +139,8 @@ def test_extractor_keeps_the_page_url_and_source_tier_even_if_the_model_echoes_o
     result = ClaudeClaimExtractor(client).extract(QUESTION, page)
 
     assert (result.source_url, result.tier, result.text) == ("https://b.example/", Tier.NEWS, "1.0")
-    assert result.usage == Usage(10, 2)
+    # 第 3 步有意修改：Usage(输入, 输出) → Usage(输入, 输出, 请求数)，原因：backlog「claude_calls 少算重试」
+    assert result.usage == Usage(10, 2, 1)
 
 
 def test_extractor_failure_is_an_unanswered_claim_with_failure():
@@ -149,7 +151,8 @@ def test_extractor_failure_is_an_unanswered_claim_with_failure():
 
     assert result.text is None and result.failure is not None
     assert result.failure.step == "extract"
-    assert result.usage == Usage(20, 4)
+    # 第 3 步有意修改：Usage(输入, 输出) → Usage(输入, 输出, 请求数)，原因：backlog「claude_calls 少算重试」
+    assert result.usage == Usage(20, 4, 2)
 
 
 # ---- 批量比对 ----

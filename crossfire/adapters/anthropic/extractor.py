@@ -55,7 +55,7 @@ EXTRACT_SCHEMA: dict[str, Any] = {
     "required": ["claim", "evidence", "source_type", "confidence", "published_date"],
 }
 
-_NO_USAGE = {"input_tokens": 0, "output_tokens": 0}
+_NO_USAGE = {"input_tokens": 0, "output_tokens": 0, "requests": 0}
 
 
 class ClaudeClaimExtractor:

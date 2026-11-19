@@ -69,7 +69,7 @@ JUDGE_SCHEMA: dict[str, Any] = {
     "required": ["answer", "confidence", "reasoning", "conflicts", "trusted_sources"],
 }
 
-_NO_USAGE = {"input_tokens": 0, "output_tokens": 0}
+_NO_USAGE = {"input_tokens": 0, "output_tokens": 0, "requests": 0}
 
 
 def _parse(data: dict[str, Any]) -> Judgment:

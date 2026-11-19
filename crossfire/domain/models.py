@@ -4,7 +4,7 @@ to_dict/from_dict 放在实体上，是因为字段名和 JSON 键名并不一�
 "claim"，Pair.a_url 叫 "a"），而这些键名是前端和 out/runs/*.json 依赖的对外契约。映射和字段写在
 同一处，改字段时才不会漏改键名。转成字符串、读写文件是外层的事，这里不碰 json。
 
-from_dict 读的是本项目自己写出的结构，键缺失或枚举值不认识都直接抛错，不做兜底。
+from_dict 读的是本项目自己写出的结构，键缺失、枚举值不认识、标量类型不对都直接抛错，不做兜底。
 """
 
 from collections.abc import Sequence
@@ -43,8 +43,54 @@ class SourceType(StrEnum):
     OTHER = "other"
 
 
-def _optional[E: StrEnum](enum: type[E], value: str | None) -> E | None:
-    return None if value is None else enum(value)
+# 下面这组 _xxx(value, key) 校验标量类型，不做任何转换：类型不对就抛 TypeError。
+# 模型输出也走 from_dict，"0.9" 这样的字符串 confidence 混进去，前端算百分比会得到 NaN。
+# bool 是 int 的子类，必须单独排除，否则 true 会被当成数字 1 放行。
+
+
+def _type_error(key: str, expected: str, value: object) -> TypeError:
+    return TypeError(f"{key} 应为{expected}，实际是 {type(value).__name__}：{str(value)[:80]}")
+
+
+def _str(value: object, key: str) -> str:
+    if not isinstance(value, str):
+        raise _type_error(key, "字符串", value)
+    return value
+
+
+def _optional_str(value: object, key: str) -> str | None:
+    return None if value is None else _str(value, key)
+
+
+def _bool(value: object, key: str) -> bool:
+    if not isinstance(value, bool):
+        raise _type_error(key, "布尔值", value)
+    return value
+
+
+def _int(value: object, key: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise _type_error(key, "整数", value)
+    return value
+
+
+def _optional_int(value: object, key: str) -> int | None:
+    return None if value is None else _int(value, key)
+
+
+def _number(value: object, key: str) -> float:
+    # 不转成 float：真实结果文件里有整数 1 的 confidence，原样读回才能保证写出去的文件不变。
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise _type_error(key, "数字", value)
+    return value
+
+
+def _optional_number(value: object, key: str) -> float | None:
+    return None if value is None else _number(value, key)
+
+
+def _optional[E: StrEnum](enum: type[E], value: object, key: str) -> E | None:
+    return None if value is None else enum(_str(value, key))
 
 
 class UnknownSourceError(KeyError):
@@ -61,7 +107,7 @@ class Source:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
-        return cls(url=data["url"], tier=Tier(data["tier"]))
+        return cls(url=_str(data["url"], "url"), tier=Tier(_str(data["tier"], "tier")))
 
 
 @dataclass(frozen=True)
@@ -92,30 +138,42 @@ class Question:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
-            id=data["id"],
-            text=data["question"],
+            id=_str(data["id"], "id"),
+            text=_str(data["question"], "question"),
             sources=tuple(Source.from_dict(s) for s in data["sources"]),
         )
 
 
 @dataclass(frozen=True)
 class Usage:
-    """一个步骤的 token 用量，包含该步骤内部所有重试的累计。"""
+    """一条记录背后的用量，包含所有重试的累计。
+
+    requests 是实际发出的 API 请求数，结构化重试和网络重试都算在内，所以它可能大于 1。
+    不调 LLM 的实现（比如本地 NLI 模型）记 0。
+    """
 
     input_tokens: int
     output_tokens: int
+    requests: int
 
     def to_dict(self) -> dict[str, Any]:
-        return {"input_tokens": self.input_tokens, "output_tokens": self.output_tokens}
+        return {"input_tokens": self.input_tokens, "output_tokens": self.output_tokens, "requests": self.requests}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
-        return cls(input_tokens=data["input_tokens"], output_tokens=data["output_tokens"])
+        return cls(
+            input_tokens=_int(data["input_tokens"], "input_tokens"),
+            output_tokens=_int(data["output_tokens"], "output_tokens"),
+            requests=_int(data["requests"], "requests"),
+        )
 
 
 @dataclass(frozen=True)
 class Failure:
-    """一次 LLM 步骤在重试后仍然失败。raw 是最后一次的原始响应，供人排查。"""
+    """一个步骤失败了：抓取失败，或者 LLM 调用重试后仍然失败。
+
+    raw 是 LLM 最后一次的原始响应，供人排查；抓取失败没有模型响应，raw 为 None。
+    """
 
     step: str
     detail: str
@@ -126,7 +184,11 @@ class Failure:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
-        return cls(step=data["step"], detail=data["detail"], raw=data["raw"])
+        return cls(
+            step=_str(data["step"], "step"),
+            detail=_str(data["detail"], "detail"),
+            raw=_optional_str(data["raw"], "raw"),
+        )
 
 
 def _string_list(data: dict[str, Any], key: str) -> tuple[str, ...]:
@@ -189,13 +251,16 @@ class Page:
         # 只有 url 和 ok 必填：抓取失败、缓存缺失、手写的测试页面都会缺其余字段。
         # usable / unusable_reason 这类派生键直接忽略，需要时用 usability 重新算。
         return cls(
-            url=data["url"],
-            ok=data["ok"],
-            title=data.get("title"),
-            markdown=data.get("markdown"),
-            links=tuple(Link(text=link["text"], url=link["url"]) for link in data.get("links") or ()),
-            error=data.get("error"),
-            status_code=data.get("status_code"),
+            url=_str(data["url"], "url"),
+            ok=_bool(data["ok"], "ok"),
+            title=_optional_str(data.get("title"), "title"),
+            markdown=_optional_str(data.get("markdown"), "markdown"),
+            links=tuple(
+                Link(text=_str(link["text"], "links.text"), url=_str(link["url"], "links.url"))
+                for link in data.get("links") or ()
+            ),
+            error=_optional_str(data.get("error"), "error"),
+            status_code=_optional_int(data.get("status_code"), "status_code"),
         )
 
 
@@ -240,13 +305,13 @@ class Claim:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
-            source_url=data["url"],
-            tier=Tier(data["tier"]),
-            text=data["claim"],
-            evidence=data["evidence"],
-            source_type=_optional(SourceType, data["source_type"]),
-            published_date=data["published_date"],
-            confidence=data["confidence"],
+            source_url=_str(data["url"], "url"),
+            tier=Tier(_str(data["tier"], "tier")),
+            text=_optional_str(data["claim"], "claim"),
+            evidence=_optional_str(data["evidence"], "evidence"),
+            source_type=_optional(SourceType, data["source_type"], "source_type"),
+            published_date=_optional_str(data["published_date"], "published_date"),
+            confidence=_optional_number(data["confidence"], "confidence"),
             usage=Usage.from_dict(data["usage"]),
             failure=_failure_from(data),
         )
@@ -278,10 +343,10 @@ class Pair:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
-            a_url=data["a"],
-            b_url=data["b"],
-            relation=_optional(Relation, data["relation"]),
-            nature=data["nature"],
+            a_url=_str(data["a"], "a"),
+            b_url=_str(data["b"], "b"),
+            relation=_optional(Relation, data["relation"], "relation"),
+            nature=_optional_str(data["nature"], "nature"),
             usage=Usage.from_dict(data["usage"]),
             failure=_failure_from(data),
         )
@@ -319,9 +384,9 @@ class Judgment:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
-            answer=data["answer"],
-            confidence=data["confidence"],
-            reasoning=data["reasoning"],
+            answer=_optional_str(data["answer"], "answer"),
+            confidence=_optional_number(data["confidence"], "confidence"),
+            reasoning=_optional_str(data["reasoning"], "reasoning"),
             conflicts=_string_list(data, "conflicts"),
             trusted_sources=_string_list(data, "trusted_sources"),
             usage=Usage.from_dict(data["usage"]),
@@ -333,14 +398,16 @@ class Judgment:
 class StepStats:
     """一个步骤的耗时和用量。
 
-    calls 是这一步产出的记录条数，不是实际发出的 API 请求数（重试不计入）。
-    fetch 步骤不调 LLM，input_tokens / output_tokens 为 None，写出时省略这两个键。
+    calls 是这一步产出的记录条数，requests 是这一步实际发出的 API 请求数（含两层重试）。
+    calls 这个键名早就写进了结果文件，含义不能改，所以请求数另起一个键 requests。
+    fetch 步骤不调 LLM，input_tokens / output_tokens / requests 为 None，写出时省略这三个键。
     """
 
     calls: int
     seconds: float
     input_tokens: int | None = None
     output_tokens: int | None = None
+    requests: int | None = None
 
     @classmethod
     def summing(cls, usages: Sequence[Usage], seconds: float) -> Self:
@@ -350,6 +417,7 @@ class StepStats:
             seconds=seconds,
             input_tokens=sum(usage.input_tokens for usage in usages),
             output_tokens=sum(usage.output_tokens for usage in usages),
+            requests=sum(usage.requests for usage in usages),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -360,15 +428,20 @@ class StepStats:
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "seconds": self.seconds,
+            "requests": self.requests,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
+        calls, seconds = _int(data["calls"], "calls"), _number(data["seconds"], "seconds")
+        if "input_tokens" not in data:
+            return cls(calls=calls, seconds=seconds)
         return cls(
-            calls=data["calls"],
-            seconds=data["seconds"],
-            input_tokens=data.get("input_tokens"),
-            output_tokens=data.get("output_tokens"),
+            calls=calls,
+            seconds=seconds,
+            input_tokens=_int(data["input_tokens"], "input_tokens"),
+            output_tokens=_int(data["output_tokens"], "output_tokens"),
+            requests=_int(data["requests"], "requests"),
         )
 
 
@@ -377,8 +450,7 @@ class RunResult:
     """跑完一次的完整结果，对应 out/runs/*.json 的一个文件。
 
     pages_fetched、failures、token 总数等都由已有字段推出，做成属性而不是字段，
-    避免存一份可能对不上的副本。claude_calls 和 failures 照搬了当前的算法，
-    两者都有已登记的问题（见 notes/refactor-backlog.md），修的时候改这里一处。
+    避免存一份可能对不上的副本。
     """
 
     question: Question
@@ -401,12 +473,19 @@ class RunResult:
 
     @property
     def claude_calls(self) -> int:
-        return len(self.claims) + len(self.pairs) + 1
+        """实际发出的请求数，含重试。名字是历史遗留：EqualityPairer 这类不调 Claude 的实现记 0 次。"""
+        return sum(record.usage.requests for record in [*self.claims, *self.pairs, self.judgment])
 
     @property
     def failures(self) -> tuple[Failure, ...]:
+        """所有失败，抓取失败在前。哪怕所有页面全挂了、一次 LLM 都没调，这里也不会是空的。"""
+        fetch_failures = [
+            Failure(step="fetch", detail=page.error or "抓取失败，没有错误信息", raw=None)
+            for page in self.pages
+            if not page.ok
+        ]
         records = [*self.claims, *self.pairs, self.judgment]
-        return tuple(record.failure for record in records if record.failure is not None)
+        return (*fetch_failures, *(record.failure for record in records if record.failure is not None))
 
     @property
     def total_input_tokens(self) -> int:
@@ -441,13 +520,13 @@ class RunResult:
     def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
             question=Question(
-                id=data["question_id"],
-                text=data["question"],
+                id=_str(data["question_id"], "question_id"),
+                text=_str(data["question"], "question"),
                 sources=tuple(Source.from_dict(s) for s in data["sources"]),
             ),
-            mode=Mode(data["mode"]),
-            started_at=datetime.fromisoformat(data["started_at"]),
-            elapsed_seconds=data["elapsed_seconds"],
+            mode=Mode(_str(data["mode"], "mode")),
+            started_at=datetime.fromisoformat(_str(data["started_at"], "started_at")),
+            elapsed_seconds=_number(data["elapsed_seconds"], "elapsed_seconds"),
             steps={name: StepStats.from_dict(step) for name, step in data["steps"].items()},
             pages=tuple(Page.from_dict(page) for page in data["pages"]),
             claims=tuple(Claim.from_dict(claim) for claim in data["claims"]),

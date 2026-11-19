@@ -96,7 +96,7 @@ def print_report(result: dict) -> None:
     print(f"完整结果：{result['output_path']}")
 
     if result["failures"]:
-        print(f"\n⚠️  本次有 {len(result['failures'])} 次调用解析失败，结果可能不完整")
+        print(f"\n⚠️  本次有 {len(result['failures'])} 处失败，结果可能不完整")
         for failure in result["failures"]:
             print(f"  - [{failure['step']}] {failure['detail']}")
 

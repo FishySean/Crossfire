@@ -110,7 +110,7 @@ PAIR_SCHEMA: dict[str, Any] = {
     "required": ["relation", "nature"],
 }
 
-_NO_USAGE = {"input_tokens": 0, "output_tokens": 0}
+_NO_USAGE = {"input_tokens": 0, "output_tokens": 0, "requests": 0}
 
 
 class ClaudeClaimPairer:
@@ -174,7 +174,8 @@ class ClaudeClaimPairer:
                 b_url=b.source_url,
                 relation=None,
                 nature=None,
-                usage=Usage(0, 0),
+                # 异常带不出已经发出去的请求数（网络重试用尽时其实发了 3 次），只能记 0，claude_calls 会少算。
+                usage=Usage(0, 0, 0),
                 failure=Failure(step="pair", detail=detail, raw=None),
             )
         if call.value is not None:

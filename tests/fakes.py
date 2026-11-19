@@ -36,7 +36,7 @@ from crossfire.domain import (
     Usage,
 )
 
-USAGE = Usage(input_tokens=10, output_tokens=2)
+USAGE = Usage(input_tokens=10, output_tokens=2, requests=1)
 PROSE = "This sentence is ordinary article prose that is long enough to count here.\n" * 20
 
 
@@ -148,7 +148,7 @@ class EqualityPairer:
                 b.source_url,
                 Relation.AGREE if a.text == b.text else Relation.CONTRADICT,
                 "文字相同" if a.text == b.text else "文字不同",
-                Usage(0, 0),
+                Usage(0, 0, 0),
             )
             for a, b in claim_pairs
         ]

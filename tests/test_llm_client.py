@@ -59,7 +59,8 @@ def _as_legacy_shape(call):
     def call_structured(prompt, schema, step, max_tokens=1000):
         result = call(prompt, schema, step, parse=lambda data: data, max_tokens=max_tokens)
         shaped = dict(result.value or {})
-        shaped["_usage"] = result.usage.to_dict()
+        # call_structured 的 _usage 只有两个 token 键；请求数是第 3 步加的，单独在下面的测试里验。
+        shaped["_usage"] = {"input_tokens": result.usage.input_tokens, "output_tokens": result.usage.output_tokens}
         if result.failure is not None:
             shaped["_failure"] = result.failure.to_dict()
         return shaped
@@ -164,3 +165,32 @@ def test_usage_accumulates_across_attempts(structured):
 def test_usage_of_a_failed_call_is_still_reported(structured):
     call, _, _ = structured([text_message(input_tokens=5, output_tokens=1), text_message(input_tokens=6, output_tokens=1)])
     assert call("问题", SCHEMA, "pair")["_usage"] == {"input_tokens": 11, "output_tokens": 2}
+
+
+# ---- 请求次数：两层重试都要算进去 ----
+
+
+def _requests(script):
+    messages = ScriptedMessages(script)
+    client = ClaudeClient(client=SimpleNamespace(messages=messages), sleep=lambda delay: None)
+    result = client.call("问题", SCHEMA, "pair", parse=lambda data: data)
+    assert result.usage.requests == len(messages.prompts), "requests 必须等于真正调用 messages.create 的次数"
+    return result.usage.requests
+
+
+def test_one_clean_call_is_one_request():
+    assert _requests([tool_message({"x": 1})]) == 1
+
+
+def test_network_retries_count_as_requests():
+    error = anthropic.APITimeoutError(request=REQUEST)
+    assert _requests([error, error, tool_message({"x": 1})]) == 3
+
+
+def test_structural_retry_counts_as_a_request():
+    assert _requests([text_message(), tool_message({"x": 1})]) == 2
+
+
+def test_both_layers_add_up_even_when_the_call_finally_fails():
+    error = anthropic.APIConnectionError(request=REQUEST)
+    assert _requests([error, text_message(), error, error, text_message()]) == 5

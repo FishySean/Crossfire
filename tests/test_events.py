@@ -16,7 +16,7 @@ from crossfire.application.events import (
 from crossfire.domain import Judgment, Usage
 from tests.test_pipeline_contract import EVENT_FIELDS
 
-JUDGMENT = Judgment("1.0", 0.9, "一手源", (), ("https://a.example/",), Usage(10, 2))
+JUDGMENT = Judgment("1.0", 0.9, "一手源", (), ("https://a.example/",), Usage(10, 2, 1))
 
 # 键的顺序照着改造前 pipeline.run 里各个 dict 字面量的写法手抄，不要改成从代码里反推。
 EXPECTED = [

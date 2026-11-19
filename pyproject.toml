@@ -16,6 +16,9 @@ dependencies = [
     "uvicorn>=0.32.0",
 ]
 
+[project.scripts]
+crossfire = "crossfire.cli:main"
+
 [dependency-groups]
 dev = [
     "pyright[nodejs]>=1.1.414",

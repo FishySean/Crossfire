@@ -85,9 +85,6 @@ NOT_YET_MIGRATED = {
     "crossfire/reconcile.py",
     "crossfire/steel_client.py",
     "crossfire/adapters/steel/legacy.py",
-    "scripts/verify.py",
-    "scripts/prefetch.py",
-    "scripts/probe.py",
     "web/server.py",
     "app.py",
 }

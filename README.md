@@ -1,20 +1,41 @@
 # Crossfire
 
-查证引擎（hackathon）。当前阶段：验证并封装 [Steel.dev](https://steel.dev) 云端浏览器抓取。
+查证引擎（hackathon）：用 [Steel.dev](https://steel.dev) 云端浏览器抓取多个来源，让 Claude 逐页提取主张、
+两两比对找矛盾，最后给出带置信度的结论。
 
-## 本地结果查看器
-
-只读渲染 `out/runs/*.json`，不做任何抓取或模型调用。
+## 配置
 
 ```bash
 uv sync
+cp .env.example .env   # 填 ANTHROPIC_API_KEY 和 STEEL_API_KEY，其余设置都有默认值，见 .env.example 里的注释
+```
+
+只有 `crossfire/config.py` 读 `.env` 和环境变量；同名环境变量优先于文件。
+
+## 命令行
+
+```bash
+uv run crossfire verify --question python-latest-version --mode cached   # 页面读缓存，Claude 真跑
+uv run crossfire verify --question python-latest-version                 # 默认 --mode live，实时抓取
+uv run crossfire verify --all --mode cached
+uv run crossfire prefetch --question python-latest-version               # 实时抓一遍存进 out/cache/
+uv run crossfire prefetch --all
+```
+
+`verify --mode cached` 只要 `ANTHROPIC_API_KEY`；`prefetch` 只要 `STEEL_API_KEY`；`live` 两个都要。
+缺 key 时在开始运行之前报错，说明缺哪个、去哪里设置。结果写进 `out/runs/`。
+
+## 本地结果查看器
+
+渲染 `out/runs/*.json`，也可以在页面上发起一次查证（SSE 推送进度）。
+
+```bash
 python app.py            # 自检 → 选端口 → 就绪后自动开浏览器（uv 环境里用 uv run python app.py）
 python app.py --no-browser
 ```
 
-`app.py` 会在启动前检查工作目录（不在项目根目录会自动切过去）、`.env` 里的
-`ANTHROPIC_API_KEY` / `STEEL_API_KEY`、依赖、以及 `out/cache/` 里有没有抓取缓存，
-并从 8765 开始挑一个没被占用的端口（最多试到 8775）。
+`app.py` 会在启动前检查工作目录（不在项目根目录会自动切过去）、`.env` 里的 key、依赖、
+以及 `out/cache/` 里有没有抓取缓存，并从 8765 开始挑一个没被占用的端口（最多试到 8775）。
 
 进阶：自己控制参数时直接起 uvicorn。
 
@@ -26,14 +47,14 @@ uv run uvicorn web.server:app --reload --port 8765
 
 ## 页面可用性判断
 
-`crossfire.steel_client.is_usable_page(result) -> (usable, reason)` 识别 “HTTP 200 但内容废掉” 的页面：
+`crossfire.domain.usability.is_usable_page(page) -> (usable, reason)` 识别 “HTTP 200 但内容废掉” 的页面：
 反爬软屏蔽（`too_short`）、软 404（`error_page_title`）、数据中心 IP 只拿到导航骨架页（`nav_skeleton`）、
 以及抓取本身失败（`fetch_failed`）和空内容（`empty_content`）。阈值是模块级常量，直接改即可。
 
-`fetch_page` / `fetch_pages` / `fetch_live` 的返回 dict 会带上 `usable` 与 `unusable_reason`，
-只做标记，是否跳过由调用方决定。
+## 测试和开发工具
 
 ```bash
-uv run pytest                                  # 离线跑，使用 tests/fixtures/pages 下的抓取快照
-uv run python scripts/capture_page_fixtures.py # 需要联网，重新采集快照
+uv run pytest                                  # 离线跑：零网络、零 API key
+uv run python scripts/capture_page_fixtures.py # 需要联网，重新采集 tests/fixtures/pages 下的快照
+uv run python scripts/probe.py --test 1        # Steel 可用性探测，需要 STEEL_API_KEY
 ```

@@ -94,7 +94,7 @@ class SteelPageFetcher:
 
 
 class CachedPageFetcher:
-    """从 scripts/prefetch.py 写下的磁盘缓存读页面，不碰网络。缓存缺失的 URL 返回 ok=False 的页面。"""
+    """从 crossfire prefetch 写下的磁盘缓存读页面，不碰网络。缓存缺失的 URL 返回 ok=False 的页面。"""
 
     mode = Mode.CACHED
 

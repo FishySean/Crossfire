@@ -2,41 +2,39 @@
 """Steel.dev 可用性探测：基础抓取 / 内容格式对比 / 并发 session 上限。"""
 
 import argparse
-import os
 import traceback
-from pathlib import Path
 
-from dotenv import load_dotenv
 from steel import Steel
 
-from crossfire.steel_client import fetch_page
-
-ROOT = Path(__file__).resolve().parents[1]
-load_dotenv(ROOT / ".env")
+from crossfire.composition import build_fetcher
+from crossfire.config import ROOT, Key, Settings
+from crossfire.domain import Mode, Question
 
 DEFAULT_URL = "https://news.ycombinator.com"
 
 
-def test_1(url: str) -> None:
+def test_1(settings: Settings, url: str) -> None:
+    """走正式的抓取实现（含 429 退避），和 verify --mode live 用的是同一个。"""
     print("=== 测试 1：基础抓取 ===")
     print(f"URL: {url}")
-    result = fetch_page(url)
-    print(f"ok: {result['ok']}")
-    print(f"status_code: {result.get('status_code')}")
-    if not result["ok"]:
-        print(f"error:\n{result['error']}")
+    probe = Question.from_dict({"id": "probe", "question": "probe", "sources": [{"url": url, "tier": "primary"}]})
+    [page] = build_fetcher(settings, probe, Mode.LIVE).fetch_all([url])
+    print(f"ok: {page.ok}")
+    print(f"status_code: {page.status_code}")
+    if not page.ok:
+        print(f"error:\n{page.error}")
         return
-    print(f"title: {result['title']}")
-    md = result["markdown"] or ""
+    print(f"title: {page.title}")
+    md = page.markdown or ""
     print(f"markdown preview ({min(500, len(md))} / {len(md)} chars):")
     print(md[:500])
-    print(f"links: {len(result['links'])}")
+    print(f"links: {len(page.links)}")
 
 
-def test_2(url: str) -> None:
+def test_2(settings: Settings, url: str) -> None:
     print("=== 测试 2：内容质量对比 ===")
     print(f"URL: {url}")
-    client = Steel(steel_api_key=os.environ.get("STEEL_API_KEY"))
+    client = Steel(steel_api_key=settings.steel_api_key)
     result = client.scrape(
         url=url,
         format=["markdown", "cleaned_html", "readability"],
@@ -59,10 +57,10 @@ def test_2(url: str) -> None:
         print(f"{name}: {len(text)} chars -> {path}")
 
 
-def test_3() -> None:
+def test_3(settings: Settings) -> None:
     print("=== 测试 3：并发 session 上限探测 ===")
     print("依次创建 session 且暂不释放，最多试到 12 个。")
-    client = Steel(steel_api_key=os.environ.get("STEEL_API_KEY"))
+    client = Steel(steel_api_key=settings.steel_api_key)
     sessions = []
     try:
         for i in range(1, 13):
@@ -99,14 +97,15 @@ def main() -> None:
     parser.add_argument("--test", type=int, default=1, choices=[1, 2, 3], help="跑哪个测试（默认 1）")
     parser.add_argument("--url", default=DEFAULT_URL, help="测试用 URL")
     args = parser.parse_args()
+    settings = Settings.from_env(require=[Key.STEEL])
 
     try:
         if args.test == 1:
-            test_1(args.url)
+            test_1(settings, args.url)
         elif args.test == 2:
-            test_2(args.url)
+            test_2(settings, args.url)
         else:
-            test_3()
+            test_3(settings)
     except Exception:
         traceback.print_exc()
         raise

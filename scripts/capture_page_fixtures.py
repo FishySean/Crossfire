@@ -14,10 +14,9 @@ import zlib
 from html.parser import HTMLParser
 from pathlib import Path
 
-import yaml
+from crossfire.config import Settings, load_questions
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "pages"
-QUESTIONS = Path(__file__).resolve().parents[1] / "questions" / "demo.yaml"
 SKIP_TAGS = {"script", "style", "noscript", "svg", "head"}
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36"
 
@@ -212,8 +211,8 @@ def bad_pages():
 
 
 def good_urls():
-    config = yaml.safe_load(QUESTIONS.read_text(encoding="utf-8"))
-    return [source["url"] for question in config for source in question["sources"]]
+    questions = load_questions(Settings.from_env())
+    return [source.url for question in questions for source in question.sources]
 
 
 def main():

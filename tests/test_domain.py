@@ -102,7 +102,8 @@ def test_fixture_verdicts_match_before_move(name, expected):
         ("title match ignores case", page(ARTICLE, title="ACCESS DENIED"), (False, UnusableReason.ERROR_TITLE)),
         ("499 chars", page("a" * 499), (False, UnusableReason.TOO_SHORT)),
         ("600 chars of prose", page("a" * 600), (True, None)),
-        ("599 chars of prose", page("a" * 599), (False, UnusableReason.NAV_SKELETON)),
+        # 第 4 步有意修改：NAV_SKELETON → TOO_SHORT。原因：backlog「500–599 字无链接页判成 nav_skeleton」
+        ("599 chars of prose", page("a" * 599), (False, UnusableReason.TOO_SHORT)),
         ("59-char lines are not prose", page(("- " + "b" * 57 + "\n") * 30), (False, UnusableReason.NAV_SKELETON)),
         ("60-char lines are prose", page(("b" * 60 + "\n") * 10), (True, None)),
         ("link-dominated page", page(ARTICLE + "[" + "n" * 9000 + "](/x)\n"), (False, UnusableReason.NAV_SKELETON)),
@@ -114,22 +115,88 @@ def test_threshold_boundaries_match_before_move(label, subject, expected):
     assert is_usable_page(subject) == expected
 
 
-def test_locked_reason_for_short_page_without_links_is_nav_skeleton():
-    """锁住现状：500–599 字、一个链接都没有的页面，原因是 nav_skeleton 而不是 too_short。
-    MIN_PROSE_CHARS=600 比 MIN_CONTENT_CHARS=500 更严，把这个区间吃掉了。"""
-    assert is_usable_page(page("a" * 550)) == (False, UnusableReason.NAV_SKELETON)
+# ---- 第 4 步修掉的三处误杀。原来这里是三条「锁住现状」的测试，改成了相反的断言 ----
 
 
-@pytest.mark.parametrize("title", ["403(b) retirement plan limits", "Highway 404 closure", "Lost and not found"])
-def test_locked_error_title_is_a_substring_match(title):
-    """锁住现状：错误标题按子串匹配，标题里带 403 / 404 / not found 的正常文章也会被判废。"""
+@pytest.mark.parametrize("length", [500, 550, 599])
+def test_short_page_without_links_is_too_short_not_nav_skeleton(length):
+    """第 4 步有意修改：原 test_locked_reason_for_short_page_without_links_is_nav_skeleton 断言 NAV_SKELETON。
+    原因：一个链接都没有的短页面，缺的是篇幅，不是被导航挤掉了正文。"""
+    assert is_usable_page(page("a" * length)) == (False, UnusableReason.TOO_SHORT)
+
+
+def test_short_page_dominated_by_links_is_still_nav_skeleton():
+    links = "".join(f"[菜单项{i:02d}](/n{i})\n" for i in range(60))
+    assert is_usable_page(page(links + "a" * 50)) == (False, UnusableReason.NAV_SKELETON)
+
+
+def test_long_list_without_prose_is_still_nav_skeleton():
+    assert is_usable_page(page(("- " + "b" * 57 + "\n") * 30)) == (False, UnusableReason.NAV_SKELETON)
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "403(b) retirement plan limits",
+        "Highway 404 closure",
+        "Lost and not found",
+        "Route 403 reopens - Local News",
+        "Python 3.14.0 release notes | Python.org",
+        "Just a moment of silence for the old API",
+    ],
+)
+def test_article_titles_that_merely_contain_an_error_word_are_usable(title):
+    """第 4 步有意修改：原 test_locked_error_title_is_a_substring_match 断言 ERROR_TITLE。
+    原因：子串匹配把标题里带 403 / 404 / not found 的正常文章判成软 404。"""
+    assert is_usable_page(page(ARTICLE, title=title)) == (True, None)
+
+
+@pytest.mark.parametrize(
+    "title",
+    [
+        "Page not found",
+        "404 - The Register",
+        "Page Not Found – The New Stack",
+        "404",
+        "404 Not Found",
+        "403 Forbidden",
+        "Error 404 (Not Found)",
+        "HTTP 404 error",
+        "Not Found",
+        "Access Denied",
+        "Attention Required! | Cloudflare",
+        "Just a moment...",
+        "Are you a robot?",
+        "Oops | 404 page not found",
+    ],
+)
+def test_real_error_titles_are_still_caught(title):
     assert is_usable_page(page(ARTICLE, title=title)) == (False, UnusableReason.ERROR_TITLE)
 
 
-def test_locked_short_cjk_lines_are_not_prose():
-    """锁住现状：每行 30 个汉字已是完整的中文句子，但不到 60 字符就不算正文，1200 字的中文页被判为骨架。"""
-    markdown = "东京都的人口约为一千四百万人，这是二零二五年的最新统计数据。\n" * 40
-    assert is_usable_page(page(markdown)) == (False, UnusableReason.NAV_SKELETON)
+CJK_SENTENCE = "东京都的人口约为一千四百万人，这是二零二五年的最新统计数据。"
+
+
+def test_cjk_sentences_count_as_prose():
+    """第 4 步有意修改：原 test_locked_short_cjk_lines_are_not_prose 断言 NAV_SKELETON。
+    原因：60 字符的行长门槛是按英文定的，30 个汉字已经是完整的中文句子。"""
+    assert len(CJK_SENTENCE) == 30
+    assert is_usable_page(page((CJK_SENTENCE + "\n") * 40)) == (True, None)
+
+
+def test_japanese_sentences_count_as_prose():
+    line = "令和七年国勢調査の速報値によると、東京都の人口は増加を続けています。\n"
+    assert is_usable_page(page(line * 30)) == (True, None)
+
+
+def test_short_cjk_menu_lines_are_still_not_prose():
+    assert is_usable_page(page("- 新闻中心\n" * 300)) == (False, UnusableReason.NAV_SKELETON)
+
+
+def test_locked_total_length_floor_still_counts_raw_characters():
+    """锁住现状：总长下限 MIN_CONTENT_CHARS 仍按原始字符数算，没有按宽度。
+    300 个汉字的信息量大约相当于 600 个英文字符，仍被判 too_short。这一步只修行长，这条留着。"""
+    assert is_usable_page(page(CJK_SENTENCE * 10)) == (False, UnusableReason.TOO_SHORT)
 
 
 def test_status_code_does_not_affect_usability():

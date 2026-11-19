@@ -36,6 +36,7 @@ from crossfire.domain import (
     as_of_for,
     is_usable_page,
 )
+from crossfire.domain.usability import MIN_CONTENT_CHARS, display_width
 from crossfire.adapters.anthropic.extractor import EXTRACT_SCHEMA
 from crossfire.adapters.anthropic.pairer import PAIR_SCHEMA
 
@@ -198,10 +199,16 @@ def test_short_cjk_menu_lines_are_still_not_prose():
     assert is_usable_page(page("- 新闻中心\n" * 300)) == (False, UnusableReason.NAV_SKELETON)
 
 
-def test_locked_total_length_floor_still_counts_raw_characters():
-    """锁住现状：总长下限 MIN_CONTENT_CHARS 仍按原始字符数算，没有按宽度。
-    300 个汉字的信息量大约相当于 600 个英文字符，仍被判 too_short。这一步只修行长，这条留着。"""
-    assert is_usable_page(page(CJK_SENTENCE * 10)) == (False, UnusableReason.TOO_SHORT)
+def test_total_length_floor_counts_display_width():
+    """第 5a 步有意修改：原 test_locked_total_length_floor_still_counts_raw_characters 断言 TOO_SHORT。
+    原因：总长下限和正文门槛一样按显示宽度算，300 个汉字的宽度是 600，不该被当成内容过短。"""
+    assert len(CJK_SENTENCE * 10) == 300
+    assert is_usable_page(page(CJK_SENTENCE * 10)) == (True, None)
+
+
+def test_total_length_floor_still_rejects_short_cjk_pages():
+    assert display_width(CJK_SENTENCE * 8) < MIN_CONTENT_CHARS
+    assert is_usable_page(page(CJK_SENTENCE * 8)) == (False, UnusableReason.TOO_SHORT)
 
 
 def test_page_usability_is_computed_not_stored():

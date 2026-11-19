@@ -13,11 +13,11 @@ if TYPE_CHECKING:
     from crossfire.domain.models import Page
 
 # 可用性阈值：都是模块级常量，方便按实际抓取情况调。
-MIN_CONTENT_CHARS = 500  # 正文总长度下限（软屏蔽页通常只有几十字符）
+MIN_CONTENT_CHARS = 500  # 正文总宽度下限（软屏蔽页通常只有几十字符）
 MIN_PROSE_CHARS = 600  # 去掉链接文字后，成句正文的宽度下限
 MIN_PROSE_LINE_CHARS = 60  # 一行要多宽才算“正文”而不是导航条目
 MAX_LINK_TEXT_RATIO = 0.85  # 链接文字占可见文字的比例上限（骨架页 >0.9，导航多的正常页约 0.6-0.75）
-# 正文的两个门槛按显示宽度算：汉字、假名、全角标点算 2，其余算 1。30 个汉字的句子和 60 个英文字符一样宽。
+# 长度门槛都按显示宽度算：汉字、假名、全角标点算 2，其余算 1。30 个汉字的句子和 60 个英文字符一样宽。
 
 # 错误标题：标题按分隔符切段，某一段整段是下面这些之一才算，不做子串匹配。
 # 这样 "404 - The Register"、"Attention Required! | Cloudflare" 仍会命中，
@@ -104,7 +104,7 @@ def is_usable_page(page: "Page") -> tuple[bool, UnusableReason | None]:
     if is_error_title(page.title or ""):
         return False, UnusableReason.ERROR_TITLE
 
-    if len(markdown) < MIN_CONTENT_CHARS:
+    if display_width(markdown) < MIN_CONTENT_CHARS:
         return False, UnusableReason.TOO_SHORT
 
     without_links, link_chars = _strip_links(markdown)

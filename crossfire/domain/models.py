@@ -7,6 +7,7 @@ to_dict/from_dict 放在实体上，是因为字段名和 JSON 键名并不一�
 from_dict 读的是本项目自己写出的结构，键缺失或枚举值不认识都直接抛错，不做兜底。
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
@@ -340,6 +341,16 @@ class StepStats:
     seconds: float
     input_tokens: int | None = None
     output_tokens: int | None = None
+
+    @classmethod
+    def summing(cls, usages: Sequence[Usage], seconds: float) -> Self:
+        """一个 LLM 步骤的统计：每条记录一个 Usage。"""
+        return cls(
+            calls=len(usages),
+            seconds=seconds,
+            input_tokens=sum(usage.input_tokens for usage in usages),
+            output_tokens=sum(usage.output_tokens for usage in usages),
+        )
 
     def to_dict(self) -> dict[str, Any]:
         if self.input_tokens is None:

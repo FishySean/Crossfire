@@ -80,6 +80,52 @@ def test_nothing_inside_the_package_imports_the_temporary_wiring():
     assert offenders == []
 
 
+# use case 只编排端口。读写文件、开线程、序列化 JSON、读系统时钟都是适配器的事。
+SIDE_EFFECT_MODULES = {
+    "asyncio",
+    "concurrent",
+    "datetime",
+    "io",
+    "json",
+    "multiprocessing",
+    "os",
+    "pathlib",
+    "shutil",
+    "socket",
+    "subprocess",
+    "tempfile",
+    "threading",
+    "time",
+}
+SIDE_EFFECT_BUILTINS = {"open", "print", "input"}
+
+
+def side_effects(path: Path) -> list[str]:
+    found = [
+        f"imports {module}" for module in imports_of(path) if module.split(".")[0] in SIDE_EFFECT_MODULES
+    ]
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in SIDE_EFFECT_BUILTINS:
+            found.append(f"calls {node.func.id}()")
+    return found
+
+
+def test_use_cases_contain_no_file_thread_or_json_code():
+    paths = sorted((PACKAGE / "application" / "use_cases").rglob("*.py"))
+    assert paths
+    assert {str(path.relative_to(ROOT)): side_effects(path) for path in paths} == {
+        str(path.relative_to(ROOT)): [] for path in paths
+    }
+
+
+def test_the_side_effect_checker_catches_a_violation(tmp_path, monkeypatch):
+    """对照组：证明上面的空列表不是因为检查器什么都没认出来。"""
+    monkeypatch.setattr(sys.modules[__name__], "ROOT", tmp_path)
+    bad = tmp_path / "bad.py"
+    bad.write_text("import json\nfrom threading import Thread\n\ndef f():\n    open('x')\n", encoding="utf-8")
+    assert side_effects(bad) == ["imports json", "imports threading", "calls open()"]
+
+
 def test_the_checker_catches_a_violation(tmp_path, monkeypatch):
     """对照组：证明上面的空列表不是因为扫描器什么都没扫到。"""
     fake_root = tmp_path

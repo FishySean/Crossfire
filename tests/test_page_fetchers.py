@@ -14,6 +14,8 @@ import pytest
 import steel
 
 import crossfire.steel_client
+from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
+from crossfire.application.records import page_record
 from crossfire.steel_client import cache_path
 
 URLS = ["https://a.example/", "https://b.example/", "https://c.example/"]
@@ -59,8 +61,8 @@ def _refuse(*args, **kwargs):
     raise AssertionError("测试里不允许任何真实网络调用")
 
 
-@pytest.fixture
-def fetcher(monkeypatch):
+@pytest.fixture(params=["legacy", "adapter"])
+def fetcher(request, monkeypatch):
     """返回 install(fake_steel) -> fetch(urls, on_page, cache_dir=None)，以及记录退避的 sleeps。"""
     monkeypatch.delenv("STEEL_API_KEY", raising=False)
     monkeypatch.setattr(socket.socket, "connect", _refuse)
@@ -70,15 +72,26 @@ def fetcher(monkeypatch):
         sleeps.append(delay)
 
     def install(fake_steel):
-        monkeypatch.setattr(crossfire.steel_client, "AsyncSteel", lambda **kwargs: fake_steel)
-        monkeypatch.setattr(crossfire.steel_client.asyncio, "sleep", fake_sleep)
+        if request.param == "legacy":
+            monkeypatch.setattr(crossfire.steel_client, "AsyncSteel", lambda **kwargs: fake_steel)
+            monkeypatch.setattr(crossfire.steel_client.asyncio, "sleep", fake_sleep)
+
+            def fetch(urls, on_page=None, cache_dir=None):
+                return asyncio.run(
+                    crossfire.steel_client.fetch_pages(
+                        urls, use_cache=cache_dir is not None, cache_dir=cache_dir, on_page=on_page
+                    )
+                )
+
+            return fetch
 
         def fetch(urls, on_page=None, cache_dir=None):
-            return asyncio.run(
-                crossfire.steel_client.fetch_pages(
-                    urls, use_cache=cache_dir is not None, cache_dir=cache_dir, on_page=on_page
-                )
-            )
+            if cache_dir is not None:
+                port = CachedPageFetcher(cache_dir)
+            else:
+                port = SteelPageFetcher(None, client_factory=lambda: fake_steel, sleep=fake_sleep)
+            forward = (lambda index, page: on_page(index, page_record(page))) if on_page else None
+            return [page_record(page) for page in port.fetch_all(urls, forward)]
 
         return fetch
 

@@ -11,6 +11,7 @@ import httpx
 import pytest
 
 import crossfire.llm
+from crossfire.adapters.anthropic import ClaudeClient
 
 REQUEST = httpx.Request("POST", "https://api.anthropic.invalid/v1/messages")
 
@@ -52,17 +53,34 @@ class ScriptedMessages:
         return item
 
 
-@pytest.fixture
-def structured(monkeypatch):
+def _as_legacy_shape(call):
+    """把 ClaudeClient.call 的 Structured 结果还原成 call_structured 的 dict 形状。"""
+
+    def call_structured(prompt, schema, step, max_tokens=1000):
+        result = call(prompt, schema, step, parse=lambda data: data, max_tokens=max_tokens)
+        shaped = dict(result.value or {})
+        shaped["_usage"] = result.usage.to_dict()
+        if result.failure is not None:
+            shaped["_failure"] = result.failure.to_dict()
+        return shaped
+
+    return call_structured
+
+
+@pytest.fixture(params=["legacy", "adapter"])
+def structured(request, monkeypatch):
     """返回 (call, messages, sleeps)。call 的签名和返回形状与 llm.call_structured 一致。"""
     sleeps = []
-    state = SimpleNamespace(messages=None)
 
     def install(script):
-        state.messages = ScriptedMessages(script)
-        monkeypatch.setattr(crossfire.llm, "Anthropic", lambda **kwargs: SimpleNamespace(messages=state.messages))
-        monkeypatch.setattr(crossfire.llm.time, "sleep", sleeps.append)
-        return crossfire.llm.call_structured, state.messages, sleeps
+        messages = ScriptedMessages(script)
+        fake_sdk = SimpleNamespace(messages=messages)
+        if request.param == "legacy":
+            monkeypatch.setattr(crossfire.llm, "Anthropic", lambda **kwargs: fake_sdk)
+            monkeypatch.setattr(crossfire.llm.time, "sleep", sleeps.append)
+            return crossfire.llm.call_structured, messages, sleeps
+        client = ClaudeClient(client=fake_sdk, sleep=sleeps.append)
+        return _as_legacy_shape(client.call), messages, sleeps
 
     return install
 

@@ -10,7 +10,7 @@ from_dict 读的是本项目自己写出的结构，键缺失或枚举值不认�
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, NewType, Self
+from typing import Any, NewType, Self, cast
 
 from crossfire.domain.relations import Relation
 
@@ -130,7 +130,10 @@ def _string_list(data: dict[str, Any], key: str) -> tuple[str, ...]:
     value = data[key]
     if not isinstance(value, list):
         raise TypeError(f"{key} 应为数组，实际是 {type(value).__name__}：{str(value)[:80]}")
-    return tuple(value)
+    items = cast(list[object], value)
+    if not all(isinstance(item, str) for item in items):
+        raise TypeError(f"{key} 的元素应全为字符串：{str(items)[:80]}")
+    return tuple(cast(list[str], items))
 
 
 def _failure_from(data: dict[str, Any]) -> Failure | None:

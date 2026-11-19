@@ -5,7 +5,7 @@
 
 import threading
 import time
-from collections.abc import Collection, Sequence
+from collections.abc import Callable, Collection, Sequence
 from datetime import UTC, datetime, timedelta
 
 from crossfire.application.events import Event
@@ -18,6 +18,7 @@ from crossfire.application.ports import (
     OnPair,
     PageFetcher,
     RunRepository,
+    Ticker,
     VerdictJudge,
 )
 from crossfire.domain import (
@@ -176,14 +177,22 @@ class FakeJudge:
         )
 
 
+class _Timer:
+    def __init__(self, due: float, interval: float, tick: Callable[[], None]) -> None:
+        self.due = due
+        self.interval = interval
+        self.tick = tick
+
+
 class FakeClock:
-    """时间只在 advance 时前进。"""
+    """时间只在 advance 时前进。它同时是 Ticker：advance 跨过的每个计时点都在调用方线程里同步触发 tick。"""
 
     START = datetime(2026, 11, 19, 20, 0, 0, tzinfo=UTC)
 
     def __init__(self, start: datetime = START) -> None:
         self._start = start
         self._elapsed = 0.0
+        self._timers: list[_Timer] = []
 
     def now(self) -> datetime:
         return self._start + timedelta(seconds=self._elapsed)
@@ -191,8 +200,23 @@ class FakeClock:
     def monotonic(self) -> float:
         return 1000.0 + self._elapsed
 
+    def every(self, seconds: float, tick: Callable[[], None]) -> Callable[[], None]:
+        timer = _Timer(self._elapsed + seconds, seconds, tick)
+        self._timers.append(timer)
+        return lambda: self._timers.remove(timer)
+
+    @property
+    def running_timers(self) -> int:
+        return len(self._timers)
+
     def advance(self, seconds: float) -> None:
-        self._elapsed += seconds
+        target = self._elapsed + seconds
+        while due := [timer for timer in self._timers if timer.due <= target]:
+            timer = min(due, key=lambda t: t.due)
+            self._elapsed = timer.due
+            timer.due += timer.interval
+            timer.tick()
+        self._elapsed = target
 
 
 class RecordingSink:
@@ -223,5 +247,6 @@ _extractor: type[ClaimExtractor] = FakeExtractor
 _pairers: tuple[type[ClaimPairer], ...] = (FakePairer, EqualityPairer)
 _judge: type[VerdictJudge] = FakeJudge
 _clock: type[Clock] = FakeClock
+_ticker: type[Ticker] = FakeClock
 _sink: type[EventSink] = RecordingSink
 _runs: type[RunRepository] = InMemoryRunRepository

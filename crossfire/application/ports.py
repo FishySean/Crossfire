@@ -94,3 +94,12 @@ class Clock(Protocol):
     def monotonic(self) -> float:
         """单调递增的秒数，只用来算耗时。"""
         ...
+
+
+class Ticker(Protocol):
+    def every(self, seconds: float, tick: Callable[[], None]) -> Callable[[], None]:
+        """从现在起每隔 seconds 秒调用一次 tick，直到调用返回的 stop。
+
+        stop 返回之后保证不会再调用 tick。tick 可能在另一个线程里被调用。
+        """
+        ...

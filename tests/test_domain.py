@@ -31,8 +31,8 @@ from crossfire.domain import (
     UnusableReason,
     is_usable_page,
 )
-from crossfire.extract import EXTRACT_SCHEMA
-from crossfire.reconcile import PAIR_SCHEMA
+from crossfire.adapters.anthropic.extractor import EXTRACT_SCHEMA
+from crossfire.adapters.anthropic.pairer import PAIR_SCHEMA
 
 DOMAIN_DIR = Path(__file__).resolve().parents[1] / "crossfire" / "domain"
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "pages"

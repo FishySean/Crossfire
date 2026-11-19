@@ -76,16 +76,6 @@ def test_use_case_depends_only_on_domain_and_application():
     assert violations(USE_CASE_FILES, LAYERS["application"]) == []
 
 
-# 还没迁走的旧模块，本步后面的提交逐个删掉；列表只能变短，空了就把它删掉。
-NOT_YET_MIGRATED = {
-    "crossfire/pipeline.py",
-    "crossfire/llm.py",
-    "crossfire/extract.py",
-    "crossfire/reconcile.py",
-    "crossfire/steel_client.py",
-    "crossfire/adapters/steel/legacy.py",
-}
-
 ENTRY_POINTS = [
     *sorted((ROOT / "web").rglob("*.py")),
     *sorted((ROOT / "scripts").rglob("*.py")),
@@ -111,17 +101,12 @@ def is_under(module: str, prefix: str) -> bool:
     return module == prefix or module.startswith(prefix + ".")
 
 
-def test_the_not_yet_migrated_list_only_names_files_that_exist():
-    assert sorted(name for name in NOT_YET_MIGRATED if not (ROOT / name).exists()) == []
-
-
 def test_only_the_composition_root_imports_adapters():
     offenders = [
         f"{relative(path)} imports {module}"
         for path in sorted(PACKAGE.rglob("*.py"))
         if not path.is_relative_to(PACKAGE / "adapters")
         and path != PACKAGE / "composition.py"
-        and relative(path) not in NOT_YET_MIGRATED
         for module in imports_of(path)
         if is_under(module, "crossfire.adapters")
     ]
@@ -132,7 +117,7 @@ def entry_point_violations(paths):
     return [
         f"{relative(path)} imports {module}"
         for path in paths
-        if path.exists() and relative(path) not in NOT_YET_MIGRATED
+        if path.exists()
         for module in imports_of(path)
         if (is_under(module, "crossfire") or is_under(module, "web"))
         and not any(is_under(module, allowed) for allowed in ENTRY_POINT_ALLOWED)
@@ -168,7 +153,7 @@ def test_only_config_reads_the_environment():
     offenders = {
         relative(path): env_reads(path)
         for path in SOURCE_FILES
-        if path != PACKAGE / "config.py" and relative(path) not in NOT_YET_MIGRATED and env_reads(path)
+        if path != PACKAGE / "config.py" and env_reads(path)
     }
     assert offenders == {}
 

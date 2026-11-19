@@ -7,15 +7,31 @@ from urllib.parse import urlparse
 
 import pytest
 
-from crossfire.steel_client import (
-    UNUSABLE_EMPTY,
-    UNUSABLE_ERROR_TITLE,
-    UNUSABLE_FETCH_FAILED,
-    UNUSABLE_NAV_SKELETON,
-    UNUSABLE_TOO_SHORT,
-    _shape,
-    is_usable_page,
-)
+from crossfire.adapters.steel.fetchers import to_page
+from crossfire.application.records import page_record
+from crossfire.domain import Page, UnusableReason
+from crossfire.domain import is_usable_page as usable_page
+
+# 第 4 步删掉了 crossfire.steel_client 这个 dict 兼容层。下面几个名字原来从那里 import，
+# 现在在本文件里就地定义，行为和原来一模一样，下面的断言一条没改。
+UNUSABLE_FETCH_FAILED = UnusableReason.FETCH_FAILED
+UNUSABLE_EMPTY = UnusableReason.EMPTY
+UNUSABLE_TOO_SHORT = UnusableReason.TOO_SHORT
+UNUSABLE_ERROR_TITLE = UnusableReason.ERROR_TITLE
+UNUSABLE_NAV_SKELETON = UnusableReason.NAV_SKELETON
+
+
+def is_usable_page(result):
+    """快照是页面 dict；可用时原因为空字符串。"""
+    if not result or not result.get("ok"):
+        return False, UNUSABLE_FETCH_FAILED.value
+    usable, reason = usable_page(Page.from_dict(result))
+    return usable, "" if reason is None else reason.value
+
+
+def _shape(url, result=None, error=None):
+    return page_record(to_page(url, result=result, error=error))
+
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "pages"
 MIN_GOOD_DOMAINS = 3

@@ -13,7 +13,6 @@ from crossfire.domain import Link, Mode, Page, SourceIndex
 
 MAX_RETRIES = 3
 DEFAULT_CONCURRENCY = 8
-CACHE_ROOT = Path(__file__).resolve().parents[3] / "out" / "cache"
 
 
 def cache_path(cache_dir: Path, url: str) -> Path:

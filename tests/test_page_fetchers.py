@@ -1,8 +1,8 @@
-"""fetch_pages 的特征测试：缓存读取、缓存缺失、429 退避、on_page 回调、客户端关闭。
+"""抓取的特征测试：缓存读取、缓存缺失、429 退避、on_page 回调、客户端关闭。
 
 被测实现由 fetcher fixture 提供，断言只认页面 dict 的 url / ok / error / markdown
-和 on_page(index, page) 回调。同一组断言跑两遍：legacy 是 steel_client.fetch_pages 这个
-dict 接口（scripts/prefetch.py 还在用），adapter 是 SteelPageFetcher / CachedPageFetcher。
+和 on_page(index, page) 回调。第 3 步时同一组断言对旧的 dict 接口 steel_client.fetch_pages
+和 SteelPageFetcher / CachedPageFetcher 各跑一遍；第 4 步删掉旧接口，断言不变，只跑后者。
 """
 
 import asyncio
@@ -14,12 +14,9 @@ import httpx
 import pytest
 import steel
 
-import crossfire.adapters.steel.fetchers
-import crossfire.steel_client
-from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
+from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher, cache_path
 from crossfire.application.records import page_record
 from crossfire.domain import Mode
-from crossfire.steel_client import cache_path
 
 URLS = ["https://a.example/", "https://b.example/", "https://c.example/"]
 REQUEST = httpx.Request("POST", "https://api.steel.invalid/v1/scrape")
@@ -64,8 +61,8 @@ def _refuse(*args, **kwargs):
     raise AssertionError("测试里不允许任何真实网络调用")
 
 
-@pytest.fixture(params=["legacy", "adapter"])
-def fetcher(request, monkeypatch):
+@pytest.fixture
+def fetcher(monkeypatch):
     """返回 install(fake_steel) -> fetch(urls, on_page, cache_dir=None)，以及记录退避的 sleeps。"""
     monkeypatch.delenv("STEEL_API_KEY", raising=False)
     monkeypatch.setattr(socket.socket, "connect", _refuse)
@@ -75,19 +72,6 @@ def fetcher(request, monkeypatch):
         sleeps.append(delay)
 
     def install(fake_steel):
-        if request.param == "legacy":
-            monkeypatch.setattr(crossfire.adapters.steel.fetchers, "AsyncSteel", lambda **kwargs: fake_steel)
-            monkeypatch.setattr(asyncio, "sleep", fake_sleep)
-
-            def fetch(urls, on_page=None, cache_dir=None):
-                return asyncio.run(
-                    crossfire.steel_client.fetch_pages(
-                        urls, use_cache=cache_dir is not None, cache_dir=cache_dir, on_page=on_page
-                    )
-                )
-
-            return fetch
-
         def fetch(urls, on_page=None, cache_dir=None):
             if cache_dir is not None:
                 port = CachedPageFetcher(cache_dir)

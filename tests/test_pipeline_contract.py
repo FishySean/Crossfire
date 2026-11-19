@@ -1,15 +1,12 @@
-"""pipeline.run 的特征测试（characterization test）。
+"""整条查证流程对外的契约：事件流和结果文件（characterization test）。
 
-这些测试锁住的是 run() 现在「是什么样」，不是它「应该是什么样」。
-接下来的重构不应改变外部行为，所以它们就是重构的验收标准。
+最初锁的是 pipeline.run 的外部行为，第 4 步删掉兼容门面后改走组合根的 composition.assemble：
+四个端口（抓取、提取、比对、判决）用 tests/fakes.py 的假实现，存储、时钟、心跳线程都是真的。
 个别测试锁住的现状本身就像 bug，在对应测试的注释里标了「锁住现状」，
-重构时如果决定顺手修掉，要连同测试一起改，而且是有意识地改。
+决定修掉时要连同测试一起改，而且是有意识地改。
 
-依赖怎么来：
-四个端口（抓取、提取、比对、判决）由 tests/fakes.py 的假实现直接注入 run()，不再 monkeypatch。
-第 3 步起 run() 是兼容门面，自己组装存储、时钟和心跳，所以仍要 monkeypatch 三样：
-pipeline.RUNS_DIR、pipeline.HEARTBEAT_SECONDS，以及心跳线程所在模块 adapters.system 的 threading。
-socket.connect 也被替换成直接报错，用来证明 run() 没有绕过端口自己联网。
+心跳线程所在模块 adapters.system 的 threading 可以被替换，用来数线程。
+socket.connect 被替换成直接报错，用来证明流程没有绕过端口自己联网。
 """
 
 import json
@@ -21,7 +18,9 @@ from types import SimpleNamespace
 import pytest
 
 import crossfire.adapters.system as system
-import crossfire.pipeline as pipeline
+from crossfire.adapters.event_sinks import CallbackEventSink
+from crossfire.application.records import run_record
+from crossfire.composition import assemble
 from crossfire.domain import Mode, Question
 from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
 
@@ -80,15 +79,16 @@ def _refuse(*args, **kwargs):
 
 @pytest.fixture
 def offline_pipeline(monkeypatch, tmp_path):
-    """返回一个安装器：按参数装配四个假端口，返回调用记录和已注入依赖的 run。"""
+    """返回一个安装器：按参数装配四个假端口，返回调用记录和 run(on_event=None) -> (结果 dict, 保存位置)。"""
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.delenv("STEEL_API_KEY", raising=False)
     monkeypatch.setattr(socket.socket, "connect", _refuse)
 
     runs_dir = tmp_path / "runs"
-    monkeypatch.setattr(pipeline, "RUNS_DIR", runs_dir)
 
-    def install(failing_urls=(), unusable_urls=(), failing_pair_urls=None, judge_delay=0.0, mode=Mode.LIVE):
+    def install(
+        failing_urls=(), unusable_urls=(), failing_pair_urls=None, judge_delay=0.0, mode=Mode.LIVE, heartbeat_seconds=5
+    ):
         log = CallLog()
         deps = {
             "fetcher": FakeFetcher(failing_urls=failing_urls, unusable_urls=unusable_urls, mode=mode),
@@ -96,18 +96,21 @@ def offline_pipeline(monkeypatch, tmp_path):
             "pairer": FakePairer(log, failing_pair_urls=failing_pair_urls),
             "judge": FakeJudge(log, trusted_url=URLS[0], delay=judge_delay),
         }
-        return SimpleNamespace(
-            llm_steps=log.steps,
-            runs_dir=runs_dir,
-            run=lambda **kwargs: pipeline.run(CONFIG, **deps, **kwargs),
-        )
+        def run(on_event=None):
+            sink = CallbackEventSink(on_event) if on_event else None
+            saved = assemble(**deps, runs_dir=runs_dir, event_sink=sink, heartbeat_seconds=heartbeat_seconds).execute(
+                CONFIG
+            )
+            return run_record(saved.result), saved.location
+
+        return SimpleNamespace(llm_steps=log.steps, runs_dir=runs_dir, run=run)
 
     return install
 
 
-def _run_collecting(record, **kwargs):
+def _run_collecting(record):
     events = []
-    result = record.run(on_event=events.append, **kwargs)
+    result, _ = record.run(on_event=events.append)
     return result, events
 
 
@@ -165,7 +168,8 @@ def test_claim_index_is_the_source_index_not_the_claim_count(offline_pipeline):
 
 def test_pair_failure_is_reported_not_swallowed(offline_pipeline):
     record = offline_pipeline(failing_pair_urls=(URLS[1], URLS[2]))
-    result, events = _run_collecting(record)
+    events = []
+    result, location = record.run(on_event=events.append)
 
     assert [f["step"] for f in result["failures"]] == ["pair"]
     assert result["failures"][0]["detail"] == "假的 pair 失败"
@@ -178,7 +182,8 @@ def test_pair_failure_is_reported_not_swallowed(offline_pipeline):
     assert failed_pair["relation"] is None
 
     assert events[-1]["type"] == "done"
-    on_disk = json.loads(open(result["output_path"], encoding="utf-8").read())
+    # 第 4 步有意修改：result["output_path"] → run() 返回的保存位置。原因：决定 1，位置由 SavedRun.location 给出
+    on_disk = json.loads(open(location, encoding="utf-8").read())
     assert [f["step"] for f in on_disk["failures"]] == ["pair"]
 
 
@@ -201,15 +206,14 @@ def test_result_file_structure_and_atomic_write(offline_pipeline, monkeypatch):
             seen_at_done["exists"] = os.path.exists(event["run_file"])
             seen_at_done["tmp"] = sorted(p.name for p in record.runs_dir.glob("*.tmp"))
 
-    result = record.run(on_event=on_event)
-    path = result["output_path"]
+    result, path = record.run(on_event=on_event)
 
     on_disk = json.loads(open(path, encoding="utf-8").read())
     assert set(on_disk) == RESULT_FILE_KEYS
 
-    # 兼容门面为了让命令行不改，仍在返回值里附带 output_path，所以返回值比磁盘上的文件多一个键。
-    # use case 返回的 RunResult 与磁盘内容一致，位置随 done 事件给出，见 test_verify_question.py。
-    assert set(result) == RESULT_FILE_KEYS | {"output_path"}
+    # 第 4 步有意修改：RESULT_FILE_KEYS | {"output_path"} → RESULT_FILE_KEYS，并且与磁盘内容逐字相等。
+    # 原因：兼容门面删了，不再往返回值里塞 output_path，位置由 SavedRun.location 给出。
+    assert result == on_disk
 
     assert replaced == [(path[: -len(".json")] + ".json.tmp", path)]
     assert seen_at_done == {"exists": True, "tmp": []}
@@ -240,9 +244,10 @@ def test_without_on_event_no_heartbeat_thread_and_same_result(offline_pipeline, 
 
     monkeypatch.setattr(system, "threading", SimpleNamespace(Event=threading.Event, Thread=recording_thread))
 
-    result = record.run()
+    result, _ = record.run()
     assert created == []
-    assert set(result) == RESULT_FILE_KEYS | {"output_path"}
+    # 第 4 步有意修改：RESULT_FILE_KEYS | {"output_path"} → RESULT_FILE_KEYS。原因同上，兼容门面删了
+    assert set(result) == RESULT_FILE_KEYS
     assert result["judgment"]["answer"] == "当前版本是 1.0"
 
     # 对照组：证明上面的记录器确实能抓到心跳线程，空列表不是因为记录器失灵。
@@ -250,9 +255,8 @@ def test_without_on_event_no_heartbeat_thread_and_same_result(offline_pipeline, 
     assert created == ["beat"]
 
 
-def test_heartbeats_only_between_judge_start_and_done(offline_pipeline, monkeypatch):
-    monkeypatch.setattr(pipeline, "HEARTBEAT_SECONDS", 0.01)
-    record = offline_pipeline(judge_delay=0.06)
+def test_heartbeats_only_between_judge_start_and_done(offline_pipeline):
+    record = offline_pipeline(judge_delay=0.06, heartbeat_seconds=0.01)
     _, events = _run_collecting(record)
 
     types = [e["type"] for e in events]
@@ -284,27 +288,8 @@ def test_unusable_pages_still_go_to_extract(offline_pipeline):
 
 @pytest.mark.parametrize("mode", ["live", "cached"])
 def test_mode_is_recorded_in_the_result(offline_pipeline, mode):
-    record = offline_pipeline(mode=Mode(mode))
-    result = record.run(mode=Mode(mode))
+    # 第 4 步有意修改：删掉 run(mode=...) 参数，mode 只来自 fetcher。原因：兼容门面删了；
+    # 原来的「字符串 mode 被拒绝」挪到 test_composition / test_cli，「mode 与 fetcher 对不上」
+    # 在组合根里已经构造不出来：fetcher 就是按 mode 选的。
+    result, _ = offline_pipeline(mode=Mode(mode)).run()
     assert result["mode"] == mode
-
-
-def test_run_rejects_a_plain_string_mode(offline_pipeline):
-    """原来 run 不校验 mode，拼错的 "cahced" 会悄悄按 live 真跑。现在字符串必须在入口处转成 Mode。"""
-    record = offline_pipeline()
-    with pytest.raises(TypeError):
-        record.run(mode="cached")
-    with pytest.raises(ValueError):
-        Mode("bogus")
-
-
-def test_mode_that_disagrees_with_the_fetcher_is_rejected(offline_pipeline):
-    """原来 run(mode=CACHED) 配一个实时抓取的 fetcher 也能跑，结果文件会把实时抓取记成 cached。"""
-    record = offline_pipeline(mode=Mode.LIVE)
-    with pytest.raises(ValueError, match="对不上"):
-        record.run(mode=Mode.CACHED)
-    assert list(record.runs_dir.glob("*")) == []
-
-
-def test_mode_can_be_left_out_and_comes_from_the_fetcher(offline_pipeline):
-    assert offline_pipeline(mode=Mode.CACHED).run()["mode"] == "cached"

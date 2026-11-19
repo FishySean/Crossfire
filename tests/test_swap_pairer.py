@@ -4,7 +4,9 @@ import socket
 
 import pytest
 
-import crossfire.pipeline as pipeline
+from crossfire.adapters.event_sinks import CallbackEventSink
+from crossfire.application.records import run_record
+from crossfire.composition import assemble
 from crossfire.domain import Question
 from tests.fakes import CallLog, EqualityPairer, FakeExtractor, FakeFetcher, FakeJudge
 
@@ -27,15 +29,21 @@ def _refuse(*args, **kwargs):
     raise AssertionError("测试里不允许任何真实网络调用")
 
 
+def run(question, runs_dir, on_event=None, **ports):
+    """原来调 pipeline.run，第 4 步删掉兼容门面后改走组合根，断言不变。"""
+    sink = CallbackEventSink(on_event) if on_event else None
+    return run_record(assemble(**ports, runs_dir=runs_dir, event_sink=sink).execute(question).result)
+
+
 def test_equality_pairer_runs_the_whole_pipeline(monkeypatch, tmp_path):
     monkeypatch.setattr(socket.socket, "connect", _refuse)
-    monkeypatch.setattr(pipeline, "RUNS_DIR", tmp_path)
     log = CallLog()
     pairer = EqualityPairer()
     events = []
 
-    result = pipeline.run(
+    result = run(
         QUESTION,
+        tmp_path,
         fetcher=FakeFetcher(),
         extractor=FakeExtractor(log, texts=TEXTS),
         pairer=pairer,
@@ -54,14 +62,14 @@ def test_equality_pairer_runs_the_whole_pipeline(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("answered", [0, 1])
-def test_pairer_gets_an_empty_batch_when_fewer_than_two_claims(monkeypatch, tmp_path, answered):
-    monkeypatch.setattr(pipeline, "RUNS_DIR", tmp_path)
+def test_pairer_gets_an_empty_batch_when_fewer_than_two_claims(tmp_path, answered):
     log = CallLog()
     pairer = EqualityPairer()
     failing = [s["url"] for s in SOURCES][answered:]
 
-    result = pipeline.run(
+    result = run(
         QUESTION,
+        tmp_path,
         fetcher=FakeFetcher(failing_urls=failing),
         extractor=FakeExtractor(log, texts=TEXTS),
         pairer=pairer,

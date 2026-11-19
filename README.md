@@ -25,6 +25,23 @@ uv run crossfire prefetch --all
 `verify --mode cached` 只要 `ANTHROPIC_API_KEY`；`prefetch` 只要 `STEEL_API_KEY`；`live` 两个都要。
 缺 key 时在开始运行之前报错，说明缺哪个、去哪里设置。结果写进 `out/runs/`。
 
+提取和判断的 prompt 里会写明「今天的日期」（结果文件里的 `as_of`）：live 是运行当天，
+cached 是缓存页面抓取的那天（页面的 `fetched_at`），不是跑的那天。缓存里有页面没记抓取时间时，
+`as_of` 是 `null`，prompt 里写「未知」。结果文件的 `provenance` 记着每一步用的模型和 prompt 版本（模板的哈希）。
+
+## 评测
+
+```bash
+uv run crossfire eval --estimate-only        # 只打印预计请求数，不调模型
+uv run crossfire eval                        # 跑 evals/cases/ 下所有题
+uv run crossfire eval --case python-2026-11  # 只跑一道
+```
+
+每道题一个 `evals/cases/<id>.yaml`：问题、`as_of`、标准答案、标准答案在快照里的原文依据、判分规则。
+页面只读 `evals/snapshots/<id>/` 下的冻结快照（进 git），从不实时抓取；只要 `ANTHROPIC_API_KEY`。
+判分是确定性的正则和数字规则，不用模型打分，每条规则都写了 `why`。`repeats` 大于 1 的题每次都对才算通过；
+告诉模型的日期和题目的 `as_of` 对不上也算没通过。有题没通过时退出码非 0。结果写进 `out/eval-runs/<id>/`。
+
 ## 本地结果查看器
 
 渲染 `out/runs/*.json`，也可以在页面上发起一次查证（SSE 推送进度）。
@@ -43,13 +60,14 @@ python app.py --no-browser
 uv run uvicorn web.server:app --reload --port 8765
 ```
 
-没有真实结果时，可生成样例数据：`uv run python scripts/make_sample_runs.py`。
+没有真实结果时，可生成样例数据：`uv run python scripts/make_sample_runs.py`（`--out 目录` 写到别处）。
 
 ## 页面可用性判断
 
 `crossfire.domain.usability.is_usable_page(page) -> (usable, reason)` 识别 “HTTP 200 但内容废掉” 的页面：
 反爬软屏蔽（`too_short`）、软 404（`error_page_title`）、数据中心 IP 只拿到导航骨架页（`nav_skeleton`）、
 以及抓取本身失败（`fetch_failed`）和空内容（`empty_content`）。阈值是模块级常量，直接改即可。
+长度门槛都按显示宽度算：汉字、假名、全角标点算 2，其余算 1。
 
 不可用的页面不送去提取主张，在结果的 `failures` 里记一条 `step="usability"`，原因写在 `detail`。
 `Page.usable` 每次现算、不存，规则改了以后旧页面的结论跟着变。

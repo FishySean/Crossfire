@@ -20,7 +20,21 @@ from crossfire.application.ports import (
     RunRepository,
     VerdictJudge,
 )
-from crossfire.domain import Claim, Failure, Judgment, Mode, Page, Pair, Question, RunResult, SourceIndex, StepStats
+from crossfire.domain import (
+    AsOf,
+    Claim,
+    Failure,
+    Judgment,
+    Mode,
+    Page,
+    Pair,
+    Provenance,
+    Question,
+    RunResult,
+    SourceIndex,
+    StepStats,
+    as_of_for,
+)
 
 
 @dataclass(frozen=True)
@@ -59,22 +73,33 @@ class VerifyQuestion:
     def mode(self) -> Mode:
         return self._fetcher.mode
 
+    @property
+    def provenance(self) -> dict[str, Provenance]:
+        return {
+            "extract": self._extractor.provenance,
+            "pair": self._pairer.provenance,
+            "judge": self._judge.provenance,
+        }
+
     def execute(self, question: Question) -> SavedRun:
         started_at = self._clock.now()
         started = self._clock.monotonic()
         self._events.emit(Start(question=question.text, total_sources=len(question.sources)))
 
         pages, fetch_stats = self._fetch_pages(question)
-        claims, extract_stats = self._extract_claims(question, pages)
+        as_of = as_of_for(self._fetcher.mode, started_at, pages)
+        claims, extract_stats = self._extract_claims(question, pages, as_of)
         pairs, pair_stats = self._pair_claims(question, claims)
-        judgment, judge_stats = self._reach_verdict(question, claims, pairs)
+        judgment, judge_stats = self._reach_verdict(question, claims, pairs, as_of)
 
         result = RunResult(
             question=question,
             mode=self._fetcher.mode,
             started_at=started_at,
+            as_of=as_of,
             elapsed_seconds=self._seconds_since(started),
             steps={"fetch": fetch_stats, "extract": extract_stats, "pair": pair_stats, "judge": judge_stats},
+            provenance=self.provenance,
             pages=tuple(pages),
             claims=tuple(claims),
             pairs=tuple(pairs),
@@ -93,11 +118,11 @@ class VerifyQuestion:
         self._events.emit(FetchDone(url=page.url, ok=failure is None, chars=len(page.markdown or ""), index=index))
         self._report(failure)
 
-    def _extract_claims(self, question: Question, pages: list[Page]) -> tuple[list[Claim], StepStats]:
+    def _extract_claims(self, question: Question, pages: list[Page], as_of: AsOf) -> tuple[list[Claim], StepStats]:
         started = self._clock.monotonic()
         claims: list[Claim] = []
         for page in (page for page in pages if page.usable):
-            claim = self._extractor.extract(question, page)
+            claim = self._extractor.extract(question, page, as_of)
             claims.append(claim)
             # index 必须是来源在 sources 里的下标，跟 fetch_done 对齐：前端按它往固定的卡片槽位里填。
             # 用 claims 的长度会在有页面抓取失败时整体错位，把主张画到别的来源上。
@@ -119,11 +144,11 @@ class VerifyQuestion:
         self._report(pair.failure)
 
     def _reach_verdict(
-        self, question: Question, claims: list[Claim], pairs: list[Pair]
+        self, question: Question, claims: list[Claim], pairs: list[Pair], as_of: AsOf
     ) -> tuple[Judgment, StepStats]:
         self._events.emit(JudgeStart())
         started = self._clock.monotonic()
-        judgment = self._judge.judge(question, claims, pairs)
+        judgment = self._judge.judge(question, claims, pairs, as_of)
         stats = StepStats.summing([judgment.usage], self._seconds_since(started))
         self._report(judgment.failure)
         return judgment, stats

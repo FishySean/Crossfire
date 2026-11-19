@@ -10,7 +10,7 @@ import dataclasses
 import json
 import sys
 from dataclasses import FrozenInstanceError
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -22,6 +22,7 @@ from crossfire.domain import (
     Mode,
     Page,
     Pair,
+    Provenance,
     Question,
     Relation,
     RunResult,
@@ -32,6 +33,7 @@ from crossfire.domain import (
     UnknownSourceError,
     UnusableReason,
     Usage,
+    as_of_for,
     is_usable_page,
 )
 from crossfire.adapters.anthropic.extractor import EXTRACT_SCHEMA
@@ -351,6 +353,8 @@ RUN = {
     "question": "?",
     "mode": "cached",
     "started_at": "2026-11-19T20:00:00.123456+00:00",
+    # 第 5a 步改了测试数据（断言没改）：新增 as_of 和 provenance 两个键。
+    "as_of": "2026-09-12",
     "elapsed_seconds": 12.5,
     "sources": [{"url": s.url, "tier": s.tier.value} for s in QUESTION.sources],
     "pages_fetched": 2,
@@ -362,6 +366,11 @@ RUN = {
         "extract": {"calls": 2, "input_tokens": 20, "output_tokens": 4, "seconds": 2.0, "requests": 3},
         "pair": {"calls": 1, "input_tokens": 10, "output_tokens": 2, "seconds": 3.0, "requests": 2},
         "judge": {"calls": 1, "input_tokens": 10, "output_tokens": 2, "seconds": 4.0, "requests": 1},
+    },
+    "provenance": {
+        "extract": {"model": "claude-sonnet-4-6", "prompt_version": "0123456789ab"},
+        "pair": {"model": "nli-small", "prompt_version": None},
+        "judge": {"model": "claude-sonnet-4-6", "prompt_version": "ba9876543210"},
     },
     "total_input_tokens": 40,
     "total_output_tokens": 8,
@@ -513,3 +522,37 @@ def test_step_stats_with_an_unrecorded_request_count():
     assert StepStats.from_dict(stats.to_dict()) == stats
     with pytest.raises(KeyError):
         StepStats.from_dict({"calls": 1, "input_tokens": 1, "output_tokens": 1, "seconds": 1.0})
+
+
+# ---- 第 5a 步：as_of ----
+
+SEPT = datetime(2026, 9, 12, 21, 16, tzinfo=timezone.utc)
+
+
+def _page(url, ok=True, fetched_at=SEPT):
+    return Page(url=url, ok=ok, title="t", markdown=ARTICLE, fetched_at=fetched_at)
+
+
+def test_as_of_for_live_is_the_utc_day_of_the_run():
+    late_evening_new_york = datetime(2026, 11, 19, 23, 30, tzinfo=timezone(timedelta(hours=-5)))
+    assert as_of_for(Mode.LIVE, late_evening_new_york, [_page("a")]) == date(2026, 11, 20)
+
+
+def test_as_of_for_cached_is_the_latest_snapshot_day_and_ignores_failed_pages():
+    pages = [_page("a"), _page("b", fetched_at=SEPT + timedelta(days=1)), _page("c", ok=False, fetched_at=None)]
+    assert as_of_for(Mode.CACHED, datetime(2030, 1, 1, tzinfo=timezone.utc), pages) == date(2026, 9, 13)
+
+
+@pytest.mark.parametrize("pages", [[], [_page("a", ok=False, fetched_at=None)], [_page("a"), _page("b", fetched_at=None)]])
+def test_as_of_for_cached_is_unknown_when_any_snapshot_page_has_no_fetch_time(pages):
+    assert as_of_for(Mode.CACHED, datetime(2030, 1, 1, tzinfo=timezone.utc), pages) is None
+
+
+def test_as_of_and_provenance_round_trip_and_may_be_null():
+    run = RunResult.from_dict(RUN)
+    assert run.as_of == date(2026, 9, 12)
+    assert run.provenance is not None and run.provenance["pair"] == Provenance("nli-small", None)
+    old = RunResult.from_dict({**RUN, "as_of": None, "provenance": None})
+    assert old.as_of is None and old.provenance is None
+    with pytest.raises(KeyError):
+        RunResult.from_dict({key: value for key, value in RUN.items() if key != "as_of"})

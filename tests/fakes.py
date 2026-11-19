@@ -6,7 +6,7 @@
 import threading
 import time
 from collections.abc import Callable, Collection, Sequence
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 from crossfire.application.events import Event
 from crossfire.application.ports import (
@@ -28,6 +28,7 @@ from crossfire.domain import (
     Mode,
     Page,
     Pair,
+    Provenance,
     Question,
     Relation,
     RunResult,
@@ -95,12 +96,16 @@ class FakeFetcher:
 
 
 class FakeExtractor:
+    provenance = Provenance(model="fake-extractor", prompt_version="fake-e1")
+
     def __init__(self, log: CallLog, texts: dict[str, str] | None = None) -> None:
         self.log = log
         self.texts = texts or {}
+        self.as_of_seen: list[date | None] = []
 
-    def extract(self, question: Question, page: Page) -> Claim:
+    def extract(self, question: Question, page: Page, as_of: date | None) -> Claim:
         self.log.record("extract")
+        self.as_of_seen.append(as_of)
         return Claim(
             source_url=page.url,
             tier=question.source_of(page.url).tier,
@@ -115,6 +120,8 @@ class FakeExtractor:
 
 class FakePairer:
     """一律 agree；两个 URL 都在 failing_pair_urls 里的那一对返回失败。"""
+
+    provenance = Provenance(model="fake-pairer", prompt_version="fake-p1")
 
     def __init__(self, log: CallLog, failing_pair_urls: Collection[str] | None = None) -> None:
         self.log = log
@@ -146,6 +153,8 @@ class EqualityPairer:
     它是接入自训 NLI 模型的演练：一个与 Claude 毫无关系的比对实现，注入进去就能跑完整条流水线。
     """
 
+    provenance = Provenance(model="equality", prompt_version=None)
+
     def __init__(self) -> None:
         self.batches: list[int] = []
 
@@ -173,13 +182,17 @@ class EqualityPairer:
 
 
 class FakeJudge:
+    provenance = Provenance(model="fake-judge", prompt_version="fake-j1")
+
     def __init__(self, log: CallLog, trusted_url: str, delay: float = 0.0) -> None:
         self.log = log
         self.trusted_url = trusted_url
         self.delay = delay
+        self.as_of_seen: list[date | None] = []
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
         self.log.record("judge")
+        self.as_of_seen.append(as_of)
         time.sleep(self.delay)
         return Judgment(
             answer="当前版本是 1.0",

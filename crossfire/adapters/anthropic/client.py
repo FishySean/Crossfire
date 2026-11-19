@@ -1,8 +1,10 @@
+import hashlib
 import json
 import sys
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import date
 from typing import Any
 
 from anthropic import Anthropic, APIConnectionError
@@ -22,6 +24,16 @@ RETRY_NOTE = """
 
 # parse 抛出这几类异常，说明模型给的结构不合法，算一次结构化失败。
 INVALID_STRUCTURE = (KeyError, TypeError, ValueError)
+
+
+def prompt_version(template: str, schema: dict[str, Any]) -> str:
+    """模板和输出 schema 一起哈希：两者任何一处改动都会改变模型的行为。"""
+    body = template + "\n" + json.dumps(schema, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha256(body.encode()).hexdigest()[:12]
+
+
+def describe_date(as_of: date | None) -> str:
+    return as_of.isoformat() if as_of is not None else "未知（快照没有记录抓取日期）"
 
 
 @dataclass(frozen=True)

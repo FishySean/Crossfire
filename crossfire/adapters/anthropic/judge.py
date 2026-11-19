@@ -1,10 +1,11 @@
 import json
 from collections.abc import Sequence
 from dataclasses import replace
+from datetime import date
 from typing import Any
 
-from crossfire.adapters.anthropic.client import ClaudeClient
-from crossfire.domain import Claim, Judgment, Pair, Question, Relation
+from crossfire.adapters.anthropic.client import ClaudeClient, describe_date, prompt_version
+from crossfire.domain import Claim, Judgment, Pair, Provenance, Question, Relation
 
 # prompt 里出现的关系名一律从 Relation 填入，不手写字符串。
 RELATION_NAMES = {
@@ -16,6 +17,8 @@ RELATION_NAMES = {
 
 JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是一个问题、各来源提取出的主张，以及两两比对的结果。
 
+今天的日期：{as_of}
+
 问题：{question}
 
 各来源的主张（JSON）：
@@ -23,6 +26,15 @@ JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是�
 
 两两比对结果（JSON）：
 {pairs}
+
+关于你自己的知识，这几条优先于下面所有的判断原则：
+- 来源描述的事可能发生在你的训练数据之后。比你所知更新的版本号、日期、数字，本身不是来源出错的证据。
+- 一手来源（primary）明确写出的事实，优先于你自己的知识。
+- 不许以「超出已知范围」「与已知时间线不符」「版本号异常超前」之类的理由否定一手来源的明确陈述。
+- 如果你认为某个一手来源有误，必须在 reasoning 里引用其他来源的原文（claims 里的 evidence）作为反证；
+  你自己的知识不能当反证。
+- 旧文章描述的是它发布时的情况。published_date 明显早于今天的主张，和较新的一手来源冲突时是过时了，
+  不能拿来印证或反驳一手来源。
 
 判断原则，按优先级从高到低：
 1. 来源层级：primary（一手源、官方文档）的权重高于 news（新闻报道），news 高于 aggregator（二手聚合站）
@@ -80,8 +92,13 @@ class ClaudeVerdictJudge:
     def __init__(self, client: ClaudeClient) -> None:
         self._client = client
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
+    @property
+    def provenance(self) -> Provenance:
+        return Provenance(model=self._client.model, prompt_version=prompt_version(JUDGE_PROMPT, JUDGE_SCHEMA))
+
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
         prompt = JUDGE_PROMPT.format(
+            as_of=describe_date(as_of),
             question=question.text,
             claims=json.dumps([claim.to_dict() for claim in claims], ensure_ascii=False, indent=2),
             pairs=json.dumps([pair.to_dict() for pair in pairs], ensure_ascii=False, indent=2),

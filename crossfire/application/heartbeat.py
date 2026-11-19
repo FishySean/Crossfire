@@ -1,8 +1,9 @@
 from collections.abc import Sequence
+from datetime import date
 
 from crossfire.application.events import Heartbeat
 from crossfire.application.ports import Clock, EventSink, Ticker, VerdictJudge
-from crossfire.domain import Claim, Judgment, Pair, Question
+from crossfire.domain import Claim, Judgment, Pair, Provenance, Question
 
 
 class HeartbeatJudge:
@@ -26,7 +27,11 @@ class HeartbeatJudge:
         self._ticker = ticker
         self._interval = interval
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
+    @property
+    def provenance(self) -> Provenance:
+        return self._inner.provenance
+
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
         started = self._clock.monotonic()
 
         def beat() -> None:
@@ -34,7 +39,7 @@ class HeartbeatJudge:
 
         stop = self._ticker.every(self._interval, beat)
         try:
-            return self._inner.judge(question, claims, pairs)
+            return self._inner.judge(question, claims, pairs, as_of)
         finally:
             stop()
 

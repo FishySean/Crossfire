@@ -1,6 +1,7 @@
 """Crossfire 的领域层：实体与业务规则。只允许依赖 Python 标准库。"""
 
 from crossfire.domain.models import (
+    AsOf,
     Claim,
     Failure,
     Judgment,
@@ -8,6 +9,7 @@ from crossfire.domain.models import (
     Mode,
     Page,
     Pair,
+    Provenance,
     Question,
     RunResult,
     Source,
@@ -17,11 +19,13 @@ from crossfire.domain.models import (
     Tier,
     UnknownSourceError,
     Usage,
+    as_of_for,
 )
 from crossfire.domain.relations import Relation
 from crossfire.domain.usability import UnusableReason, is_usable_page
 
 __all__ = [
+    "AsOf",
     "Claim",
     "Failure",
     "Judgment",
@@ -29,6 +33,7 @@ __all__ = [
     "Mode",
     "Page",
     "Pair",
+    "Provenance",
     "Question",
     "Relation",
     "RunResult",
@@ -40,5 +45,6 @@ __all__ = [
     "UnknownSourceError",
     "UnusableReason",
     "Usage",
+    "as_of_for",
     "is_usable_page",
 ]

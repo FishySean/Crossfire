@@ -9,7 +9,7 @@ from_dict 读的是本项目自己写出的结构，键缺失、枚举值不认�
 
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Any, NewType, Self, cast
 
@@ -482,6 +482,45 @@ class StepStats:
         )
 
 
+@dataclass(frozen=True)
+class Provenance:
+    """一个步骤的结果是谁产出的：哪个模型、哪一版 prompt。
+
+    造训练数据时每条标签都要能查到这两项。不调模型的实现 model 写实现名，没有 prompt 时 prompt_version 为 None。
+    """
+
+    model: str
+    prompt_version: str | None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"model": self.model, "prompt_version": self.prompt_version}
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Self:
+        return cls(
+            model=_str(data["model"], "model"),
+            prompt_version=_optional_str(data["prompt_version"], "prompt_version"),
+        )
+
+
+type AsOf = date | None
+
+
+def as_of_for(mode: Mode, started_at: datetime, pages: Sequence[Page]) -> AsOf:
+    """告诉模型的「今天」。live 是运行当天；cached 是快照抓取的那天，不是运行当天。
+
+    拿 9 月的快照配 11 月的日期，模型会以为 9 月的信息都过时了。抓到的页面里有哪一页不知道抓取时间，
+    就整体算不知道，不拿运行当天去顶。日期一律按 UTC 算。
+    """
+    if mode is Mode.LIVE:
+        return started_at.astimezone(UTC).date()
+    stamps = [page.fetched_at for page in pages if page.ok]
+    known = [stamp for stamp in stamps if stamp is not None]
+    if not known or len(known) < len(stamps):
+        return None
+    return max(known).astimezone(UTC).date()
+
+
 def _sum_or_none(values: Iterable[int | None]) -> int | None:
     """有一个没记录，总数就是未知。"""
     total = 0
@@ -498,13 +537,18 @@ class RunResult:
 
     pages_fetched、failures、token 总数等都由已有字段推出，做成属性而不是字段，
     避免存一份可能对不上的副本。
+
+    as_of 是告诉模型的「今天」：live 是运行当天，cached 是快照抓取的那天。None 表示没有告诉模型日期，
+    第 5a 步之前的运行都是这样，迁移过来就是 None。provenance 按步骤记模型和 prompt 版本，旧文件是 None。
     """
 
     question: Question
     mode: Mode
     started_at: datetime
+    as_of: date | None
     elapsed_seconds: float
     steps: dict[str, StepStats]
+    provenance: dict[str, Provenance] | None
     pages: tuple[Page, ...]
     claims: tuple[Claim, ...]
     pairs: tuple[Pair, ...]
@@ -547,6 +591,7 @@ class RunResult:
             "question": self.question.text,
             "mode": self.mode.value,
             "started_at": self.started_at.isoformat(),
+            "as_of": None if self.as_of is None else self.as_of.isoformat(),
             "elapsed_seconds": self.elapsed_seconds,
             "sources": [source.to_dict() for source in self.question.sources],
             "pages_fetched": self.pages_fetched,
@@ -554,6 +599,9 @@ class RunResult:
             "claude_calls": self.model_requests,
             "failures": [failure.to_dict() for failure in self.failures],
             "steps": {name: step.to_dict() for name, step in self.steps.items()},
+            "provenance": None
+            if self.provenance is None
+            else {name: item.to_dict() for name, item in self.provenance.items()},
             "total_input_tokens": self.total_input_tokens,
             "total_output_tokens": self.total_output_tokens,
             "pages": [page.to_dict() for page in self.pages],
@@ -572,8 +620,12 @@ class RunResult:
             ),
             mode=Mode(_str(data["mode"], "mode")),
             started_at=datetime.fromisoformat(_str(data["started_at"], "started_at")),
+            as_of=None if data["as_of"] is None else date.fromisoformat(_str(data["as_of"], "as_of")),
             elapsed_seconds=_number(data["elapsed_seconds"], "elapsed_seconds"),
             steps={name: StepStats.from_dict(step) for name, step in data["steps"].items()},
+            provenance=None
+            if data["provenance"] is None
+            else {name: Provenance.from_dict(item) for name, item in data["provenance"].items()},
             pages=tuple(Page.from_dict(page) for page in data["pages"]),
             claims=tuple(Claim.from_dict(claim) for claim in data["claims"]),
             pairs=tuple(Pair.from_dict(pair) for pair in data["pairs"]),

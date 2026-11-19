@@ -4,11 +4,11 @@
 """
 
 from collections.abc import Callable, Sequence
-from datetime import datetime
+from datetime import date, datetime
 from typing import Protocol
 
 from crossfire.application.events import Event
-from crossfire.domain import Claim, Judgment, Mode, Page, Pair, Question, RunResult, SourceIndex
+from crossfire.domain import Claim, Judgment, Mode, Page, Pair, Provenance, Question, RunResult, SourceIndex
 
 type OnPage = Callable[[SourceIndex, Page], None]
 type OnPair = Callable[[int, int, Pair], None]
@@ -30,15 +30,27 @@ class PageFetcher(Protocol):
 
 
 class ClaimExtractor(Protocol):
-    def extract(self, question: Question, page: Page) -> Claim:
+    @property
+    def provenance(self) -> Provenance:
+        """产出主张的模型和 prompt 版本，写进结果文件。"""
+        ...
+
+    def extract(self, question: Question, page: Page, as_of: date | None) -> Claim:
         """从一个已抓到的页面里提取针对问题的主张。来源层级用 question.source_of(page.url) 查。
 
+        as_of 是这次查证的「今天」，必须照实告诉模型；None 表示不知道，也要明说不知道。
+        实现里不许自己取当前时间：cached 模式和评测时，「今天」是快照那天，不是运行那天。
         失败时返回带 failure 的 Claim，不抛异常。
         """
         ...
 
 
 class ClaimPairer(Protocol):
+    @property
+    def provenance(self) -> Provenance:
+        """产出比对结果的模型和 prompt 版本。本地 NLI 模型写模型名和权重版本，没有 prompt。"""
+        ...
+
     def pair_all(
         self,
         question: Question,
@@ -65,8 +77,14 @@ class ClaimPairer(Protocol):
 
 
 class VerdictJudge(Protocol):
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
-        """综合所有主张和比对结果下最终结论。失败时返回带 failure 的 Judgment，不抛异常。"""
+    @property
+    def provenance(self) -> Provenance: ...
+
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+        """综合所有主张和比对结果下最终结论。as_of 的要求同 ClaimExtractor.extract。
+
+        失败时返回带 failure 的 Judgment，不抛异常。
+        """
         ...
 
 

@@ -3,6 +3,7 @@
 import threading
 import time
 from collections.abc import Sequence
+from datetime import date
 
 import pytest
 
@@ -33,17 +34,17 @@ class ClockAdvancingJudge(FakeJudge):
         self.seconds = seconds
         self.error = error
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
         self.clock.advance(self.seconds)
         if self.error:
             raise self.error
-        return super().judge(question, claims, pairs)
+        return super().judge(question, claims, pairs, as_of)
 
 
 def test_twelve_seconds_of_judging_give_exactly_two_beats():
     clock, sink = FakeClock(), RecordingSink()
     inner = ClockAdvancingJudge(clock, seconds=12)
-    judgment = HeartbeatJudge(inner, sink, clock, clock, INTERVAL).judge(QUESTION, [], [])
+    judgment = HeartbeatJudge(inner, sink, clock, clock, INTERVAL).judge(QUESTION, [], [], None)
 
     assert sink.events == [Heartbeat("judge", 5.0), Heartbeat("judge", 10.0)]
     assert judgment.answer == "当前版本是 1.0"
@@ -51,7 +52,7 @@ def test_twelve_seconds_of_judging_give_exactly_two_beats():
 
 def test_no_beats_after_the_judge_returns():
     clock, sink = FakeClock(), RecordingSink()
-    HeartbeatJudge(ClockAdvancingJudge(clock, seconds=12), sink, clock, clock, INTERVAL).judge(QUESTION, [], [])
+    HeartbeatJudge(ClockAdvancingJudge(clock, seconds=12), sink, clock, clock, INTERVAL).judge(QUESTION, [], [], None)
     clock.advance(60)
 
     assert len(sink.events) == 2
@@ -62,7 +63,7 @@ def test_beating_stops_even_when_the_judge_raises():
     clock, sink = FakeClock(), RecordingSink()
     inner = ClockAdvancingJudge(clock, seconds=7, error=RuntimeError("boom"))
     with pytest.raises(RuntimeError):
-        HeartbeatJudge(inner, sink, clock, clock, INTERVAL).judge(QUESTION, [], [])
+        HeartbeatJudge(inner, sink, clock, clock, INTERVAL).judge(QUESTION, [], [], None)
     clock.advance(60)
 
     assert sink.events == [Heartbeat("judge", 5.0)]

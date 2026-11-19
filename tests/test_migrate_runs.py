@@ -15,7 +15,7 @@ CURRENT = RunResult.from_dict(RUN).to_dict()
 def old_format():
     """开始统计请求数、记录 mode 之前写出的文件长这样。"""
     data = json.loads(json.dumps(CURRENT))
-    del data["mode"]
+    del data["mode"], data["as_of"], data["provenance"]
     for record in [*data["claims"], *data["pairs"], data["judgment"]]:
         del record["usage"]["requests"]
     for step in data["steps"].values():
@@ -40,7 +40,18 @@ def test_old_file_gets_mode_and_unrecorded_requests():
     assert migrated["claude_calls"] is None
     run = RunResult.from_dict(migrated)
     assert run.model_requests is None
-    assert len(changes) == 4
+    # 第 5a 步有意修改：4 → 5，原因：多了一条「补 as_of=null、provenance=null」
+    assert len(changes) == 5
+
+
+def test_step_four_files_only_get_as_of_and_provenance_as_null():
+    data = json.loads(json.dumps(CURRENT))
+    del data["as_of"], data["provenance"]
+    migrated, changes = migrate(data)
+    assert changes == ["补 as_of=null、provenance=null"]
+    assert list(migrated) == list(CURRENT)
+    run = RunResult.from_dict(migrated)
+    assert run.as_of is None and run.provenance is None
 
 
 def test_migration_is_idempotent():

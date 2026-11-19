@@ -33,7 +33,7 @@ QUESTIONS = [
 
 
 class ExplodingExtractor(FakeExtractor):
-    def extract(self, question, page):
+    def extract(self, question, page, as_of):
         raise RuntimeError("提取器炸了")
 
 

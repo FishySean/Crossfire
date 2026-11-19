@@ -228,3 +228,11 @@ def test_eval_needs_only_the_anthropic_key(eval_env, capsys):
     assert run_eval("--case", "right", STEEL_API_KEY="") == 0
     assert run_eval("--case", "right", ANTHROPIC_API_KEY="") == 2
     assert "ANTHROPIC_API_KEY" in capsys.readouterr().err
+
+
+def test_report_shows_the_day_told_to_the_model_and_who_produced_each_step(env, capsys):
+    run, _, _ = env
+    run("verify", "--question", "q1", "--mode", "cached")
+    out = capsys.readouterr().out
+    assert "告诉模型的今天：2026-09-12    模式：cached" in out
+    assert "judge     模型 fake-judge  prompt fake-j1" in out

@@ -2,12 +2,13 @@
 
 from collections.abc import Sequence
 from dataclasses import replace
+from datetime import UTC, date, datetime
 
 import pytest
 
 from crossfire.application.events import Done, Error
 from crossfire.application.use_cases import VerifyQuestion
-from crossfire.domain import Claim, Judgment, Mode, Pair, Question, Usage
+from crossfire.domain import Claim, Judgment, Mode, Pair, Provenance, Question, Usage
 from tests.fakes import (
     CallLog,
     FakeClock,
@@ -38,9 +39,9 @@ class SlowJudge(FakeJudge):
         self.clock = clock
         self.seconds = seconds
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
         self.clock.advance(self.seconds)
-        return super().judge(question, claims, pairs)
+        return super().judge(question, claims, pairs, as_of)
 
 
 @pytest.fixture
@@ -159,8 +160,8 @@ def test_all_pages_failing_is_still_loud(build):
 class RetryingExtractor(FakeExtractor):
     """第一个来源的提取重试过一次：两次请求。"""
 
-    def extract(self, question, page):
-        claim = super().extract(question, page)
+    def extract(self, question, page, as_of):
+        claim = super().extract(question, page, as_of)
         if page.url == URLS[0]:
             return replace(claim, usage=Usage(20, 4, requests=2))
         return claim
@@ -212,3 +213,43 @@ def test_fetch_error_detail_is_always_a_string(build):
     [error] = [e for e in parts["events"].events if isinstance(e, Error)]
     [failure] = result.failures
     assert error.detail == failure.detail == "抓取失败，没有错误信息"
+
+
+# ---- 第 5a 步：「今天」是哪天，按模式定，原样交给提取和判决 ----
+
+SEPTEMBER_FETCH = datetime(2026, 9, 12, 21, 16, tzinfo=UTC)
+NOVEMBER_RUN = datetime(2026, 11, 19, 23, 3, 33, tzinfo=UTC)
+
+
+def test_live_runs_tell_the_model_the_day_of_the_run(build):
+    use_case, parts = build(clock=FakeClock(NOVEMBER_RUN))
+    result = use_case.execute(QUESTION).result
+    assert result.as_of == date(2026, 11, 19)
+    assert set(parts["extractor"].as_of_seen) == {date(2026, 11, 19)}
+    assert parts["judge"].as_of_seen == [date(2026, 11, 19)]
+
+
+def test_cached_runs_tell_the_model_the_day_of_the_snapshot_not_today(build):
+    fetcher = FakeFetcher(mode=Mode.CACHED, fetched_at=SEPTEMBER_FETCH)
+    use_case, parts = build(fetcher=fetcher, clock=FakeClock(NOVEMBER_RUN))
+    result = use_case.execute(QUESTION).result
+    assert result.as_of == date(2026, 9, 12)
+    assert parts["extractor"].as_of_seen == [date(2026, 9, 12)] * 4
+    assert parts["judge"].as_of_seen == [date(2026, 9, 12)]
+
+
+def test_a_snapshot_without_fetch_time_is_an_unknown_day_not_today(build):
+    fetcher = FakeFetcher(mode=Mode.CACHED, fetched_at=None)
+    use_case, parts = build(fetcher=fetcher, clock=FakeClock(NOVEMBER_RUN))
+    assert use_case.execute(QUESTION).result.as_of is None
+    assert parts["judge"].as_of_seen == [None]
+
+
+def test_the_result_records_which_model_and_prompt_produced_each_step(build):
+    use_case, _ = build()
+    provenance = use_case.execute(QUESTION).result.provenance
+    assert provenance == {
+        "extract": Provenance("fake-extractor", "fake-e1"),
+        "pair": Provenance("fake-pairer", "fake-p1"),
+        "judge": Provenance("fake-judge", "fake-j1"),
+    }

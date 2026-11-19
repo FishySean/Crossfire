@@ -3,6 +3,7 @@
 import re
 import threading
 import time
+from datetime import date
 from types import SimpleNamespace
 
 import anthropic
@@ -10,6 +11,7 @@ import httpx
 import pytest
 
 from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClaimPairer, ClaudeClient, ClaudeVerdictJudge
+from crossfire.adapters.anthropic.client import prompt_version
 from crossfire.adapters.anthropic.judge import JUDGE_PROMPT
 from crossfire.adapters.anthropic.pairer import PAIR_PROMPT, PAIR_SCHEMA, RELATION_NAMES
 from crossfire.domain import Claim, Page, Question, Relation, Source, Tier, Usage
@@ -23,6 +25,8 @@ QUESTION = Question(
         Source("https://c.example/", Tier.AGGREGATOR),
     ),
 )
+
+AS_OF = date(2026, 9, 12)
 
 JUDGMENT = {
     "answer": "1.0",
@@ -85,7 +89,7 @@ def claim(url, text, tier=Tier.PRIMARY):
 
 def test_judge_retries_when_conflicts_come_back_as_a_string():
     client, messages = client_for(scripted({**JUDGMENT, "conflicts": '["时间不同"]'}, JUDGMENT))
-    judgment = ClaudeVerdictJudge(client).judge(QUESTION, [], [])
+    judgment = ClaudeVerdictJudge(client).judge(QUESTION, [], [], AS_OF)
 
     assert judgment.failure is None
     assert judgment.conflicts == ("时间不同",)
@@ -98,7 +102,7 @@ def test_judge_retries_when_conflicts_come_back_as_a_string():
 def test_judge_reports_failure_when_conflicts_stay_a_string(capsys):
     bad = {**JUDGMENT, "conflicts": '["时间不同"]'}
     client, messages = client_for(scripted(bad, bad))
-    judgment = ClaudeVerdictJudge(client).judge(QUESTION, [], [])
+    judgment = ClaudeVerdictJudge(client).judge(QUESTION, [], [], AS_OF)
 
     assert len(messages.prompts) == 2
     assert judgment.failure is not None
@@ -111,7 +115,7 @@ def test_judge_reports_failure_when_conflicts_stay_a_string(capsys):
 def test_judge_rejects_non_string_conflict_items():
     bad = {**JUDGMENT, "conflicts": [{"note": "时间不同"}]}
     client, _ = client_for(scripted(bad, bad))
-    assert ClaudeVerdictJudge(client).judge(QUESTION, [], []).failure is not None
+    assert ClaudeVerdictJudge(client).judge(QUESTION, [], [], AS_OF).failure is not None
 
 
 def test_pairer_rejects_a_relation_outside_the_enum():
@@ -136,7 +140,7 @@ def test_extractor_keeps_the_page_url_and_source_tier_even_if_the_model_echoes_o
     }
     client, _ = client_for(scripted(data))
     page = Page(url="https://b.example/", ok=True, title="t", markdown="正文")
-    result = ClaudeClaimExtractor(client).extract(QUESTION, page)
+    result = ClaudeClaimExtractor(client).extract(QUESTION, page, AS_OF)
 
     assert (result.source_url, result.tier, result.text) == ("https://b.example/", Tier.NEWS, "1.0")
     # 第 3 步有意修改：Usage(输入, 输出) → Usage(输入, 输出, 请求数)，原因：backlog「claude_calls 少算重试」
@@ -147,7 +151,7 @@ def test_extractor_failure_is_an_unanswered_claim_with_failure():
     bad = {"claim": "1.0"}
     client, _ = client_for(scripted(bad, bad))
     page = Page(url="https://a.example/", ok=True, title="t", markdown="正文")
-    result = ClaudeClaimExtractor(client).extract(QUESTION, page)
+    result = ClaudeClaimExtractor(client).extract(QUESTION, page, AS_OF)
 
     assert result.text is None and result.failure is not None
     assert result.failure.step == "extract"
@@ -242,3 +246,44 @@ def test_pair_schema_and_prompt_take_relation_names_from_the_enum():
         template_text = re.sub(r"\{\w+\}", "", template)
         for relation in Relation:
             assert relation.value not in template_text, f"{relation.value} 在 {name} 模板里被手写了"
+
+
+# ---- 第 5a 步：告诉模型「今天」是哪天，记下模型和 prompt 版本 ----
+
+EXTRACTED = {"claim": "1.0", "evidence": "v1.0", "source_type": "news_article", "confidence": 0.8, "published_date": None}
+
+
+@pytest.mark.parametrize("as_of", [date(2026, 9, 12), date(2031, 1, 2)])
+def test_both_prompts_carry_the_date_they_were_given_not_today(as_of):
+    client, messages = client_for(scripted(EXTRACTED, JUDGMENT))
+    page = Page(url="https://a.example/", ok=True, title="t", markdown="正文")
+    ClaudeClaimExtractor(client).extract(QUESTION, page, as_of)
+    ClaudeVerdictJudge(client).judge(QUESTION, [], [], as_of)
+    assert [f"今天的日期：{as_of.isoformat()}" in prompt for prompt in messages.prompts] == [True, True]
+
+
+def test_unknown_date_is_said_out_loud():
+    client, messages = client_for(scripted(EXTRACTED, JUDGMENT))
+    page = Page(url="https://a.example/", ok=True, title="t", markdown="正文")
+    ClaudeClaimExtractor(client).extract(QUESTION, page, None)
+    ClaudeVerdictJudge(client).judge(QUESTION, [], [], None)
+    assert all("今天的日期：未知" in prompt for prompt in messages.prompts)
+
+
+def test_provenance_names_the_model_and_a_version_of_each_prompt():
+    def adapters(model):
+        client = ClaudeClient(client=SimpleNamespace(messages=None), model=model)
+        return ClaudeClaimExtractor(client), ClaudeClaimPairer(client), ClaudeVerdictJudge(client)
+
+    first, again, other_model = adapters("m-1"), adapters("m-1"), adapters("m-2")
+    versions = [adapter.provenance.prompt_version for adapter in first]
+    assert all(adapter.provenance.model == "m-1" for adapter in first)
+    assert len(set(versions)) == 3 and all(re.fullmatch(r"[0-9a-f]{12}", v or "") for v in versions)
+    assert [a.provenance for a in first] == [a.provenance for a in again]
+    assert [a.provenance.prompt_version for a in other_model] == versions
+
+
+def test_prompt_version_changes_with_the_template_or_the_schema():
+    assert prompt_version("a", {}) == prompt_version("a", {})
+    assert prompt_version("a", {}) != prompt_version("b", {})
+    assert prompt_version("a", {}) != prompt_version("a", {"type": "object"})

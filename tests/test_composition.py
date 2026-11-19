@@ -54,9 +54,14 @@ def test_mode_selects_the_fetcher(tmp_path, mode, kind):
 def test_verifier_uses_one_model_per_step_and_the_configured_runs_dir(tmp_path):
     verifier = build_verifier(settings(tmp_path), QUESTION, Mode.CACHED)
     assert isinstance(verifier, VerifyQuestion)
-    assert verifier._extractor._client.model == "model-e"
-    assert verifier._pairer._client.model == "model-p"
-    assert verifier._judge._client.model == "model-j"
+    # 第 5a 步有意修改：读 _extractor._client.model 这类私有属性 → 读结果文件里也会写的 provenance。
+    # 原因：每次运行都要记下每步用的模型，测试读这份公开的记录就够了。
+    assert {step: item.model for step, item in verifier.provenance.items()} == {
+        "extract": "model-e",
+        "pair": "model-p",
+        "judge": "model-j",
+    }
+    assert all(item.prompt_version for item in verifier.provenance.values())
     assert isinstance(verifier._runs, JsonRunRepository)
     assert verifier._runs.runs_dir == tmp_path / "runs"
 
@@ -66,6 +71,7 @@ def test_heartbeat_wraps_the_judge_only_when_someone_listens(tmp_path):
     loud = build_verifier(settings(tmp_path), QUESTION, Mode.CACHED, RecordingSink())
     assert not isinstance(quiet._judge, HeartbeatJudge)
     assert isinstance(loud._judge, HeartbeatJudge)
+    assert loud.provenance == quiet.provenance
 
 
 def test_mode_must_be_a_mode(tmp_path):

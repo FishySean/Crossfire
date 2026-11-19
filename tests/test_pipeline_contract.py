@@ -70,6 +70,10 @@ RESULT_FILE_KEYS = {
     "claims",
     "pairs",
     "judgment",
+    # 第 5a 步有意修改：新增 as_of、provenance 两个键，已有的键不动。原因：造数据集时每条标签要能查到
+    # 是哪天的数据、哪个模型、哪版 prompt 产出的。
+    "as_of",
+    "provenance",
 }
 
 

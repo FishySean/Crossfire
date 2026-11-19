@@ -4,8 +4,10 @@
 默认只演练（dry-run）：列出每个文件要改什么，一个字节都不写。加 --apply 才写：
 先把整个目录原样备份到 runs.bak-<时间戳>/，再逐个原子替换要改的文件。可以重复跑，改过的不会再改。
 
-改三类问题：
+改四类问题：
   - 早期文件没有 mode 键：那时只有实时抓取，补 "mode": "live"。
+  - 第 5a 步之前没有 as_of 和 provenance：补 null。那时 prompt 里没有日期，as_of 按定义就是「没告诉模型」，
+    不能拿运行日期去补；用的哪个模型、哪版 prompt 也没记下来。
   - 开始统计请求数之前的 usage 和步骤统计没有 requests 键：补 null，表示「当时没有记录」，
     不是 0。这样的文件顶层 claude_calls 也改成 null：旧值没算重试，和逐条记录对不上。
   - 模型把 judgment.conflicts 整个数组编码成了一个 JSON 字符串：解析回数组。字符串里的引号没转义、
@@ -52,6 +54,14 @@ def migrate(data: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     if (usages or steps) and data.get("claude_calls") is not None:
         changes.append(f"claude_calls {data['claude_calls']} → null")
         data["claude_calls"] = None
+
+    added = [key for key in ("as_of", "provenance") if key not in data]
+    if "as_of" in added:
+        data = _insert_after(data, "started_at", "as_of", None)
+    if "provenance" in added:
+        data = _insert_after(data, "steps", "provenance", None)
+    if added:
+        changes.append(f"补 {'、'.join(f'{key}=null' for key in added)}")
 
     judgment = data.get("judgment") or {}
     conflicts = judgment.get("conflicts")

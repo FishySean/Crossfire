@@ -46,7 +46,10 @@ class RunEvals:
         attempts: list[Attempt] = []
         for _ in range(case.repeats):
             saved = self._verifier_for(case, question).execute(question)
-            attempt = Attempt(saved=saved, grade=case.grade(saved.result.judgment.answer))
+            grade = case.grade(saved.result.judgment.answer)
+            if saved.result.as_of != case.as_of:
+                grade = grade.failing(f"告诉模型的今天是 {saved.result.as_of}，这道题的快照日期是 {case.as_of}")
+            attempt = Attempt(saved=saved, grade=grade)
             attempts.append(attempt)
             if on_attempt:
                 on_attempt(attempt)

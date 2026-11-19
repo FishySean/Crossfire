@@ -189,6 +189,7 @@ def print_eval_table(outcomes: Sequence[CaseOutcome]) -> None:
 def print_report(result: dict[str, Any], location: str) -> None:
     print("=" * 70)
     print(f"问题：{result['question']}")
+    print(f"告诉模型的今天：{result['as_of'] or '未知（快照没有记录抓取日期）'}    模式：{result['mode']}")
     print("=" * 70)
 
     print("\n--- 各来源主张 ---")
@@ -258,6 +259,8 @@ def print_report(result: dict[str, Any], location: str) -> None:
             f"{step.get('output_tokens', 0):>12}{step['seconds']:>10}"
         )
     print(f"token 合计：输入 {result['total_input_tokens']}，输出 {result['total_output_tokens']}")
+    for step, item in (result["provenance"] or {}).items():
+        print(f"{step:<10}模型 {item['model']}  prompt {item['prompt_version'] or '-'}")
     print(f"总耗时：{result['elapsed_seconds']} 秒")
     print(f"完整结果：{location}")
 

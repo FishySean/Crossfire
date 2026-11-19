@@ -1,7 +1,7 @@
 """评测集：判分规则、标准答案的依据、冻结快照。全部离线，不调模型。"""
 
 import json
-from datetime import date
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -23,6 +23,8 @@ from crossfire.domain.evals import (
 from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakePairer, FakeJudge
 
 SETTINGS = Settings.from_mapping({})
+SEPTEMBER = datetime(2026, 9, 12, 21, 16, tzinfo=UTC)
+NOVEMBER = datetime(2026, 11, 19, 23, 3, 33, tzinfo=UTC)
 CASES = {case.id: case for case in load_eval_cases(SETTINGS)}
 QUESTIONS = {question.id: question for question in load_questions(SETTINGS)}
 
@@ -214,7 +216,7 @@ def test_a_case_passes_only_if_every_repeat_passes(tmp_path):
 
     def verifier_for(_case, _question):
         return assemble(
-            fetcher=FakeFetcher(mode=Mode.CACHED),
+            fetcher=FakeFetcher(mode=Mode.CACHED, fetched_at=NOVEMBER),
             extractor=FakeExtractor(log),
             pairer=FakePairer(log),
             judge=ScriptedJudge(log, question.sources[0].url),
@@ -225,6 +227,26 @@ def test_a_case_passes_only_if_every_repeat_passes(tmp_path):
     assert [attempt.grade.passed for attempt in outcome.attempts] == [True, False, True]
     assert not outcome.passed
     assert len(list(tmp_path.glob("*.json"))) == 3
+
+
+def test_a_right_answer_on_the_wrong_day_fails(tmp_path):
+    """快照日期没传对时，答案碰巧对了也不算：那说明这道题测的不是我们以为的东西。"""
+    case = CASES["python-2026-11"]
+    question = QUESTIONS[case.question_id]
+
+    class RightJudge(FakeJudge):
+        def judge(self, *args, **kwargs):
+            judgment = super().judge(*args, **kwargs)
+            return type(judgment)(**{**judgment.__dict__, "answer": "最新稳定版是 3.15.2。"})
+
+    def verifier_for(_case, _question):
+        log = CallLog()
+        return assemble(FakeFetcher(mode=Mode.CACHED, fetched_at=SEPTEMBER), FakeExtractor(log), FakePairer(log),
+                        RightJudge(log, question.sources[0].url), runs_dir=tmp_path)
+
+    [attempt, *_] = RunEvals(verifier_for).execute(case, question).attempts
+    assert not attempt.grade.passed
+    assert attempt.grade.reasons == ("告诉模型的今天是 2026-09-12，这道题的快照日期是 2026-11-19",)
 
 
 def test_case_and_question_must_match():

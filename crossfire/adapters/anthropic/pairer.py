@@ -4,9 +4,9 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import replace
 from typing import Any
 
-from crossfire.adapters.anthropic.client import ClaudeClient
+from crossfire.adapters.anthropic.client import ClaudeClient, prompt_version
 from crossfire.application.ports import OnPair
-from crossfire.domain import Claim, Failure, Pair, Question, Relation, Usage
+from crossfire.domain import Claim, Failure, Pair, Provenance, Question, Relation, Usage
 
 DEFAULT_PAIR_CONCURRENCY = 6
 
@@ -119,6 +119,10 @@ class ClaudeClaimPairer:
     def __init__(self, client: ClaudeClient, concurrency: int = DEFAULT_PAIR_CONCURRENCY) -> None:
         self._client = client
         self._concurrency = concurrency
+
+    @property
+    def provenance(self) -> Provenance:
+        return Provenance(model=self._client.model, prompt_version=prompt_version(PAIR_PROMPT, PAIR_SCHEMA))
 
     def pair_all(
         self,

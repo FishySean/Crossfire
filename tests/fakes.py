@@ -58,10 +58,12 @@ class FakeFetcher:
         failing_urls: Collection[str] = (),
         unusable_urls: Collection[str] = (),
         mode: Mode = Mode.LIVE,
+        errorless_urls: Collection[str] = (),
     ) -> None:
         self.mode = mode
         self.failing_urls = failing_urls
         self.unusable_urls = unusable_urls
+        self.errorless_urls = errorless_urls
         self.fetched: list[str] = []
 
     def fetch_all(self, urls: Sequence[str], on_page: OnPage | None = None) -> list[Page]:
@@ -70,6 +72,8 @@ class FakeFetcher:
             self.fetched.append(url)
             if url in self.failing_urls:
                 page = Page(url=url, ok=False, error=f"假的抓取失败 {url}", status_code=503)
+            elif url in self.errorless_urls:
+                page = Page(url=url, ok=False)
             else:
                 # 不可用页面：正文太短，usability 会判成 too_short。
                 markdown = f"正文 {url}" if url in self.unusable_urls else f"正文 {url}\n{PROSE}"

@@ -272,18 +272,25 @@ def test_heartbeats_only_between_judge_start_and_done(offline_pipeline):
     assert elapsed == sorted(elapsed)
 
 
-def test_unusable_pages_still_go_to_extract(offline_pipeline):
-    """锁住现状：steel_client 会给每页算出 usable，但 pipeline 从来不读它。
+def test_unusable_pages_are_not_extracted(offline_pipeline):
+    """第 4 步有意修改：原 test_unusable_pages_still_go_to_extract 断言不可用页面照样送进 extract
+    （extract 调用 4 次、claim_done 里有它）。原因：backlog「usable 算出来了但没人读」。
 
-    导航骨架页、软 404 只要 ok=True 就照样送进 extract 烧 token。
-    这是已知的断线，第 4 步接上 usable 之后这条测试要有意识地改写。
+    现在不可用页面不提取，fetch_done 报 ok=false 让前端卡片直接进终态，紧跟一条 step=usability 的 error，
+    结果文件的 failures 里记一条 usability。抓取本身成功，所以 pages_fetched 不变。
     """
     record = offline_pipeline(unusable_urls={URLS[2]})
     result, events = _run_collecting(record)
 
-    assert record.llm_steps.count("extract") == 4
-    assert URLS[2] in [e["url"] for e in events if e["type"] == "claim_done"]
+    assert record.llm_steps.count("extract") == 3
+    assert URLS[2] not in [e["url"] for e in events if e["type"] == "claim_done"]
+    fetch_done = next(e for e in events if e["type"] == "fetch_done" and e["url"] == URLS[2])
+    assert fetch_done["ok"] is False
+    assert events[events.index(fetch_done) + 1] == {"type": "error", "step": "usability", "detail": "too_short"}
+    assert result["failures"] == [{"step": "usability", "detail": "too_short", "raw": None}]
     assert result["pages_fetched"] == 4
+    page = next(p for p in result["pages"] if p["url"] == URLS[2])
+    assert (page["ok"], page["usable"], page["unusable_reason"]) == (True, False, "too_short")
 
 
 @pytest.mark.parametrize("mode", ["live", "cached"])

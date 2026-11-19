@@ -6,8 +6,11 @@
 import re
 import unicodedata
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
-from crossfire.domain.models import Page
+if TYPE_CHECKING:
+    # 只为类型标注；运行时 models 反过来 import 这里（Page.usable），不能形成循环。
+    from crossfire.domain.models import Page
 
 # 可用性阈值：都是模块级常量，方便按实际抓取情况调。
 MIN_CONTENT_CHARS = 500  # 正文总长度下限（软屏蔽页通常只有几十字符）
@@ -82,7 +85,7 @@ def _prose_width(text_without_links: str) -> int:
     return total
 
 
-def is_usable_page(page: Page) -> tuple[bool, UnusableReason | None]:
+def is_usable_page(page: "Page") -> tuple[bool, UnusableReason | None]:
     """判断一次抓取结果是否可用。
 
     覆盖“HTTP 200 但内容废掉”的几类情况：反爬软屏蔽（内容极短）、

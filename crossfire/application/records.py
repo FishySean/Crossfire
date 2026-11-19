@@ -2,13 +2,13 @@
 
 from typing import Any
 
-from crossfire.domain import Page, RunResult, is_usable_page
+from crossfire.domain import Page, RunResult
 
 
 def page_record(page: Page) -> dict[str, Any]:
     """结果文件和缓存文件里的页面，比 Page.to_dict 多两个派生键 usable / unusable_reason。"""
-    usable, reason = is_usable_page(page)
-    return {**page.to_dict(), "usable": usable, "unusable_reason": "" if reason is None else reason.value}
+    reason = page.unusable_reason
+    return {**page.to_dict(), "usable": reason is None, "unusable_reason": "" if reason is None else reason.value}
 
 
 def run_record(result: RunResult) -> dict[str, Any]:

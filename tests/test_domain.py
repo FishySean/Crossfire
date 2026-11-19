@@ -6,6 +6,7 @@ usability 的预期结果不是按「应该怎样」写的，而是用搬家前 
 """
 
 import ast
+import dataclasses
 import json
 import sys
 from dataclasses import FrozenInstanceError
@@ -199,6 +200,28 @@ def test_locked_total_length_floor_still_counts_raw_characters():
     assert is_usable_page(page(CJK_SENTENCE * 10)) == (False, UnusableReason.TOO_SHORT)
 
 
+def test_page_usability_is_computed_not_stored():
+    good, bad = page(ARTICLE), page("a" * 550)
+    assert (good.usable, good.unusable_reason) == (True, None)
+    assert (bad.usable, bad.unusable_reason) == (False, UnusableReason.TOO_SHORT)
+    assert "usable" not in {field.name for field in dataclasses.fields(Page)}
+    assert "usable" not in bad.to_dict()
+
+
+@pytest.mark.parametrize(
+    ("subject", "expected"),
+    [
+        (page(ARTICLE), None),
+        (Page(url="https://x/", ok=False, error="503 boom"), Failure("fetch", "503 boom", None)),
+        (Page(url="https://x/", ok=False), Failure("fetch", "抓取失败，没有错误信息", None)),
+        (page("a" * 550), Failure("usability", "too_short", None)),
+        (page(ARTICLE, title="404 - The Register"), Failure("usability", "error_page_title", None)),
+    ],
+)
+def test_page_failure_explains_why_a_page_was_not_extracted(subject, expected):
+    assert subject.failure == expected
+
+
 def test_status_code_does_not_affect_usability():
     assert is_usable_page(Page(url="https://example.com/", ok=True, title="Article", markdown=ARTICLE, status_code=404)) == (
         True,
@@ -311,7 +334,9 @@ PAGE = {
     "url": "https://a.example/",
     "ok": True,
     "title": "Python",
-    "markdown": "body",
+    # 第 4 步改了测试数据（断言没改）："body" → 一篇够长的正文。原因：usable 接上之后，
+    # 4 个字符的正文会被判 too_short 并进 failures，而这个样例的本意是「两页可用、一页抓取失败」。
+    "markdown": ARTICLE,
     "links": [{"text": "Docs", "url": "/docs"}],
     "error": None,
     "status_code": 200,

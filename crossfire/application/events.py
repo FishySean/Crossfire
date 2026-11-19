@@ -89,7 +89,7 @@ class Done(_Event):
 class Error(_Event):
     type: ClassVar[str] = "error"
     step: str
-    detail: str | None
+    detail: str
 
 
 type Event = Start | FetchDone | ClaimDone | PairStart | PairDone | JudgeStart | Heartbeat | Done | Error

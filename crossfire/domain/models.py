@@ -14,6 +14,9 @@ from enum import StrEnum
 from typing import Any, NewType, Self, cast
 
 from crossfire.domain.relations import Relation
+from crossfire.domain.usability import UnusableReason, is_usable_page
+
+NO_FETCH_ERROR_DETAIL = "抓取失败，没有错误信息"
 
 # 来源在 Question.sources 里的下标。fetch_done、claim_done 的 index 都必须是它，前端按它定位卡片槽。
 # 曾经有人用「已提取主张的个数」当下标，有页面抓取失败时整排卡片错位。
@@ -224,7 +227,7 @@ class Page:
     """一次抓取的结果。
 
     ok 只表示「抓取这一步没有报错」，不代表 HTTP 2xx，也不代表内容可用。
-    内容可不可用由 domain.usability 判断。
+    内容可不可用看 usable，每次按 domain.usability 现算，不存：规则改了，旧页面的结论跟着变。
     """
 
     url: str
@@ -245,6 +248,24 @@ class Page:
             "error": self.error,
             "status_code": self.status_code,
         }
+
+    @property
+    def usable(self) -> bool:
+        return is_usable_page(self)[0]
+
+    @property
+    def unusable_reason(self) -> UnusableReason | None:
+        return is_usable_page(self)[1]
+
+    @property
+    def failure(self) -> "Failure | None":
+        """这一页为什么没有进入提取：抓取失败，或者抓到了但内容不可用。能用时为 None。"""
+        if not self.ok:
+            return Failure(step="fetch", detail=self.error or NO_FETCH_ERROR_DETAIL, raw=None)
+        reason = self.unusable_reason
+        if reason is not None:
+            return Failure(step="usability", detail=reason.value, raw=None)
+        return None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
@@ -481,14 +502,9 @@ class RunResult:
 
     @property
     def failures(self) -> tuple[Failure, ...]:
-        """所有失败，抓取失败在前。哪怕所有页面全挂了、一次 LLM 都没调，这里也不会是空的。"""
-        fetch_failures = [
-            Failure(step="fetch", detail=page.error or "抓取失败，没有错误信息", raw=None)
-            for page in self.pages
-            if not page.ok
-        ]
-        records = [*self.claims, *self.pairs, self.judgment]
-        return (*fetch_failures, *(record.failure for record in records if record.failure is not None))
+        """所有失败，页面的（抓取失败、内容不可用）按来源顺序在前。哪怕所有页面全挂了、一次 LLM 都没调，这里也不会是空的。"""
+        records = [*self.pages, *self.claims, *self.pairs, self.judgment]
+        return tuple(record.failure for record in records if record.failure is not None)
 
     @property
     def total_input_tokens(self) -> int:

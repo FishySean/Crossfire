@@ -51,6 +51,9 @@ uv run uvicorn web.server:app --reload --port 8765
 反爬软屏蔽（`too_short`）、软 404（`error_page_title`）、数据中心 IP 只拿到导航骨架页（`nav_skeleton`）、
 以及抓取本身失败（`fetch_failed`）和空内容（`empty_content`）。阈值是模块级常量，直接改即可。
 
+不可用的页面不送去提取主张，在结果的 `failures` 里记一条 `step="usability"`，原因写在 `detail`。
+`Page.usable` 每次现算、不存，规则改了以后旧页面的结论跟着变。
+
 ## 测试和开发工具
 
 ```bash

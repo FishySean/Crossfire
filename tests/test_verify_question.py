@@ -174,3 +174,41 @@ def test_model_requests_counts_retried_requests(build):
     assert result.model_requests == 4 + 6 + 1 + 1
     assert result.steps["extract"].calls == 4
     assert result.steps["extract"].requests == 5
+
+
+# ---- 第 4 步：接上页面可用性 ----
+
+
+def test_unusable_pages_are_not_extracted_and_become_usability_failures(build):
+    use_case, parts = build(fetcher=FakeFetcher(unusable_urls={URLS[2]}))
+    result = use_case.execute(QUESTION).result
+
+    assert [claim.source_url for claim in result.claims] == [URLS[0], URLS[1], URLS[3]]
+    assert [(f.step, f.detail, f.raw) for f in result.failures] == [("usability", "too_short", None)]
+    assert result.pages_fetched == 4 and result.pages_failed == 0
+    assert [page.usable for page in result.pages] == [True, True, False, True]
+
+
+def test_unusable_page_card_reaches_its_final_state(build):
+    """前端收到 ok=false 的 fetch_done 就把卡片画成终态，不再等 claim_done；error 进失败横幅。"""
+    use_case, parts = build(fetcher=FakeFetcher(unusable_urls={URLS[2]}))
+    use_case.execute(QUESTION)
+
+    events = [e.to_dict() for e in parts["events"].events]
+    fetch_done = {e["index"]: e for e in events if e["type"] == "fetch_done"}
+    assert fetch_done[2]["ok"] is False
+    assert fetch_done[2]["chars"] > 0
+    assert [e["index"] for e in events if e["type"] == "claim_done"] == [0, 1, 3]
+    errors = [e for e in events if e["type"] == "error"]
+    assert errors == [{"type": "error", "step": "usability", "detail": "too_short"}]
+    assert events.index(errors[0]) == events.index(fetch_done[2]) + 1
+
+
+def test_fetch_error_detail_is_always_a_string(build):
+    """决定 4：error 事件的 detail 和 Failure.detail 用同一句兜底文字，不会是 None。"""
+    use_case, parts = build(fetcher=FakeFetcher(errorless_urls={URLS[1]}))
+    result = use_case.execute(QUESTION).result
+
+    [error] = [e for e in parts["events"].events if isinstance(e, Error)]
+    [failure] = result.failures
+    assert error.detail == failure.detail == "抓取失败，没有错误信息"

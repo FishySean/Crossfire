@@ -1,0 +1,94 @@
+"""依赖方向的自动检查：扫描 import 语句，内层不许依赖外层。
+
+  domain       → 只能依赖标准库和 domain 自己
+  application  → 只能依赖标准库、domain、application
+  pipeline.py  → 同 application（它就是现在的 use case，第 3 步搬进 application/）
+  adapters     → 可以依赖任何东西
+  _wiring.py   → 临时组装点，只有入口（scripts/、web/）可以 import 它
+
+函数体里的延迟 import 也会被扫到。
+"""
+
+import ast
+import sys
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+PACKAGE = ROOT / "crossfire"
+
+LAYERS = {
+    "domain": ("crossfire.domain",),
+    "application": ("crossfire.domain", "crossfire.application"),
+}
+USE_CASE_FILES = [PACKAGE / "pipeline.py"]
+
+
+def module_name(path: Path) -> str:
+    parts = list(path.relative_to(ROOT).with_suffix("").parts)
+    if parts[-1] == "__init__":
+        parts.pop()
+    return ".".join(parts)
+
+
+def imports_of(path: Path) -> list[str]:
+    """文件里所有 import 的绝对模块名，相对 import 会被解析成绝对名。"""
+    package = module_name(path) if path.name == "__init__.py" else module_name(path).rpartition(".")[0]
+    found = []
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Import):
+            found.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                base = package.split(".")[: len(package.split(".")) - node.level + 1]
+                found.append(".".join([*base, node.module] if node.module else base))
+            else:
+                found.append(node.module or "")
+    return found
+
+
+def violations(paths, allowed_prefixes):
+    bad = []
+    for path in paths:
+        for module in imports_of(path):
+            if module.split(".")[0] in sys.stdlib_module_names:
+                continue
+            if any(module == prefix or module.startswith(prefix + ".") for prefix in allowed_prefixes):
+                continue
+            bad.append(f"{path.relative_to(ROOT)} imports {module}")
+    return bad
+
+
+@pytest.mark.parametrize("layer", sorted(LAYERS))
+def test_inner_layers_depend_only_inward(layer):
+    paths = sorted((PACKAGE / layer).rglob("*.py"))
+    assert paths, f"crossfire/{layer}/ 下没有文件，检查是不是空转了"
+    assert violations(paths, LAYERS[layer]) == []
+
+
+def test_use_case_depends_only_on_domain_and_application():
+    assert violations(USE_CASE_FILES, LAYERS["application"]) == []
+
+
+def test_nothing_inside_the_package_imports_the_temporary_wiring():
+    offenders = [
+        str(path.relative_to(ROOT))
+        for path in sorted(PACKAGE.rglob("*.py"))
+        if path.name != "_wiring.py" and "crossfire._wiring" in imports_of(path)
+    ]
+    assert offenders == []
+
+
+def test_the_checker_catches_a_violation(tmp_path, monkeypatch):
+    """对照组：证明上面的空列表不是因为扫描器什么都没扫到。"""
+    fake_root = tmp_path
+    layer = fake_root / "crossfire" / "domain"
+    layer.mkdir(parents=True)
+    (layer / "bad.py").write_text("import anthropic\nfrom ..adapters.steel import CACHE_ROOT\n", encoding="utf-8")
+    monkeypatch.setattr(sys.modules[__name__], "ROOT", fake_root)
+    found = violations([layer / "bad.py"], LAYERS["domain"])
+    assert found == [
+        "crossfire/domain/bad.py imports anthropic",
+        "crossfire/domain/bad.py imports crossfire.adapters.steel",
+    ]

@@ -34,6 +34,5 @@ pythonVersion = "3.12"
 venvPath = "."
 venv = ".venv"
 include = ["crossfire", "tests/fakes.py"]
-exclude = ["crossfire/llm.py", "crossfire/steel_client.py"]
 typeCheckingMode = "standard"
 strict = ["crossfire/domain", "crossfire/application"]

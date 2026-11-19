@@ -1,7 +1,8 @@
 """call_structured 的特征测试：两层重试、失败返回、token 累加。
 
 被测实现由 structured fixture 提供，断言只认 call_structured 原来的返回形状
-（工具入参 + _usage，失败时多一个 _failure）。搬家之后在 fixture 里换实现，断言不动。
+（工具入参 + _usage，失败时多一个 _failure）。这组断言先锁住了 llm.call_structured，
+搬家期间对旧实现和 ClaudeClient 各跑一遍，旧实现删除后只跑 ClaudeClient，断言没动过。
 """
 
 from types import SimpleNamespace
@@ -10,7 +11,6 @@ import anthropic
 import httpx
 import pytest
 
-import crossfire.llm
 from crossfire.adapters.anthropic import ClaudeClient
 
 REQUEST = httpx.Request("POST", "https://api.anthropic.invalid/v1/messages")
@@ -67,19 +67,14 @@ def _as_legacy_shape(call):
     return call_structured
 
 
-@pytest.fixture(params=["legacy", "adapter"])
-def structured(request, monkeypatch):
-    """返回 (call, messages, sleeps)。call 的签名和返回形状与 llm.call_structured 一致。"""
+@pytest.fixture
+def structured():
+    """返回 (call, messages, sleeps)。call 的签名和返回形状与原来的 llm.call_structured 一致。"""
     sleeps = []
 
     def install(script):
         messages = ScriptedMessages(script)
-        fake_sdk = SimpleNamespace(messages=messages)
-        if request.param == "legacy":
-            monkeypatch.setattr(crossfire.llm, "Anthropic", lambda **kwargs: fake_sdk)
-            monkeypatch.setattr(crossfire.llm.time, "sleep", sleeps.append)
-            return crossfire.llm.call_structured, messages, sleeps
-        client = ClaudeClient(client=fake_sdk, sleep=sleeps.append)
+        client = ClaudeClient(client=SimpleNamespace(messages=messages), sleep=sleeps.append)
         return _as_legacy_shape(client.call), messages, sleeps
 
     return install

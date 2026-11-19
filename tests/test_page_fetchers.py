@@ -1,7 +1,8 @@
 """fetch_pages 的特征测试：缓存读取、缓存缺失、429 退避、on_page 回调、客户端关闭。
 
 被测实现由 fetcher fixture 提供，断言只认页面 dict 的 url / ok / error / markdown
-和 on_page(index, page) 回调。搬家之后在 fixture 里换实现，断言不动。
+和 on_page(index, page) 回调。同一组断言跑两遍：legacy 是 steel_client.fetch_pages 这个
+dict 接口（scripts/prefetch.py 还在用），adapter 是 SteelPageFetcher / CachedPageFetcher。
 """
 
 import asyncio
@@ -13,6 +14,7 @@ import httpx
 import pytest
 import steel
 
+import crossfire.adapters.steel.fetchers
 import crossfire.steel_client
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.application.records import page_record
@@ -73,8 +75,8 @@ def fetcher(request, monkeypatch):
 
     def install(fake_steel):
         if request.param == "legacy":
-            monkeypatch.setattr(crossfire.steel_client, "AsyncSteel", lambda **kwargs: fake_steel)
-            monkeypatch.setattr(crossfire.steel_client.asyncio, "sleep", fake_sleep)
+            monkeypatch.setattr(crossfire.adapters.steel.fetchers, "AsyncSteel", lambda **kwargs: fake_steel)
+            monkeypatch.setattr(asyncio, "sleep", fake_sleep)
 
             def fetch(urls, on_page=None, cache_dir=None):
                 return asyncio.run(
@@ -166,6 +168,19 @@ def test_on_page_called_once_per_page_with_its_url_index(fetcher):
     assert sorted(seen) == list(enumerate(URLS))
     assert [url for _, url in seen] != URLS, "完成顺序应与 urls 顺序不同，否则测不出 index 是不是按完成顺序数的"
     assert [p["url"] for p in pages] == URLS
+
+
+def test_cached_on_page_called_once_per_page_with_its_url_index(fetcher, tmp_path):
+    """cached 模式下前端同样按 index 定位卡片，缓存缺失的页面也要回调。"""
+    install, _ = fetcher
+    fetch = install(FakeSteel())
+    page = {"url": URLS[1], "ok": True, "title": "t", "markdown": "缓存", "links": [], "error": None, "status_code": 200}
+    cache_path(tmp_path, URLS[1]).write_text(json.dumps(page), encoding="utf-8")
+    seen = []
+
+    fetch(URLS, on_page=lambda index, page: seen.append((index, page["url"], page["ok"])), cache_dir=tmp_path)
+
+    assert sorted(seen) == [(0, URLS[0], False), (1, URLS[1], True), (2, URLS[2], False)]
 
 
 def test_live_client_is_closed(fetcher):

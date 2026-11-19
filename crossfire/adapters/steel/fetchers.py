@@ -48,11 +48,11 @@ class SteelPageFetcher:
         concurrency: int = DEFAULT_CONCURRENCY,
         *,
         client_factory: Callable[[], Any] | None = None,
-        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+        sleep: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
         self._client_factory = client_factory or (lambda: AsyncSteel(steel_api_key=api_key))
         self._concurrency = concurrency
-        self._sleep = sleep
+        self._sleep = sleep or asyncio.sleep
 
     def fetch_all(self, urls: Sequence[str], on_page: OnPage | None = None) -> list[Page]:
         return asyncio.run(self.fetch_all_async(urls, on_page))

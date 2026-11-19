@@ -7,8 +7,8 @@
 
 依赖怎么来：
 四个端口（抓取、提取、比对、判决）由 tests/fakes.py 的假实现直接注入 run()，不再 monkeypatch。
-仍然 monkeypatch 的只有三样，它们还不是端口：RUNS_DIR（结果存储，第 3 步变成端口）、
-HEARTBEAT_SECONDS 和 threading（心跳的计时与线程）。
+第 3 步起 run() 是兼容门面，自己组装存储、时钟和心跳，所以仍要 monkeypatch 三样：
+pipeline.RUNS_DIR、pipeline.HEARTBEAT_SECONDS，以及心跳线程所在模块 adapters.system 的 threading。
 socket.connect 也被替换成直接报错，用来证明 run() 没有绕过端口自己联网。
 """
 
@@ -20,6 +20,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import crossfire.adapters.system as system
 import crossfire.pipeline as pipeline
 from crossfire._wiring import build_default_dependencies
 from crossfire.adapters.steel import CACHE_ROOT, CachedPageFetcher, SteelPageFetcher
@@ -89,10 +90,10 @@ def offline_pipeline(monkeypatch, tmp_path):
     runs_dir = tmp_path / "runs"
     monkeypatch.setattr(pipeline, "RUNS_DIR", runs_dir)
 
-    def install(failing_urls=(), unusable_urls=(), failing_pair_urls=None, judge_delay=0.0):
+    def install(failing_urls=(), unusable_urls=(), failing_pair_urls=None, judge_delay=0.0, mode=Mode.LIVE):
         log = CallLog()
         deps = {
-            "fetcher": FakeFetcher(failing_urls=failing_urls, unusable_urls=unusable_urls),
+            "fetcher": FakeFetcher(failing_urls=failing_urls, unusable_urls=unusable_urls, mode=mode),
             "extractor": FakeExtractor(log),
             "pairer": FakePairer(log, failing_pair_urls=failing_pair_urls),
             "judge": FakeJudge(log, trusted_url=URLS[0], delay=judge_delay),
@@ -158,9 +159,9 @@ def test_claim_index_is_the_source_index_not_the_claim_count(offline_pipeline):
     assert len(fetch_errors) == 1
     assert events[[e["type"] for e in events].index("pair_start")]["total_pairs"] == 3
 
-    # 锁住现状：抓取失败只发 error 事件，不进 failures 数组，
-    # 所以命令行摘要末尾那段「⚠️ 本次有 N 次调用解析失败」不会提到它。
-    assert result["failures"] == []
+    # 第 3 步有意修改：抓取失败只发 error 事件、failures == [] → 抓取失败以 step="fetch" 进 failures，
+    # 原因：backlog「【最高优先级】抓取失败不进 failures」
+    assert result["failures"] == [{"step": "fetch", "detail": f"假的抓取失败 {URLS[1]}", "raw": None}]
     assert result["pages_failed"] == 1
 
 
@@ -208,7 +209,8 @@ def test_result_file_structure_and_atomic_write(offline_pipeline, monkeypatch):
     on_disk = json.loads(open(path, encoding="utf-8").read())
     assert set(on_disk) == RESULT_FILE_KEYS
 
-    # 锁住现状：output_path 是写完文件之后才塞进返回值的，所以返回值比磁盘上的文件多一个键。
+    # 兼容门面为了让命令行不改，仍在返回值里附带 output_path，所以返回值比磁盘上的文件多一个键。
+    # use case 返回的 RunResult 与磁盘内容一致，位置随 done 事件给出，见 test_verify_question.py。
     assert set(result) == RESULT_FILE_KEYS | {"output_path"}
 
     assert replaced == [(path[: -len(".json")] + ".json.tmp", path)]
@@ -238,7 +240,7 @@ def test_without_on_event_no_heartbeat_thread_and_same_result(offline_pipeline, 
         created.append(kwargs.get("target").__name__)
         return threading.Thread(*args, **kwargs)
 
-    monkeypatch.setattr(pipeline, "threading", SimpleNamespace(Event=threading.Event, Thread=recording_thread))
+    monkeypatch.setattr(system, "threading", SimpleNamespace(Event=threading.Event, Thread=recording_thread))
 
     result = record.run()
     assert created == []
@@ -284,7 +286,7 @@ def test_unusable_pages_still_go_to_extract(offline_pipeline):
 
 @pytest.mark.parametrize("mode", ["live", "cached"])
 def test_mode_is_recorded_in_the_result(offline_pipeline, mode):
-    record = offline_pipeline()
+    record = offline_pipeline(mode=Mode(mode))
     result = record.run(mode=Mode(mode))
     assert result["mode"] == mode
 
@@ -306,3 +308,15 @@ def test_mode_selects_cache(mode, use_cache):
     assert isinstance(deps.fetcher, SteelPageFetcher) is not use_cache
     if use_cache:
         assert deps.fetcher.cache_dir == CACHE_ROOT / QUESTION_ID
+
+
+def test_mode_that_disagrees_with_the_fetcher_is_rejected(offline_pipeline):
+    """原来 run(mode=CACHED) 配一个实时抓取的 fetcher 也能跑，结果文件会把实时抓取记成 cached。"""
+    record = offline_pipeline(mode=Mode.LIVE)
+    with pytest.raises(ValueError, match="对不上"):
+        record.run(mode=Mode.CACHED)
+    assert list(record.runs_dir.glob("*")) == []
+
+
+def test_mode_can_be_left_out_and_comes_from_the_fetcher(offline_pipeline):
+    assert offline_pipeline(mode=Mode.CACHED).run()["mode"] == "cached"

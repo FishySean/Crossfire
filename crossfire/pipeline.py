@@ -1,31 +1,39 @@
-import itertools
-import json
-import os
-import threading
-import time
+"""兼容门面，第 4 步删除。
+
+run() 的签名和返回的 dict 跟原来一样，命令行和 web 端点一行不用改。它只做组装：
+把 VerifyQuestion 和存储、时钟、心跳、事件回调拼起来，再把 RunResult 转回原来的 dict。
+第 4 步的组合根接手组装之后，入口直接调用 VerifyQuestion，这个文件整个删掉。
+"""
+
 from collections.abc import Callable
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from crossfire.application.ports import ClaimExtractor, ClaimPairer, PageFetcher, VerdictJudge
-from crossfire.application.records import page_record
-from crossfire.domain import Claim, Mode, Page, Pair, Question, SourceIndex
+from crossfire.adapters.event_sinks import CallbackEventSink, NullEventSink
+from crossfire.adapters.storage import JsonRunRepository
+from crossfire.adapters.system import SystemClock, ThreadTicker
+from crossfire.application.events import Done, Event
+from crossfire.application.heartbeat import judge_with_heartbeat
+from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
+from crossfire.application.records import run_record
+from crossfire.application.use_cases import VerifyQuestion
+from crossfire.domain import Mode, Question
 
 RUNS_DIR = Path(__file__).resolve().parents[1] / "out" / "runs"
 HEARTBEAT_SECONDS = 5
 
-type Event = dict[str, Any]
 
+class _LegacySink:
+    """把事件转成 dict 交给 on_event，并记下 done 事件里的保存位置，用来填旧返回值的 output_path。"""
 
-def _step_usage(records: list[dict[str, Any]], seconds: float) -> dict[str, Any]:
-    usages = [r["usage"] for r in records if r.get("usage")]
-    return {
-        "calls": len(usages),
-        "input_tokens": sum(u["input_tokens"] for u in usages),
-        "output_tokens": sum(u["output_tokens"] for u in usages),
-        "seconds": seconds,
-    }
+    def __init__(self, on_event: Callable[[dict[str, Any]], None] | None) -> None:
+        self._forward: EventSink = CallbackEventSink(on_event) if on_event else NullEventSink()
+        self.run_file = ""
+
+    def emit(self, event: Event) -> None:
+        if isinstance(event, Done):
+            self.run_file = event.run_file
+        self._forward.emit(event)
 
 
 def run(
@@ -34,161 +42,27 @@ def run(
     extractor: ClaimExtractor,
     pairer: ClaimPairer,
     judge: VerdictJudge,
-    on_event: Callable[[Event], None] | None = None,
-    mode: Mode = Mode.LIVE,
+    on_event: Callable[[dict[str, Any]], None] | None = None,
+    mode: Mode | None = None,
 ) -> dict[str, Any]:
-    if not isinstance(mode, Mode):
-        raise TypeError(f"mode 必须是 Mode，收到 {mode!r}；字符串请在入口处用 Mode(...) 转换")
-    emit = on_event if on_event else lambda event: None
+    """mode 只为兼容旧调用方保留：结果里的 mode 一律取自 fetcher，传了就必须和它一致。"""
+    if mode is not None:
+        if not isinstance(mode, Mode):
+            raise TypeError(f"mode 必须是 Mode，收到 {mode!r}；字符串请在入口处用 Mode(...) 转换")
+        if mode is not fetcher.mode:
+            raise ValueError(f"传入的 mode={mode.value} 与注入的 fetcher（{fetcher.mode.value}）对不上")
 
-    started = time.monotonic()
-    started_at = datetime.now(timezone.utc)
-
-    sources = question.to_dict()["sources"]
-    urls = [source.url for source in question.sources]
-
-    emit({"type": "start", "question": question.text, "total_sources": len(question.sources)})
-
-    def on_page(index: SourceIndex, page: Page) -> None:
-        emit(
-            {
-                "type": "fetch_done",
-                "url": page.url,
-                "ok": page.ok,
-                "chars": len(page.markdown or ""),
-                "index": index,
-            }
-        )
-        if not page.ok:
-            emit({"type": "error", "step": "fetch", "detail": page.error})
-
-    fetch_started = time.monotonic()
-    pages = fetcher.fetch_all(urls, on_page)
-    fetch_seconds = round(time.monotonic() - fetch_started, 2)
-
-    extract_started = time.monotonic()
-    claims: list[Claim] = []
-    # index 必须是来源在 sources 里的下标，跟 fetch_done 对齐：前端按它往固定的卡片槽位里填。
-    # 用 claims 的长度会在有页面抓取失败时整体错位，把主张画到别的来源上。
-    for page in pages:
-        if not page.ok:
-            continue
-        index = question.index_of(page.url)
-        claim = extractor.extract(question, page)
-        claims.append(claim)
-        emit(
-            {
-                "type": "claim_done",
-                "url": claim.source_url,
-                "claim": claim.text,
-                "tier": claim.tier.value,
-                "index": index,
-            }
-        )
-        if claim.failure:
-            emit({"type": "error", "step": "extract", "detail": claim.failure.detail})
-    extract_seconds = round(time.monotonic() - extract_started, 2)
-
-    claim_pairs = list(itertools.combinations([c for c in claims if c.answered], 2))
-    emit({"type": "pair_start", "total_pairs": len(claim_pairs)})
-
-    def on_pair(index: int, total: int, pair: Pair) -> None:
-        emit(
-            {
-                "type": "pair_done",
-                "a_url": pair.a_url,
-                "b_url": pair.b_url,
-                "relation": None if pair.relation is None else pair.relation.value,
-                "nature": pair.nature,
-                "index": index,
-                "total": total,
-            }
-        )
-        if pair.failure:
-            emit({"type": "error", "step": "pair", "detail": pair.failure.detail})
-
-    pair_started = time.monotonic()
-    pairs = pairer.pair_all(question, claim_pairs, on_pair)
-    pair_seconds = round(time.monotonic() - pair_started, 2)
-
-    emit({"type": "judge_start"})
-    judge_started = time.monotonic()
-
-    # judge 是一次阻塞调用，中间没有任何可报告的进度，实测能跑到 27 秒。
-    # 心跳只说明「还在跑、跑了多久」，不编造进度，让前端的超时计时器有东西可重置。
-    stop_beating = threading.Event()
-
-    def beat() -> None:
-        while not stop_beating.wait(HEARTBEAT_SECONDS):
-            emit(
-                {
-                    "type": "heartbeat",
-                    "step": "judge",
-                    "elapsed": round(time.monotonic() - judge_started, 2),
-                }
-            )
-
-    heartbeat = threading.Thread(target=beat, daemon=True) if on_event else None
-    if heartbeat:
-        heartbeat.start()
-    try:
-        verdict = judge.judge(question, claims, pairs)
-    finally:
-        stop_beating.set()
-        if heartbeat:
-            heartbeat.join()
-    judge_seconds = round(time.monotonic() - judge_started, 2)
-    if verdict.failure:
-        emit({"type": "error", "step": "judge", "detail": verdict.failure.detail})
-
-    page_records = [page_record(page) for page in pages]
-    claim_records = [claim.to_dict() for claim in claims]
-    pair_records = [pair.to_dict() for pair in pairs]
-    judgment = verdict.to_dict()
-
-    steps = {
-        "fetch": {"calls": len(pages), "seconds": fetch_seconds},
-        "extract": _step_usage(claim_records, extract_seconds),
-        "pair": _step_usage(pair_records, pair_seconds),
-        "judge": _step_usage([judgment], judge_seconds),
-    }
-    failures = [r["failure"] for r in [*claim_records, *pair_records, judgment] if r.get("failure")]
-
-    result: dict[str, Any] = {
-        "question_id": question.id,
-        "question": question.text,
-        "mode": mode.value,
-        "started_at": started_at.isoformat(),
-        "elapsed_seconds": round(time.monotonic() - started, 2),
-        "sources": sources,
-        "pages_fetched": sum(1 for p in pages if p.ok),
-        "pages_failed": sum(1 for p in pages if not p.ok),
-        "claude_calls": len(claims) + len(pairs) + 1,
-        "failures": failures,
-        "steps": steps,
-        "total_input_tokens": sum(s.get("input_tokens", 0) for s in steps.values()),
-        "total_output_tokens": sum(s.get("output_tokens", 0) for s in steps.values()),
-        "pages": page_records,
-        "claims": claim_records,
-        "pairs": pair_records,
-        "judgment": judgment,
-    }
-
-    RUNS_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = started_at.strftime("%Y%m%dT%H%M%SZ")
-    path = RUNS_DIR / f"{question.id}_{timestamp}.json"
-    staging = path.with_suffix(".json.tmp")
-    staging.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    os.replace(staging, path)
-    result["output_path"] = str(path)
-
-    emit(
-        {
-            "type": "done",
-            "judgment": judgment,
-            "run_file": str(path),
-            "elapsed": result["elapsed_seconds"],
-        }
+    clock = SystemClock()
+    sink = _LegacySink(on_event)
+    listener = sink if on_event else None
+    use_case = VerifyQuestion(
+        fetcher=fetcher,
+        extractor=extractor,
+        pairer=pairer,
+        judge=judge_with_heartbeat(judge, listener, clock, ThreadTicker(), HEARTBEAT_SECONDS),
+        runs=JsonRunRepository(RUNS_DIR),
+        events=sink,
+        clock=clock,
     )
-
-    return result
+    result = use_case.execute(question)
+    return {**run_record(result), "output_path": sink.run_file}

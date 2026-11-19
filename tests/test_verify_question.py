@@ -5,9 +5,7 @@ from dataclasses import replace
 
 import pytest
 
-import crossfire.pipeline as pipeline
 from crossfire.application.events import Done, Error
-from crossfire.application.records import run_record
 from crossfire.application.use_cases import VerifyQuestion
 from crossfire.domain import Claim, Judgment, Mode, Pair, Question, Usage
 from tests.fakes import (
@@ -114,42 +112,6 @@ def test_failed_pages_are_not_extracted_and_claim_index_stays_the_source_index(b
     assert [e["index"] for e in claim_done] == [0, 2, 3]
     errors = [e for e in parts["events"].events if isinstance(e, Error)]
     assert [(e.step, e.detail) for e in errors] == [("fetch", f"假的抓取失败 {URLS[1]}")]
-
-
-def _without_timing(record):
-    steps = {name: {k: v for k, v in step.items() if k != "seconds"} for name, step in record["steps"].items()}
-    skipped = {"started_at", "elapsed_seconds", "output_path", "steps"}
-    return {**{k: v for k, v in record.items() if k not in skipped}, "steps": steps}
-
-
-@pytest.mark.parametrize("failing", [(), (URLS[1],)], ids=["all-ok", "one-fetch-failure"])
-def test_same_record_and_events_as_pipeline_run_apart_from_timing(build, monkeypatch, tmp_path, failing):
-    monkeypatch.setattr(pipeline, "RUNS_DIR", tmp_path)
-    log = CallLog()
-    old_events = []
-    old = pipeline.run(
-        QUESTION,
-        FakeFetcher(failing_urls=failing),
-        FakeExtractor(log),
-        FakePairer(log),
-        FakeJudge(log, trusted_url=URLS[0]),
-        on_event=old_events.append,
-    )
-
-    use_case, parts = build(fetcher=FakeFetcher(failing_urls=failing))
-    new = run_record(use_case.execute(QUESTION))
-
-    # 旧 pipeline 还没有第 3 步的两处修复，按修复的内容把它补上再比：抓取失败进 failures，LLM 步骤多一个 requests。
-    fetch_failures = [{"step": "fetch", "detail": p["error"], "raw": None} for p in old["pages"] if not p["ok"]]
-    old = {**old, "failures": fetch_failures + old["failures"]}
-    for name in ("extract", "pair", "judge"):
-        old["steps"][name]["requests"] = old["steps"][name]["calls"]
-    assert _without_timing(new) == _without_timing(old)
-    new_events = [event.to_dict() for event in parts["events"].events]
-    untimed = {"run_file", "elapsed"}
-    assert [{k: v for k, v in e.items() if k not in untimed} for e in new_events] == [
-        {k: v for k, v in e.items() if k not in untimed} for e in old_events
-    ]
 
 
 def test_step_stats(build):

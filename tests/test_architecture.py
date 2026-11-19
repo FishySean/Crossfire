@@ -2,9 +2,11 @@
 
   domain       → 只能依赖标准库和 domain 自己
   application  → 只能依赖标准库、domain、application
-  pipeline.py  → 同 application（它就是现在的 use case，第 3 步搬进 application/）
   adapters     → 可以依赖任何东西
+  pipeline.py  → 兼容门面，负责组装，可以依赖 adapters，第 4 步删除
   _wiring.py   → 临时组装点，只有入口（scripts/、web/）可以 import 它
+
+application/use_cases 另有一条更严的规则：不许有文件、线程、JSON、系统时钟的代码。
 
 函数体里的延迟 import 也会被扫到。
 """
@@ -22,7 +24,7 @@ LAYERS = {
     "domain": ("crossfire.domain",),
     "application": ("crossfire.domain", "crossfire.application"),
 }
-USE_CASE_FILES = [PACKAGE / "pipeline.py"]
+USE_CASE_FILES = sorted((PACKAGE / "application" / "use_cases").rglob("*.py"))
 
 
 def module_name(path: Path) -> str:

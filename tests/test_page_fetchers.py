@@ -18,6 +18,7 @@ import crossfire.adapters.steel.fetchers
 import crossfire.steel_client
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.application.records import page_record
+from crossfire.domain import Mode
 from crossfire.steel_client import cache_path
 
 URLS = ["https://a.example/", "https://b.example/", "https://c.example/"]
@@ -188,3 +189,9 @@ def test_live_client_is_closed(fetcher):
     fake = FakeSteel(script={URLS[0]: [RuntimeError("boom")]})
     install(fake)(URLS)
     assert fake.closed == 1
+
+
+def test_each_fetcher_reports_its_own_mode(tmp_path):
+    """结果文件里的 mode 从注入的 fetcher 读，不再由调用方另传一份。"""
+    assert SteelPageFetcher(None, client_factory=FakeSteel).mode is Mode.LIVE
+    assert CachedPageFetcher(tmp_path).mode is Mode.CACHED

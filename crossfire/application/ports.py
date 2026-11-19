@@ -4,15 +4,22 @@
 """
 
 from collections.abc import Callable, Sequence
+from datetime import datetime
 from typing import Protocol
 
-from crossfire.domain import Claim, Judgment, Page, Pair, Question, Source, SourceIndex
+from crossfire.application.events import Event
+from crossfire.domain import Claim, Judgment, Mode, Page, Pair, Question, RunResult, SourceIndex
 
 type OnPage = Callable[[SourceIndex, Page], None]
 type OnPair = Callable[[int, int, Pair], None]
 
 
 class PageFetcher(Protocol):
+    @property
+    def mode(self) -> Mode:
+        """这个实现是实时抓取还是读缓存。结果文件里的 mode 只从这里来，调用方不再另传一份。"""
+        ...
+
     def fetch_all(self, urls: Sequence[str], on_page: OnPage | None = None) -> list[Page]:
         """按 urls 的顺序返回页面，每个 URL 恰好一页。
 
@@ -23,8 +30,11 @@ class PageFetcher(Protocol):
 
 
 class ClaimExtractor(Protocol):
-    def extract(self, question: Question, page: Page, source: Source) -> Claim:
-        """从一个已抓到的页面里提取针对问题的主张。失败时返回带 failure 的 Claim，不抛异常。"""
+    def extract(self, question: Question, page: Page) -> Claim:
+        """从一个已抓到的页面里提取针对问题的主张。来源层级用 question.source_of(page.url) 查。
+
+        失败时返回带 failure 的 Claim，不抛异常。
+        """
         ...
 
 
@@ -45,6 +55,11 @@ class ClaimPairer(Protocol):
 
         on_pair(index, total, pair) 在每对判定完成时调用一次，index 是它在 claim_pairs 里的下标，
         调用顺序是完成顺序。单对失败时返回带 failure 的 Pair，不抛异常。
+
+        整批失败（比如 GPU 推理整批报错、远程调用抛了异常）时，同样不抛：把受影响的每一对都返回成
+        带 failure 的 Pair，并照常对每一对调用 on_pair。原因是走到比对这一步时，抓取和提取已经做完、
+        钱已经花了；抛异常会让整次运行作废，这些结果全部白费。返回失败的 Pair 则会进入
+        RunResult.failures，并通过 error 事件通知前端，失败照样是大声的，判决也还能基于已有主张给出结论。
         """
         ...
 
@@ -52,4 +67,30 @@ class ClaimPairer(Protocol):
 class VerdictJudge(Protocol):
     def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
         """综合所有主张和比对结果下最终结论。失败时返回带 failure 的 Judgment，不抛异常。"""
+        ...
+
+
+class RunRepository(Protocol):
+    def save(self, result: RunResult) -> str:
+        """保存一次运行的完整结果，返回保存位置。
+
+        必须是原子的：读者要么看不到它，要么看到完整的内容，不会读到写了一半的文件。
+        两次保存不许互相覆盖，哪怕 question 和 started_at 完全相同。
+        """
+        ...
+
+
+class EventSink(Protocol):
+    def emit(self, event: Event) -> None:
+        """推送一个进度事件。可能从后台线程调用（心跳），实现需要自己保证线程安全。"""
+        ...
+
+
+class Clock(Protocol):
+    def now(self) -> datetime:
+        """带时区的当前 UTC 时间，用于记录运行开始的时刻。"""
+        ...
+
+    def monotonic(self) -> float:
+        """单调递增的秒数，只用来算耗时。"""
         ...

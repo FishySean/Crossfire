@@ -5,6 +5,8 @@ import threading
 import time
 from types import SimpleNamespace
 
+import anthropic
+import httpx
 import pytest
 
 from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClaimPairer, ClaudeClient, ClaudeVerdictJudge
@@ -133,7 +135,7 @@ def test_extractor_keeps_the_page_url_and_source_tier_even_if_the_model_echoes_o
     }
     client, _ = client_for(scripted(data))
     page = Page(url="https://b.example/", ok=True, title="t", markdown="正文")
-    result = ClaudeClaimExtractor(client).extract(QUESTION, page, QUESTION.sources[1])
+    result = ClaudeClaimExtractor(client).extract(QUESTION, page)
 
     assert (result.source_url, result.tier, result.text) == ("https://b.example/", Tier.NEWS, "1.0")
     assert result.usage == Usage(10, 2)
@@ -143,7 +145,7 @@ def test_extractor_failure_is_an_unanswered_claim_with_failure():
     bad = {"claim": "1.0"}
     client, _ = client_for(scripted(bad, bad))
     page = Page(url="https://a.example/", ok=True, title="t", markdown="正文")
-    result = ClaudeClaimExtractor(client).extract(QUESTION, page, QUESTION.sources[0])
+    result = ClaudeClaimExtractor(client).extract(QUESTION, page)
 
     assert result.text is None and result.failure is not None
     assert result.failure.step == "extract"
@@ -198,6 +200,27 @@ def test_pair_all_never_exceeds_its_concurrency():
     client, _ = client_for(slow)
     ClaudeClaimPairer(client, concurrency=2).pair_all(QUESTION, PAIRS * 3)
     assert peak == 2
+
+
+def test_pair_all_turns_exceptions_into_failed_pairs_instead_of_raising(capsys):
+    """端口约定：比对阶段抛异常会让已经花钱做完的抓取和提取全部作废，所以失败只能记在 Pair 上。"""
+
+    def flaky(prompt):
+        if "主张: 2" in prompt:
+            raise anthropic.APITimeoutError(request=httpx.Request("POST", "https://api.anthropic.invalid/"))
+        return {"relation": "agree", "nature": "测试"}
+
+    client, _ = client_for(flaky)
+    seen = []
+    pairs = ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS, on_pair=lambda index, total, pair: seen.append(index))
+
+    assert [p.failure is None for p in pairs] == [True, False, False]
+    assert [p.relation for p in pairs] == [Relation.AGREE, None, None]
+    assert pairs[1].failure is not None
+    assert pairs[1].failure.step == "pair"
+    assert "APITimeoutError" in pairs[1].failure.detail
+    assert sorted(seen) == [0, 1, 2]
+    assert "❌" in capsys.readouterr().err
 
 
 def test_pair_all_with_no_pairs_makes_no_calls():

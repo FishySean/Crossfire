@@ -74,7 +74,7 @@ def run(
         if not page.ok:
             continue
         index = question.index_of(page.url)
-        claim = extractor.extract(question, page, question.sources[index])
+        claim = extractor.extract(question, page)
         claims.append(claim)
         emit(
             {

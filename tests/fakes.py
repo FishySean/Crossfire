@@ -1,4 +1,4 @@
-"""四个端口的假实现，直接注入 pipeline.run，不需要 monkeypatch。
+"""端口的假实现，直接注入，不需要 monkeypatch。
 
 数据与第 0 步那套 monkeypatch 假数据一致：每个来源都说「当前版本是 1.0」，比对一律 agree。
 """
@@ -6,24 +6,30 @@
 import threading
 import time
 from collections.abc import Collection, Sequence
+from datetime import UTC, datetime, timedelta
 
+from crossfire.application.events import Event
 from crossfire.application.ports import (
     ClaimExtractor,
     ClaimPairer,
+    Clock,
+    EventSink,
     OnPage,
     OnPair,
     PageFetcher,
+    RunRepository,
     VerdictJudge,
 )
 from crossfire.domain import (
     Claim,
     Failure,
     Judgment,
+    Mode,
     Page,
     Pair,
     Question,
     Relation,
-    Source,
+    RunResult,
     SourceIndex,
     SourceType,
     Usage,
@@ -46,7 +52,13 @@ class CallLog:
 
 
 class FakeFetcher:
-    def __init__(self, failing_urls: Collection[str] = (), unusable_urls: Collection[str] = ()) -> None:
+    def __init__(
+        self,
+        failing_urls: Collection[str] = (),
+        unusable_urls: Collection[str] = (),
+        mode: Mode = Mode.LIVE,
+    ) -> None:
+        self.mode = mode
         self.failing_urls = failing_urls
         self.unusable_urls = unusable_urls
         self.fetched: list[str] = []
@@ -72,11 +84,11 @@ class FakeExtractor:
         self.log = log
         self.texts = texts or {}
 
-    def extract(self, question: Question, page: Page, source: Source) -> Claim:
+    def extract(self, question: Question, page: Page) -> Claim:
         self.log.record("extract")
         return Claim(
             source_url=page.url,
-            tier=source.tier,
+            tier=question.source_of(page.url).tier,
             text=self.texts.get(page.url, f"{page.url} 说当前版本是 1.0"),
             evidence="version 1.0",
             source_type=SourceType.OFFICIAL_DOCUMENTATION,
@@ -164,8 +176,52 @@ class FakeJudge:
         )
 
 
+class FakeClock:
+    """时间只在 advance 时前进。"""
+
+    START = datetime(2026, 11, 19, 20, 0, 0, tzinfo=UTC)
+
+    def __init__(self, start: datetime = START) -> None:
+        self._start = start
+        self._elapsed = 0.0
+
+    def now(self) -> datetime:
+        return self._start + timedelta(seconds=self._elapsed)
+
+    def monotonic(self) -> float:
+        return 1000.0 + self._elapsed
+
+    def advance(self, seconds: float) -> None:
+        self._elapsed += seconds
+
+
+class RecordingSink:
+    def __init__(self) -> None:
+        self.events: list[Event] = []
+        self._lock = threading.Lock()
+
+    def emit(self, event: Event) -> None:
+        with self._lock:
+            self.events.append(event)
+
+    def types(self) -> list[str]:
+        return [event.type for event in self.events]
+
+
+class InMemoryRunRepository:
+    def __init__(self) -> None:
+        self.saved: list[RunResult] = []
+
+    def save(self, result: RunResult) -> str:
+        self.saved.append(result)
+        return f"memory://{len(self.saved)}"
+
+
 # 让 pyright 核对这些假实现确实满足端口协议。
 _fetcher: type[PageFetcher] = FakeFetcher
 _extractor: type[ClaimExtractor] = FakeExtractor
 _pairers: tuple[type[ClaimPairer], ...] = (FakePairer, EqualityPairer)
 _judge: type[VerdictJudge] = FakeJudge
+_clock: type[Clock] = FakeClock
+_sink: type[EventSink] = RecordingSink
+_runs: type[RunRepository] = InMemoryRunRepository

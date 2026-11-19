@@ -9,7 +9,7 @@ from typing import Any
 from steel import AsyncSteel, RateLimitError
 
 from crossfire.application.ports import OnPage
-from crossfire.domain import Link, Page, SourceIndex
+from crossfire.domain import Link, Mode, Page, SourceIndex
 
 MAX_RETRIES = 3
 DEFAULT_CONCURRENCY = 8
@@ -41,6 +41,8 @@ def to_page(url: str, result: Any = None, error: Exception | None = None) -> Pag
 
 class SteelPageFetcher:
     """通过 Steel /v1/scrape 实时抓取。并发受 concurrency 限制，429 指数退避重试。"""
+
+    mode = Mode.LIVE
 
     def __init__(
         self,
@@ -93,6 +95,8 @@ class SteelPageFetcher:
 
 class CachedPageFetcher:
     """从 scripts/prefetch.py 写下的磁盘缓存读页面，不碰网络。缓存缺失的 URL 返回 ok=False 的页面。"""
+
+    mode = Mode.CACHED
 
     def __init__(self, cache_dir: Path) -> None:
         self.cache_dir = Path(cache_dir)

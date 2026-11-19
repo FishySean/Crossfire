@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Sequence
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import replace
@@ -5,7 +6,7 @@ from typing import Any
 
 from crossfire.adapters.anthropic.client import ClaudeClient
 from crossfire.application.ports import OnPair
-from crossfire.domain import Claim, Pair, Question, Relation
+from crossfire.domain import Claim, Failure, Pair, Question, Relation, Usage
 
 DEFAULT_PAIR_CONCURRENCY = 6
 
@@ -162,7 +163,20 @@ class ClaudeClaimPairer:
         def parse(data: dict[str, Any]) -> Pair:
             return Pair.from_dict({**data, "a": a.source_url, "b": b.source_url, "usage": _NO_USAGE})
 
-        call = self._client.call(prompt, PAIR_SCHEMA, "pair", parse)
+        try:
+            call = self._client.call(prompt, PAIR_SCHEMA, "pair", parse)
+        except Exception as e:
+            # 端口约定 pair_all 不抛异常，见 ClaimPairer.pair_all。网络重试用尽、鉴权失败都落到这里。
+            detail = f"{type(e).__name__}: {e}"
+            print(f"❌ [llm] pair 调用抛出异常，该对记为失败：{detail}", file=sys.stderr)
+            return Pair(
+                a_url=a.source_url,
+                b_url=b.source_url,
+                relation=None,
+                nature=None,
+                usage=Usage(0, 0),
+                failure=Failure(step="pair", detail=detail, raw=None),
+            )
         if call.value is not None:
             return replace(call.value, usage=call.usage)
         return Pair(

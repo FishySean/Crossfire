@@ -82,6 +82,9 @@ class Question:
                 return SourceIndex(index)
         raise UnknownSourceError(url)
 
+    def source_of(self, url: str) -> Source:
+        return self.sources[self.index_of(url)]
+
     def to_dict(self) -> dict[str, Any]:
         return {"id": self.id, "question": self.text, "sources": [s.to_dict() for s in self.sources]}
 

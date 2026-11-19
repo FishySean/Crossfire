@@ -2,7 +2,7 @@ from dataclasses import replace
 from typing import Any
 
 from crossfire.adapters.anthropic.client import ClaudeClient
-from crossfire.domain import Claim, Page, Question, Source, SourceType
+from crossfire.domain import Claim, Page, Question, SourceType
 
 # 正文截断上限，保留开头。这个值基本等于关掉裁剪，只用来兜住极端长页面烧穿 token。
 # 千万不要设到 12000 到 18000 之间：实测在这个区间里，模型会读到半张版本表格，
@@ -62,7 +62,8 @@ class ClaudeClaimExtractor:
     def __init__(self, client: ClaudeClient) -> None:
         self._client = client
 
-    def extract(self, question: Question, page: Page, source: Source) -> Claim:
+    def extract(self, question: Question, page: Page) -> Claim:
+        source = question.source_of(page.url)
         prompt = EXTRACT_PROMPT.format(
             question=question.text,
             url=page.url,

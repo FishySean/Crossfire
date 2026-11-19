@@ -3,12 +3,13 @@ import hashlib
 import json
 import sys
 from collections.abc import Awaitable, Callable, Sequence
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from steel import AsyncSteel, RateLimitError
 
-from crossfire.application.ports import OnPage
+from crossfire.application.ports import Clock, OnPage
 from crossfire.domain import Link, Mode, Page, SourceIndex
 
 MAX_RETRIES = 3
@@ -19,14 +20,16 @@ def cache_path(cache_dir: Path, url: str) -> Path:
     return Path(cache_dir) / f"{hashlib.sha256(url.encode()).hexdigest()[:16]}.json"
 
 
-def to_page(url: str, result: Any = None, error: Exception | None = None) -> Page:
+def to_page(url: str, result: Any = None, error: Exception | None = None, fetched_at: datetime | None = None) -> Page:
     """把 Steel 的 scrape 结果或异常转成 Page。"""
     if error is not None:
         message = str(error)
         response = getattr(error, "response", None)
         if response is not None:
             message = f"{message}\n{response.text}"
-        return Page(url=url, ok=False, error=message, status_code=getattr(error, "status_code", None))
+        return Page(
+            url=url, ok=False, error=message, status_code=getattr(error, "status_code", None), fetched_at=fetched_at
+        )
     return Page(
         url=url,
         ok=True,
@@ -35,23 +38,29 @@ def to_page(url: str, result: Any = None, error: Exception | None = None) -> Pag
         links=tuple(Link(text=link.text, url=link.url) for link in result.links),
         error=None,
         status_code=result.metadata.status_code,
+        fetched_at=fetched_at,
     )
 
 
 class SteelPageFetcher:
-    """通过 Steel /v1/scrape 实时抓取。并发受 concurrency 限制，429 指数退避重试。"""
+    """通过 Steel /v1/scrape 实时抓取。并发受 concurrency 限制，429 指数退避重试。
+
+    每页的 fetched_at 取自 clock：页面缓存靠它知道快照是哪天的。
+    """
 
     mode = Mode.LIVE
 
     def __init__(
         self,
         api_key: str | None,
-        concurrency: int = DEFAULT_CONCURRENCY,
         *,
+        clock: Clock,
+        concurrency: int = DEFAULT_CONCURRENCY,
         client_factory: Callable[[], Any] | None = None,
         sleep: Callable[[float], Awaitable[None]] | None = None,
     ) -> None:
         self._client_factory = client_factory or (lambda: AsyncSteel(steel_api_key=api_key))
+        self._clock = clock
         self._concurrency = concurrency
         self._sleep = sleep or asyncio.sleep
 
@@ -77,10 +86,11 @@ class SteelPageFetcher:
     async def _scrape_with_backoff(self, client: Any, url: str) -> Page:
         for attempt in range(MAX_RETRIES + 1):
             try:
-                return to_page(url, result=await client.scrape(url=url, format=["markdown"]))
+                result = await client.scrape(url=url, format=["markdown"])
+                return to_page(url, result=result, fetched_at=self._clock.now())
             except RateLimitError as e:
                 if attempt == MAX_RETRIES:
-                    return to_page(url, error=e)
+                    return to_page(url, error=e, fetched_at=self._clock.now())
                 delay = 2**attempt
                 print(
                     f"[steel] 429 {url} — 退避 {delay}s 后第 {attempt + 1}/{MAX_RETRIES} 次重试",
@@ -88,7 +98,7 @@ class SteelPageFetcher:
                 )
                 await self._sleep(delay)
             except Exception as e:
-                return to_page(url, error=e)
+                return to_page(url, error=e, fetched_at=self._clock.now())
         raise AssertionError("unreachable")
 
 

@@ -8,6 +8,7 @@
 import asyncio
 import json
 import socket
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import httpx
@@ -17,6 +18,7 @@ import steel
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher, cache_path
 from crossfire.application.records import page_record
 from crossfire.domain import Mode
+from tests.fakes import FakeClock
 
 URLS = ["https://a.example/", "https://b.example/", "https://c.example/"]
 REQUEST = httpx.Request("POST", "https://api.steel.invalid/v1/scrape")
@@ -76,7 +78,7 @@ def fetcher(monkeypatch):
             if cache_dir is not None:
                 port = CachedPageFetcher(cache_dir)
             else:
-                port = SteelPageFetcher(None, client_factory=lambda: fake_steel, sleep=fake_sleep)
+                port = SteelPageFetcher(None, clock=FakeClock(), client_factory=lambda: fake_steel, sleep=fake_sleep)
             forward = (lambda index, page: on_page(index, page_record(page))) if on_page else None
             return [page_record(page) for page in port.fetch_all(urls, forward)]
 
@@ -177,5 +179,21 @@ def test_live_client_is_closed(fetcher):
 
 def test_each_fetcher_reports_its_own_mode(tmp_path):
     """结果文件里的 mode 从注入的 fetcher 读，不再由调用方另传一份。"""
-    assert SteelPageFetcher(None, client_factory=FakeSteel).mode is Mode.LIVE
+    assert SteelPageFetcher(None, clock=FakeClock(), client_factory=FakeSteel).mode is Mode.LIVE
     assert CachedPageFetcher(tmp_path).mode is Mode.CACHED
+
+
+def test_live_pages_are_stamped_with_the_clock_time_even_when_they_fail():
+    clock = FakeClock(datetime(2026, 11, 19, 23, 3, 33, tzinfo=UTC))
+    fake = FakeSteel(script={URLS[1]: [RuntimeError("boom")]})
+    pages = SteelPageFetcher(None, clock=clock, client_factory=lambda: fake).fetch_all(URLS[:2])
+    assert [page.fetched_at for page in pages] == [clock.now(), clock.now()]
+
+
+def test_cached_pages_keep_the_fetch_time_they_were_stored_with(tmp_path):
+    page = {"url": URLS[0], "ok": True, "title": "t", "markdown": "缓存", "links": [], "error": None,
+            "status_code": 200, "fetched_at": "2026-09-12T21:16:16+00:00"}
+    cache_path(tmp_path, URLS[0]).write_text(json.dumps(page), encoding="utf-8")
+    [cached, missing] = CachedPageFetcher(tmp_path).fetch_all(URLS[:2])
+    assert cached.fetched_at == datetime(2026, 9, 12, 21, 16, 16, tzinfo=UTC)
+    assert missing.fetched_at is None

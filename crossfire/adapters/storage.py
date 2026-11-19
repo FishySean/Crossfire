@@ -9,6 +9,10 @@ from crossfire.application.records import page_record, run_record
 from crossfire.domain import Page, RunResult
 
 
+class MissingFetchTimeError(ValueError):
+    """页面没有 fetched_at。存进缓存之后就没人知道它是哪天的快照了。"""
+
+
 class CachePageStore:
     """把抓到的页面写进 cache_dir，CachedPageFetcher 按同样的文件名读回来。抓取失败的页面也照写。"""
 
@@ -16,6 +20,8 @@ class CachePageStore:
         self.cache_dir = Path(cache_dir)
 
     def save(self, page: Page) -> str:
+        if page.fetched_at is None:
+            raise MissingFetchTimeError(f"{page.url} 没有 fetched_at，不存：cached 模式要靠它确定快照日期")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         path = cache_path(self.cache_dir, page.url)
         staging = path.with_suffix(".json.tmp")

@@ -92,6 +92,15 @@ def _optional_number(value: object, key: str) -> float | None:
     return None if value is None else _number(value, key)
 
 
+def _optional_datetime(value: object, key: str) -> datetime | None:
+    if value is None:
+        return None
+    parsed = datetime.fromisoformat(_str(value, key))
+    if parsed.tzinfo is None:
+        raise ValueError(f"{key} 必须带时区：{value}")
+    return parsed
+
+
 def _optional[E: StrEnum](enum: type[E], value: object, key: str) -> E | None:
     return None if value is None else enum(_str(value, key))
 
@@ -229,6 +238,9 @@ class Page:
 
     ok 只表示「抓取这一步没有报错」，不代表 HTTP 2xx，也不代表内容可用。
     内容可不可用看 usable，每次按 domain.usability 现算，不存：规则改了，旧页面的结论跟着变。
+
+    fetched_at 是抓取完成的 UTC 时刻。cached 模式靠它确定「这份快照是哪天的」，再把那一天
+    当作「今天」告诉模型。None 表示不知道：早期缓存没记，手写的测试页面也没有。
     """
 
     url: str
@@ -238,6 +250,7 @@ class Page:
     links: tuple[Link, ...] = ()
     error: str | None = None
     status_code: int | None = None
+    fetched_at: datetime | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -248,6 +261,7 @@ class Page:
             "links": [{"text": link.text, "url": link.url} for link in self.links],
             "error": self.error,
             "status_code": self.status_code,
+            "fetched_at": None if self.fetched_at is None else self.fetched_at.isoformat(),
         }
 
     @property
@@ -283,6 +297,7 @@ class Page:
             ),
             error=_optional_str(data.get("error"), "error"),
             status_code=_optional_int(data.get("status_code"), "status_code"),
+            fetched_at=_optional_datetime(data.get("fetched_at"), "fetched_at"),
         )
 
 

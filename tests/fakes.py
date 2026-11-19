@@ -38,6 +38,7 @@ from crossfire.domain import (
 
 USAGE = Usage(input_tokens=10, output_tokens=2, requests=1)
 PROSE = "This sentence is ordinary article prose that is long enough to count here.\n" * 20
+FETCHED_AT = datetime(2026, 9, 12, 21, 16, 0, tzinfo=UTC)
 
 
 class CallLog:
@@ -59,11 +60,13 @@ class FakeFetcher:
         unusable_urls: Collection[str] = (),
         mode: Mode = Mode.LIVE,
         errorless_urls: Collection[str] = (),
+        fetched_at: datetime | None = FETCHED_AT,
     ) -> None:
         self.mode = mode
         self.failing_urls = failing_urls
         self.unusable_urls = unusable_urls
         self.errorless_urls = errorless_urls
+        self.fetched_at = fetched_at
         self.fetched: list[str] = []
 
     def fetch_all(self, urls: Sequence[str], on_page: OnPage | None = None) -> list[Page]:
@@ -71,13 +74,20 @@ class FakeFetcher:
         for index, url in enumerate(urls):
             self.fetched.append(url)
             if url in self.failing_urls:
-                page = Page(url=url, ok=False, error=f"假的抓取失败 {url}", status_code=503)
+                page = Page(url=url, ok=False, error=f"假的抓取失败 {url}", status_code=503, fetched_at=self.fetched_at)
             elif url in self.errorless_urls:
-                page = Page(url=url, ok=False)
+                page = Page(url=url, ok=False, fetched_at=self.fetched_at)
             else:
                 # 不可用页面：正文太短，usability 会判成 too_short。
                 markdown = f"正文 {url}" if url in self.unusable_urls else f"正文 {url}\n{PROSE}"
-                page = Page(url=url, ok=True, title=f"标题 {url}", markdown=markdown, status_code=200)
+                page = Page(
+                    url=url,
+                    ok=True,
+                    title=f"标题 {url}",
+                    markdown=markdown,
+                    status_code=200,
+                    fetched_at=self.fetched_at,
+                )
             if on_page:
                 on_page(SourceIndex(index), page)
             pages.append(page)

@@ -82,7 +82,10 @@ class RunRepository(Protocol):
 
 class PageStore(Protocol):
     def save(self, page: Page) -> str:
-        """存下一个抓到的页面（抓取失败的也存），返回保存位置。同一 URL 再存一次就覆盖。"""
+        """存下一个抓到的页面（抓取失败的也存），返回保存位置。同一 URL 再存一次就覆盖。
+
+        页面必须带 fetched_at，没有就抛异常：缓存是给 cached 模式当快照用的，不知道日期的快照没法用。
+        """
         ...
 
 

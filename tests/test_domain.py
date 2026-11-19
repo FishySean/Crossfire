@@ -342,6 +342,8 @@ PAGE = {
     "links": [{"text": "Docs", "url": "/docs"}],
     "error": None,
     "status_code": 200,
+    # 第 5a 步改了测试数据（断言没改）：新增 fetched_at 键，Page 写出时总带着它。
+    "fetched_at": "2026-09-12T21:16:16.010100+00:00",
 }
 FETCH_FAILURE = {"step": "fetch", "detail": "HTTP 503", "raw": None}
 RUN = {
@@ -469,6 +471,18 @@ def test_usage_requests_must_be_an_integer():
         Claim.from_dict({**CLAIM, "usage": {**USAGE, "requests": "1"}})
     with pytest.raises(KeyError):
         Claim.from_dict({**CLAIM, "usage": {"input_tokens": 10, "output_tokens": 2}})
+
+
+def test_page_fetch_time_is_read_back_and_may_be_missing():
+    page = Page.from_dict(PAGE)
+    assert page.fetched_at == datetime(2026, 9, 12, 21, 16, 16, 10100, tzinfo=timezone.utc)
+    old_cache_file = {key: value for key, value in PAGE.items() if key != "fetched_at"}
+    assert Page.from_dict(old_cache_file).fetched_at is None
+
+
+def test_page_fetch_time_must_carry_a_time_zone():
+    with pytest.raises(ValueError, match="时区"):
+        Page.from_dict({**PAGE, "fetched_at": "2026-09-12T21:16:16"})
 
 
 def test_integer_confidence_is_kept_as_is():

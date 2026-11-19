@@ -69,7 +69,7 @@ def assemble(
 def build_fetcher(settings: Settings, question: Question, mode: Mode) -> PageFetcher:
     if mode is Mode.CACHED:
         return CachedPageFetcher(settings.cache_dir / question.id)
-    return SteelPageFetcher(settings.steel_api_key)
+    return SteelPageFetcher(settings.steel_api_key, clock=SystemClock())
 
 
 def build_pairer(settings: Settings) -> ClaimPairer:
@@ -81,7 +81,7 @@ def build_pairer(settings: Settings) -> ClaimPairer:
 def build_prefetcher(settings: Settings, question: Question) -> PrefetchPages:
     settings.require(*KEYS_FOR_PREFETCH)
     return PrefetchPages(
-        fetcher=SteelPageFetcher(settings.steel_api_key),
+        fetcher=SteelPageFetcher(settings.steel_api_key, clock=SystemClock()),
         store=CachePageStore(settings.cache_dir / question.id),
     )
 

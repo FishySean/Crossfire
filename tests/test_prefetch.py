@@ -1,7 +1,9 @@
 """预抓取：PrefetchPages 用例 + CachePageStore。存下去的页面必须能被 CachedPageFetcher 原样读回来。"""
 
+import pytest
+
 from crossfire.adapters.steel import CachedPageFetcher, cache_path
-from crossfire.adapters.storage import CachePageStore
+from crossfire.adapters.storage import CachePageStore, MissingFetchTimeError
 from crossfire.application.use_cases import PrefetchPages
 from crossfire.domain import Question
 from tests.fakes import FakeFetcher
@@ -46,6 +48,20 @@ def test_cache_store_round_trips_through_the_cached_fetcher(tmp_path):
     assert locations == [str(cache_path(tmp_path / "pre-q", url)) for url in URLS]
     assert list((tmp_path / "pre-q").glob("*.tmp")) == []
     assert CachedPageFetcher(tmp_path / "pre-q").fetch_all(URLS) == pages
+
+
+def test_cache_store_keeps_the_fetch_time(tmp_path):
+    [page] = FakeFetcher().fetch_all(URLS[:1])
+    CachePageStore(tmp_path).save(page)
+    [read_back] = CachedPageFetcher(tmp_path).fetch_all(URLS[:1])
+    assert read_back.fetched_at == page.fetched_at is not None
+
+
+def test_cache_store_refuses_a_page_without_fetch_time(tmp_path):
+    [page] = FakeFetcher(fetched_at=None).fetch_all(URLS[:1])
+    with pytest.raises(MissingFetchTimeError, match="fetched_at"):
+        CachePageStore(tmp_path).save(page)
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_saving_the_same_url_again_overwrites(tmp_path):

@@ -80,6 +80,12 @@ class RunRepository(Protocol):
         ...
 
 
+class PageStore(Protocol):
+    def save(self, page: Page) -> str:
+        """存下一个抓到的页面（抓取失败的也存），返回保存位置。同一 URL 再存一次就覆盖。"""
+        ...
+
+
 class EventSink(Protocol):
     def emit(self, event: Event) -> None:
         """推送一个进度事件。可能从后台线程调用（心跳），实现需要自己保证线程安全。"""

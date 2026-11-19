@@ -76,9 +76,12 @@ def test_stages_run_in_order_and_every_event_has_the_contract_shape(build):
 
 def test_returns_exactly_what_it_saved_and_done_carries_the_location(build):
     use_case, parts = build()
-    result = use_case.execute(QUESTION)
+    saved = use_case.execute(QUESTION)
+    result = saved.result
 
     assert parts["runs"].saved == [result]
+    # 第 4 步有意修改：新增 location 断言。原因：决定 1，execute 返回 SavedRun(result, location)
+    assert saved.location == "memory://1"
     done = parts["events"].events[-1]
     assert isinstance(done, Done)
     assert done.run_file == "memory://1"
@@ -89,13 +92,13 @@ def test_returns_exactly_what_it_saved_and_done_carries_the_location(build):
 @pytest.mark.parametrize("mode", list(Mode))
 def test_mode_comes_from_the_fetcher(build, mode):
     use_case, _ = build(fetcher=FakeFetcher(mode=mode))
-    assert use_case.execute(QUESTION).mode is mode
+    assert use_case.execute(QUESTION).result.mode is mode
 
 
 def test_timings_come_from_the_injected_clock(build):
     clock = FakeClock()
     use_case, _ = build(judge=SlowJudge(CallLog(), clock, seconds=3.0), clock=clock)
-    result = use_case.execute(QUESTION)
+    result = use_case.execute(QUESTION).result
 
     assert result.started_at == FakeClock.START
     assert result.steps["judge"].seconds == 3.0
@@ -105,7 +108,7 @@ def test_timings_come_from_the_injected_clock(build):
 
 def test_failed_pages_are_not_extracted_and_claim_index_stays_the_source_index(build):
     use_case, parts = build(fetcher=FakeFetcher(failing_urls={URLS[1]}))
-    result = use_case.execute(QUESTION)
+    result = use_case.execute(QUESTION).result
 
     assert [claim.source_url for claim in result.claims] == [URLS[0], URLS[2], URLS[3]]
     claim_done = [e.to_dict() for e in parts["events"].events if e.type == "claim_done"]
@@ -116,7 +119,7 @@ def test_failed_pages_are_not_extracted_and_claim_index_stays_the_source_index(b
 
 def test_step_stats(build):
     use_case, _ = build()
-    steps = use_case.execute(QUESTION).steps
+    steps = use_case.execute(QUESTION).result.steps
 
     assert {name: stats.calls for name, stats in steps.items()} == {"fetch": 4, "extract": 4, "pair": 6, "judge": 1}
     assert steps["fetch"].input_tokens is None
@@ -135,7 +138,7 @@ EIGHT = Question.from_dict(
 def test_eight_sources_three_fetch_failures_give_exactly_three_fetch_failures(build):
     failing = {"https://s1.example/", "https://s4.example/", "https://s6.example/"}
     use_case, _ = build(fetcher=FakeFetcher(failing_urls=failing))
-    result = use_case.execute(EIGHT)
+    result = use_case.execute(EIGHT).result
 
     fetch_failures = [f for f in result.failures if f.step == "fetch"]
     assert len(fetch_failures) == 3
@@ -147,7 +150,7 @@ def test_eight_sources_three_fetch_failures_give_exactly_three_fetch_failures(bu
 
 def test_all_pages_failing_is_still_loud(build):
     use_case, _ = build(fetcher=FakeFetcher(failing_urls=set(URLS)))
-    result = use_case.execute(QUESTION)
+    result = use_case.execute(QUESTION).result
 
     assert result.claims == () and result.pairs == ()
     assert [f.step for f in result.failures] == ["fetch"] * 4
@@ -163,10 +166,11 @@ class RetryingExtractor(FakeExtractor):
         return claim
 
 
-def test_claude_calls_counts_retried_requests(build):
+def test_model_requests_counts_retried_requests(build):
     _, parts = build()
-    result = VerifyQuestion(**{**parts, "extractor": RetryingExtractor(CallLog())}).execute(QUESTION)
+    result = VerifyQuestion(**{**parts, "extractor": RetryingExtractor(CallLog())}).execute(QUESTION).result
 
-    assert result.claude_calls == 4 + 6 + 1 + 1
+    # 第 4 步有意修改：claude_calls → model_requests。原因：决定 3，代码里改名，JSON 键名不变
+    assert result.model_requests == 4 + 6 + 1 + 1
     assert result.steps["extract"].calls == 4
     assert result.steps["extract"].requests == 5

@@ -9,31 +9,14 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from crossfire.adapters.event_sinks import CallbackEventSink, NullEventSink
-from crossfire.adapters.storage import JsonRunRepository
-from crossfire.adapters.system import SystemClock, ThreadTicker
-from crossfire.application.events import Done, Event
-from crossfire.application.heartbeat import judge_with_heartbeat
-from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
+from crossfire.adapters.event_sinks import CallbackEventSink
+from crossfire.application.ports import ClaimExtractor, ClaimPairer, PageFetcher, VerdictJudge
 from crossfire.application.records import run_record
-from crossfire.application.use_cases import VerifyQuestion
+from crossfire.composition import assemble
 from crossfire.domain import Mode, Question
 
 RUNS_DIR = Path(__file__).resolve().parents[1] / "out" / "runs"
 HEARTBEAT_SECONDS = 5
-
-
-class _LegacySink:
-    """把事件转成 dict 交给 on_event，并记下 done 事件里的保存位置，用来填旧返回值的 output_path。"""
-
-    def __init__(self, on_event: Callable[[dict[str, Any]], None] | None) -> None:
-        self._forward: EventSink = CallbackEventSink(on_event) if on_event else NullEventSink()
-        self.run_file = ""
-
-    def emit(self, event: Event) -> None:
-        if isinstance(event, Done):
-            self.run_file = event.run_file
-        self._forward.emit(event)
 
 
 def run(
@@ -52,17 +35,14 @@ def run(
         if mode is not fetcher.mode:
             raise ValueError(f"传入的 mode={mode.value} 与注入的 fetcher（{fetcher.mode.value}）对不上")
 
-    clock = SystemClock()
-    sink = _LegacySink(on_event)
-    listener = sink if on_event else None
-    use_case = VerifyQuestion(
-        fetcher=fetcher,
-        extractor=extractor,
-        pairer=pairer,
-        judge=judge_with_heartbeat(judge, listener, clock, ThreadTicker(), HEARTBEAT_SECONDS),
-        runs=JsonRunRepository(RUNS_DIR),
-        events=sink,
-        clock=clock,
+    use_case = assemble(
+        fetcher,
+        extractor,
+        pairer,
+        judge,
+        runs_dir=RUNS_DIR,
+        event_sink=CallbackEventSink(on_event) if on_event else None,
+        heartbeat_seconds=HEARTBEAT_SECONDS,
     )
-    result = use_case.execute(question)
-    return {**run_record(result), "output_path": sink.run_file}
+    saved = use_case.execute(question)
+    return {**run_record(saved.result), "output_path": saved.location}

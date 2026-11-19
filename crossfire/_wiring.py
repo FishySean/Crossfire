@@ -1,19 +1,15 @@
-"""临时的组装点：把 Steel 和 Claude 的实现拼成 pipeline.run 需要的四个依赖。
+"""临时的组装点，只为还没迁到组合根的 scripts/verify.py 和 web/server.py 保留，第 4 步后面的提交删掉。
 
-这里是临时位置。第 4 步建真正的组合根（composition root，全程序唯一负责组装零件的地方）时，
-这个文件整体挪过去，读环境变量和 .env 也一并集中到那里。在那之前，只有入口（scripts/verify.py、
-web/server.py）可以 import 这个模块；业务代码不许 import 它。
+配置已经改从 Settings 读，这里不再碰 .env 和环境变量。
 """
 
-import os
 from dataclasses import dataclass
 
-from dotenv import load_dotenv
-
-from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClaimPairer, ClaudeClient, ClaudeVerdictJudge
-from crossfire.adapters.anthropic.pairer import DEFAULT_PAIR_CONCURRENCY
-from crossfire.adapters.steel import CACHE_ROOT, CachedPageFetcher, SteelPageFetcher
+from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClient, ClaudeVerdictJudge
+from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.application.ports import ClaimExtractor, ClaimPairer, PageFetcher, VerdictJudge
+from crossfire.composition import KEYS_FOR_MODE, build_pairer
+from crossfire.config import Settings
 from crossfire.domain import Mode
 
 
@@ -25,25 +21,17 @@ class Dependencies:
     judge: VerdictJudge
 
 
-def build_default_dependencies(
-    mode: Mode,
-    question_id: str,
-    *,
-    anthropic_api_key: str | None = None,
-    steel_api_key: str | None = None,
-    pair_concurrency: int = DEFAULT_PAIR_CONCURRENCY,
-) -> Dependencies:
-    """key 不传时从环境变量和 .env 读。缓存按问题分目录存放，所以要 question_id。"""
-    load_dotenv()
-    claude = ClaudeClient(anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY"))
+def build_default_dependencies(mode: Mode, question_id: str, *, settings: Settings | None = None) -> Dependencies:
+    settings = settings or Settings.from_env()
+    settings.require(*KEYS_FOR_MODE[mode])
     fetcher: PageFetcher
     if mode is Mode.CACHED:
-        fetcher = CachedPageFetcher(CACHE_ROOT / question_id)
+        fetcher = CachedPageFetcher(settings.cache_dir / question_id)
     else:
-        fetcher = SteelPageFetcher(steel_api_key or os.environ.get("STEEL_API_KEY"))
+        fetcher = SteelPageFetcher(settings.steel_api_key)
     return Dependencies(
         fetcher=fetcher,
-        extractor=ClaudeClaimExtractor(claude),
-        pairer=ClaudeClaimPairer(claude, concurrency=pair_concurrency),
-        judge=ClaudeVerdictJudge(claude),
+        extractor=ClaudeClaimExtractor(ClaudeClient(settings.anthropic_api_key, settings.model_extract)),
+        pairer=build_pairer(settings),
+        judge=ClaudeVerdictJudge(ClaudeClient(settings.anthropic_api_key, settings.model_judge)),
     )

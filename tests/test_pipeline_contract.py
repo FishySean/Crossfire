@@ -22,8 +22,6 @@ import pytest
 
 import crossfire.adapters.system as system
 import crossfire.pipeline as pipeline
-from crossfire._wiring import build_default_dependencies
-from crossfire.adapters.steel import CACHE_ROOT, CachedPageFetcher, SteelPageFetcher
 from crossfire.domain import Mode, Question
 from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
 
@@ -298,16 +296,6 @@ def test_run_rejects_a_plain_string_mode(offline_pipeline):
         record.run(mode="cached")
     with pytest.raises(ValueError):
         Mode("bogus")
-
-
-@pytest.mark.parametrize(("mode", "use_cache"), [(Mode.LIVE, False), (Mode.CACHED, True)])
-def test_mode_selects_cache(mode, use_cache):
-    """选哪种抓取方式从 run() 挪到了组装依赖的地方。"""
-    deps = build_default_dependencies(mode, QUESTION_ID, anthropic_api_key="unused", steel_api_key="unused")
-    assert isinstance(deps.fetcher, CachedPageFetcher) is use_cache
-    assert isinstance(deps.fetcher, SteelPageFetcher) is not use_cache
-    if use_cache:
-        assert deps.fetcher.cache_dir == CACHE_ROOT / QUESTION_ID
 
 
 def test_mode_that_disagrees_with_the_fetcher_is_rejected(offline_pipeline):

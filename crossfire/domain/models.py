@@ -472,8 +472,11 @@ class RunResult:
         return sum(1 for page in self.pages if not page.ok)
 
     @property
-    def claude_calls(self) -> int:
-        """实际发出的请求数，含重试。名字是历史遗留：EqualityPairer 这类不调 Claude 的实现记 0 次。"""
+    def model_requests(self) -> int:
+        """各记录实际发出的模型请求数之和，含重试。不调模型的实现（比如 EqualityPairer）记 0 次。
+
+        写进结果文件时键名仍叫 claude_calls：前端和历史文件都认这个名字。
+        """
         return sum(record.usage.requests for record in [*self.claims, *self.pairs, self.judgment])
 
     @property
@@ -505,7 +508,7 @@ class RunResult:
             "sources": [source.to_dict() for source in self.question.sources],
             "pages_fetched": self.pages_fetched,
             "pages_failed": self.pages_failed,
-            "claude_calls": self.claude_calls,
+            "claude_calls": self.model_requests,
             "failures": [failure.to_dict() for failure in self.failures],
             "steps": {name: step.to_dict() for name, step in self.steps.items()},
             "total_input_tokens": self.total_input_tokens,

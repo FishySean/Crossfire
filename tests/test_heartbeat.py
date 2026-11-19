@@ -77,7 +77,7 @@ def test_without_a_sink_the_judge_is_not_wrapped_and_works_normally():
     log = CallLog()
     result = VerifyQuestion(
         FakeFetcher(), FakeExtractor(log), FakePairer(log), judge, InMemoryRunRepository(), RecordingSink(), clock
-    ).execute(QUESTION)
+    ).execute(QUESTION).result
     assert result.judgment.answer == "当前版本是 1.0"
     assert result.steps["judge"].seconds == 12.0
     assert clock.running_timers == 0

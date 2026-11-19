@@ -341,10 +341,12 @@ def test_every_failed_page_is_a_failure_even_without_an_error_message():
     assert all(f.detail for f in run.failures)
 
 
-def test_claude_calls_counts_every_request_including_retries():
+def test_model_requests_counts_every_request_including_retries():
     # 第 3 步有意修改：claude_calls == 条数之和 + 1 → 各记录 usage.requests 之和（1 + 2 + 2 + 1），
     # 原因：backlog「claude_calls 少算重试」
-    assert RunResult.from_dict(RUN).claude_calls == 6
+    # 第 4 步有意修改：claude_calls → model_requests。原因：决定 3，代码里改名，JSON 键名不变
+    assert RunResult.from_dict(RUN).model_requests == 6
+    assert RunResult.from_dict(RUN).to_dict()["claude_calls"] == 6
     assert RunResult.from_dict(RUN).steps["extract"].requests == 3
 
 

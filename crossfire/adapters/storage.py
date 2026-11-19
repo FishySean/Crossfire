@@ -4,8 +4,24 @@ import os
 from pathlib import Path
 from typing import IO
 
-from crossfire.application.records import run_record
-from crossfire.domain import RunResult
+from crossfire.adapters.steel.fetchers import cache_path
+from crossfire.application.records import page_record, run_record
+from crossfire.domain import Page, RunResult
+
+
+class CachePageStore:
+    """把抓到的页面写进 cache_dir，CachedPageFetcher 按同样的文件名读回来。抓取失败的页面也照写。"""
+
+    def __init__(self, cache_dir: Path) -> None:
+        self.cache_dir = Path(cache_dir)
+
+    def save(self, page: Page) -> str:
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        path = cache_path(self.cache_dir, page.url)
+        staging = path.with_suffix(".json.tmp")
+        staging.write_text(json.dumps(page_record(page), ensure_ascii=False), encoding="utf-8")
+        os.replace(staging, path)
+        return str(path)
 
 
 class JsonRunRepository:

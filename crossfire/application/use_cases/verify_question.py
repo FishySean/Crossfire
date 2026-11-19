@@ -1,4 +1,5 @@
 import itertools
+from dataclasses import dataclass
 
 from crossfire.application.events import (
     ClaimDone,
@@ -22,10 +23,18 @@ from crossfire.application.ports import (
 from crossfire.domain import Claim, Failure, Judgment, Page, Pair, Question, RunResult, SourceIndex, StepStats
 
 
+@dataclass(frozen=True)
+class SavedRun:
+    """一次查证的结果和它保存的位置。用字段名取值，不用元组按位置取。"""
+
+    result: RunResult
+    location: str
+
+
 class VerifyQuestion:
     """查证一个问题：抓取所有来源，逐页提取主张，两两比对，下结论，保存结果。
 
-    每一步完成时通过 EventSink 推送进度事件，保存的位置随最后的 done 事件一起发出。
+    每一步完成时通过 EventSink 推送进度事件，保存的位置也随最后的 done 事件发出。
     """
 
     def __init__(
@@ -46,7 +55,7 @@ class VerifyQuestion:
         self._events = events
         self._clock = clock
 
-    def execute(self, question: Question) -> RunResult:
+    def execute(self, question: Question) -> SavedRun:
         started_at = self._clock.now()
         started = self._clock.monotonic()
         self._events.emit(Start(question=question.text, total_sources=len(question.sources)))
@@ -67,8 +76,7 @@ class VerifyQuestion:
             pairs=tuple(pairs),
             judgment=judgment,
         )
-        self._save(result)
-        return result
+        return SavedRun(result=result, location=self._save(result))
 
     def _fetch_pages(self, question: Question) -> tuple[list[Page], StepStats]:
         started = self._clock.monotonic()
@@ -115,9 +123,10 @@ class VerifyQuestion:
         self._report("judge", judgment.failure)
         return judgment, stats
 
-    def _save(self, result: RunResult) -> None:
+    def _save(self, result: RunResult) -> str:
         location = self._runs.save(result)
         self._events.emit(Done(judgment=result.judgment, run_file=location, elapsed=result.elapsed_seconds))
+        return location
 
     def _report(self, step: str, failure: Failure | None) -> None:
         if failure is not None:

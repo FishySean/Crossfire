@@ -36,6 +36,8 @@ packages = ["crossfire"]
 pythonVersion = "3.12"
 venvPath = "."
 venv = ".venv"
-include = ["crossfire", "tests/fakes.py", "web/server.py", "app.py"]
+# 不检查 web/fake_events.py：手写的彩排事件剧本，几百个 dict 字面量混着 str 和 float，
+# 要过检查只能逐个标成 dict[str, Any]，没有产品价值；它只在 /api/fake-run 和前端彩排里用。
+include = ["crossfire", "tests/fakes.py", "web/server.py", "app.py", "scripts"]
 typeCheckingMode = "standard"
 strict = ["crossfire/domain", "crossfire/application"]

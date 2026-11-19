@@ -7,7 +7,7 @@ to_dict/from_dict 放在实体上，是因为字段名和 JSON 键名并不一�
 from_dict 读的是本项目自己写出的结构，键缺失、枚举值不认识、标量类型不对都直接抛错，不做兜底。
 """
 
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
@@ -152,12 +152,13 @@ class Usage:
     """一条记录背后的用量，包含所有重试的累计。
 
     requests 是实际发出的 API 请求数，结构化重试和网络重试都算在内，所以它可能大于 1。
-    不调 LLM 的实现（比如本地 NLI 模型）记 0。
+    不调 LLM 的实现（比如本地 NLI 模型）记 0。None 表示「当时没有记录」：开始统计请求数之前的
+    旧结果文件迁移过来就是 None，不能当成 0，否则总数偏小还看不出来。键本身必须在。
     """
 
     input_tokens: int
     output_tokens: int
-    requests: int
+    requests: int | None
 
     def to_dict(self) -> dict[str, Any]:
         return {"input_tokens": self.input_tokens, "output_tokens": self.output_tokens, "requests": self.requests}
@@ -167,7 +168,7 @@ class Usage:
         return cls(
             input_tokens=_int(data["input_tokens"], "input_tokens"),
             output_tokens=_int(data["output_tokens"], "output_tokens"),
-            requests=_int(data["requests"], "requests"),
+            requests=_optional_int(data["requests"], "requests"),
         )
 
 
@@ -438,7 +439,7 @@ class StepStats:
             seconds=seconds,
             input_tokens=sum(usage.input_tokens for usage in usages),
             output_tokens=sum(usage.output_tokens for usage in usages),
-            requests=sum(usage.requests for usage in usages),
+            requests=_sum_or_none(usage.requests for usage in usages),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -462,8 +463,18 @@ class StepStats:
             seconds=seconds,
             input_tokens=_int(data["input_tokens"], "input_tokens"),
             output_tokens=_int(data["output_tokens"], "output_tokens"),
-            requests=_int(data["requests"], "requests"),
+            requests=_optional_int(data["requests"], "requests"),
         )
+
+
+def _sum_or_none(values: Iterable[int | None]) -> int | None:
+    """有一个没记录，总数就是未知。"""
+    total = 0
+    for value in values:
+        if value is None:
+            return None
+        total += value
+    return total
 
 
 @dataclass(frozen=True)
@@ -493,12 +504,13 @@ class RunResult:
         return sum(1 for page in self.pages if not page.ok)
 
     @property
-    def model_requests(self) -> int:
+    def model_requests(self) -> int | None:
         """各记录实际发出的模型请求数之和，含重试。不调模型的实现（比如 EqualityPairer）记 0 次。
+        任何一条记录的请求数没有记录（旧文件迁移来的），总数就是 None。
 
         写进结果文件时键名仍叫 claude_calls：前端和历史文件都认这个名字。
         """
-        return sum(record.usage.requests for record in [*self.claims, *self.pairs, self.judgment])
+        return _sum_or_none(record.usage.requests for record in [*self.claims, *self.pairs, self.judgment])
 
     @property
     def failures(self) -> tuple[Failure, ...]:

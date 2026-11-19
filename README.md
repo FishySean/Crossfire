@@ -60,4 +60,5 @@ uv run uvicorn web.server:app --reload --port 8765
 uv run pytest                                  # 离线跑：零网络、零 API key
 uv run python scripts/capture_page_fixtures.py # 需要联网，重新采集 tests/fixtures/pages 下的快照
 uv run python scripts/probe.py --test 1        # Steel 可用性探测，需要 STEEL_API_KEY
+uv run python scripts/migrate_runs.py          # 把旧结果文件迁到当前格式，默认只演练；--apply 才写（先整目录备份）
 ```

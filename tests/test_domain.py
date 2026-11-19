@@ -27,9 +27,11 @@ from crossfire.domain import (
     RunResult,
     Source,
     SourceType,
+    StepStats,
     Tier,
     UnknownSourceError,
     UnusableReason,
+    Usage,
     is_usable_page,
 )
 from crossfire.adapters.anthropic.extractor import EXTRACT_SCHEMA
@@ -472,3 +474,28 @@ def test_usage_requests_must_be_an_integer():
 def test_integer_confidence_is_kept_as_is():
     """真实结果文件里有整数 1 的 confidence。"""
     assert Claim.from_dict({**CLAIM, "confidence": 1}).to_dict()["confidence"] == 1
+
+
+# ---- 第 4 步：requests 可以是 None（「当时没有记录」）----
+
+
+def test_unrecorded_requests_load_as_none_but_the_key_is_still_required():
+    assert Usage.from_dict({"input_tokens": 1, "output_tokens": 2, "requests": None}) == Usage(1, 2, None)
+    with pytest.raises(KeyError):
+        Usage.from_dict({"input_tokens": 1, "output_tokens": 2})
+
+
+def test_one_unrecorded_request_count_makes_the_total_unknown():
+    """少记的那几条不能当 0 加进去：总数会偏小，还看不出来偏小。"""
+    unknown = {**CLAIM, "usage": {**CLAIM["usage"], "requests": None}}
+    run = RunResult.from_dict({**RUN, "claims": [unknown, FAILED_CLAIM]})
+    assert run.model_requests is None
+    assert run.to_dict()["claude_calls"] is None
+
+
+def test_step_stats_with_an_unrecorded_request_count():
+    stats = StepStats.summing([Usage(1, 1, 1), Usage(1, 1, None)], seconds=1.0)
+    assert stats.requests is None
+    assert StepStats.from_dict(stats.to_dict()) == stats
+    with pytest.raises(KeyError):
+        StepStats.from_dict({"calls": 1, "input_tokens": 1, "output_tokens": 1, "seconds": 1.0})

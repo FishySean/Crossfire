@@ -20,7 +20,7 @@ from crossfire.application.ports import (
     RunRepository,
     VerdictJudge,
 )
-from crossfire.domain import Claim, Failure, Judgment, Page, Pair, Question, RunResult, SourceIndex, StepStats
+from crossfire.domain import Claim, Failure, Judgment, Mode, Page, Pair, Question, RunResult, SourceIndex, StepStats
 
 
 @dataclass(frozen=True)
@@ -54,6 +54,10 @@ class VerifyQuestion:
         self._runs = runs
         self._events = events
         self._clock = clock
+
+    @property
+    def mode(self) -> Mode:
+        return self._fetcher.mode
 
     def execute(self, question: Question) -> SavedRun:
         started_at = self._clock.now()

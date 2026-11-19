@@ -1,0 +1,28 @@
+# 11 月快照，取自 out/runs/python-latest-version_20261119T230333Z.json（第 4 步那次答错的 live 运行）。
+id: python-2026-11
+question_id: python-latest-version
+as_of: 2026-11-19
+repeats: 3
+gold_answer: "3.15.2"
+evidence:
+  - url: https://www.python.org/downloads/
+    quote: "Download the latest [Python 3](https://www.python.org/ftp/python/3.15.2/Python-3.15.2.tar.xz) source."
+  - url: https://devguide.python.org/versions/
+    quote: "| 3.15 | [**PEP 790**](https://peps.python.org/pep-0790/) | bugfix | 2026-10-09 |"
+  - url: https://devguide.python.org/versions/
+    quote: "| 3.13 | [**PEP 719**](https://peps.python.org/pep-0719/) | security | 2024-10-07 |"
+  - url: https://devguide.python.org/versions/
+    quote: "This phase is also called **maintenance** mode or **stable** release."
+rules:
+  - kind: leads_with
+    expected: '3\.15\.2'
+    competitors:
+      - '3\.1[0-46-9](?:\.(?:\d+|x))?(?!\d)'
+    why: >-
+      下载页的源码链接指向 3.15.2；devguide 里 3.15 于 2026-10-09 首发、处于 bugfix（页面定义为 stable），
+      3.13 已是 security。答案说出的第一个版本号必须是 3.15.2。第 4 步那次的错误答案先说了 3.13.x，会被这条拦下。
+  - kind: forbids
+    pattern: '3\.15\.2[^。；;\n]{0,40}(?:存疑|预发布|开发版|误标|不可信|尚未正式)'
+    why: >-
+      答案不能一边给出 3.15.2、一边说它可疑或是预发布版：两个一手来源都明确把它列为已发布的稳定版。
+      这条防的是「答案写对了数字，结论却在对冲」。

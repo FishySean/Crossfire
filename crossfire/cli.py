@@ -1,4 +1,4 @@
-"""命令行入口：uv run crossfire verify|prefetch ...
+"""命令行入口：uv run crossfire verify|prefetch|eval ...
 
 只做解析参数、把字符串转成领域类型、打印。组装交给 composition，配置交给 config。
 """
@@ -13,7 +13,8 @@ from typing import Any
 
 import crossfire.composition as composition
 from crossfire.application.records import run_record
-from crossfire.config import Settings, SettingsError, load_questions
+from crossfire.application.use_cases import Attempt, CaseOutcome, estimate_requests
+from crossfire.config import Settings, SettingsError, load_eval_cases, load_questions
 from crossfire.domain import Mode, Question
 
 
@@ -41,6 +42,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     prefetch = commands.add_parser("prefetch", help="把来源实时抓一遍存进页面缓存，给 cached 模式用")
     _add_targets(prefetch, "预抓")
+
+    evaluate = commands.add_parser("eval", help="跑评测集：只读冻结快照，按标准答案判分")
+    evaluate.add_argument("--case", metavar="ID", help="只跑这一道题，默认全部")
+    evaluate.add_argument("--estimate-only", action="store_true", help="只打印预计请求数，不跑")
     return parser
 
 
@@ -55,6 +60,13 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
     args = parser.parse_args(argv)
     settings = settings or Settings.from_env()
     questions = load_questions(settings)
+
+    if args.command == "eval":
+        try:
+            return evaluate(settings, questions, args.case, args.estimate_only, parser)
+        except SettingsError as error:
+            print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
+            return 2
 
     if args.all:
         targets = questions
@@ -103,6 +115,75 @@ def prefetch(settings: Settings, targets: Sequence[Question]) -> None:
             page = item.page
             flag = "ok" if page.ok else f"失败 {page.error}"
             print(f"  {flag:<10} {len(page.markdown or ''):>7} 字符  -> {Path(item.location).name}  {page.url}")
+
+
+def evaluate(
+    settings: Settings,
+    questions: Sequence[Question],
+    case_id: str | None,
+    estimate_only: bool,
+    parser: argparse.ArgumentParser,
+) -> int:
+    cases = load_eval_cases(settings)
+    if case_id is not None:
+        cases = [case for case in cases if case.id == case_id]
+        if not cases:
+            available = ", ".join(case.id for case in load_eval_cases(settings)) or "（没有评测题）"
+            parser.error(f"找不到评测题 {case_id}。可用：{available}")
+    by_id = {question.id: question for question in questions}
+    missing = sorted({case.question_id for case in cases} - set(by_id))
+    if missing:
+        parser.error(f"评测题引用的问题不在 {settings.questions_file} 里：{', '.join(missing)}")
+
+    total = 0
+    print("预计请求数（上限，不含重试）：")
+    for case in cases:
+        question = by_id[case.question_id]
+        estimate = estimate_requests(case, question)
+        total += estimate
+        print(f"  {case.id:<18} {len(question.sources)} 个来源 × {case.repeats} 次  最多 {estimate} 次")
+    print(f"  合计最多 {total} 次")
+    if estimate_only:
+        return 0
+
+    runner = composition.build_eval_runner(settings)
+    outcomes: list[CaseOutcome] = []
+    for case in cases:
+        print(f"\n=== {case.id}（as_of {case.as_of}，标准答案 {case.gold_answer}）===")
+        outcomes.append(runner.execute(case, by_id[case.question_id], on_attempt=_print_attempt))
+    print_eval_table(outcomes)
+    return 0 if all(outcome.passed for outcome in outcomes) else 1
+
+
+def _print_attempt(attempt: Attempt) -> None:
+    result = attempt.saved.result
+    flag = "通过" if attempt.grade.passed else "没通过"
+    print(f"  {flag}  {result.elapsed_seconds} 秒  请求 {_count(result.model_requests)}  -> {attempt.saved.location}")
+
+
+def print_eval_table(outcomes: Sequence[CaseOutcome]) -> None:
+    print("\n" + "=" * 70)
+    print(f"{'题目':<18}{'次':>3}  {'结果':<6}{'置信度':>6}  实际答案 / 没通过的原因")
+    requests: list[int | None] = []
+    tokens_in = tokens_out = 0
+    for outcome in outcomes:
+        for number, attempt in enumerate(outcome.attempts, 1):
+            result = attempt.saved.result
+            judgment = result.judgment
+            confidence = "n/a" if judgment.confidence is None else f"{judgment.confidence:.2f}"
+            flag = "通过" if attempt.grade.passed else "没通过"
+            answer = " ".join((judgment.answer or "(没有答案)").split())
+            print(f"{outcome.case.id:<18}{number:>3}  {flag:<6}{confidence:>6}  {answer[:90]}")
+            for reason in attempt.grade.reasons:
+                print(f"{'':<35}✗ {reason}")
+            requests.append(result.model_requests)
+            tokens_in += result.total_input_tokens
+            tokens_out += result.total_output_tokens
+    passed = sum(outcome.passed for outcome in outcomes)
+    print("-" * 70)
+    print(f"通过 {passed}/{len(outcomes)} 道题（每道题所有重复都对才算通过）")
+    known = [count for count in requests if count is not None]
+    print(f"实际请求 {sum(known)} 次{'（有未记录的）' if len(known) < len(requests) else ''}，token 输入 {tokens_in}，输出 {tokens_out}")
 
 
 def print_report(result: dict[str, Any], location: str) -> None:

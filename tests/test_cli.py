@@ -6,7 +6,7 @@ import pytest
 
 from crossfire import cli, composition
 from crossfire.adapters.storage import CachePageStore
-from crossfire.application.use_cases import PrefetchPages
+from crossfire.application.use_cases import PrefetchPages, RunEvals
 from crossfire.config import Settings
 from crossfire.domain import Mode
 from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
@@ -140,3 +140,91 @@ def test_prefetch_all(env, capsys):
     run, tmp_path, _ = env
     assert run("prefetch", "--all") == 0
     assert sorted(p.name for p in (tmp_path / "cache").iterdir()) == ["q1", "q2"]
+
+
+# ---- eval ----
+
+CASE_YAML = """
+id: {id}
+question_id: q1
+as_of: 2026-09-12
+repeats: {repeats}
+gold_answer: '{gold}'
+evidence:
+  - {{url: 'https://a.example/', quote: '1.0'}}
+rules:
+  - {{kind: leads_with, expected: '{gold}', competitors: [], why: 测试}}
+"""
+
+
+@pytest.fixture
+def eval_env(env, monkeypatch):
+    run, tmp_path, _ = env
+    cases = tmp_path / "evals" / "cases"
+    cases.mkdir(parents=True)
+    (cases / "right.yaml").write_text(CASE_YAML.format(id="right", repeats=2, gold=r"1\.0"), encoding="utf-8")
+    (cases / "wrong.yaml").write_text(CASE_YAML.format(id="wrong", repeats=1, gold=r"2\.0"), encoding="utf-8")
+
+    def fake_runner(settings):
+        settings.require(*composition.KEYS_FOR_MODE[Mode.CACHED])
+
+        def verifier_for(case, question):
+            log = CallLog()
+            return composition.assemble(
+                FakeFetcher(mode=Mode.CACHED),
+                FakeExtractor(log),
+                FakePairer(log),
+                FakeJudge(log, trusted_url=question.sources[0].url),
+                runs_dir=settings.eval_runs_dir / case.id,
+            )
+
+        return RunEvals(verifier_for)
+
+    monkeypatch.setattr(composition, "build_eval_runner", fake_runner)
+
+    def run_eval(*argv, **overrides):
+        return run("eval", *argv, CROSSFIRE_EVALS_DIR=str(tmp_path / "evals"),
+                   CROSSFIRE_EVAL_RUNS_DIR=str(tmp_path / "eval-runs"), **overrides)
+
+    return run_eval, tmp_path
+
+
+def test_eval_estimate_only_prints_the_upper_bound_and_runs_nothing(eval_env, capsys):
+    run_eval, tmp_path = eval_env
+    assert run_eval("--estimate-only") == 0
+    out = capsys.readouterr().out
+    # q1 有 2 个来源：2 次提取 + 1 次比对 + 1 次判决 = 4；right 跑 2 次，wrong 跑 1 次。
+    assert "right" in out and "最多 8 次" in out and "最多 4 次" in out and "合计最多 12 次" in out
+    assert not (tmp_path / "eval-runs").exists()
+
+
+def test_eval_passing_case_exits_zero_and_saves_runs_apart_from_history(eval_env, capsys):
+    run_eval, tmp_path = eval_env
+    assert run_eval("--case", "right") == 0
+    out = capsys.readouterr().out
+    assert out.index("预计请求数") < out.index("=== right")
+    assert "通过 1/1 道题" in out and "当前版本是 1.0" in out
+    assert len(list((tmp_path / "eval-runs" / "right").glob("*.json"))) == 2
+    assert not (tmp_path / "runs").exists()
+
+
+def test_eval_exits_nonzero_when_any_case_fails_and_says_why(eval_env, capsys):
+    run_eval, _ = eval_env
+    assert run_eval() == 1
+    out = capsys.readouterr().out
+    assert "通过 1/2 道题" in out
+    assert "没通过" in out and "答案里没有标准答案" in out
+
+
+def test_eval_unknown_case_lists_the_available_ones(eval_env, capsys):
+    run_eval, _ = eval_env
+    with pytest.raises(SystemExit):
+        run_eval("--case", "nope")
+    assert "right, wrong" in capsys.readouterr().err
+
+
+def test_eval_needs_only_the_anthropic_key(eval_env, capsys):
+    run_eval, _ = eval_env
+    assert run_eval("--case", "right", STEEL_API_KEY="") == 0
+    assert run_eval("--case", "right", ANTHROPIC_API_KEY="") == 2
+    assert "ANTHROPIC_API_KEY" in capsys.readouterr().err

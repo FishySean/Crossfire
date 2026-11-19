@@ -15,6 +15,7 @@ import yaml
 from dotenv import dotenv_values
 
 from crossfire.domain import Question
+from crossfire.domain.evals import EvalCase
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = ROOT / ".env"
@@ -53,6 +54,8 @@ class Settings:
     runs_dir: Path
     cache_dir: Path
     questions_file: Path
+    evals_dir: Path
+    eval_runs_dir: Path
     env_file: Path
 
     @classmethod
@@ -89,6 +92,8 @@ class Settings:
             runs_dir=_path(get("CROSSFIRE_RUNS_DIR", "out/runs")),
             cache_dir=_path(get("CROSSFIRE_CACHE_DIR", "out/cache")),
             questions_file=_path(get("CROSSFIRE_QUESTIONS_FILE", "questions/demo.yaml")),
+            evals_dir=_path(get("CROSSFIRE_EVALS_DIR", "evals")),
+            eval_runs_dir=_path(get("CROSSFIRE_EVAL_RUNS_DIR", "out/eval-runs")),
             env_file=env_file,
         )
 
@@ -122,3 +127,18 @@ def load_questions(settings: Settings) -> list[Question]:
         return []
     data: Any = yaml.safe_load(settings.questions_file.read_text(encoding="utf-8")) or []
     return [Question.from_dict(item) for item in data]
+
+
+def load_eval_cases(settings: Settings) -> list[EvalCase]:
+    """读 evals/cases/*.yaml，每个文件一道题，按 id 排序。文件名必须等于 id，快照目录也按 id 找。"""
+    cases: list[EvalCase] = []
+    for path in sorted((settings.evals_dir / "cases").glob("*.yaml")):
+        case = EvalCase.from_dict(yaml.safe_load(path.read_text(encoding="utf-8")))
+        if case.id != path.stem:
+            raise SettingsError(f"{path} 里的 id 是 {case.id}，必须和文件名 {path.stem} 一致")
+        cases.append(case)
+    return sorted(cases, key=lambda case: case.id)
+
+
+def eval_snapshot_dir(settings: Settings, case: EvalCase) -> Path:
+    return settings.evals_dir / "snapshots" / case.id

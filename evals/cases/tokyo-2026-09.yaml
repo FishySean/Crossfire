@@ -1,0 +1,26 @@
+id: tokyo-2026-09
+question_id: tokyo-population
+as_of: 2026-09-12
+repeats: 1
+gold_answer: "东京都约 1,430 万人（2026 年 8 月推计 14,303,513 人；2025 年国势调查速报 14,246,219 人）。约 3,700 万是大东京都市圈的人口。"
+evidence:
+  - url: https://www.toukei.metro.tokyo.jp/jsuikei/js-index.htm
+    quote: "<td>8月</td><td>14,303,513</td>"
+  - url: https://www.metro.tokyo.lg.jp/information/press/2026/05/2026052914
+    quote: "東京都の人口は14,246,219人で、令和2年より約20万人増"
+  - url: https://asia.nikkei.com/business/transportation/railway-development-drives-tokyo-s-growth-as-world-s-largest-metro-area
+    quote: "fueling further growth of the capital's sprawling metropolitan area, solidifying its status as the world's largest with 37 million people"
+rules:
+  - kind: figure_in_range
+    low: 14200000
+    high: 14399999
+    why: >-
+      东京都有两个官方数字：东京都统计局 2026 年 8 月推计 14,303,513 人，2025-10-01 国势调查速报 14,246,219 人。
+      时点不同，两个都成立，所以接受 1,420 万到 1,440 万之间的数。2020 年普查的 14,047,594 已经过时，不在区间内。
+  - kind: figure_needs_context
+    low: 36000000
+    high: 39000000
+    context: '都市圈|都市圏|首都圈|首都圏|大东京|大東京|Greater Tokyo|metropolitan|都会区|都市区'
+    why: >-
+      3,700 万是都市圈口径（Nikkei 原文说的是 metropolitan area）。答案里出现 3,600 万到 3,900 万的数字时，
+      它所在的那一句必须说明这是都市圈，不能当成东京都的人口。

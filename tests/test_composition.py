@@ -10,8 +10,16 @@ from crossfire.adapters.storage import CachePageStore, JsonRunRepository
 from crossfire.application.events import Start
 from crossfire.application.heartbeat import HeartbeatJudge
 from crossfire.application.use_cases import PrefetchPages, VerifyQuestion
-from crossfire.composition import build_fetcher, build_pairer, build_prefetcher, build_verifier, queue_event_sink
-from crossfire.config import Settings, SettingsError
+from crossfire.composition import (
+    build_eval_runner,
+    build_eval_verifier,
+    build_fetcher,
+    build_pairer,
+    build_prefetcher,
+    build_verifier,
+    queue_event_sink,
+)
+from crossfire.config import Settings, SettingsError, eval_snapshot_dir, load_eval_cases
 from crossfire.domain import Mode, Question
 from tests.fakes import RecordingSink
 
@@ -93,6 +101,20 @@ def test_prefetch_needs_only_steel(tmp_path):
     assert prefetcher._store.cache_dir == tmp_path / "cache" / "comp-q"
     with pytest.raises(SettingsError, match="STEEL_API_KEY"):
         build_prefetcher(settings(tmp_path, STEEL_API_KEY=""), QUESTION)
+
+
+def test_eval_never_fetches_live_and_reads_the_case_snapshot(tmp_path):
+    [case] = [c for c in load_eval_cases(Settings.from_mapping({})) if c.id == "python-2026-11"]
+    configured = settings(tmp_path, CROSSFIRE_EVALS_DIR=str(tmp_path / "evals"))
+    verifier = build_eval_verifier(configured, case)
+    assert verifier.mode is Mode.CACHED
+    assert eval_snapshot_dir(configured, case) == tmp_path / "evals" / "snapshots" / "python-2026-11"
+
+
+def test_eval_needs_only_anthropic(tmp_path):
+    build_eval_runner(settings(tmp_path, STEEL_API_KEY=""))
+    with pytest.raises(SettingsError, match="ANTHROPIC_API_KEY"):
+        build_eval_runner(settings(tmp_path, ANTHROPIC_API_KEY=""))
 
 
 def test_queue_sink_puts_event_dicts():

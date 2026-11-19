@@ -15,9 +15,10 @@ from crossfire.adapters.storage import CachePageStore, JsonRunRepository
 from crossfire.adapters.system import SystemClock, ThreadTicker
 from crossfire.application.heartbeat import judge_with_heartbeat
 from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
-from crossfire.application.use_cases import PrefetchPages, VerifyQuestion
-from crossfire.config import Key, Pairer, Settings
+from crossfire.application.use_cases import PrefetchPages, RunEvals, VerifyQuestion
+from crossfire.config import Key, Pairer, Settings, eval_snapshot_dir
 from crossfire.domain import Mode, Question
+from crossfire.domain.evals import EvalCase
 
 HEARTBEAT_SECONDS = 5
 
@@ -42,6 +43,23 @@ def build_verifier(
         runs_dir=settings.runs_dir,
         event_sink=event_sink,
     )
+
+
+def build_eval_verifier(settings: Settings, case: EvalCase) -> VerifyQuestion:
+    """评测只读这道题的冻结快照，结果写进单独的目录，不混进 out/runs 的历史记录。"""
+    settings.require(*KEYS_FOR_MODE[Mode.CACHED])
+    return assemble(
+        fetcher=CachedPageFetcher(eval_snapshot_dir(settings, case)),
+        extractor=ClaudeClaimExtractor(ClaudeClient(settings.anthropic_api_key, settings.model_extract)),
+        pairer=build_pairer(settings),
+        judge=ClaudeVerdictJudge(ClaudeClient(settings.anthropic_api_key, settings.model_judge)),
+        runs_dir=settings.eval_runs_dir / case.id,
+    )
+
+
+def build_eval_runner(settings: Settings) -> RunEvals:
+    settings.require(*KEYS_FOR_MODE[Mode.CACHED])
+    return RunEvals(lambda case, _question: build_eval_verifier(settings, case))
 
 
 def assemble(

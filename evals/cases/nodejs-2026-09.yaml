@@ -1,0 +1,21 @@
+id: nodejs-2026-09
+question_id: nodejs-lts-version
+as_of: 2026-09-12
+repeats: 1
+gold_answer: "v24（Krypton）"
+evidence:
+  - url: https://github.com/nodejs/release
+    quote: "| [24.x](https://nodejs.org/download/release/latest-v24.x/) | **Active LTS** | [Krypton](https://nodejs.org/download/release/latest-krypton/) | 2025-05-06 | 2025-10-28 | 2026-10-20 | 2028-04-30 |"
+  - url: https://github.com/nodejs/release
+    quote: "| [22.x](https://nodejs.org/download/release/latest-v22.x/) | **Maintenance LTS** | [Jod](https://nodejs.org/download/release/latest-jod/) | 2024-04-24 | 2024-10-29 | 2025-10-21 | 2027-04-30 |"
+  - url: https://github.com/nodejs/release
+    quote: "| [26.x](https://nodejs.org/download/release/latest-v26.x/) | **Current** |  | 2026-05-05 | 2026-10-28 | 2027-10-20 | 2029-04-30 |"
+rules:
+  - kind: leads_with
+    expected: '(?:(?<![A-Za-z])v|Node(?:\.js)?\s*)24(?!\d)'
+    competitors:
+      - '(?:(?<![A-Za-z])v|Node(?:\.js)?\s*)(?:1\d|2[0-35-9])(?!\d)'
+    why: >-
+      Node.js 发布工作组的表里 24.x 是 Active LTS，它的 Maintenance 从 2026-10-20 才开始，晚于快照日期 2026-09-12；
+      22.x 已是 Maintenance LTS，26.x 还是 Current。答案说出的第一个大版本必须是 24。
+      只认 v24、Node 24、Node.js 24 这几种写法，免得把 2026-10-20 这样的日期误当成版本号。

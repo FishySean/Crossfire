@@ -7,14 +7,14 @@
 
 import json
 import socket
-from types import SimpleNamespace
 
 import pytest
 import yaml
 from fastapi.testclient import TestClient
 
-import crossfire.pipeline as pipeline
 import web.server as server
+from crossfire.composition import assemble
+from crossfire.config import Settings
 from crossfire.domain import Mode
 from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
 
@@ -53,22 +53,23 @@ def web_env(monkeypatch, tmp_path):
     questions_file.write_text(yaml.safe_dump(QUESTIONS, allow_unicode=True), encoding="utf-8")
 
     def install(crash=False):
-        log = CallLog()
-
-        def build(mode, question_id):
-            return SimpleNamespace(
-                fetcher=FakeFetcher(mode=mode),
-                extractor=ExplodingExtractor(log) if crash else FakeExtractor(log),
-                pairer=FakePairer(log),
-                judge=FakeJudge(log, trusted_url="https://a.example/"),
+        def build(settings, question, mode, event_sink=None):
+            log = CallLog()
+            return assemble(
+                FakeFetcher(mode=mode),
+                ExplodingExtractor(log) if crash else FakeExtractor(log),
+                FakePairer(log),
+                FakeJudge(log, trusted_url="https://a.example/"),
+                runs_dir=settings.runs_dir,
+                event_sink=event_sink,
             )
 
-        monkeypatch.setattr(server, "RUNS_DIR", runs_dir)
-        monkeypatch.setattr(server, "QUESTIONS_FILE", questions_file)
+        settings = Settings.from_mapping(
+            {"CROSSFIRE_RUNS_DIR": str(runs_dir), "CROSSFIRE_QUESTIONS_FILE": str(questions_file)},
+            env_file=tmp_path / ".env",
+        )
         monkeypatch.setattr(server, "RETRY_DELAY_SECONDS", 0)
-        monkeypatch.setattr(server, "build_default_dependencies", build)
-        monkeypatch.setattr(pipeline, "RUNS_DIR", runs_dir)
-        return TestClient(server.app), runs_dir
+        return TestClient(server.create_app(settings, build)), runs_dir
 
     return install
 
@@ -147,6 +148,17 @@ def test_crash_sends_error_then_done_and_ends_the_stream(web_env):
     assert done["judgment"] == {} and done["run_file"] == ""
     assert isinstance(done["elapsed"], (int, float))
     assert [e["type"] for e in events].count("done") == 1
+
+
+def test_missing_key_with_the_real_composition_root_ends_with_error_then_done(tmp_path):
+    """不注入假实现：没配 key 时 build_verifier 在联网之前就报错，照样走 error → done 收尾。"""
+    questions_file = tmp_path / "questions.yaml"
+    questions_file.write_text(yaml.safe_dump(QUESTIONS, allow_unicode=True), encoding="utf-8")
+    settings = Settings.from_mapping({"CROSSFIRE_QUESTIONS_FILE": str(questions_file)}, env_file=tmp_path / ".env")
+    events = sse_events(TestClient(server.create_app(settings)).get("/api/run/web-q?mode=cached"))
+
+    assert [e["type"] for e in events] == ["error", "done"]
+    assert "ANTHROPIC_API_KEY" in events[0]["detail"]
 
 
 # ---- /api/runs ----

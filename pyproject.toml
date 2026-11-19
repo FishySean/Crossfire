@@ -36,6 +36,6 @@ packages = ["crossfire"]
 pythonVersion = "3.12"
 venvPath = "."
 venv = ".venv"
-include = ["crossfire", "tests/fakes.py"]
+include = ["crossfire", "tests/fakes.py", "web/server.py", "app.py"]
 typeCheckingMode = "standard"
 strict = ["crossfire/domain", "crossfire/application"]

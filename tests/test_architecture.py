@@ -79,14 +79,11 @@ def test_use_case_depends_only_on_domain_and_application():
 # 还没迁走的旧模块，本步后面的提交逐个删掉；列表只能变短，空了就把它删掉。
 NOT_YET_MIGRATED = {
     "crossfire/pipeline.py",
-    "crossfire/_wiring.py",
     "crossfire/llm.py",
     "crossfire/extract.py",
     "crossfire/reconcile.py",
     "crossfire/steel_client.py",
     "crossfire/adapters/steel/legacy.py",
-    "web/server.py",
-    "app.py",
 }
 
 ENTRY_POINTS = [

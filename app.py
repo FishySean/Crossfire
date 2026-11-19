@@ -17,8 +17,7 @@ import webbrowser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-MARKER_FILES = ("web/server.py", "crossfire/pipeline.py", "pyproject.toml")
-CACHE_DIR = ROOT / "out" / "cache"
+MARKER_FILES = ("web/server.py", "crossfire/composition.py", "pyproject.toml")
 PORT_FIRST = 8765
 PORT_LAST = 8775
 READY_TIMEOUT_SECONDS = 15.0
@@ -33,11 +32,6 @@ REQUIRED_MODULES = {
     "steel": "steel-sdk",
     "yaml": "pyyaml",
     "dotenv": "python-dotenv",
-}
-
-REQUIRED_KEYS = {
-    "ANTHROPIC_API_KEY": "Claude 调用（提取主张、两两比对、最终判断）",
-    "STEEL_API_KEY": "Steel 云端浏览器抓取网页",
 }
 
 OK = "  \u2713 "
@@ -64,36 +58,32 @@ def ensure_project_root():
     return True
 
 
-def read_env_file():
-    """只读 .env 的键，不覆盖已有环境变量，也不依赖 python-dotenv（它可能还没装）。"""
-    values = {}
-    env_file = ROOT / ".env"
-    if not env_file.is_file():
-        return values
-    for line in env_file.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        values[key.strip()] = value.strip().strip("'\"")
-    return values
+def load_settings(env_file=None):
+    """读配置并检查两个 key。缺 key 不阻止启动：看历史结果和 ?fake= 彩排都不需要 key，只有真跑一次才需要。
 
+    配置写错（比如 PAIRER 不认识）就返回 None，不启动。
+    """
+    from crossfire.config import ENV_FILE, KEY_PURPOSES, Key, Settings, SettingsError
 
-def check_api_keys():
-    """缺 key 不阻止启动：看历史结果和 ?fake= 彩排都不需要 key，只有真跑一次才需要。"""
-    from_file = read_env_file()
-    missing = []
-    for key, purpose in REQUIRED_KEYS.items():
-        value = os.environ.get(key) or from_file.get(key, "")
-        if value and not value.startswith("your_"):
-            print(OK + f"{key} 已配置 —— 用于{purpose}")
-        else:
-            missing.append(key)
-            print(BAD + f"{key} 缺失 —— 用于{purpose}")
-    if missing:
-        print(INFO + f"在 {ROOT / '.env'} 里加上：" + "、".join(f"{k}=你的密钥" for k in missing))
+    env_file = env_file or ENV_FILE
+    try:
+        settings = Settings.from_env(env_file)
+    except SettingsError as error:
+        print(BAD + _indent(str(error)))
+        return None
+    for key in Key:
+        if key not in settings.missing(key):
+            print(OK + f"{key.value} 已配置 —— 用于{KEY_PURPOSES[key]}")
+    try:
+        Settings.from_env(env_file, require=list(Key))
+    except SettingsError as error:
+        print(BAD + _indent(str(error)))
         print(INFO + "没有也能启动：查看历史结果、?fake= 假事件彩排都不需要密钥，只有真跑一次查证需要。")
-    return missing
+    return settings
+
+
+def _indent(text):
+    return text.replace("\n", "\n" + INFO)
 
 
 def check_dependencies():
@@ -106,14 +96,14 @@ def check_dependencies():
     return True
 
 
-def check_cache():
-    cached = [d.name for d in CACHE_DIR.glob("*") if d.is_dir() and any(d.glob("*.json"))] if CACHE_DIR.is_dir() else []
+def check_cache(cache_dir):
+    cached = [d.name for d in cache_dir.glob("*") if d.is_dir() and any(d.glob("*.json"))] if cache_dir.is_dir() else []
     if cached:
         print(OK + f"抓取缓存：{len(cached)} 个问题有缓存（{', '.join(sorted(cached))}）")
     else:
-        print(BAD + f"{CACHE_DIR} 下没有抓取缓存")
-        print(INFO + "cached 模式会退回真实抓取，变慢且需要 STEEL_API_KEY。")
-        print(INFO + "先跑 `uv run python scripts/prefetch.py --all` 把来源抓进缓存，演示才稳。")
+        print(BAD + f"{cache_dir} 下没有抓取缓存")
+        print(INFO + "cached 模式下没有缓存的来源会记为抓取失败，用 live 模式则需要 STEEL_API_KEY。")
+        print(INFO + "先跑 `uv run crossfire prefetch --all` 把来源抓进缓存，演示才稳。")
     return cached
 
 
@@ -155,12 +145,14 @@ def main():
     print("Crossfire 启动自检")
     if not ensure_project_root():
         return 1
-    deps_ok = check_dependencies()
-    check_api_keys()
-    if not deps_ok:
+    if not check_dependencies():
         print("\n缺少依赖，无法启动。装好依赖后再运行 python app.py。")
         return 1
-    check_cache()
+    settings = load_settings()
+    if settings is None:
+        print("\n配置有误，无法启动。按上面的提示改好 .env 后再运行 python app.py。")
+        return 1
+    check_cache(settings.cache_dir)
 
     port = pick_port()
     if port is None:
@@ -174,9 +166,9 @@ def main():
 
     import uvicorn
 
-    from web.server import app
+    from web.server import create_app
 
-    server = uvicorn.Server(uvicorn.Config(app, host=HOST, port=port, log_level="warning"))
+    server = uvicorn.Server(uvicorn.Config(create_app(settings), host=HOST, port=port, log_level="warning"))
     thread = threading.Thread(target=server.run, name="uvicorn", daemon=True)
     thread.start()
 

@@ -16,7 +16,6 @@ import json
 import os
 import socket
 import threading
-import time
 from types import SimpleNamespace
 
 import pytest

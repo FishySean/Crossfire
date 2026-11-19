@@ -1,0 +1,153 @@
+"""call_structured 的特征测试：两层重试、失败返回、token 累加。
+
+被测实现由 structured fixture 提供，断言只认 call_structured 原来的返回形状
+（工具入参 + _usage，失败时多一个 _failure）。搬家之后在 fixture 里换实现，断言不动。
+"""
+
+from types import SimpleNamespace
+
+import anthropic
+import httpx
+import pytest
+
+import crossfire.llm
+
+REQUEST = httpx.Request("POST", "https://api.anthropic.invalid/v1/messages")
+
+
+def tool_message(data, input_tokens=10, output_tokens=2):
+    block = SimpleNamespace(type="tool_use", input=data, model_dump=lambda: {"type": "tool_use", "input": data})
+    return SimpleNamespace(
+        stop_reason="tool_use",
+        content=[block],
+        usage=SimpleNamespace(input_tokens=input_tokens, output_tokens=output_tokens),
+    )
+
+
+def text_message(stop_reason="end_turn", input_tokens=10, output_tokens=2):
+    block = SimpleNamespace(type="text", text="不想用工具", model_dump=lambda: {"type": "text", "text": "不想用工具"})
+    return SimpleNamespace(
+        stop_reason=stop_reason,
+        content=[block],
+        usage=SimpleNamespace(input_tokens=input_tokens, output_tokens=output_tokens),
+    )
+
+
+def status_error(cls, code):
+    return cls(f"HTTP {code}", response=httpx.Response(code, request=REQUEST), body=None)
+
+
+class ScriptedMessages:
+    """按顺序吐出预设的响应；元素是异常就抛出。"""
+
+    def __init__(self, script):
+        self.script = list(script)
+        self.prompts = []
+
+    def create(self, **kwargs):
+        self.prompts.append(kwargs["messages"][0]["content"])
+        item = self.script.pop(0)
+        if isinstance(item, BaseException):
+            raise item
+        return item
+
+
+@pytest.fixture
+def structured(monkeypatch):
+    """返回 (call, messages, sleeps)。call 的签名和返回形状与 llm.call_structured 一致。"""
+    sleeps = []
+    state = SimpleNamespace(messages=None)
+
+    def install(script):
+        state.messages = ScriptedMessages(script)
+        monkeypatch.setattr(crossfire.llm, "Anthropic", lambda **kwargs: SimpleNamespace(messages=state.messages))
+        monkeypatch.setattr(crossfire.llm.time, "sleep", sleeps.append)
+        return crossfire.llm.call_structured, state.messages, sleeps
+
+    return install
+
+
+SCHEMA = {"type": "object", "properties": {"x": {"type": "number"}}, "required": ["x"]}
+
+
+@pytest.mark.parametrize(
+    "error",
+    [anthropic.APIConnectionError(request=REQUEST), anthropic.APITimeoutError(request=REQUEST)],
+    ids=["connection", "timeout"],
+)
+def test_network_errors_retry_twice_with_backoff(structured, error, capsys):
+    call, messages, sleeps = structured([error, error, tool_message({"x": 1})])
+    result = call("问题", SCHEMA, "pair")
+
+    assert result["x"] == 1
+    assert "_failure" not in result
+    assert len(messages.prompts) == 3
+    assert sleeps == [1, 2]
+    assert capsys.readouterr().err.count("⚠️") == 2
+
+
+def test_network_errors_raise_after_retries_are_exhausted(structured):
+    error = anthropic.APITimeoutError(request=REQUEST)
+    call, messages, sleeps = structured([error, error, error])
+    with pytest.raises(anthropic.APITimeoutError):
+        call("问题", SCHEMA, "pair")
+    assert len(messages.prompts) == 3
+    assert sleeps == [1, 2]
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        status_error(anthropic.AuthenticationError, 401),
+        status_error(anthropic.BadRequestError, 400),
+        status_error(anthropic.RateLimitError, 429),
+    ],
+    ids=["auth", "bad-request", "rate-limit"],
+)
+def test_other_api_errors_raise_immediately(structured, error):
+    call, messages, sleeps = structured([error])
+    with pytest.raises(type(error)):
+        call("问题", SCHEMA, "pair")
+    assert len(messages.prompts) == 1
+    assert sleeps == []
+
+
+@pytest.mark.parametrize(
+    ("first", "detail_fragment"),
+    [(text_message(stop_reason="max_tokens"), "max_tokens=1000"), (text_message(), "没有 tool_use")],
+    ids=["truncated", "no-tool-use"],
+)
+def test_structural_failure_retries_once_with_the_reason(structured, first, detail_fragment):
+    call, messages, sleeps = structured([first, tool_message({"x": 2})])
+    result = call("原始问题", SCHEMA, "extract")
+
+    assert result["x"] == 2
+    assert len(messages.prompts) == 2
+    assert messages.prompts[0] == "原始问题"
+    assert messages.prompts[1].startswith("原始问题")
+    assert detail_fragment in messages.prompts[1]
+    assert sleeps == []
+
+
+def test_both_attempts_failing_returns_failure_instead_of_raising(structured, capsys):
+    call, messages, _ = structured([text_message(stop_reason="max_tokens"), text_message(stop_reason="max_tokens")])
+    result = call("问题", SCHEMA, "judge", max_tokens=3000)
+
+    assert len(messages.prompts) == 2
+    assert set(result) == {"_usage", "_failure"}
+    assert result["_failure"]["step"] == "judge"
+    assert "max_tokens=3000" in result["_failure"]["detail"]
+    assert result["_failure"]["raw"]
+    assert "❌" in capsys.readouterr().err
+
+
+def test_usage_accumulates_across_attempts(structured):
+    call, _, _ = structured(
+        [text_message(input_tokens=100, output_tokens=7), tool_message({"x": 3}, input_tokens=120, output_tokens=9)]
+    )
+    assert call("问题", SCHEMA, "pair")["_usage"] == {"input_tokens": 220, "output_tokens": 16}
+
+
+def test_usage_of_a_failed_call_is_still_reported(structured):
+    call, _, _ = structured([text_message(input_tokens=5, output_tokens=1), text_message(input_tokens=6, output_tokens=1)])
+    assert call("问题", SCHEMA, "pair")["_usage"] == {"input_tokens": 11, "output_tokens": 2}

@@ -11,6 +11,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from crossfire._wiring import build_default_dependencies
+from crossfire.domain import Mode, Question
 from crossfire.pipeline import run
 from web.fake_events import SCENARIOS, scenario_events
 
@@ -79,11 +81,13 @@ def _frame(event: dict) -> str:
 async def run_question(question_id: str, mode: str = "cached") -> StreamingResponse:
     """把 pipeline.run 的 on_event 回调转成 SSE 事件流。
 
-    run 是同步阻塞的，而且内部自己调 asyncio.run，所以不能在这里 await：
+    run 是同步阻塞的（Steel 适配器内部还会自己调 asyncio.run），所以不能在这里 await：
     它跑在独立线程里，回调往线程安全队列里塞，下面的生成器从队列抽。
     """
-    if mode not in ("live", "cached"):
-        raise HTTPException(status_code=400, detail=f"unknown mode: {mode}")
+    try:
+        run_mode = Mode(mode)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"unknown mode: {mode}") from None
     config = next((q for q in _questions() if q["id"] == question_id), None)
     if config is None:
         raise HTTPException(status_code=404, detail=f"unknown question: {question_id}")
@@ -95,7 +99,9 @@ async def run_question(question_id: str, mode: str = "cached") -> StreamingRespo
 
         def work() -> None:
             try:
-                run(config, on_event=events.put, mode=mode)
+                question = Question.from_dict(config)
+                deps = build_default_dependencies(run_mode, question.id)
+                run(question, deps.fetcher, deps.extractor, deps.pairer, deps.judge, on_event=events.put, mode=run_mode)
             except Exception as e:
                 traceback.print_exc()
                 # 前端把「done 之前流就断了」当成事件流中断报错，所以失败也必须以 done 收尾。

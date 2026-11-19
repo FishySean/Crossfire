@@ -1,0 +1,171 @@
+"""四个端口的假实现，直接注入 pipeline.run，不需要 monkeypatch。
+
+数据与第 0 步那套 monkeypatch 假数据一致：每个来源都说「当前版本是 1.0」，比对一律 agree。
+"""
+
+import threading
+import time
+from collections.abc import Collection, Sequence
+
+from crossfire.application.ports import (
+    ClaimExtractor,
+    ClaimPairer,
+    OnPage,
+    OnPair,
+    PageFetcher,
+    VerdictJudge,
+)
+from crossfire.domain import (
+    Claim,
+    Failure,
+    Judgment,
+    Page,
+    Pair,
+    Question,
+    Relation,
+    Source,
+    SourceIndex,
+    SourceType,
+    Usage,
+)
+
+USAGE = Usage(input_tokens=10, output_tokens=2)
+PROSE = "This sentence is ordinary article prose that is long enough to count here.\n" * 20
+
+
+class CallLog:
+    """按调用顺序记下各端口被调用的步骤名。pairer 可能被并发调用，所以加锁。"""
+
+    def __init__(self) -> None:
+        self.steps: list[str] = []
+        self._lock = threading.Lock()
+
+    def record(self, step: str) -> None:
+        with self._lock:
+            self.steps.append(step)
+
+
+class FakeFetcher:
+    def __init__(self, failing_urls: Collection[str] = (), unusable_urls: Collection[str] = ()) -> None:
+        self.failing_urls = failing_urls
+        self.unusable_urls = unusable_urls
+        self.fetched: list[str] = []
+
+    def fetch_all(self, urls: Sequence[str], on_page: OnPage | None = None) -> list[Page]:
+        pages: list[Page] = []
+        for index, url in enumerate(urls):
+            self.fetched.append(url)
+            if url in self.failing_urls:
+                page = Page(url=url, ok=False, error=f"假的抓取失败 {url}", status_code=503)
+            else:
+                # 不可用页面：正文太短，usability 会判成 too_short。
+                markdown = f"正文 {url}" if url in self.unusable_urls else f"正文 {url}\n{PROSE}"
+                page = Page(url=url, ok=True, title=f"标题 {url}", markdown=markdown, status_code=200)
+            if on_page:
+                on_page(SourceIndex(index), page)
+            pages.append(page)
+        return pages
+
+
+class FakeExtractor:
+    def __init__(self, log: CallLog, texts: dict[str, str] | None = None) -> None:
+        self.log = log
+        self.texts = texts or {}
+
+    def extract(self, question: Question, page: Page, source: Source) -> Claim:
+        self.log.record("extract")
+        return Claim(
+            source_url=page.url,
+            tier=source.tier,
+            text=self.texts.get(page.url, f"{page.url} 说当前版本是 1.0"),
+            evidence="version 1.0",
+            source_type=SourceType.OFFICIAL_DOCUMENTATION,
+            published_date=None,
+            confidence=0.9,
+            usage=USAGE,
+        )
+
+
+class FakePairer:
+    """一律 agree；两个 URL 都在 failing_pair_urls 里的那一对返回失败。"""
+
+    def __init__(self, log: CallLog, failing_pair_urls: Collection[str] | None = None) -> None:
+        self.log = log
+        self.failing_pair_urls = failing_pair_urls
+
+    def pair_all(
+        self,
+        question: Question,
+        claim_pairs: Sequence[tuple[Claim, Claim]],
+        on_pair: OnPair | None = None,
+    ) -> list[Pair]:
+        pairs: list[Pair] = []
+        for index, (a, b) in enumerate(claim_pairs):
+            self.log.record("pair")
+            if self.failing_pair_urls and {a.source_url, b.source_url} <= set(self.failing_pair_urls):
+                failure = Failure(step="pair", detail="假的 pair 失败", raw="[]")
+                pair = Pair(a.source_url, b.source_url, relation=None, nature=None, usage=USAGE, failure=failure)
+            else:
+                pair = Pair(a.source_url, b.source_url, Relation.AGREE, "粒度不同——测试数据", USAGE)
+            if on_pair:
+                on_pair(index, len(claim_pairs), pair)
+            pairs.append(pair)
+        return pairs
+
+
+class EqualityPairer:
+    """只看两条主张的文字是否相同：相同判 agree，不同判 contradict。
+
+    它是接入自训 NLI 模型的演练：一个与 Claude 毫无关系的比对实现，注入进去就能跑完整条流水线。
+    """
+
+    def __init__(self) -> None:
+        self.batches: list[int] = []
+
+    def pair_all(
+        self,
+        question: Question,
+        claim_pairs: Sequence[tuple[Claim, Claim]],
+        on_pair: OnPair | None = None,
+    ) -> list[Pair]:
+        self.batches.append(len(claim_pairs))
+        pairs = [
+            Pair(
+                a.source_url,
+                b.source_url,
+                Relation.AGREE if a.text == b.text else Relation.CONTRADICT,
+                "文字相同" if a.text == b.text else "文字不同",
+                Usage(0, 0),
+            )
+            for a, b in claim_pairs
+        ]
+        for index, pair in enumerate(pairs):
+            if on_pair:
+                on_pair(index, len(pairs), pair)
+        return pairs
+
+
+class FakeJudge:
+    def __init__(self, log: CallLog, trusted_url: str, delay: float = 0.0) -> None:
+        self.log = log
+        self.trusted_url = trusted_url
+        self.delay = delay
+
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair]) -> Judgment:
+        self.log.record("judge")
+        time.sleep(self.delay)
+        return Judgment(
+            answer="当前版本是 1.0",
+            confidence=0.9,
+            reasoning="测试数据",
+            conflicts=(),
+            trusted_sources=(self.trusted_url,),
+            usage=USAGE,
+        )
+
+
+# 让 pyright 核对这些假实现确实满足端口协议。
+_fetcher: type[PageFetcher] = FakeFetcher
+_extractor: type[ClaimExtractor] = FakeExtractor
+_pairers: tuple[type[ClaimPairer], ...] = (FakePairer, EqualityPairer)
+_judge: type[VerdictJudge] = FakeJudge

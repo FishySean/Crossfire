@@ -5,17 +5,11 @@
 个别测试锁住的现状本身就像 bug，在对应测试的注释里标了「锁住现状」，
 重构时如果决定顺手修掉，要连同测试一起改，而且是有意识地改。
 
-为什么用 monkeypatch：
-pipeline.run 没有任何注入点，抓取和 Claude 调用都是模块级 import 进来的，
-只能在测试里替换模块属性。这本身就是当前架构缺少依赖注入的证据。
-第 2 步（ports + adapters）做完之后，这些测试要改写成直接把假实现传给 use case，
-届时删掉 offline_pipeline 这个 fixture 里的全部 setattr。
-
-替换的位置有讲究：pipeline.py 写的是 `from crossfire.steel_client import fetch_pages`，
-名字已经绑定在 crossfire.pipeline 里，替换 crossfire.steel_client.fetch_pages 不会生效。
-call_structured 同理，被 crossfire.extract 和 crossfire.reconcile 各自绑定了一份。
-所以要替换三处：crossfire.pipeline.fetch_pages、crossfire.extract.call_structured、
-crossfire.reconcile.call_structured。
+依赖怎么来：
+四个端口（抓取、提取、比对、判决）由 tests/fakes.py 的假实现直接注入 run()，不再 monkeypatch。
+仍然 monkeypatch 的只有三样，它们还不是端口：RUNS_DIR（结果存储，第 3 步变成端口）、
+HEARTBEAT_SECONDS 和 threading（心跳的计时与线程）。
+socket.connect 也被替换成直接报错，用来证明 run() 没有绕过端口自己联网。
 """
 
 import json
@@ -27,11 +21,11 @@ from types import SimpleNamespace
 
 import pytest
 
-import crossfire.extract
-import crossfire.llm
 import crossfire.pipeline as pipeline
-import crossfire.reconcile
-import crossfire.steel_client
+from crossfire._wiring import build_default_dependencies
+from crossfire.adapters.steel import CACHE_ROOT, CachedPageFetcher, SteelPageFetcher
+from crossfire.domain import Mode, Question
+from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
 
 QUESTION_ID = "contract-fixture"
 QUESTION = "测试问题：某产品当前版本是多少？"
@@ -41,7 +35,7 @@ SOURCES = [
     {"url": "https://source-c.example/", "tier": "news"},
     {"url": "https://source-d.example/", "tier": "aggregator"},
 ]
-CONFIG = {"id": QUESTION_ID, "question": QUESTION, "sources": SOURCES}
+CONFIG = Question.from_dict({"id": QUESTION_ID, "question": QUESTION, "sources": SOURCES})
 URLS = [s["url"] for s in SOURCES]
 
 USAGE = {"input_tokens": 10, "output_tokens": 2}
@@ -82,115 +76,46 @@ RESULT_FILE_KEYS = {
 }
 
 
-def _ok_page(url: str, usable: bool = True) -> dict:
-    return {
-        "url": url,
-        "ok": True,
-        "title": f"标题 {url}",
-        "markdown": f"正文 {url}",
-        "links": [],
-        "error": None,
-        "status_code": 200,
-        "usable": usable,
-        "unusable_reason": "" if usable else "nav_skeleton",
-    }
-
-
-def _failed_page(url: str) -> dict:
-    return {
-        "url": url,
-        "ok": False,
-        "title": None,
-        "markdown": None,
-        "links": [],
-        "error": f"假的抓取失败 {url}",
-        "status_code": 503,
-        "usable": False,
-        "unusable_reason": "fetch_failed",
-    }
-
-
 def _refuse(*args, **kwargs):
     raise AssertionError("测试里不允许任何真实网络或 API 调用")
 
 
 @pytest.fixture
 def offline_pipeline(monkeypatch, tmp_path):
-    """装好假抓取和假 Claude，返回一个可调参数的安装器和调用记录。"""
+    """返回一个安装器：按参数装配四个假端口，返回调用记录和已注入依赖的 run。"""
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.delenv("STEEL_API_KEY", raising=False)
-    monkeypatch.setattr(crossfire.llm, "Anthropic", _refuse)
-    monkeypatch.setattr(crossfire.steel_client, "Steel", _refuse)
-    monkeypatch.setattr(crossfire.steel_client, "AsyncSteel", _refuse)
     monkeypatch.setattr(socket.socket, "connect", _refuse)
 
     runs_dir = tmp_path / "runs"
     monkeypatch.setattr(pipeline, "RUNS_DIR", runs_dir)
 
-    record = SimpleNamespace(llm_steps=[], fetch_kwargs=None, runs_dir=runs_dir)
-    lock = threading.Lock()
-
     def install(failing_urls=(), unusable_urls=(), failing_pair_urls=None, judge_delay=0.0):
-        async def fake_fetch_pages(urls, concurrency=8, use_cache=False, cache_dir=None, on_page=None):
-            record.fetch_kwargs = {"use_cache": use_cache, "cache_dir": cache_dir}
-            pages = []
-            for index, url in enumerate(urls):
-                if url in failing_urls:
-                    page = _failed_page(url)
-                else:
-                    page = _ok_page(url, usable=url not in unusable_urls)
-                if on_page:
-                    on_page(index, page)
-                pages.append(page)
-            return pages
-
-        def fake_call_structured(prompt, schema, step, max_tokens=1000):
-            with lock:
-                record.llm_steps.append(step)
-            usage = dict(USAGE)
-            if step == "extract":
-                url = next(u for u in URLS if u in prompt)
-                return {
-                    "claim": f"{url} 说当前版本是 1.0",
-                    "evidence": "version 1.0",
-                    "source_type": "official_documentation",
-                    "confidence": 0.9,
-                    "published_date": None,
-                    "_usage": usage,
-                }
-            if step == "pair":
-                if failing_pair_urls and all(u in prompt for u in failing_pair_urls):
-                    return {"_usage": usage, "_failure": {"step": "pair", "detail": "假的 pair 失败", "raw": "[]"}}
-                return {"relation": "agree", "nature": "粒度不同——测试数据", "_usage": usage}
-            if step == "judge":
-                time.sleep(judge_delay)
-                return {
-                    "answer": "当前版本是 1.0",
-                    "confidence": 0.9,
-                    "reasoning": "测试数据",
-                    "conflicts": [],
-                    "trusted_sources": [URLS[0]],
-                    "_usage": usage,
-                }
-            raise AssertionError(f"未知步骤 {step}")
-
-        monkeypatch.setattr(pipeline, "fetch_pages", fake_fetch_pages)
-        monkeypatch.setattr(crossfire.extract, "call_structured", fake_call_structured)
-        monkeypatch.setattr(crossfire.reconcile, "call_structured", fake_call_structured)
-        return record
+        log = CallLog()
+        deps = {
+            "fetcher": FakeFetcher(failing_urls=failing_urls, unusable_urls=unusable_urls),
+            "extractor": FakeExtractor(log),
+            "pairer": FakePairer(log, failing_pair_urls=failing_pair_urls),
+            "judge": FakeJudge(log, trusted_url=URLS[0], delay=judge_delay),
+        }
+        return SimpleNamespace(
+            llm_steps=log.steps,
+            runs_dir=runs_dir,
+            run=lambda **kwargs: pipeline.run(CONFIG, **deps, **kwargs),
+        )
 
     return install
 
 
-def _run_collecting(config=CONFIG, **kwargs):
+def _run_collecting(record, **kwargs):
     events = []
-    result = pipeline.run(config, on_event=events.append, **kwargs)
+    result = record.run(on_event=events.append, **kwargs)
     return result, events
 
 
 def test_event_sequence_shape(offline_pipeline):
-    offline_pipeline()
-    _, events = _run_collecting()
+    record = offline_pipeline()
+    _, events = _run_collecting(record)
 
     types = [e["type"] for e in events]
     assert types == (
@@ -218,8 +143,8 @@ def test_claim_index_is_the_source_index_not_the_claim_count(offline_pipeline):
     后面每条主张都会错位一格，画到别的来源卡片上。假事件永远不会有抓取失败，
     所以只跑假事件时这个 bug 完全不可见，是第一次接真实链路时才暴露的。
     """
-    offline_pipeline(failing_urls={URLS[1]})
-    result, events = _run_collecting()
+    record = offline_pipeline(failing_urls={URLS[1]})
+    result, events = _run_collecting(record)
 
     fetch = [e for e in events if e["type"] == "fetch_done"]
     claim = [e for e in events if e["type"] == "claim_done"]
@@ -241,8 +166,8 @@ def test_claim_index_is_the_source_index_not_the_claim_count(offline_pipeline):
 
 
 def test_pair_failure_is_reported_not_swallowed(offline_pipeline):
-    offline_pipeline(failing_pair_urls=(URLS[1], URLS[2]))
-    result, events = _run_collecting()
+    record = offline_pipeline(failing_pair_urls=(URLS[1], URLS[2]))
+    result, events = _run_collecting(record)
 
     assert [f["step"] for f in result["failures"]] == ["pair"]
     assert result["failures"][0]["detail"] == "假的 pair 失败"
@@ -278,7 +203,7 @@ def test_result_file_structure_and_atomic_write(offline_pipeline, monkeypatch):
             seen_at_done["exists"] = os.path.exists(event["run_file"])
             seen_at_done["tmp"] = sorted(p.name for p in record.runs_dir.glob("*.tmp"))
 
-    result = pipeline.run(CONFIG, on_event=on_event)
+    result = record.run(on_event=on_event)
     path = result["output_path"]
 
     on_disk = json.loads(open(path, encoding="utf-8").read())
@@ -293,8 +218,8 @@ def test_result_file_structure_and_atomic_write(offline_pipeline, monkeypatch):
 
 
 def test_accounting(offline_pipeline):
-    offline_pipeline()
-    result, _ = _run_collecting()
+    record = offline_pipeline()
+    result, _ = _run_collecting(record)
 
     assert result["claude_calls"] == 4 + 6 + 1
     assert result["steps"]["extract"]["calls"] == 4
@@ -306,7 +231,7 @@ def test_accounting(offline_pipeline):
 
 
 def test_without_on_event_no_heartbeat_thread_and_same_result(offline_pipeline, monkeypatch):
-    offline_pipeline()
+    record = offline_pipeline()
 
     created = []
 
@@ -316,20 +241,20 @@ def test_without_on_event_no_heartbeat_thread_and_same_result(offline_pipeline, 
 
     monkeypatch.setattr(pipeline, "threading", SimpleNamespace(Event=threading.Event, Thread=recording_thread))
 
-    result = pipeline.run(CONFIG)
+    result = record.run()
     assert created == []
     assert set(result) == RESULT_FILE_KEYS | {"output_path"}
     assert result["judgment"]["answer"] == "当前版本是 1.0"
 
     # 对照组：证明上面的记录器确实能抓到心跳线程，空列表不是因为记录器失灵。
-    pipeline.run(CONFIG, on_event=lambda event: None)
+    record.run(on_event=lambda event: None)
     assert created == ["beat"]
 
 
 def test_heartbeats_only_between_judge_start_and_done(offline_pipeline, monkeypatch):
     monkeypatch.setattr(pipeline, "HEARTBEAT_SECONDS", 0.01)
-    offline_pipeline(judge_delay=0.06)
-    _, events = _run_collecting()
+    record = offline_pipeline(judge_delay=0.06)
+    _, events = _run_collecting(record)
 
     types = [e["type"] for e in events]
     beats = [i for i, t in enumerate(types) if t == "heartbeat"]
@@ -351,23 +276,34 @@ def test_unusable_pages_still_go_to_extract(offline_pipeline):
     这是已知的断线，第 4 步接上 usable 之后这条测试要有意识地改写。
     """
     record = offline_pipeline(unusable_urls={URLS[2]})
-    result, events = _run_collecting()
+    result, events = _run_collecting(record)
 
     assert record.llm_steps.count("extract") == 4
     assert URLS[2] in [e["url"] for e in events if e["type"] == "claim_done"]
     assert result["pages_fetched"] == 4
 
 
-@pytest.mark.parametrize(
-    ("mode", "use_cache"),
-    [("live", False), ("cached", True), ("bogus", False)],
-)
-def test_mode_selects_cache(offline_pipeline, mode, use_cache):
-    """锁住现状：run 不校验 mode，除 "cached" 以外的任何字符串都按 live 跑，
-    而且结果文件里会原样记下那个非法值。只有 web 端点在入口处校验了 mode。"""
+@pytest.mark.parametrize("mode", ["live", "cached"])
+def test_mode_is_recorded_in_the_result(offline_pipeline, mode):
     record = offline_pipeline()
-    result = pipeline.run(CONFIG, mode=mode)
-
-    assert record.fetch_kwargs["use_cache"] is use_cache
-    assert record.fetch_kwargs["cache_dir"] == crossfire.steel_client.CACHE_ROOT / QUESTION_ID
+    result = record.run(mode=Mode(mode))
     assert result["mode"] == mode
+
+
+def test_run_rejects_a_plain_string_mode(offline_pipeline):
+    """原来 run 不校验 mode，拼错的 "cahced" 会悄悄按 live 真跑。现在字符串必须在入口处转成 Mode。"""
+    record = offline_pipeline()
+    with pytest.raises(TypeError):
+        record.run(mode="cached")
+    with pytest.raises(ValueError):
+        Mode("bogus")
+
+
+@pytest.mark.parametrize(("mode", "use_cache"), [(Mode.LIVE, False), (Mode.CACHED, True)])
+def test_mode_selects_cache(mode, use_cache):
+    """选哪种抓取方式从 run() 挪到了组装依赖的地方。"""
+    deps = build_default_dependencies(mode, QUESTION_ID, anthropic_api_key="unused", steel_api_key="unused")
+    assert isinstance(deps.fetcher, CachedPageFetcher) is use_cache
+    assert isinstance(deps.fetcher, SteelPageFetcher) is not use_cache
+    if use_cache:
+        assert deps.fetcher.cache_dir == CACHE_ROOT / QUESTION_ID

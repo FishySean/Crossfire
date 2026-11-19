@@ -8,6 +8,8 @@ from pathlib import Path
 
 import yaml
 
+from crossfire._wiring import build_default_dependencies
+from crossfire.domain import Mode, Question
 from crossfire.pipeline import run
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -122,10 +124,13 @@ def main() -> None:
             available = ", ".join(q["id"] for q in questions)
             parser.error(f"找不到问题 id: {args.question}。可用：{available}")
 
+    mode = Mode(args.mode)
     started = time.monotonic()
     for question_config in targets:
         try:
-            print_report(run(question_config, mode=args.mode))
+            question = Question.from_dict(question_config)
+            deps = build_default_dependencies(mode, question.id)
+            print_report(run(question, deps.fetcher, deps.extractor, deps.pairer, deps.judge, mode=mode))
         except Exception:
             traceback.print_exc()
             raise

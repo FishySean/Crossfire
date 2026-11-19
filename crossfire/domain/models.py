@@ -215,7 +215,8 @@ class Claim:
 
     @property
     def answered(self) -> bool:
-        return self.text is not None
+        # 空字符串也算没回答：只有回答了的主张才参与两两比对。
+        return bool(self.text)
 
     def to_dict(self) -> dict[str, Any]:
         return _with_failure(

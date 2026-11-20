@@ -1,14 +1,21 @@
 """评测集：事先知道标准答案的题。每次改 prompt 前后各跑一遍，看答对了几道。
 
 标准答案来自冻结的网页快照，不来自任何一次模型输出：评测集要独立于被测对象。
-判分只看 judgment.answer 的文字，规则全是确定的正则和数字区间，同一个答案永远得到同一个结果，
-不用另一个模型来打分。每条规则都带 why，写明为什么这么判。
+判分看 judgment.answer 的文字，有的题还看 reasoning。规则全是确定的正则和数字区间，
+同一个答案永远得到同一个结果，不用另一个模型来打分。每条规则都带 why，写明为什么这么判。
+
+题分两类。full 题跑完整条流水线，页面读冻结快照。judge 题只测判决这一步：输入是事先存好的
+claims 和 pairs，每份输入只调一次 judge，用来专门制造判决必须处理的局面（比如旧文章说的「目前」
+和比模型知识更新的一手来源冲突），不受提取那一步好坏的影响。
 """
 
 import re
 from dataclasses import dataclass
 from datetime import date
+from enum import StrEnum
 from typing import Any, Protocol, Self
+
+from crossfire.domain.models import Claim, Pair
 
 
 class Rule(Protocol):
@@ -112,11 +119,37 @@ class FigureNeedsContext:
         return None
 
 
+def sentences(text: str) -> list[str]:
+    """按句末标点和编号切句，逗号不断句。与 sentence_around 同一套标点。"""
+    return [part for part in _SENTENCE_END.split(text) if part.strip()]
+
+
+@dataclass(frozen=True)
+class ForbidsInSentence:
+    """同一句里同时命中 all_of 的每一个模式、又不含 unless 里的任何一个，就算没通过。
+
+    用来抓「拿模型自己的知识否定来源」：同一句里既提到自己的知识（知识截止、训练数据……），
+    又说来源可疑。只禁其中一类词会误杀：「3.15.2 晚于我的训练数据，但这不是来源出错的证据」
+    是照规则办事的正确推理，所以带否定说法的句子用 unless 放过。
+    """
+
+    all_of: tuple[str, ...]
+    unless: tuple[str, ...]
+    why: str
+
+    def check(self, answer: str) -> str | None:
+        for sentence in sentences(answer):
+            if all(re.search(p, sentence) for p in self.all_of) and not any(re.search(p, sentence) for p in self.unless):
+                return f"这句拿自己的知识否定来源：「{sentence.strip()[:80]}」"
+        return None
+
+
 RULE_KINDS: dict[str, type] = {
     "leads_with": LeadsWith,
     "forbids": Forbids,
     "figure_in_range": FigureInRange,
     "figure_needs_context": FigureNeedsContext,
+    "forbids_in_sentence": ForbidsInSentence,
 }
 
 
@@ -130,10 +163,11 @@ def rule_from_dict(data: dict[str, Any]) -> Rule:
     for pattern_key in ("expected", "pattern", "context"):
         if pattern_key in fields:
             re.compile(fields[pattern_key])
-    if "competitors" in fields:
-        fields["competitors"] = tuple(fields["competitors"])
-        for pattern in fields["competitors"]:
-            re.compile(pattern)
+    for list_key in ("competitors", "all_of", "unless"):
+        if list_key in fields:
+            fields[list_key] = tuple(fields[list_key])
+            for pattern in fields[list_key]:
+                re.compile(pattern)
     return RULE_KINDS[kind](**fields)
 
 
@@ -154,8 +188,33 @@ class Evidence:
     quote: str
 
 
+class CaseKind(StrEnum):
+    FULL = "full"
+    JUDGE = "judge"
+
+
+@dataclass(frozen=True)
+class JudgeInput:
+    """judge 题的一份冻结输入：某次真实运行产出的 claims 和 pairs，原样存下。source 写明取自哪次运行。"""
+
+    source: str
+    claims: tuple[Claim, ...]
+    pairs: tuple[Pair, ...]
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Self:
+        return cls(
+            source=str(data["source"]),
+            claims=tuple(Claim.from_dict(claim) for claim in data["claims"]),
+            pairs=tuple(Pair.from_dict(pair) for pair in data["pairs"]),
+        )
+
+
 @dataclass(frozen=True)
 class EvalCase:
+    """snapshot 是标准答案依据所在的冻结页面目录名，默认就是 id。judge 题不读页面，
+    但标准答案照样要站在页面原文上，所以指向它所用 claims 的那份快照。"""
+
     id: str
     question_id: str
     as_of: date
@@ -163,12 +222,20 @@ class EvalCase:
     evidence: tuple[Evidence, ...]
     rules: tuple[Rule, ...]
     repeats: int
+    kind: CaseKind = CaseKind.FULL
+    snapshot: str = ""
+    reasoning_rules: tuple[Rule, ...] = ()
 
-    def grade(self, answer: str | None) -> Grade:
+    def grade(self, answer: str | None, reasoning: str | None = None) -> Grade:
         if not answer:
             return Grade(passed=False, reasons=("没有给出答案",))
-        reasons = tuple(reason for rule in self.rules if (reason := rule.check(answer)) is not None)
-        return Grade(passed=not reasons, reasons=reasons)
+        reasons = [reason for rule in self.rules if (reason := rule.check(answer)) is not None]
+        if self.reasoning_rules:
+            if not reasoning:
+                reasons.append("没有给出推理")
+            else:
+                reasons += [f"推理里：{reason}" for rule in self.reasoning_rules if (reason := rule.check(reasoning)) is not None]
+        return Grade(passed=not reasons, reasons=tuple(reasons))
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
@@ -190,4 +257,7 @@ class EvalCase:
             evidence=evidence,
             rules=rules,
             repeats=repeats,
+            kind=CaseKind(data.get("kind", CaseKind.FULL.value)),
+            snapshot=data.get("snapshot") or data["id"],
+            reasoning_rules=tuple(rule_from_dict(rule) for rule in data.get("reasoning_rules", [])),
         )

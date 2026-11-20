@@ -14,8 +14,9 @@ from typing import Any
 import crossfire.composition as composition
 from crossfire.application.records import run_record
 from crossfire.application.use_cases import Attempt, CaseOutcome, estimate_requests
-from crossfire.config import Settings, SettingsError, load_eval_cases, load_questions
+from crossfire.config import Settings, SettingsError, load_eval_cases, load_judge_inputs, load_questions
 from crossfire.domain import Mode, Question, UnknownSnapshotDateError
+from crossfire.domain.evals import CaseKind, EvalCase, JudgeInput
 
 
 def parse_mode(value: str) -> Mode:
@@ -140,50 +141,66 @@ def evaluate(
     if missing:
         parser.error(f"评测题引用的问题不在 {settings.questions_file} 里：{', '.join(missing)}")
 
+    inputs = {case.id: load_judge_inputs(settings, case) for case in cases if case.kind is CaseKind.JUDGE}
     total = 0
     print("预计请求数（上限，不含重试）：")
     for case in cases:
         question = by_id[case.question_id]
-        estimate = estimate_requests(case, question)
+        estimate = estimate_requests(case, question, inputs.get(case.id, ()))
         total += estimate
-        print(f"  {case.id:<18} {len(question.sources)} 个来源 × {case.repeats} 次  最多 {estimate} 次")
+        unit = f"{len(inputs[case.id])} 份判决输入" if case.kind is CaseKind.JUDGE else f"{len(question.sources)} 个来源"
+        print(f"  {case.id:<24} {unit} × {case.repeats} 次  最多 {estimate} 次")
     print(f"  合计最多 {total} 次")
     if estimate_only:
         return 0
 
-    runner = composition.build_eval_runner(settings)
-    outcomes: list[CaseOutcome] = []
-    for case in cases:
-        print(f"\n=== {case.id}（as_of {case.as_of}，标准答案 {case.gold_answer}）===")
-        outcomes.append(runner.execute(case, by_id[case.question_id], on_attempt=_print_attempt))
+    outcomes = run_cases(settings, cases, by_id, inputs)
     print_eval_table(outcomes)
     return 0 if all(outcome.passed for outcome in outcomes) else 1
 
 
+def run_cases(
+    settings: Settings,
+    cases: Sequence[EvalCase],
+    by_id: dict[str, Question],
+    inputs: dict[str, list[JudgeInput]],
+) -> list[CaseOutcome]:
+    full = composition.build_eval_runner(settings)
+    judge = composition.build_judge_eval_runner(settings)
+    outcomes: list[CaseOutcome] = []
+    for case in cases:
+        print(f"\n=== {case.id}（{case.kind.value}，as_of {case.as_of}，标准答案 {case.gold_answer}）===")
+        question = by_id[case.question_id]
+        if case.kind is CaseKind.JUDGE:
+            outcomes.append(judge.execute(case, question, inputs[case.id], on_attempt=_print_attempt))
+        else:
+            outcomes.append(full.execute(case, question, on_attempt=_print_attempt))
+    return outcomes
+
+
 def _print_attempt(attempt: Attempt) -> None:
-    result = attempt.saved.result
     flag = "通过" if attempt.grade.passed else "没通过"
-    print(f"  {flag}  {result.elapsed_seconds} 秒  请求 {_count(result.model_requests)}  -> {attempt.saved.location}")
+    where = attempt.location or f"输入取自 {attempt.source}"
+    print(f"  {flag}  {attempt.seconds} 秒  请求 {_count(attempt.requests)}  -> {where}")
 
 
 def print_eval_table(outcomes: Sequence[CaseOutcome]) -> None:
     print("\n" + "=" * 70)
-    print(f"{'题目':<18}{'次':>3}  {'结果':<6}{'置信度':>6}  实际答案 / 没通过的原因")
+    print(f"{'题目':<24}{'次':>3}  {'结果':<6}{'置信度':>6}  实际答案 / 没通过的原因")
     requests: list[int | None] = []
     tokens_in = tokens_out = 0
     for outcome in outcomes:
         for number, attempt in enumerate(outcome.attempts, 1):
-            result = attempt.saved.result
-            judgment = result.judgment
+            judgment = attempt.judgment
             confidence = "n/a" if judgment.confidence is None else f"{judgment.confidence:.2f}"
             flag = "通过" if attempt.grade.passed else "没通过"
             answer = " ".join((judgment.answer or "(没有答案)").split())
-            print(f"{outcome.case.id:<18}{number:>3}  {flag:<6}{confidence:>6}  {answer[:90]}")
+            print(f"{outcome.case.id:<24}{number:>3}  {flag:<6}{confidence:>6}  {answer[:90]}")
             for reason in attempt.grade.reasons:
-                print(f"{'':<35}✗ {reason}")
-            requests.append(result.model_requests)
-            tokens_in += result.total_input_tokens
-            tokens_out += result.total_output_tokens
+                print(f"{'':<41}✗ {reason}")
+            requests.append(attempt.requests)
+            tokens_in += attempt.input_tokens
+            tokens_out += attempt.output_tokens
     passed = sum(outcome.passed for outcome in outcomes)
     print("-" * 70)
     print(f"通过 {passed}/{len(outcomes)} 道题（每道题所有重复都对才算通过）")
@@ -194,7 +211,7 @@ def print_eval_table(outcomes: Sequence[CaseOutcome]) -> None:
 def print_report(result: dict[str, Any], location: str) -> None:
     print("=" * 70)
     print(f"问题：{result['question']}")
-    print(f"告诉模型的今天：{result['as_of'] or '未知（快照没有记录抓取日期）'}    模式：{result['mode']}")
+    print(f"告诉模型的今天：{result['as_of']}    模式：{result['mode']}")
     print("=" * 70)
 
     print("\n--- 各来源主张 ---")

@@ -1,0 +1,43 @@
+# 只测判决：输入是 evals/judge_inputs/judge-python-2026-11.json 里冻结的 claims 和 pairs，
+# 取自第 5a 步修复前 python-2026-11 的三次运行。三份输入里都有「2024 年的 RealPython 文章说当前最新是 3.13」，
+# 判决必须顶住旧文章和自己的先验，采信下载页的 3.15.2。每份输入一次请求，共 3 次。
+id: judge-python-2026-11
+kind: judge
+question_id: python-latest-version
+snapshot: python-2026-11
+as_of: 2026-11-19
+repeats: 1
+gold_answer: "3.15.2"
+evidence:
+  - url: https://www.python.org/downloads/
+    quote: "Download the latest [Python 3](https://www.python.org/ftp/python/3.15.2/Python-3.15.2.tar.xz) source."
+  - url: https://devguide.python.org/versions/
+    quote: "| 3.15 | [**PEP 790**](https://peps.python.org/pep-0790/) | bugfix | 2026-10-09 |"
+  - url: https://devguide.python.org/versions/
+    quote: "| 3.13 | [**PEP 719**](https://peps.python.org/pep-0719/) | security | 2024-10-07 |"
+  - url: https://devguide.python.org/versions/
+    quote: "This phase is also called **maintenance** mode or **stable** release."
+rules:
+  - kind: leads_with
+    expected: '3\.15\.2'
+    competitors:
+      - '3\.1[0-46-9](?:\.(?:\d+|x))?(?!\d)'
+    why: >-
+      标准答案和依据同 python-2026-11：下载页的源码链接指向 3.15.2，devguide 里 3.15 处于 bugfix（页面定义为 stable）。
+      判决面前的 claims 里有两条说 3.13，答案说出的第一个版本号仍必须是 3.15.2。
+  - kind: forbids
+    pattern: '3\.15\.2[^。；;\n]{0,40}(?:存疑|预发布|开发版|误标|不可信|尚未正式)'
+    why: >-
+      答案不能一边给出 3.15.2、一边说它可疑或是预发布版。修复前第 3 次的答案就是「3.15.2 异常超前，极可能是抓取错误或预发布构件」。
+reasoning_rules:
+  - kind: forbids_in_sentence
+    all_of:
+      - '知识截止|训练数据|据我所知|就我所知|我的知识|已知(?:的)?(?:发布|版本)?(?:时间线|序列|范围|节奏|规律)|发布节奏|发布规律|迭代规律'
+      - '存疑|可疑|错误|失误|误读|误标|误作|不存在|异常|预发布|开发版|不可信|持保留|不代表真实'
+    unless:
+      - '不是|不能|不构成|并非|不应|不许|不可以|无法作为|不作为'
+    why: >-
+      推理里不许拿模型自己的知识否定一手来源。修复前第 2 次写「3.15.2 这一版本号在当前知识截止日期前并不存在……抓取结果存疑」，
+      第 3 次写「截至知识截止日期，Python 版本号刚到 3.13……爬取失误」，都是同一句里先引自己的知识、再说来源可疑。
+      带否定说法的句子放过：「3.15.2 晚于我的训练数据，但这不是来源出错的证据」正是规则要求的推理。
+      局限：用否定词写出的质疑（「据我所知 3.15.2 不是正式版」）会被放过，但那种情况答案本身多半也会被上面两条拦下。

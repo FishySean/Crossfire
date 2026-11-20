@@ -9,13 +9,14 @@ from pathlib import Path
 from typing import Any
 
 from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClaimPairer, ClaudeClient, ClaudeVerdictJudge
+from crossfire.adapters.anthropic.judge import JUDGE_PROMPT, without_sources_over_memory
 from crossfire.adapters.event_sinks import NullEventSink, QueueEventSink
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.adapters.storage import CachePageStore, JsonRunRepository
 from crossfire.adapters.system import SystemClock, ThreadTicker
 from crossfire.application.heartbeat import judge_with_heartbeat
 from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
-from crossfire.application.use_cases import PrefetchPages, RunEvals, VerifyQuestion
+from crossfire.application.use_cases import PrefetchPages, RunEvals, RunJudgeEvals, VerifyQuestion
 from crossfire.config import Key, Pairer, Settings, eval_snapshot_dir
 from crossfire.domain import Mode, Question
 from crossfire.domain.evals import EvalCase
@@ -60,6 +61,16 @@ def build_eval_verifier(settings: Settings, case: EvalCase) -> VerifyQuestion:
 def build_eval_runner(settings: Settings) -> RunEvals:
     settings.require(*KEYS_FOR_MODE[Mode.CACHED])
     return RunEvals(lambda case, _question: build_eval_verifier(settings, case))
+
+
+def build_judge_eval_runner(settings: Settings, *, drop_sources_over_memory: bool = False) -> RunJudgeEvals:
+    """judge 题只调判决。drop_sources_over_memory 只给对照实验用：去掉判决 prompt 里「关于你自己的知识」那段。"""
+    settings.require(*KEYS_FOR_MODE[Mode.CACHED])
+    prompt = without_sources_over_memory() if drop_sources_over_memory else JUDGE_PROMPT
+    return RunJudgeEvals(
+        lambda _case: ClaudeVerdictJudge(ClaudeClient(settings.anthropic_api_key, settings.model_judge), prompt),
+        SystemClock(),
+    )
 
 
 def assemble(

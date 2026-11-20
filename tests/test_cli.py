@@ -6,10 +6,10 @@ import pytest
 
 from crossfire import cli, composition
 from crossfire.adapters.storage import CachePageStore
-from crossfire.application.use_cases import PrefetchPages, RunEvals
+from crossfire.application.use_cases import PrefetchPages, RunEvals, RunJudgeEvals
 from crossfire.config import Settings
 from crossfire.domain import Mode
-from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
+from tests.fakes import CallLog, FakeClock, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
 
 QUESTIONS_YAML = """
 - id: q1
@@ -250,6 +250,40 @@ def test_eval_needs_only_the_anthropic_key(eval_env, capsys):
     assert run_eval("--case", "right", STEEL_API_KEY="") == 0
     assert run_eval("--case", "right", ANTHROPIC_API_KEY="") == 2
     assert "ANTHROPIC_API_KEY" in capsys.readouterr().err
+
+
+JUDGE_CASE_YAML = """
+id: judge-q1
+kind: judge
+question_id: q1
+snapshot: right
+as_of: 2026-09-12
+gold_answer: '1.0'
+evidence:
+  - {url: 'https://a.example/', quote: '1.0'}
+rules:
+  - {kind: leads_with, expected: '1\\.0', competitors: [], why: 测试}
+"""
+
+
+def test_eval_runs_judge_cases_on_their_frozen_inputs_one_request_each(eval_env, monkeypatch, capsys):
+    run_eval, tmp_path = eval_env
+    (tmp_path / "evals" / "cases" / "judge-q1.yaml").write_text(JUDGE_CASE_YAML, encoding="utf-8")
+    claim = {"url": "https://a.example/", "tier": "primary", "claim": "1.0", "evidence": "1.0", "source_type": None,
+             "confidence": 0.9, "published_date": None, "usage": {"input_tokens": 0, "output_tokens": 0, "requests": 1}}
+    inputs = {"inputs": [{"source": f"run-{n}", "claims": [claim], "pairs": []} for n in (1, 2)]}
+    (tmp_path / "evals" / "judge_inputs").mkdir()
+    (tmp_path / "evals" / "judge_inputs" / "judge-q1.json").write_text(json.dumps(inputs), encoding="utf-8")
+    monkeypatch.setattr(
+        composition, "build_judge_eval_runner",
+        lambda settings: RunJudgeEvals(lambda _case: FakeJudge(CallLog(), "https://a.example/"), FakeClock()),
+    )
+
+    assert run_eval("--case", "judge-q1") == 0
+    out = capsys.readouterr().out
+    assert "2 份判决输入 × 1 次  最多 2 次" in out
+    assert "输入取自 run-1" in out and "输入取自 run-2" in out
+    assert "通过 1/1 道题" in out
 
 
 def test_report_shows_the_day_told_to_the_model_and_who_produced_each_step(env, capsys):

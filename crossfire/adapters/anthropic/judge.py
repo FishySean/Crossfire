@@ -88,16 +88,27 @@ def _parse(data: dict[str, Any]) -> Judgment:
     return Judgment.from_dict({**data, "usage": _NO_USAGE})
 
 
+SOURCES_OVER_MEMORY_HEADING = "关于你自己的知识，"
+PRINCIPLES_HEADING = "判断原则，按优先级"
+
+
+def without_sources_over_memory(prompt: str = JUDGE_PROMPT) -> str:
+    """对照实验用：去掉「关于你自己的知识」那一段，其余一字不改。"""
+    start, end = prompt.index(SOURCES_OVER_MEMORY_HEADING), prompt.index(PRINCIPLES_HEADING)
+    return prompt[:start] + prompt[end:]
+
+
 class ClaudeVerdictJudge:
-    def __init__(self, client: ClaudeClient) -> None:
+    def __init__(self, client: ClaudeClient, prompt: str = JUDGE_PROMPT) -> None:
         self._client = client
+        self._prompt = prompt
 
     @property
     def provenance(self) -> Provenance:
-        return Provenance(model=self._client.model, prompt_version=prompt_version(JUDGE_PROMPT, JUDGE_SCHEMA))
+        return Provenance(model=self._client.model, prompt_version=prompt_version(self._prompt, JUDGE_SCHEMA))
 
     def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
-        prompt = JUDGE_PROMPT.format(
+        prompt = self._prompt.format(
             as_of=as_of.isoformat(),
             question=question.text,
             claims=json.dumps([claim.to_dict() for claim in claims], ensure_ascii=False, indent=2),

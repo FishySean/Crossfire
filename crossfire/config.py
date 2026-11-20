@@ -4,6 +4,7 @@
 扫描全仓库，发现就变红。
 """
 
+import json
 import os
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -15,7 +16,7 @@ import yaml
 from dotenv import dotenv_values
 
 from crossfire.domain import Question
-from crossfire.domain.evals import EvalCase
+from crossfire.domain.evals import EvalCase, JudgeInput
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = ROOT / ".env"
@@ -153,4 +154,16 @@ def load_eval_cases(settings: Settings) -> list[EvalCase]:
 
 
 def eval_snapshot_dir(settings: Settings, case: EvalCase) -> Path:
-    return settings.evals_dir / "snapshots" / case.id
+    return settings.evals_dir / "snapshots" / case.snapshot
+
+
+def load_judge_inputs(settings: Settings, case: EvalCase) -> list[JudgeInput]:
+    """judge 题的冻结输入：evals/judge_inputs/<id>.json。"""
+    path = settings.evals_dir / "judge_inputs" / f"{case.id}.json"
+    if not path.exists():
+        raise SettingsError(f"judge 题 {case.id} 缺输入文件 {path}")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    inputs = [JudgeInput.from_dict(item) for item in data["inputs"]]
+    if not inputs:
+        raise SettingsError(f"{path} 里没有输入")
+    return inputs

@@ -13,7 +13,7 @@ import pytest
 
 from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClaimPairer, ClaudeClient, ClaudeVerdictJudge
 from crossfire.adapters.anthropic.client import prompt_version
-from crossfire.adapters.anthropic.judge import JUDGE_PROMPT
+from crossfire.adapters.anthropic.judge import JUDGE_PROMPT, JUDGE_SCHEMA, without_sources_over_memory
 from crossfire.adapters.anthropic.pairer import PAIR_PROMPT, PAIR_SCHEMA, RELATION_NAMES
 from crossfire.domain import Claim, Page, Question, Relation, Source, Tier, Usage
 
@@ -391,3 +391,18 @@ def test_prompt_version_changes_with_the_template_or_the_schema():
     assert prompt_version("a", {}) == prompt_version("a", {})
     assert prompt_version("a", {}) != prompt_version("b", {})
     assert prompt_version("a", {}) != prompt_version("a", {"type": "object"})
+
+
+def test_dropping_the_sources_over_memory_block_removes_only_that_block():
+    trimmed = without_sources_over_memory()
+    assert "关于你自己的知识" not in trimmed and "一手来源（primary）明确写出的事实" not in trimmed
+    assert JUDGE_PROMPT.replace(JUDGE_PROMPT[JUDGE_PROMPT.index("关于你自己的知识"):JUDGE_PROMPT.index("判断原则，按优先级")], "") == trimmed
+    client = ClaudeClient(client=SimpleNamespace(messages=None), model="m")
+    assert ClaudeVerdictJudge(client).provenance.prompt_version == prompt_version(JUDGE_PROMPT, JUDGE_SCHEMA)
+    assert ClaudeVerdictJudge(client, trimmed).provenance != ClaudeVerdictJudge(client).provenance
+
+
+def test_judge_sends_the_prompt_it_was_given():
+    client, messages = client_for(scripted(JUDGMENT))
+    ClaudeVerdictJudge(client, without_sources_over_memory()).judge(QUESTION, [], [], AS_OF)
+    assert "关于你自己的知识" not in messages.prompts[0] and "今天的日期：2026-09-12" in messages.prompts[0]

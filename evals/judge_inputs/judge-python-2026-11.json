@@ -1,0 +1,392 @@
+{
+  "note": "第 5a 步修复前，python-2026-11 那三次评测运行的 claims 和 pairs，原样复制。三份里都有把 2024 年 RealPython 文章写成「当前最新是 3.13」的主张，另有两份把 devguide 读成 3.13 或 3.14。当时的判决有两次信了模型自己的知识、否定了下载页的 3.15.2。",
+  "inputs": [
+    {
+      "source": "out/eval-runs/python-2026-11/python-latest-version_20261119T233230Z.json",
+      "claims": [
+        {
+          "url": "https://www.python.org/downloads/",
+          "tier": "primary",
+          "claim": "Python 目前最新的稳定版本是 Python 3.15.2",
+          "evidence": "Download the latest Python 3 source. (链接指向 https://www.python.org/ftp/python/3.15.2/Python-3.15.2.tar.xz)",
+          "source_type": "official_documentation",
+          "confidence": 0.9,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 2545,
+            "output_tokens": 174,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://devguide.python.org/versions/",
+          "tier": "primary",
+          "claim": "Python 目前最新的稳定版本是 Python 3.13，于 2024-10-07 首次发布，当前处于 security 支持阶段。",
+          "evidence": "3.13 | PEP 719 | security | 2024-10-07 | *2029-10* | Thomas Wouters",
+          "source_type": "official_documentation",
+          "confidence": 0.72,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 15451,
+            "output_tokens": 188,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://realpython.com/python313-new-features/",
+          "tier": "news",
+          "claim": "Python 3.13 是当前最新稳定版本，于2024年10月7日发布。",
+          "evidence": "Python 3.13 was published on October 7, 2024.",
+          "source_type": "blog",
+          "confidence": 0.82,
+          "published_date": "2024-10-07",
+          "usage": {
+            "input_tokens": 12087,
+            "output_tokens": 154,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://www.w3schools.com/python/python_intro.asp",
+          "tier": "aggregator",
+          "claim": "该网页仅提及 Python 3 是最新主要版本，未说明具体最新稳定版本号。",
+          "evidence": "The most recent major version of Python is Python 3, which we shall be using in this tutorial.",
+          "source_type": "encyclopedia",
+          "confidence": 0.5,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 12411,
+            "output_tokens": 159,
+            "requests": 1
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://devguide.python.org/versions/",
+          "relation": "contradict",
+          "nature": "数字不同。来源 A 主张当前最新稳定版本为 Python 3.15.2，来源 B 主张当前最新稳定版本为 Python 3.13。同一时刻\"最新稳定版本\"只能有一个，两者不可能同时为真；这不是口径差异（两者都在回答同一个问题：当前最新的稳定发布版），而是版本号本身不同，必有一方错误或已过时（来源 B 极可能未及时更新，3.13 已被后续版本超越）。",
+          "usage": {
+            "input_tokens": 2670,
+            "output_tokens": 216,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://realpython.com/python313-new-features/",
+          "relation": "contradict",
+          "nature": "数字不同。两个来源均在回答\"Python 当前最新稳定版本是哪个\"这同一个问题，A 主张是 3.15.2，B 主张是 3.13。同一时刻\"最新稳定版\"只能有一个，两者不可能同时为真。差异并非口径不同，而是时间差导致：来源 B 发布于 2024-10-07，彼时 3.13 刚发布；来源 A 为官网下载页（无发布日期，推测更新），指向更高版本 3.15.2。B 所述版本已过时，不再是当前最新稳定版。",
+          "usage": {
+            "input_tokens": 2642,
+            "output_tokens": 242,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：来源 A 给出了具体最新稳定版本号（Python 3.15.2），来源 B 仅泛称\"Python 3 是最新主要版本\"，是更粗粒度的表述。两者指向同一结论（当前最新版本属于 Python 3 系列），Python 3.15.2 正是 Python 3 系列中的一个具体版本，两句话可以同时为真，B 只是没有细化到补丁版本号，这是详略差异而非矛盾。",
+          "usage": {
+            "input_tokens": 2650,
+            "output_tokens": 207,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://devguide.python.org/versions/",
+          "b": "https://realpython.com/python313-new-features/",
+          "relation": "agree",
+          "nature": "粒度不同：两个来源得出的结论完全一致——Python 3.13 是当前最新稳定版本，首发日期均为 2024-10-07。来源 A 额外提供了支持阶段（security）和预计终止支持时间（2029-10）等细节，来源 B 表述更简洁，但两者可以同时为真，详略不同不构成矛盾。",
+          "usage": {
+            "input_tokens": 2658,
+            "output_tokens": 171,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://devguide.python.org/versions/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：A 明确指出最新稳定版本为 Python 3.13（3.x 系列中的具体版本），B 仅泛指\"最新主要版本是 Python 3\"（即 3.x 系列），是对同一事实更粗粒度的表述。两句话同时成立，B 并未否定 A，只是详略不同，不构成矛盾。",
+          "usage": {
+            "input_tokens": 2666,
+            "output_tokens": 167,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://realpython.com/python313-new-features/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：来源 A 明确指出最新稳定版本为 Python 3.13（细粒度），来源 B 仅说明 Python 3 是最新主要版本（粗粒度）。Python 3.13 本身就是 Python 3 系列的一个具体版本，两者并不矛盾，可以同时为真；B 只是粒度更粗、未指明具体版本号，这属于详略不同而非冲突。",
+          "usage": {
+            "input_tokens": 2638,
+            "output_tokens": 187,
+            "requests": 1
+          }
+        }
+      ]
+    },
+    {
+      "source": "out/eval-runs/python-2026-11/python-latest-version_20261119T233303Z.json",
+      "claims": [
+        {
+          "url": "https://www.python.org/downloads/",
+          "tier": "primary",
+          "claim": "Python 目前的最新稳定版本是 Python 3.15.2",
+          "evidence": "Download the latest Python 3 source. (链接指向 https://www.python.org/ftp/python/3.15.2/Python-3.15.2.tar.xz)",
+          "source_type": "official_documentation",
+          "confidence": 0.9,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 2545,
+            "output_tokens": 174,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://devguide.python.org/versions/",
+          "tier": "primary",
+          "claim": "Python 目前处于\"bugfix\"（稳定）阶段的最新版本是 3.14，于2025年10月7日首次发布；3.13 也是已发布的稳定版本（security阶段）。",
+          "evidence": "3.14 | bugfix | 2025-10-07 | *2030-10*; 3.13 | security | 2024-10-07 | *2029-10*",
+          "source_type": "official_documentation",
+          "confidence": 0.82,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 15451,
+            "output_tokens": 218,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://realpython.com/python313-new-features/",
+          "tier": "news",
+          "claim": "Python 3.13 是当前最新版本，于 2024 年 10 月 7 日发布。",
+          "evidence": "Python 3.13 was published on October 7, 2024.",
+          "source_type": "blog",
+          "confidence": 0.72,
+          "published_date": "2024-10-07",
+          "usage": {
+            "input_tokens": 12087,
+            "output_tokens": 157,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://www.w3schools.com/python/python_intro.asp",
+          "tier": "aggregator",
+          "claim": "该网页仅提及Python 3是目前最新的主要版本，未说明具体最新稳定版本号。",
+          "evidence": "The most recent major version of Python is Python 3, which we shall be using in this tutorial.",
+          "source_type": "other",
+          "confidence": 0.5,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 12411,
+            "output_tokens": 160,
+            "requests": 1
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://devguide.python.org/versions/",
+          "relation": "contradict",
+          "nature": "数字不同。来源A主张当前最新稳定版本是3.15.2（一个已发布的正式补丁版本），来源B主张当前处于\"bugfix\"（稳定）阶段的最高版本系列是3.14（首发2025年10月7日），隐含3.14.x才是当前最新稳定系列，3.15系列尚未出现在其版本列表中。两者不能同时为真：若3.15.2已作为最新稳定版发布，则3.14不可能仍是最新稳定系列；若3.14是当前最新bugfix系列，则3.15.2尚不存在或尚未稳定发布。两个说法描述的是同一个问题（当前最新稳定版本），且必有一方已过时或有误。",
+          "usage": {
+            "input_tokens": 2700,
+            "output_tokens": 287,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://realpython.com/python313-new-features/",
+          "relation": "contradict",
+          "nature": "数字不同。来源 A 主张当前最新稳定版为 Python 3.15.2，来源 B 主张当前最新版为 Python 3.13。同一时刻\"最新稳定版\"只能有一个，两者不可能同时为真。来源 B 发布于 2024 年 10 月 7 日，彼时 3.13 刚发布，但来源 A 为官方下载页（无发布日期），显示的是更新的版本 3.15.2，说明来源 B 已过时，其\"最新版本\"的描述不再符合当前事实。",
+          "usage": {
+            "input_tokens": 2645,
+            "output_tokens": 229,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：来源 A 给出了具体的最新稳定版本号（Python 3.15.2），来源 B 仅说明 Python 3 是目前最新的主要版本，未提及具体小版本号。B 是 A 的更粗粒度表述——Python 3.15.2 本身就是 Python 3 系列的最新版，两者不矛盾，可以同时为真。\"未说明具体版本号\"不构成矛盾。",
+          "usage": {
+            "input_tokens": 2651,
+            "output_tokens": 191,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://devguide.python.org/versions/",
+          "b": "https://realpython.com/python313-new-features/",
+          "relation": "contradict",
+          "nature": "数字不同。两者均在回答\"Python 当前最新稳定版本是哪一个\"这同一个问题，但给出了不同答案：来源 A 称最新稳定版为 3.14（bugfix 阶段，2025年10月发布），来源 B 称最新版为 3.13（2024年10月发布）。同一时刻\"最新稳定版\"只能有一个，两者不可能同时为真；来源 B 发布于 2024 年 10 月，彼时 3.14 尚未发布，因此来源 B 已过时，来源 A 为当前正确信息。",
+          "usage": {
+            "input_tokens": 2691,
+            "output_tokens": 237,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://devguide.python.org/versions/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：来源A明确指出Python当前处于bugfix阶段的最新版本是3.14（即Python 3系列的具体最新稳定版本号）；来源B仅笼统说明Python 3是目前最新的主要版本，未给出具体版本号。B的表述是A的更粗粒度概括，两者不矛盾，可同时为真。\"无法互相印证\"或\"粒度不够细\"不构成矛盾。",
+          "usage": {
+            "input_tokens": 2697,
+            "output_tokens": 189,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://realpython.com/python313-new-features/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：A 明确指出最新稳定版本为 Python 3.13（3.x 系列中的具体小版本），B 仅泛指 Python 3 是当前最新主要版本（大版本粒度）。B 的表述是 A 的更粗粒度概括，Python 3.13 本身就属于 Python 3，两者可以同时为真，不存在矛盾。",
+          "usage": {
+            "input_tokens": 2642,
+            "output_tokens": 172,
+            "requests": 1
+          }
+        }
+      ]
+    },
+    {
+      "source": "out/eval-runs/python-2026-11/python-latest-version_20261119T233344Z.json",
+      "claims": [
+        {
+          "url": "https://www.python.org/downloads/",
+          "tier": "primary",
+          "claim": "Python 目前最新的稳定版本是 Python 3.15.2",
+          "evidence": "Download the latest Python 3 source. (链接指向 https://www.python.org/ftp/python/3.15.2/Python-3.15.2.tar.xz)",
+          "source_type": "official_documentation",
+          "confidence": 0.85,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 2545,
+            "output_tokens": 174,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://devguide.python.org/versions/",
+          "tier": "primary",
+          "claim": "Python 目前最新稳定版本是 Python 3.13，于 2024-10-07 首次发布，当前处于 security 支持阶段。",
+          "evidence": "3.13 | PEP 719 | security | 2024-10-07 | *2029-10* | Thomas Wouters",
+          "source_type": "official_documentation",
+          "confidence": 0.72,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 15451,
+            "output_tokens": 187,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://realpython.com/python313-new-features/",
+          "tier": "news",
+          "claim": "Python 目前的最新稳定版本是 Python 3.13，于 2024 年 10 月 7 日发布。",
+          "evidence": "Python 3.13 was published on October 7, 2024.",
+          "source_type": "blog",
+          "confidence": 0.85,
+          "published_date": "2024-10-07",
+          "usage": {
+            "input_tokens": 12087,
+            "output_tokens": 163,
+            "requests": 1
+          }
+        },
+        {
+          "url": "https://www.w3schools.com/python/python_intro.asp",
+          "tier": "aggregator",
+          "claim": "该网页未明确指出Python当前最新稳定版本号，仅提及最新主要版本是Python 3。",
+          "evidence": "The most recent major version of Python is Python 3, which we shall be using in this tutorial.",
+          "source_type": "other",
+          "confidence": 0.4,
+          "published_date": null,
+          "usage": {
+            "input_tokens": 12411,
+            "output_tokens": 160,
+            "requests": 1
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://devguide.python.org/versions/",
+          "relation": "contradict",
+          "nature": "数字不同。来源 A 主张当前最新稳定版本为 Python 3.15.2，来源 B 主张当前最新稳定版本为 Python 3.13。同一时刻\"最新稳定版本\"只能有一个，两者不可能同时为真——若 3.15.2 已发布，则 3.13 必然不再是最新版；这是同一指标在数值上的直接冲突，而非口径差异，必有一方信息已过时或有误。",
+          "usage": {
+            "input_tokens": 2669,
+            "output_tokens": 199,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://realpython.com/python313-new-features/",
+          "relation": "contradict",
+          "nature": "数字不同。两者均在回答\"当前最新稳定版本是哪一个\"这同一个问题，A（来源于官方下载页，无发布日期）声称是 Python 3.15.2，B（发布于 2024-10-07）声称是 Python 3.13。同一时刻最新稳定版只能有一个，两者不可能同时为真。这不是口径差异，而是时间差导致的信息过时：B 发布时 3.13 确为最新版，但 A 作为官方网站的当前状态指向更高版本 3.15.2，说明 B 的说法已经过时。",
+          "usage": {
+            "input_tokens": 2651,
+            "output_tokens": 241,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://www.python.org/downloads/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：来源 A 给出具体版本号 Python 3.15.2，来源 B 仅说明最新主要版本是 Python 3。B 是 A 的更粗粒度表述——3.15.2 本身就是 Python 3 大版本下的一个具体发行版，两句话同时成立，B 未否定任何具体版本号，属于详略差异而非矛盾。",
+          "usage": {
+            "input_tokens": 2651,
+            "output_tokens": 175,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://devguide.python.org/versions/",
+          "b": "https://realpython.com/python313-new-features/",
+          "relation": "agree",
+          "nature": "粒度不同：两者均指向同一结论——Python 最新稳定版本为 3.13，发布日期为 2024 年 10 月 7 日。来源 A 额外提供了 PEP 编号、当前支持阶段（security）、维护终止时间及维护者等细节，来源 B 仅陈述版本号与发布日期。详略不同，但不存在任何实质矛盾，两者可同时为真。",
+          "usage": {
+            "input_tokens": 2666,
+            "output_tokens": 187,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://devguide.python.org/versions/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：A 明确指出最新稳定版本为 Python 3.13（细粒度，具体到次版本号及发布日期）；B 仅表述最新主要版本为 Python 3（粗粒度，只到大版本号）。Python 3.13 本身就是 Python 3 系列的一个版本，两句话在同一时刻可以同时成立，B 是 A 的更粗粒度表述，不构成矛盾。",
+          "usage": {
+            "input_tokens": 2666,
+            "output_tokens": 190,
+            "requests": 1
+          }
+        },
+        {
+          "a": "https://realpython.com/python313-new-features/",
+          "b": "https://www.w3schools.com/python/python_intro.asp",
+          "relation": "agree",
+          "nature": "粒度不同：来源 A 给出了具体版本号（Python 3.13）及发布日期，来源 B 仅泛称\"最新主要版本是 Python 3\"，是对 A 结论的粗粒度表述。Python 3.13 本身就属于 Python 3 系列，两者可同时为真，不构成矛盾。B 未提供具体版本号并不意味着否定 A 的说法。",
+          "usage": {
+            "input_tokens": 2648,
+            "output_tokens": 180,
+            "requests": 1
+          }
+        }
+      ]
+    }
+  ]
+}

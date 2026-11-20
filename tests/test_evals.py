@@ -1,26 +1,30 @@
 """评测集：判分规则、标准答案的依据、冻结快照。全部离线，不调模型。"""
 
 import json
+from dataclasses import replace
 from datetime import UTC, date, datetime
+from pathlib import Path
 
 import pytest
 
 from crossfire.adapters.steel import CachedPageFetcher
-from crossfire.application.use_cases import RunEvals, estimate_requests
+from crossfire.application.use_cases import RunEvals, RunJudgeEvals, estimate_requests
 from crossfire.composition import assemble
-from crossfire.config import Settings, eval_snapshot_dir, load_eval_cases, load_questions
-from crossfire.domain import Mode, Question
+from crossfire.config import Settings, eval_snapshot_dir, load_eval_cases, load_judge_inputs, load_questions
+from crossfire.domain import Failure, Mode, Question
 from crossfire.domain.evals import (
+    CaseKind,
     EvalCase,
     FigureInRange,
     FigureNeedsContext,
     Forbids,
+    ForbidsInSentence,
     LeadsWith,
     figures,
     rule_from_dict,
     sentence_around,
 )
-from tests.fakes import CallLog, FakeExtractor, FakeFetcher, FakePairer, FakeJudge
+from tests.fakes import CallLog, FakeClock, FakeExtractor, FakeFetcher, FakeJudge, FakePairer
 
 SETTINGS = Settings.from_mapping({})
 SEPTEMBER = datetime(2026, 9, 12, 21, 16, tzinfo=UTC)
@@ -53,6 +57,34 @@ WRONG_ANSWERS = {
     ],
 }
 
+WRONG_ANSWERS["judge-python-2026-11"] = WRONG_ANSWERS["python-2026-11"]
+
+# 修复前三次判决的真实输出（answer, reasoning），取自 judge_inputs 里每份输入的来源运行。
+PRE_FIX_JUDGMENTS = {
+    source: json.loads(Path(source).read_text(encoding="utf-8"))["judgment"]
+    for source in [
+        "out/eval-runs/python-2026-11/python-latest-version_20261119T233230Z.json",
+        "out/eval-runs/python-2026-11/python-latest-version_20261119T233303Z.json",
+        "out/eval-runs/python-2026-11/python-latest-version_20261119T233344Z.json",
+    ]
+    if Path(source).exists()
+}
+
+# 推理里提到自己的知识、但没有拿它否定来源：规则不能误杀。
+RIGHT_REASONINGS = [
+    "3.15.2 晚于我的训练数据，但这不是来源出错的证据；下载页是一手来源，直接采信。",
+    "RealPython 发布于 2024-10-07，描述的是当时的情况，已经过时。devguide 表格里 3.15 处于 bugfix。",
+    "按规则，不能以「超出已知范围」为由否定一手来源，所以采信 3.15.2。",
+]
+WRONG_REASONINGS = [
+    "3.15.2 这一版本号在当前知识截止日期前并不存在，downloads 页的抓取结果存疑。",
+    "截至知识截止日期，Python 版本号刚到 3.13，3.15.2 极可能是爬取失误。",
+    "按照 Python 的发布节奏，3.15.2 出现得太早，属于异常数据。",
+]
+
+# judge 题也看推理。这句推理不触发任何推理规则，答案对错只由答案规则决定。
+NEUTRAL_REASONING = "按一手来源采信。"
+
 # 写法不同但都对的答案：规则不能误杀。
 RIGHT_ANSWERS = {
     "python-2026-11": [
@@ -74,16 +106,19 @@ RIGHT_ANSWERS = {
         "Tokyo Metropolis has about 14.3 million people.",
     ],
 }
+RIGHT_ANSWERS["judge-python-2026-11"] = RIGHT_ANSWERS["python-2026-11"]
 
 
-def test_the_four_cases_exist():
-    assert sorted(CASES) == ["nodejs-2026-09", "python-2026-09", "python-2026-11", "tokyo-2026-09"]
+def test_the_cases_exist():
+    """第 5b 步有意修改：原 test_the_four_cases_exist 只列 4 道题。原因：加了只测判决的 judge-python-2026-11。"""
+    assert sorted(CASES) == ["judge-python-2026-11", "nodejs-2026-09", "python-2026-09", "python-2026-11", "tokyo-2026-09"]
+    assert {case.id for case in CASES.values() if case.kind is CaseKind.JUDGE} == {"judge-python-2026-11"}
 
 
 @pytest.mark.parametrize("case_id", sorted(WRONG_ANSWERS))
 def test_known_wrong_answers_fail(case_id):
     for answer in WRONG_ANSWERS[case_id]:
-        grade = CASES[case_id].grade(answer)
+        grade = CASES[case_id].grade(answer, NEUTRAL_REASONING)
         assert not grade.passed, answer
         assert grade.reasons
 
@@ -91,13 +126,32 @@ def test_known_wrong_answers_fail(case_id):
 @pytest.mark.parametrize("case_id", sorted(RIGHT_ANSWERS))
 def test_right_answers_in_other_wordings_pass(case_id):
     for answer in RIGHT_ANSWERS[case_id]:
-        grade = CASES[case_id].grade(answer)
+        grade = CASES[case_id].grade(answer, NEUTRAL_REASONING)
         assert grade.passed, (answer, grade.reasons)
 
 
 @pytest.mark.parametrize("case_id", sorted(CASES))
 def test_gold_answer_passes_its_own_rules(case_id):
-    assert CASES[case_id].grade(CASES[case_id].gold_answer).passed
+    assert CASES[case_id].grade(CASES[case_id].gold_answer, NEUTRAL_REASONING).passed
+
+
+def test_judge_case_reasoning_rule_tells_knowledge_based_rejection_from_rule_following():
+    case = CASES["judge-python-2026-11"]
+    answer = "Python 目前最新的稳定版本是 3.15.2。"
+    for reasoning in RIGHT_REASONINGS:
+        assert case.grade(answer, reasoning).passed, reasoning
+    for reasoning in WRONG_REASONINGS:
+        grade = case.grade(answer, reasoning)
+        assert not grade.passed and grade.reasons[0].startswith("推理里："), reasoning
+    assert case.grade(answer, None).reasons == ("没有给出推理",)
+
+
+@pytest.mark.skipif(len(PRE_FIX_JUDGMENTS) < 3, reason="需要本地 out/eval-runs 里修复前那三次运行")
+def test_judge_case_grades_the_three_pre_fix_judgments_as_pass_fail_fail():
+    case = CASES["judge-python-2026-11"]
+    grades = [case.grade(j["answer"], j["reasoning"]) for j in PRE_FIX_JUDGMENTS.values()]
+    assert [grade.passed for grade in grades] == [True, False, False]
+    assert all(any(reason.startswith("推理里：") for reason in grade.reasons) for grade in grades[1:])
 
 
 def test_no_answer_fails():
@@ -143,6 +197,79 @@ def test_snapshot_pages_record_where_their_fetch_time_came_from(case_id):
         assert json.loads(path.read_text(encoding="utf-8"))["fetched_at_basis"]
 
 
+# ---- judge 题的冻结输入 ----
+
+
+def test_judge_inputs_are_the_three_pre_fix_runs_with_the_stale_article_called_current():
+    inputs = load_judge_inputs(SETTINGS, CASES["judge-python-2026-11"])
+    assert [item.source.rsplit("_", 1)[1] for item in inputs] == ["20261119T233230Z.json", "20261119T233303Z.json", "20261119T233344Z.json"]
+    for item in inputs:
+        assert len(item.claims) == 4 and len(item.pairs) == 6
+        realpython = next(c for c in item.claims if "realpython" in c.source_url)
+        assert realpython.text and "3.13" in realpython.text and ("当前" in realpython.text or "目前" in realpython.text)
+        downloads = next(c for c in item.claims if "python.org/downloads" in c.source_url)
+        assert downloads.text and "3.15.2" in downloads.text
+
+
+@pytest.mark.skipif(len(PRE_FIX_JUDGMENTS) < 3, reason="需要本地 out/eval-runs 里修复前那三次运行")
+def test_judge_inputs_are_copied_verbatim_from_their_runs():
+    for item in load_judge_inputs(SETTINGS, CASES["judge-python-2026-11"]):
+        record = json.loads(Path(item.source).read_text(encoding="utf-8"))
+        assert [c.to_dict() for c in item.claims] == record["claims"]
+        assert [p.to_dict() for p in item.pairs] == record["pairs"]
+
+
+def test_judge_estimate_is_one_request_per_input_and_repeat():
+    case = CASES["judge-python-2026-11"]
+    inputs = load_judge_inputs(SETTINGS, case)
+    assert estimate_requests(case, QUESTIONS[case.question_id], inputs) == 3 * case.repeats
+
+
+def test_judge_eval_passes_the_case_day_and_grades_answer_and_reasoning():
+    case = CASES["judge-python-2026-11"]
+    question = QUESTIONS[case.question_id]
+    inputs = load_judge_inputs(SETTINGS, case)
+    replies = iter([
+        ("最新稳定版是 3.15.2。", "下载页是一手来源。"),
+        ("最新稳定版是 3.15.2。", "截至知识截止日期 3.15 不存在，3.15.2 可疑，但还是写它。"),
+        ("最新稳定版是 3.13.x。", "旧文章。"),
+    ])
+
+    class ScriptedJudge(FakeJudge):
+        def judge(self, *args, **kwargs):
+            judgment = super().judge(*args, **kwargs)
+            answer, reasoning = next(replies)
+            return replace(judgment, answer=answer, reasoning=reasoning)
+
+    judge = ScriptedJudge(CallLog(), question.sources[0].url)
+    outcome = RunJudgeEvals(lambda _case: judge, FakeClock()).execute(case, question, inputs)
+    assert judge.as_of_seen == [case.as_of] * 3
+    assert [a.grade.passed for a in outcome.attempts] == [True, False, False]
+    assert [a.source for a in outcome.attempts] == [item.source for item in inputs]
+    assert all(a.requests == 1 and a.location is None for a in outcome.attempts)
+    assert not outcome.passed
+
+
+def test_a_failed_judge_call_fails_the_attempt():
+    case = CASES["judge-python-2026-11"]
+    question = QUESTIONS[case.question_id]
+
+    class FailingJudge(FakeJudge):
+        def judge(self, *args, **kwargs):
+            judgment = super().judge(*args, **kwargs)
+            return replace(judgment, answer=None, reasoning=None, failure=Failure("judge", "炸了", None))
+
+    inputs = load_judge_inputs(SETTINGS, case)[:1]
+    [attempt] = RunJudgeEvals(lambda _c: FailingJudge(CallLog(), "u"), FakeClock()).execute(case, question, inputs).attempts
+    assert "判决调用失败：炸了" in attempt.grade.reasons
+
+
+def test_judge_runner_refuses_full_cases():
+    case = CASES["python-2026-11"]
+    with pytest.raises(ValueError, match="不是 judge 题"):
+        RunJudgeEvals(lambda _c: FakeJudge(CallLog(), "u"), FakeClock()).execute(case, QUESTIONS[case.question_id], [])
+
+
 # ---- 规则 ----
 
 
@@ -185,6 +312,14 @@ def test_figure_rules():
     context = FigureNeedsContext(low=36_000_000, high=39_000_000, context="都市圈", why="-")
     assert context.check("东京都市圈约3,700万人") is None
     assert context.check("东京人口约3,700万人。都市圈") is not None
+
+
+def test_forbids_in_sentence_needs_every_pattern_in_one_sentence_and_spares_negations():
+    rule = ForbidsInSentence(all_of=("训练数据", "可疑"), unless=("不是",), why="-")
+    assert rule.check("按训练数据，这个版本可疑。") is not None
+    assert rule.check("超出训练数据。来源并不可疑") is None, "两个词在不同句子里"
+    assert rule.check("超出训练数据不是可疑的理由。") is None
+    assert rule_from_dict({"kind": "forbids_in_sentence", "all_of": ["a"], "unless": [], "why": "-"}) == ForbidsInSentence(("a",), (), "-")
 
 
 def test_every_rule_needs_a_reason():

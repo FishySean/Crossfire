@@ -3,6 +3,7 @@
 import re
 import threading
 import time
+from dataclasses import replace
 from datetime import date
 from types import SimpleNamespace
 
@@ -121,7 +122,7 @@ def test_judge_rejects_non_string_conflict_items():
 def test_pairer_rejects_a_relation_outside_the_enum():
     bad = {"relation": "disagree", "nature": "数字不同"}
     client, messages = client_for(scripted(bad, bad))
-    [pair] = ClaudeClaimPairer(client).pair_all(QUESTION, [(claim("https://a.example/", "1"), claim("https://b.example/", "2"))])
+    [pair] = ClaudeClaimPairer(client).pair_all(QUESTION, [(claim("https://a.example/", "1"), claim("https://b.example/", "2"))], AS_OF)
 
     assert len(messages.prompts) == 2
     assert pair.relation is None
@@ -179,7 +180,7 @@ def test_pair_all_returns_results_in_input_order_and_reports_each_once():
     seen = []
     caller = threading.get_ident()
     pairs = ClaudeClaimPairer(client).pair_all(
-        QUESTION, PAIRS, on_pair=lambda index, total, pair: seen.append((index, total, threading.get_ident()))
+        QUESTION, PAIRS, AS_OF, on_pair=lambda index, total, pair: seen.append((index, total, threading.get_ident()))
     )
 
     assert [(p.a_url, p.b_url) for p in pairs] == [(a.source_url, b.source_url) for a, b in PAIRS]
@@ -205,7 +206,7 @@ def test_pair_all_never_exceeds_its_concurrency():
         return {"relation": "agree", "nature": "测试"}
 
     client, _ = client_for(slow)
-    ClaudeClaimPairer(client, concurrency=2).pair_all(QUESTION, PAIRS * 3)
+    ClaudeClaimPairer(client, concurrency=2).pair_all(QUESTION, PAIRS * 3, AS_OF)
     assert peak == 2
 
 
@@ -219,7 +220,7 @@ def test_pair_all_turns_exceptions_into_failed_pairs_instead_of_raising(capsys):
 
     client, _ = client_for(flaky)
     seen = []
-    pairs = ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS, on_pair=lambda index, total, pair: seen.append(index))
+    pairs = ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS, AS_OF, on_pair=lambda index, total, pair: seen.append(index))
 
     assert [p.failure is None for p in pairs] == [True, False, False]
     assert [p.relation for p in pairs] == [Relation.AGREE, None, None]
@@ -237,14 +238,14 @@ def test_pair_all_records_unknown_requests_when_something_other_than_the_api_rai
         raise RuntimeError("bug")
 
     client, _ = client_for(broken)
-    [pair] = ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS[:1])
+    [pair] = ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS[:1], AS_OF)
     assert pair.failure is not None and "RuntimeError" in pair.failure.detail
     assert pair.usage.requests is None
 
 
 def test_pair_all_with_no_pairs_makes_no_calls():
     client, messages = client_for(relation_by_text)
-    assert ClaudeClaimPairer(client).pair_all(QUESTION, []) == []
+    assert ClaudeClaimPairer(client).pair_all(QUESTION, [], AS_OF) == []
     assert messages.prompts == []
 
 
@@ -266,12 +267,23 @@ EXTRACTED = {"claim": "1.0", "evidence": "v1.0", "source_type": "news_article", 
 
 
 @pytest.mark.parametrize("as_of", [date(2026, 9, 12), date(2031, 1, 2)])
-def test_both_prompts_carry_the_date_they_were_given_not_today(as_of):
-    client, messages = client_for(scripted(EXTRACTED, JUDGMENT))
+def test_every_prompt_carries_the_date_it_was_given_not_today(as_of):
+    client, messages = client_for(scripted(EXTRACTED, {"relation": "agree", "nature": "测试"}, JUDGMENT))
     page = Page(url="https://a.example/", ok=True, title="t", markdown="正文")
     ClaudeClaimExtractor(client).extract(QUESTION, page, as_of)
+    ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS[:1], as_of)
     ClaudeVerdictJudge(client).judge(QUESTION, [], [], as_of)
-    assert [f"今天的日期：{as_of.isoformat()}" in prompt for prompt in messages.prompts] == [True, True]
+    assert [f"今天的日期：{as_of.isoformat()}" in prompt for prompt in messages.prompts] == [True, True, True]
+
+
+def test_pair_prompt_shows_both_publication_dates_and_says_when_one_is_missing():
+    client, messages = client_for(scripted({"relation": "contradict", "nature": "时间不同"}))
+    dated = replace(claim("https://a.example/", "最新是 3.13"), published_date="2024-10-07")
+    undated = claim("https://b.example/", "最新是 3.15.2")
+    ClaudeClaimPairer(client).pair_all(QUESTION, [(dated, undated)], AS_OF)
+    [prompt] = messages.prompts
+    assert "发布日期: 2024-10-07" in prompt
+    assert "发布日期: 未知" in prompt and "None" not in prompt
 
 
 def test_provenance_names_the_model_and_a_version_of_each_prompt():

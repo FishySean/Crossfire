@@ -126,13 +126,16 @@ class FakePairer:
     def __init__(self, log: CallLog, failing_pair_urls: Collection[str] | None = None) -> None:
         self.log = log
         self.failing_pair_urls = failing_pair_urls
+        self.as_of_seen: list[date] = []
 
     def pair_all(
         self,
         question: Question,
         claim_pairs: Sequence[tuple[Claim, Claim]],
+        as_of: date,
         on_pair: OnPair | None = None,
     ) -> list[Pair]:
+        self.as_of_seen.append(as_of)
         pairs: list[Pair] = []
         for index, (a, b) in enumerate(claim_pairs):
             self.log.record("pair")
@@ -162,6 +165,7 @@ class EqualityPairer:
         self,
         question: Question,
         claim_pairs: Sequence[tuple[Claim, Claim]],
+        as_of: date,
         on_pair: OnPair | None = None,
     ) -> list[Pair]:
         self.batches.append(len(claim_pairs))

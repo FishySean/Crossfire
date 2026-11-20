@@ -55,9 +55,13 @@ class ClaimPairer(Protocol):
         self,
         question: Question,
         claim_pairs: Sequence[tuple[Claim, Claim]],
+        as_of: date,
         on_pair: OnPair | None = None,
     ) -> list[Pair]:
         """一次判定一整批主张对，返回与 claim_pairs 一一对应、顺序相同的 Pair。
+
+        as_of 的要求同 ClaimExtractor.extract。「2024 年说最新是 3.13」和「2026 年说最新是 3.15」
+        算矛盾还是算时间不同，取决于知不知道今天是哪天。不用日期的实现（比如本地 NLI 模型）可以忽略它。
 
         必须是批量接口而不是一次一对：不同实现最快的调度方式完全不同。
         Claude 这类远程 API 一次只能问一对，最快的办法是在内部并发发请求；

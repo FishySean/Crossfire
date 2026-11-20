@@ -89,7 +89,7 @@ class VerifyQuestion:
         pages, fetch_stats = self._fetch_pages(question)
         as_of = as_of_for(self._fetcher.mode, started_at, pages)
         claims, extract_stats = self._extract_claims(question, pages, as_of)
-        pairs, pair_stats = self._pair_claims(question, claims)
+        pairs, pair_stats = self._pair_claims(question, claims, as_of)
         judgment, judge_stats = self._reach_verdict(question, claims, pairs, as_of)
 
         result = RunResult(
@@ -131,11 +131,11 @@ class VerifyQuestion:
             self._report(claim.failure)
         return claims, StepStats.summing([claim.usage for claim in claims], self._seconds_since(started))
 
-    def _pair_claims(self, question: Question, claims: list[Claim]) -> tuple[list[Pair], StepStats]:
+    def _pair_claims(self, question: Question, claims: list[Claim], as_of: AsOf) -> tuple[list[Pair], StepStats]:
         claim_pairs = list(itertools.combinations([claim for claim in claims if claim.answered], 2))
         self._events.emit(PairStart(total_pairs=len(claim_pairs)))
         started = self._clock.monotonic()
-        pairs = self._pairer.pair_all(question, claim_pairs, self._on_pair)
+        pairs = self._pairer.pair_all(question, claim_pairs, as_of, self._on_pair)
         return pairs, StepStats.summing([pair.usage for pair in pairs], self._seconds_since(started))
 
     def _on_pair(self, index: int, total: int, pair: Pair) -> None:

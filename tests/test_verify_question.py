@@ -226,6 +226,7 @@ def test_live_runs_tell_the_model_the_day_of_the_run(build):
     result = use_case.execute(QUESTION).result
     assert result.as_of == date(2026, 11, 19)
     assert set(parts["extractor"].as_of_seen) == {date(2026, 11, 19)}
+    assert parts["pairer"].as_of_seen == [date(2026, 11, 19)]
     assert parts["judge"].as_of_seen == [date(2026, 11, 19)]
 
 
@@ -235,6 +236,7 @@ def test_cached_runs_tell_the_model_the_day_of_the_snapshot_not_today(build):
     result = use_case.execute(QUESTION).result
     assert result.as_of == date(2026, 9, 12)
     assert parts["extractor"].as_of_seen == [date(2026, 9, 12)] * 4
+    assert parts["pairer"].as_of_seen == [date(2026, 9, 12)]
     assert parts["judge"].as_of_seen == [date(2026, 9, 12)]
 
 
@@ -246,6 +248,7 @@ def test_a_snapshot_without_fetch_time_is_refused_before_any_model_call(build):
     with pytest.raises(UnknownSnapshotDateError, match="没有记录抓取时间"):
         use_case.execute(QUESTION)
     assert parts["extractor"].as_of_seen == []
+    assert parts["pairer"].as_of_seen == []
     assert parts["judge"].as_of_seen == []
     assert parts["runs"].saved == []
 

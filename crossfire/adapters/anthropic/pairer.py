@@ -2,6 +2,7 @@ import sys
 from collections.abc import Sequence
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import replace
+from datetime import date
 from typing import Any
 
 from crossfire.adapters.anthropic.client import ClaudeCallError, ClaudeClient, prompt_version
@@ -9,6 +10,8 @@ from crossfire.application.ports import OnPair
 from crossfire.domain import Claim, Failure, Pair, Provenance, Question, Relation, Usage
 
 DEFAULT_PAIR_CONCURRENCY = 6
+UNKNOWN_DATE = "未知"
+NO_EVIDENCE = "（来源没有给出原文）"
 
 # prompt 里出现的关系名一律从 Relation 填入，不手写字符串。
 RELATION_NAMES = {
@@ -19,6 +22,10 @@ RELATION_NAMES = {
 }
 
 PAIR_PROMPT = """你在为一个事实查证引擎比对两个来源对同一个问题的主张。
+
+今天的日期：{as_of}。下面说的「当前」「当前时刻」都指今天。
+来源描述的事可能发生在你的训练数据之后，比你所知更新的版本号、日期、数字本身不是判断依据；
+只比较两个来源写了什么。发布日期是来源自己的日期，「未知」表示来源没写。
 
 问题：{question}
 
@@ -128,6 +135,7 @@ class ClaudeClaimPairer:
         self,
         question: Question,
         claim_pairs: Sequence[tuple[Claim, Claim]],
+        as_of: date,
         on_pair: OnPair | None = None,
     ) -> list[Pair]:
         total = len(claim_pairs)
@@ -135,7 +143,7 @@ class ClaudeClaimPairer:
         executor = ThreadPoolExecutor(max_workers=self._concurrency)
         try:
             futures: dict[Future[Pair], int] = {
-                executor.submit(self._compare, question, a, b): index for index, (a, b) in enumerate(claim_pairs)
+                executor.submit(self._compare, question, a, b, as_of): index for index, (a, b) in enumerate(claim_pairs)
             }
             # 回调在调用方线程里按完成顺序触发，事件推送方不用处理多线程。
             for future in as_completed(futures):
@@ -148,19 +156,20 @@ class ClaudeClaimPairer:
             executor.shutdown(wait=True, cancel_futures=True)
         return [pair for pair in results if pair is not None]
 
-    def _compare(self, question: Question, a: Claim, b: Claim) -> Pair:
+    def _compare(self, question: Question, a: Claim, b: Claim, as_of: date) -> Pair:
         prompt = PAIR_PROMPT.format(
+            as_of=as_of.isoformat(),
             question=question.text,
             a_url=a.source_url,
             a_tier=a.tier.value,
-            a_date=a.published_date,
+            a_date=a.published_date or UNKNOWN_DATE,
             a_claim=a.text,
-            a_evidence=a.evidence,
+            a_evidence=a.evidence or NO_EVIDENCE,
             b_url=b.source_url,
             b_tier=b.tier.value,
-            b_date=b.published_date,
+            b_date=b.published_date or UNKNOWN_DATE,
             b_claim=b.text,
-            b_evidence=b.evidence,
+            b_evidence=b.evidence or NO_EVIDENCE,
             **RELATION_NAMES,
         )
 

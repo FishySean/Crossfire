@@ -59,16 +59,13 @@ WRONG_ANSWERS = {
 
 WRONG_ANSWERS["judge-python-2026-11"] = WRONG_ANSWERS["python-2026-11"]
 
-# 修复前三次判决的真实输出（answer, reasoning），取自 judge_inputs 里每份输入的来源运行。
-PRE_FIX_JUDGMENTS = {
-    source: json.loads(Path(source).read_text(encoding="utf-8"))["judgment"]
-    for source in [
-        "out/eval-runs/python-2026-11/python-latest-version_20261119T233230Z.json",
-        "out/eval-runs/python-2026-11/python-latest-version_20261119T233303Z.json",
-        "out/eval-runs/python-2026-11/python-latest-version_20261119T233344Z.json",
-    ]
-    if Path(source).exists()
-}
+# 修复前三次判决的真实输出。源文件在 evals/fixtures/pre-fix-runs/，进 git，任何机器都能跑。
+PRE_FIX_RUNS = [
+    "evals/fixtures/pre-fix-runs/python-latest-version_20261119T233230Z.json",
+    "evals/fixtures/pre-fix-runs/python-latest-version_20261119T233303Z.json",
+    "evals/fixtures/pre-fix-runs/python-latest-version_20261119T233344Z.json",
+]
+PRE_FIX_JUDGMENTS = {source: json.loads(Path(source).read_text(encoding="utf-8"))["judgment"] for source in PRE_FIX_RUNS}
 
 # 推理里提到自己的知识、但没有拿它否定来源：规则不能误杀。
 RIGHT_REASONINGS = [
@@ -146,7 +143,6 @@ def test_judge_case_reasoning_rule_tells_knowledge_based_rejection_from_rule_fol
     assert case.grade(answer, None).reasons == ("没有给出推理",)
 
 
-@pytest.mark.skipif(len(PRE_FIX_JUDGMENTS) < 3, reason="需要本地 out/eval-runs 里修复前那三次运行")
 def test_judge_case_grades_the_three_pre_fix_judgments_as_pass_fail_fail():
     case = CASES["judge-python-2026-11"]
     grades = [case.grade(j["answer"], j["reasoning"]) for j in PRE_FIX_JUDGMENTS.values()]
@@ -211,7 +207,6 @@ def test_judge_inputs_are_the_three_pre_fix_runs_with_the_stale_article_called_c
         assert downloads.text and "3.15.2" in downloads.text
 
 
-@pytest.mark.skipif(len(PRE_FIX_JUDGMENTS) < 3, reason="需要本地 out/eval-runs 里修复前那三次运行")
 def test_judge_inputs_are_copied_verbatim_from_their_runs():
     for item in load_judge_inputs(SETTINGS, CASES["judge-python-2026-11"]):
         record = json.loads(Path(item.source).read_text(encoding="utf-8"))

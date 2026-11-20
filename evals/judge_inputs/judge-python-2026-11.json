@@ -2,7 +2,7 @@
   "note": "第 5a 步修复前，python-2026-11 那三次评测运行的 claims 和 pairs，原样复制。三份里都有把 2024 年 RealPython 文章写成「当前最新是 3.13」的主张，另有两份把 devguide 读成 3.13 或 3.14。当时的判决有两次信了模型自己的知识、否定了下载页的 3.15.2。",
   "inputs": [
     {
-      "source": "out/eval-runs/python-2026-11/python-latest-version_20261119T233230Z.json",
+      "source": "evals/fixtures/pre-fix-runs/python-latest-version_20261119T233230Z.json",
       "claims": [
         {
           "url": "https://www.python.org/downloads/",
@@ -131,7 +131,7 @@
       ]
     },
     {
-      "source": "out/eval-runs/python-2026-11/python-latest-version_20261119T233303Z.json",
+      "source": "evals/fixtures/pre-fix-runs/python-latest-version_20261119T233303Z.json",
       "claims": [
         {
           "url": "https://www.python.org/downloads/",
@@ -260,7 +260,7 @@
       ]
     },
     {
-      "source": "out/eval-runs/python-2026-11/python-latest-version_20261119T233344Z.json",
+      "source": "evals/fixtures/pre-fix-runs/python-latest-version_20261119T233344Z.json",
       "claims": [
         {
           "url": "https://www.python.org/downloads/",

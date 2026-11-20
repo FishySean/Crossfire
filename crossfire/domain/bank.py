@@ -18,10 +18,20 @@ class DropReason(StrEnum):
     """题目或来源被丢掉的原因，会写进 bank.yaml 和 bank-review.md。"""
 
     TOO_FEW_USABLE = "too_few_usable"
+    NO_PRIMARY = "no_primary"
     UNUSABLE_PAGE = "unusable_page"
     FETCH_FAILED = "fetch_failed"
     KEYWORD_MISS = "keyword_miss"
     DUPLICATE_URL = "duplicate_url"
+    # 余额不足等中断：不是「真的找不到来源」。续跑时要重做，不能跟 TOO_FEW_USABLE 混在一起。
+    INTERRUPTED = "interrupted"
+
+
+CATEGORY_QUOTAS: dict[QuestionCategory, int] = {
+    QuestionCategory.TIME_LAG: 8,
+    QuestionCategory.SCOPE: 8,
+    QuestionCategory.REPRINT_ERROR: 4,
+}
 
 
 @dataclass(frozen=True)
@@ -136,6 +146,38 @@ class BankQuestion:
             "rejected_sources": [item.to_dict() for item in self.rejected],
         }
 
+    @classmethod
+    def from_yaml_dict(cls, data: dict[str, Any]) -> Self:
+        source_rows = cast(list[dict[str, Any]], data["sources"])
+        sources = tuple(
+            KeptSource(
+                source=Source(url=str(item["url"]), tier=Tier(str(item["tier"]))),
+                title=str(item.get("title") or item["url"]),
+                query=str(item.get("found_by") or item.get("query") or ""),
+            )
+            for item in source_rows
+        )
+        rejected_rows = cast(list[dict[str, Any]], data.get("rejected_sources") or [])
+        rejected = tuple(
+            RejectedSource(url=str(item["url"]), reason=DropReason(str(item["reason"])), detail=str(item["detail"]))
+            for item in rejected_rows
+        )
+        raw_keywords = data.get("keywords", [])
+        if not isinstance(raw_keywords, list):
+            keywords: tuple[str, ...] = ()
+        else:
+            keywords = tuple(str(item) for item in cast(list[object], raw_keywords))
+        return cls(
+            id=str(data["id"]),
+            text=str(data["question"]),
+            category=QuestionCategory(str(data["category"])),
+            language=str(data["language"]),
+            generated_on=date.fromisoformat(str(data["generated_on"])),
+            keywords=keywords,
+            sources=sources,
+            rejected=rejected,
+        )
+
 
 @dataclass(frozen=True)
 class DroppedQuestion:
@@ -151,3 +193,17 @@ class DroppedQuestion:
             "drop_detail": self.detail,
             "rejected_sources": [item.to_dict() for item in self.rejected],
         }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Self:
+        rejected_rows = cast(list[dict[str, Any]], data.get("rejected_sources") or [])
+        rejected = tuple(
+            RejectedSource(url=str(item["url"]), reason=DropReason(str(item["reason"])), detail=str(item["detail"]))
+            for item in rejected_rows
+        )
+        return cls(
+            proposed=ProposedQuestion.from_dict(data),
+            reason=DropReason(str(data["drop_reason"])),
+            detail=str(data["drop_detail"]),
+            rejected=rejected,
+        )

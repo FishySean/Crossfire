@@ -96,51 +96,6 @@
   - url: https://tech-insider.org/ie/python-3-15-release-3-10-end-of-life-2026/
     reason: unusable_page
     detail: too_short
-- id: imf-world-gdp-rank-2024
-  question: According to IMF data, which country has the largest GDP in the world?
-  category: time_lag
-  language: en
-  generated_on: '2026-11-20'
-  keywords:
-  - IMF
-  - GDP
-  - largest economy
-  - world ranking
-  - nominal GDP
-  - United States
-  - China
-  sources:
-  - url: https://www.axi.com/int/blog/education/largest-economies-in-the-world
-    tier: news
-    title: Top 10 Largest Economies in the World by GDP in 2026 - Axi
-    found_by: largest GDP world IMF data Wikipedia
-  - url: https://www.economyinsights.com/p/the-worlds-largest-economies-ranked-by-gdp
-    tier: news
-    title: The World's Largest Economies Ranked by GDP - Economy Insights
-    found_by: IMF GDP by country largest economy 2024 2025
-  - url: https://www.forbesindia.com/article/explainers/top-10-largest-economies-in-the-world/86159/1
-    tier: news
-    title: World GDP Rankings 2025 - Forbes India
-    found_by: IMF GDP by country largest economy 2024 2025
-  - url: https://www.worldometers.info/gdp/gdp-by-country/
-    tier: aggregator
-    title: GDP by Country (2026) - IMF | Worldometers
-    found_by: IMF GDP by country largest economy 2024 2025
-  - url: https://statisticstimes.com/economy/projected-world-gdp-ranking.php
-    tier: aggregator
-    title: World GDP Ranking 2026 - StatisticsTimes.com
-    found_by: IMF World Economic Outlook GDP rankings official
-  - url: https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(PPP)
-    tier: aggregator
-    title: List of countries by GDP (PPP) - Wikipedia
-    found_by: largest GDP world IMF data Wikipedia
-  rejected_sources:
-  - url: https://www.imf.org/external/datamapper/NGDPD@WEO/WEOWORLD
-    reason: unusable_page
-    detail: too_short
-  - url: https://www.imf.org/-/media/files/publications/weo/2026/april/english/text.pdf
-    reason: unusable_page
-    detail: error_page_title
 - id: eiffel-tower-height
   question: What is the current official height of the Eiffel Tower in meters?
   category: time_lag
@@ -187,46 +142,6 @@
   - url: https://www.toureiffel.paris/en/news/history-and-culture/why-does-eiffel-tower-change-size
     reason: unusable_page
     detail: error_page_title
-- id: openai-ceo
-  question: Who is the current CEO of OpenAI?
-  category: time_lag
-  language: en
-  generated_on: '2026-11-20'
-  keywords:
-  - OpenAI
-  - CEO
-  - chief executive
-  - Sam Altman
-  - leadership
-  sources:
-  - url: https://techcrunch.com/2026/11/18/openai-ceo-sam-altman-says-its-hard-to-imagine-the-ai-industry-without-jensen/
-    tier: news
-    title: OpenAI CEO Sam Altman says it's 'hard to imagine the AI industry without
-      Jensen'
-    found_by: current CEO OpenAI 2026
-  - url: https://finance.yahoo.com/markets/article/openai-ceo-sam-altman-on-potential-ipo-we-plan-to-be-public-184333485.html
-    tier: news
-    title: 'OpenAI CEO Sam Altman on potential IPO: ''We plan to be public'''
-    found_by: current CEO OpenAI 2026
-  - url: https://en.wikipedia.org/wiki/Sam_Altman
-    tier: aggregator
-    title: Sam Altman - Wikipedia
-    found_by: OpenAI CEO Wikipedia
-  - url: https://en.wikipedia.org/wiki/OpenAI
-    tier: aggregator
-    title: OpenAI - Wikipedia
-    found_by: OpenAI CEO Wikipedia
-  - url: https://penchan.co/en/market/ai/openai/openai-leadership-team/
-    tier: aggregator
-    title: 'OpenAI Founders & Leadership: Who Runs OpenAI Now'
-    found_by: current CEO OpenAI 2026
-  rejected_sources:
-  - url: https://openai.com/index/sam-altman-returns-as-ceo-openai-has-a-new-initial-board/
-    reason: unusable_page
-    detail: empty_content
-  - url: https://openai.com/index/sam-altman-un-security-council-remarks/
-    reason: unusable_page
-    detail: empty_content
 - id: apple-ceo-current
   question: 现任苹果公司（Apple Inc.）CEO 是谁？
   category: time_lag
@@ -465,56 +380,6 @@
     title: 'Ubuntu LTS: Release Schedule & Support Windows - MedhaCloud'
     found_by: Ubuntu LTS latest release 2024 2025
   rejected_sources: []
-- id: us-federal-minimum-wage
-  question: What is the current federal minimum wage in the United States (in USD
-    per hour)?
-  category: time_lag
-  language: en
-  generated_on: '2026-11-20'
-  keywords:
-  - federal minimum wage
-  - United States
-  - per hour
-  - FLSA
-  - Fair Labor Standards Act
-  - '7.25'
-  sources:
-  - url: https://www.dol.gov/agencies/whd/minimum-wage
-    tier: primary
-    title: Minimum Wage – Wage and Hour Division (U.S. Department of Labor)
-    found_by: US federal minimum wage per hour official dol.gov
-  - url: https://www.dol.gov/general/topic/wages/minimumwage
-    tier: primary
-    title: Minimum Wage – U.S. Department of Labor (Topic Page)
-    found_by: US federal minimum wage per hour official dol.gov
-  - url: https://www.aljazeera.com/economy/2026/11/18/us-lawmakers-push-to-raise-minimum-wage-to-25-end-tipped-pay-system
-    tier: news
-    title: US lawmakers push to raise minimum wage to $25, end tipped pay system –
-      Al Jazeera
-    found_by: US federal minimum wage 2026 current news
-  - url: https://www.cnbc.com/make-it/2026/04/29/federal-minimum-wage-increase-affordability.html
-    tier: news
-    title: Democratic lawmakers introduce bill to raise federal minimum wage to $25
-      an hour – CNBC
-    found_by: US federal minimum wage 2026 current news
-  - url: https://www.wesh.com/article/federal-minimum-wage-increase/71184820
-    tier: news
-    title: Lawmakers introduce bill to raise federal minimum wage to $25 an hour –
-      WESH
-    found_by: US federal minimum wage 2026 current news
-  - url: https://en.wikipedia.org/wiki/Minimum_wage_in_the_United_States
-    tier: aggregator
-    title: Minimum wage in the United States – Wikipedia
-    found_by: federal minimum wage United States Wikipedia
-  - url: https://www.law.cornell.edu/wex/minimum_wage
-    tier: aggregator
-    title: Minimum Wage – Cornell Law School Legal Information Institute (LII)
-    found_by: federal minimum wage United States Wikipedia
-  - url: https://nowsta.com/blog/federal-minimum-wage-2026/
-    tier: aggregator
-    title: Federal Minimum Wage 2026 – Nowsta Blog
-    found_by: US federal minimum wage 2026 current news
-  rejected_sources: []
 - id: shanghai-population-scope
   question: 上海的人口是多少？（常住人口 vs 户籍人口口径不同，数字有差异）
   category: scope
@@ -718,3 +583,376 @@
   - url: https://www.un.org/dgacm/en/content/regional-groups
     reason: keyword_miss
     detail: 正文未出现任何关键词
+- id: bitcoin-creator-reprint
+  question: 比特币白皮书的作者署名是什么？（转载常误写为其他形式）
+  category: reprint_error
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 比特币
+  - 白皮书
+  - 中本聪
+  - Nakamoto
+  sources:
+  - url: https://bitcoin.org/files/bitcoin-paper/bitcoin_es_latam.pdf
+    tier: primary
+    title: Bitcoin whitepaper Spanish translation – bitcoin.org official files（含原署名
+      Satoshi Nakamoto / satoshin@gmx.com）
+    found_by: bitcoin.org bitcoin whitepaper PDF Satoshi Nakamoto original
+  - url: https://www.jb51.net/blockchain/930565.html
+    tier: news
+    title: 澳本聪不是中本聪 也非比特币白皮书作者 – 脚本之家（报道英国法院裁决）
+    found_by: 比特币白皮书署名误写 中本聪 常见错误
+  - url: https://en.wikipedia.org/wiki/Satoshi_Nakamoto
+    tier: aggregator
+    title: Satoshi Nakamoto – Wikipedia
+    found_by: Bitcoin whitepaper original author name spelling
+  - url: https://en.wikipedia.org/wiki/Bitcoin
+    tier: aggregator
+    title: 'Bitcoin – Wikipedia（infobox 列明 Original author: Satoshi Nakamoto）'
+    found_by: Bitcoin whitepaper original author name spelling
+  - url: https://en.wikipedia.org/wiki/History_of_bitcoin
+    tier: aggregator
+    title: History of bitcoin – Wikipedia
+    found_by: Bitcoin whitepaper original author name spelling
+  rejected_sources:
+  - url: https://www.secrss.com/articles/2020
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://finance.sina.com.cn/blockchain/roll/2019-08-20/doc-ihytcitn0573842.shtml
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+- id: marie-curie-birth-year-reprint
+  question: Marie Curie's birth year is sometimes misprinted in secondary sources.
+    What is her correct birth year?
+  category: reprint_error
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - Marie Curie
+  - birth
+  - '1867'
+  sources:
+  - url: https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/
+    tier: primary
+    title: Marie Curie – Biographical | Nobel Prize in Physics 1903
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://www.nobelprize.org/prizes/physics/1903/marie-curie/facts/
+    tier: primary
+    title: Marie Curie – Facts | Nobel Prize in Physics 1903
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://www.mariecurie.org.uk/about-us/our-history/marie-curie-the-scientist
+    tier: primary
+    title: Marie Curie the scientist | Marie Curie (charity)
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://www.biography.com/scientists/marie-curie
+    tier: news
+    title: 'Marie Curie: How She Broke Barriers as the First Woman to Win a Nobel
+      Prize | Biography.com'
+    found_by: Marie Curie birth year correct date
+  - url: https://www.history.com/this-day-in-history/december-10/curies-isolate-radium
+    tier: news
+    title: Marie and Pierre Curie are awarded Nobel Prize for their work with radium
+      | History.com
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://en.wikipedia.org/wiki/Marie_Curie
+    tier: aggregator
+    title: Marie Curie – Wikipedia
+    found_by: Marie Curie born 1867 Wikipedia
+  - url: https://simple.wikipedia.org/wiki/Marie_Curie
+    tier: aggregator
+    title: Marie Curie – Simple English Wikipedia
+    found_by: Marie Curie born 1867 Wikipedia
+  rejected_sources:
+  - url: https://www.britannica.com/biography/Marie-Curie
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.britannica.com/summary/Marie-Curie
+    reason: unusable_page
+    detail: empty_content
+- id: titanic-sinking-year-reprint
+  question: 泰坦尼克号沉没于哪一年？（部分转载文章错误写为 1911 年）
+  category: reprint_error
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 泰坦尼克
+  - 沉没
+  - '1912'
+  sources:
+  - url: https://www.noaa.gov/office-of-general-counsel/gc-international-section/rms-titanic-history-and-significance
+    tier: primary
+    title: R.M.S Titanic - History and Significance (NOAA)
+    found_by: Titanic sinking 1912 official history
+  - url: https://www.govinfo.gov/features/featured-content/sinking-of-titanic
+    tier: primary
+    title: Sinking of the R.M.S. Titanic (GovInfo - U.S. Government Publishing Office)
+    found_by: Titanic sinking 1912 official history
+  - url: https://www.history.com/articles/titanic
+    tier: news
+    title: 'The Titanic: Deaths, Dates, Sinking & Facts (HISTORY Channel)'
+    found_by: Titanic sinking 1912 official history
+  - url: https://en.wikipedia.org/wiki/Sinking_of_the_Titanic
+    tier: aggregator
+    title: Sinking of the Titanic - Wikipedia (English)
+    found_by: Titanic sinking year Wikipedia encyclopedia
+  - url: https://zh.wikipedia.org/zh-cn/%E9%90%B5%E9%81%94%E5%B0%BC%E8%99%9F%E6%B2%89%E6%B2%92%E4%BA%8B%E6%95%85
+    tier: aggregator
+    title: 泰坦尼克号沉没事故 - 维基百科（中文）
+    found_by: 泰坦尼克号沉没 1912年 新闻报道
+  rejected_sources:
+  - url: https://www.thepaper.cn/newsDetail_forward_30648990
+    reason: unusable_page
+    detail: too_short
+  - url: https://view.inews.qq.com/k/20250415A01ULD00?scene=wap&no-redirect=1
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.britannica.com/topic/Titanic
+    reason: unusable_page
+    detail: empty_content
+- id: dna-double-helix-discoverers-reprint
+  question: Who are credited as the discoverers of the DNA double helix structure?
+    (Some reprintings omit Rosalind Franklin or misattribute the discovery.)
+  category: reprint_error
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - DNA
+  - double helix
+  - Watson
+  - Crick
+  - Franklin
+  sources:
+  - url: https://www.genome.gov/25520255/online-education-kit-1953-dna-double-helix
+    tier: primary
+    title: '1953: DNA Double Helix – National Human Genome Research Institute (NHGRI)'
+    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
+  - url: https://profiles.nlm.nih.gov/spotlight/kr/feature/biographical-overview
+    tier: primary
+    title: Rosalind Franklin – Biographical Overview (NLM/NIH Profiles in Science)
+    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
+  - url: https://profiles.nlm.nih.gov/spotlight/sc/feature/doublehelix
+    tier: primary
+    title: The Discovery of the Double Helix, 1951–1953 (NLM Profiles in Science)
+    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
+  - url: https://www.scientificamerican.com/article/rosalind-franklin-deserves-a-posthumous-nobel-prize-for-co-discovering-dna-structure/
+    tier: news
+    title: Rosalind Franklin Deserves a Posthumous Nobel Prize for Co-discovering
+      DNA Structure – Scientific American
+    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
+  - url: https://theconversation.com/rosalind-franklin-still-doesnt-get-the-recognition-she-deserves-for-her-dna-discovery-95536
+    tier: news
+    title: Rosalind Franklin still doesn't get the recognition she deserves for her
+      DNA discovery – The Conversation
+    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
+  - url: https://www.nature.com/articles/d41586-019-02554-z
+    tier: news
+    title: The structure of DNA – Nature (news/history feature)
+    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
+  - url: https://www.sciencehistory.org/education/scientific-biographies/francis-crick-rosalind-franklin-james-watson-and-maurice-wilkins/
+    tier: aggregator
+    title: Francis Crick, Rosalind Franklin, James Watson, and Maurice Wilkins – Science
+      History Institute
+    found_by: DNA double helix discovery Watson Crick Franklin Wilkins credited discoverers
+  - url: https://www.nature.com/scitable/topicpage/discovery-of-dna-structure-and-function-watson-397/
+    tier: aggregator
+    title: 'Discovery of DNA Structure and Function: Watson and Crick – Nature Scitable'
+    found_by: DNA double helix discovery Watson Crick Franklin Wilkins credited discoverers
+  rejected_sources:
+  - url: https://www.britannica.com/question/Who-discovered-the-structure-of-DNA
+    reason: unusable_page
+    detail: empty_content
+- id: london-population-scope
+  question: 伦敦的人口是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - London population
+  - Greater London
+  - London metropolitan area
+  - City of London
+  - urban area
+  - census
+  sources:
+  - url: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/populationestimatesforenglandandwales/mid2025
+    tier: primary
+    title: 'Population estimates for England and Wales: mid-2025 - Office for National
+      Statistics'
+    found_by: ONS mid-year population estimates 2025 Greater London site:ons.gov.uk
+  - url: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2025
+    tier: primary
+    title: 'Population estimates for the UK, England, Wales, Scotland and Northern
+      Ireland: mid-2025 - Office for National Statistics'
+    found_by: ONS mid-year population estimates 2025 Greater London site:ons.gov.uk
+  - url: https://en.wikipedia.org/wiki/Greater_London
+    tier: aggregator
+    title: Greater London - Wikipedia
+    found_by: London population Wikipedia
+  - url: https://en.wikipedia.org/wiki/Demographics_of_London
+    tier: aggregator
+    title: Demographics of London - Wikipedia
+    found_by: London population Wikipedia
+  - url: https://www.propertyinvestmentsuk.co.uk/london-population/
+    tier: aggregator
+    title: 'London Population by Borough: How Many People Live in London - Property
+      Investments UK'
+    found_by: London population official statistics 2024 2025
+  rejected_sources:
+  - url: https://www.yahoo.com/news/world/articles/london-only-english-region-see-162741246.html
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.onlondon.co.uk/richard-brown-londons-population-fall-results-from-politicians-cutting-immigration/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://centreforlondon.org/blog/london-population-falling/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: eu-member-states-scope
+  question: How many member states does the European Union have?
+  category: scope
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - European Union
+  - member states
+  - EU members
+  - Brexit
+  - candidate countries
+  - accession
+  - 27 members
+  sources:
+  - url: https://eur-lex.europa.eu/EN/legal-content/glossary/member-states.html
+    tier: primary
+    title: Member States - EUR-Lex - European Union
+    found_by: European Union member states official europa.eu
+  - url: https://european-union.europa.eu/easy-read_en
+    tier: primary
+    title: Easy to read - The European Union (european-union.europa.eu)
+    found_by: European Union member states official europa.eu
+  - url: https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary%3AEuropean_Union_%28EU%29
+    tier: primary
+    title: Glossary:European Union (EU) - Statistics Explained - Eurostat
+    found_by: European Union member states official europa.eu
+  - url: https://www.polgeonow.com/2016/06/map-which-countries-are-in-the-eu.html
+    tier: news
+    title: 'Map: Which Countries are in the European Union in 2025, Which Aren''t,
+      and Which Want to Join? - Political Geography Now'
+    found_by: how many EU member states 2024 2025 news
+  - url: https://www.statista.com/statistics/1402650/eu-total-number-of-member-states/
+    tier: news
+    title: Number of member states of the EU 1957-2026 - Statista
+    found_by: European Union member states official europa.eu
+  - url: https://en.wikipedia.org/wiki/Member_state_of_the_European_Union
+    tier: aggregator
+    title: Member state of the European Union - Wikipedia
+    found_by: European Union member states Wikipedia
+  - url: https://en.wikipedia.org/wiki/European_Union
+    tier: aggregator
+    title: European Union - Wikipedia
+    found_by: European Union member states Wikipedia
+  - url: https://www.worlddata.info/alliances/european-union.php
+    tier: aggregator
+    title: Members of the European Union - World Data
+    found_by: European Union member states official europa.eu
+  rejected_sources: []
+- id: nba-team-count-scope
+  question: NBA currently has how many teams — 30 or 32?
+  category: scope
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - NBA
+  - teams
+  - number of teams
+  - franchises
+  - league expansion
+  - 30 teams
+  - 32 teams
+  sources:
+  - url: https://www.nba.com/news/about
+    tier: primary
+    title: About The NBA — NBA.com (Official)
+    found_by: NBA teams list official nba.com
+  - url: https://www.espn.com/nba/story/_/id/48994601/grading-bold-2025-26-nba-season-predictions-all-30-teams-playoffs-rookies-stats
+    tier: news
+    title: Grading bold 2025-26 season predictions for all 30 NBA teams — ESPN
+    found_by: NBA 30 teams 2025-26 season news
+  - url: https://www.espn.com/nba/story/_/id/50502518/first-month-lakers-knicks-spurs-celtics
+    tier: news
+    title: What the NBA's first month has revealed about all 30 teams — ESPN
+    found_by: NBA 30 teams 2025-26 season news
+  - url: https://en.wikipedia.org/wiki/National_Basketball_Association
+    tier: aggregator
+    title: National Basketball Association — Wikipedia
+    found_by: Wikipedia NBA number of franchises teams
+  - url: https://en.wikipedia.org/wiki/Expansion_of_the_NBA
+    tier: aggregator
+    title: Expansion of the NBA — Wikipedia
+    found_by: Wikipedia NBA number of franchises teams
+  - url: https://en.wikipedia.org/wiki/Forbes_list_of_the_most_valuable_NBA_teams
+    tier: aggregator
+    title: Forbes list of the most valuable NBA teams — Wikipedia
+    found_by: Wikipedia NBA number of franchises teams
+  rejected_sources:
+  - url: https://www.nba.com/news/nba-rosters-set-for-2025-26-regular-season
+    reason: unusable_page
+    detail: too_short
+- id: great-barrier-reef-area-scope
+  question: 大堡礁的面积是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 大堡礁
+  - 面积
+  - 平方公里
+  - 珊瑚礁
+  - 海洋公园
+  - 世界遗产
+  - coral reef
+  sources:
+  - url: https://www.gbrmpa.gov.au/learn/world-heritage-area
+    tier: primary
+    title: World Heritage Area - Great Barrier Reef Marine Park Authority (GBRMPA)
+    found_by: Great Barrier Reef area size official
+  - url: https://whc.unesco.org/en/list/154/
+    tier: primary
+    title: Great Barrier Reef - UNESCO World Heritage Centre
+    found_by: Great Barrier Reef area size official
+  - url: https://www.dcceew.gov.au/parks-heritage/heritage/places/national/great-barrier-reef
+    tier: primary
+    title: Great Barrier Reef - DCCEEW (Australian Government Department)
+    found_by: Great Barrier Reef area size official
+  - url: https://zh.wikipedia.org/zh-hans/%E5%A4%A7%E5%A0%A1%E7%A4%81
+    tier: aggregator
+    title: 大堡礁 - 维基百科（简体中文）
+    found_by: 大堡礁 面积 新闻报道
+  - url: https://en.wikipedia.org/wiki/Great_Barrier_Reef
+    tier: aggregator
+    title: Great Barrier Reef - Wikipedia (English)
+    found_by: Great Barrier Reef Wikipedia area square kilometers
+  rejected_sources:
+  - url: https://www.time-weekly.com/post/20217
+    reason: unusable_page
+    detail: error_page_title
+  - url: https://m.mp.oeeee.com/a/BAAFRD000020201028375077.html
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.britannica.com/facts/Great-Barrier-Reef
+    reason: unusable_page
+    detail: empty_content

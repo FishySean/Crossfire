@@ -74,6 +74,7 @@ class Settings:
     consistency_dir: Path
     bank_file: Path
     bank_review_file: Path
+    bank_progress_file: Path
     extract_concurrency: int
     env_file: Path
 
@@ -116,6 +117,7 @@ class Settings:
             consistency_dir=_path(get("CROSSFIRE_CONSISTENCY_DIR", "out/consistency")),
             bank_file=_path(get("CROSSFIRE_BANK_FILE", "questions/bank.yaml")),
             bank_review_file=_path(get("CROSSFIRE_BANK_REVIEW_FILE", "notes/bank-review.md")),
+            bank_progress_file=_path(get("CROSSFIRE_BANK_PROGRESS_FILE", "questions/bank-progress.yaml")),
             extract_concurrency=_positive_int("CROSSFIRE_EXTRACT_CONCURRENCY", get("CROSSFIRE_EXTRACT_CONCURRENCY", "4"), env_file),
             env_file=env_file,
         )

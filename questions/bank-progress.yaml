@@ -1,0 +1,1309 @@
+as_of: '2026-11-20'
+kept:
+- id: nodejs-lts-version
+  question: Node.js 当前的 LTS（长期支持）稳定版本号是多少？
+  category: time_lag
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - Node.js
+  - LTS
+  - 长期支持
+  - 稳定版
+  - Current
+  - 版本号
+  sources:
+  - url: https://nodejs.org/en/about/previous-releases
+    tier: primary
+    title: Node.js — Node.js Releases (Official)
+    found_by: Node.js LTS version Wikipedia tutorial
+  - url: https://github.com/nodejs/node/releases
+    tier: primary
+    title: Releases · nodejs/node · GitHub (Official Repository)
+    found_by: Node.js current LTS version 2026
+  - url: https://privatedevops.com/news/nodejs-26-lts
+    tier: news
+    title: Node.js 26 LTS Adds a Modern Date API and Support to 2029
+    found_by: Node.js LTS release news 2026
+  - url: https://convika.com/blog/nodejs-26-lts-which-version-to-run/
+    tier: news
+    title: 'Node.js 26 LTS on October 28: which version to run?'
+    found_by: Node.js LTS release news 2026
+  - url: https://en.wikipedia.org/wiki/Node.js
+    tier: aggregator
+    title: Node.js — Wikipedia
+    found_by: Node.js LTS version Wikipedia tutorial
+  - url: https://latestat.com/nodejs
+    tier: aggregator
+    title: 'Node.js latest version (2026): 26.13.1 LTS & end-of-life dates'
+    found_by: Node.js current LTS version 2026
+  - url: https://seahawkmedia.com/development/nodejs-lts-versions/
+    tier: aggregator
+    title: 'Node.js LTS Versions: Which One to Run in Production'
+    found_by: Node.js current LTS version 2026
+  rejected_sources:
+  - url: https://nodejs.org/en/blog/release
+    reason: unusable_page
+    detail: nav_skeleton
+  - url: https://medium.com/@ascendrixtech/node-js-26-becomes-lts-on-october-28-whats-new-what-breaks-and-the-end-of-odd-even-releases-236978d43551
+    reason: unusable_page
+    detail: empty_content
+- id: python-latest-stable
+  question: Python 当前最新稳定版本号是多少？
+  category: time_lag
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - Python
+  - 稳定版
+  - 最新版本
+  - release
+  - '3.'
+  - 正式版
+  sources:
+  - url: https://www.python.org/downloads/
+    tier: primary
+    title: Download Python — python.org 官方下载页
+    found_by: Python official download page current version
+  - url: https://docs.python.org/3/whatsnew/3.15.html
+    tier: primary
+    title: What's new in Python 3.15 — Python 3.15.2 documentation
+    found_by: Python latest stable release version 2026
+  - url: https://blog.python.org/2026/10/python-3150-final-is-here/
+    tier: primary
+    title: Python 3.15.0 (final) is here! — Python官方博客
+    found_by: Python latest stable release version 2026
+  - url: https://realpython.com/python-news-october-2026/
+    tier: news
+    title: Python 3.15 Gets a Surprise RC3 and Other Python News for October 2026
+      — Real Python
+    found_by: Python 3.15 release news October 2026
+  - url: https://realpython.com/python315-new-features/
+    tier: news
+    title: 'Python 3.15: Cool New Features for You to Try — Real Python'
+    found_by: Python 3.15 release news October 2026
+  - url: https://en.wikipedia.org/wiki/Python_(programming_language)
+    tier: aggregator
+    title: Python (programming language) — Wikipedia
+    found_by: Python latest stable release version 2026
+  - url: https://tecadmin.net/software/python/
+    tier: aggregator
+    title: Python Versions, Release History & EOL Dates — TecAdmin
+    found_by: Python latest stable release version 2026
+  - url: https://pythonresources.com/python-versions/
+    tier: aggregator
+    title: 'Python Versions: Latest Release, Supported and EOL Dates — PythonResources'
+    found_by: Python latest stable release version 2026
+  rejected_sources:
+  - url: https://tech-insider.org/ie/python-3-15-release-3-10-end-of-life-2026/
+    reason: unusable_page
+    detail: too_short
+- id: eiffel-tower-height
+  question: What is the current official height of the Eiffel Tower in meters?
+  category: time_lag
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - Eiffel Tower
+  - height
+  - meters
+  - antenna
+  - broadcast
+  - tallest structure Paris
+  sources:
+  - url: https://www.skyscrapercenter.com/paris/eiffel-tower/9410
+    tier: primary
+    title: Eiffel Tower - The Skyscraper Center (CTBUH)
+    found_by: Eiffel Tower official height meters
+  - url: https://place-du-trocadero.fr/en/eiffel-tower-height/
+    tier: news
+    title: 'Eiffel Tower Height 2026: 330 m (1,083 ft), Floor by Floor - Place du
+      Trocadéro'
+    found_by: toureiffel.paris official height 330 meters
+  - url: https://lesinvalides.com/en/eiffel-tower-height/
+    tier: news
+    title: Eiffel Tower height in meters and key figures - Les Invalides
+    found_by: Eiffel Tower official height meters
+  - url: https://eiffel-tower.tours/blog/how-tall-is-the-eiffel-tower/
+    tier: news
+    title: How Tall Is the Eiffel Tower? Height, Floors & Steps - eiffel-tower.tours
+    found_by: Eiffel Tower height meters 2024 2025 news
+  - url: https://en.wikipedia.org/wiki/Eiffel_Tower
+    tier: aggregator
+    title: Eiffel Tower - Wikipedia
+    found_by: Eiffel Tower height Wikipedia
+  - url: https://simple.wikipedia.org/wiki/Eiffel_Tower
+    tier: aggregator
+    title: Eiffel Tower - Simple English Wikipedia
+    found_by: Eiffel Tower height Wikipedia
+  - url: https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_the_Paris_region
+    tier: aggregator
+    title: List of tallest buildings in the Paris region - Wikipedia
+    found_by: Eiffel Tower height meters 2024 2025 news
+  rejected_sources:
+  - url: https://www.toureiffel.paris/en/news/history-and-culture/why-does-eiffel-tower-change-size
+    reason: unusable_page
+    detail: error_page_title
+- id: apple-ceo-current
+  question: 现任苹果公司（Apple Inc.）CEO 是谁？
+  category: time_lag
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 苹果
+  - Apple
+  - CEO
+  - 首席执行官
+  - Tim Cook
+  - 蒂姆·库克
+  sources:
+  - url: https://www.sec.gov/Archives/edgar/data/0000320193/000114036126015711/ef20071035_8k.htm
+    tier: primary
+    title: Apple Inc. - Form 8-K - FY2026 (SEC官方公告)
+    found_by: Apple Inc current CEO 2026
+  - url: https://www.sec.gov/Archives/edgar/data/0000320193/000114036126035325/ef20081427_8ka.htm
+    tier: primary
+    title: Apple Inc. - Form 8-K/A - FY2026 (SEC官方补充公告，含CEO交接细节)
+    found_by: Apple Inc current CEO 2026
+  - url: https://finance.yahoo.com/markets/stocks/articles/apple-names-ceo-tim-cook-144900683.html
+    tier: news
+    title: Apple Names New CEO as Tim Cook to Step Down in September - Yahoo Finance
+    found_by: Apple Inc current CEO 2026
+  - url: https://en.wikipedia.org/wiki/John_Ternus
+    tier: aggregator
+    title: John Ternus - Wikipedia
+    found_by: Apple CEO Wikipedia
+  - url: https://en.wikipedia.org/wiki/Apple_Inc.
+    tier: aggregator
+    title: Apple Inc. - Wikipedia
+    found_by: Apple CEO Wikipedia
+  - url: https://simple.wikipedia.org/wiki/Apple_Inc.
+    tier: aggregator
+    title: Apple Inc. - Simple Wikipedia
+    found_by: Apple CEO Wikipedia
+  rejected_sources:
+  - url: https://www.cnbc.com/john-ternus/
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.news.cn/world/20260421/a9aa283edcda41b7a6d9d4d58119b2d9/c.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+- id: un-member-states-count
+  question: 联合国目前共有多少个成员国？
+  category: time_lag
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 联合国
+  - 成员国
+  - 会员国
+  - 数量
+  - UN member states
+  sources:
+  - url: https://www.un.org/en/about-us
+    tier: primary
+    title: About Us | United Nations
+    found_by: United Nations member states total number official
+  - url: https://research.un.org/en/unmembers/intro
+    tier: primary
+    title: Current UN Member States – UN Dag Research Guide
+    found_by: United Nations member states total number official
+  - url: https://news.un.org/zh/story/2025/01/1135091
+    tier: news
+    title: 联大主席阐明2025年优先事项 呼吁全球合作应对重大挑战 | 联合国新闻
+    found_by: 联合国成员国数量 2024 2025 新闻
+  - url: https://cn.chinadiplomacy.org.cn/2025-10/10/content_118116867.shtml
+    tier: news
+    title: '1945-2025: 联合国的使命与担当——纪念联合国成立80周年 | 中国外交'
+    found_by: 联合国成员国数量 2024 2025 新闻
+  - url: https://www.cssn.cn/skgz/bwyc/202510/t20251029_5921385.shtml
+    tier: news
+    title: 联合国改革势在必行 | 中国社会科学网
+    found_by: 联合国成员国数量 2024 2025 新闻
+  - url: https://en.wikipedia.org/wiki/Member_states_of_the_United_Nations
+    tier: aggregator
+    title: Member states of the United Nations – Wikipedia
+    found_by: United Nations member states Wikipedia
+  rejected_sources:
+  - url: https://www.worldometers.info/united-nations/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: world-tallest-building
+  question: What is currently the tallest building in the world?
+  category: time_lag
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - tallest building
+  - world
+  - Burj Khalifa
+  - skyscraper
+  - height
+  - meters
+  sources:
+  - url: https://www.skyscrapercenter.com/dubai/burj-khalifa/3
+    tier: primary
+    title: Burj Khalifa - The Skyscraper Center (CTBUH官方数据库)
+    found_by: CTBUH Skyscraper Center Burj Khalifa official record tallest building
+  - url: https://newsletter.ctbuh.org/eblast/BurjKhalifa/BurjKhalifaHeight.html
+    tier: primary
+    title: CTBUH Ratifies Official Height of Burj Khalifa - 828m World's Tallest
+    found_by: CTBUH Skyscraper Center Burj Khalifa official record tallest building
+  - url: https://www.thenationalnews.com/arts-culture/art-design/2026/03/13/burj-khalifa-history-tallest-building/
+    tier: news
+    title: 'Timeframe: When Burj Khalifa was officially named the world''s tallest
+      building in 2010 – The National News'
+    found_by: Burj Khalifa official height world's tallest skyscraper
+  - url: https://www.travelpirates.com/captains-log/us-the-10-tallest-buildings-in-the-world-in-2026
+    tier: news
+    title: The 10 Tallest Buildings in the World Right Now (2026 Rankings) – TravelPirates
+    found_by: tallest building in the world 2026
+  - url: https://en.wikipedia.org/wiki/List_of_tallest_buildings
+    tier: aggregator
+    title: List of tallest buildings – Wikipedia
+    found_by: tallest building world Wikipedia skyscraper list
+  - url: https://en.wikipedia.org/wiki/Burj_Khalifa
+    tier: aggregator
+    title: Burj Khalifa – Wikipedia
+    found_by: CTBUH Skyscraper Center Burj Khalifa official record tallest building
+  - url: https://archeyes.com/tallest-buildings-in-the-world/
+    tier: aggregator
+    title: 'Tallest Buildings in the World 2026: Top 58 Ranked – ArchEyes'
+    found_by: tallest building in the world 2026
+  rejected_sources:
+  - url: https://www.guinnessworldrecords.com/records/partners/organisations/ctbuh
+    reason: unusable_page
+    detail: too_short
+- id: mysql-latest-ga
+  question: MySQL 当前最新 GA（正式发布）版本号是多少？
+  category: time_lag
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - MySQL
+  - GA
+  - 正式版
+  - 最新版本
+  - General Availability
+  - '8.'
+  sources:
+  - url: https://dev.mysql.com/doc/relnotes/mysql/26.7/en/news-26-7-0.html
+    tier: primary
+    title: 'MySQL :: MySQL 26.7 Release Notes :: Changes in MySQL 26.7.0 (2026-07-28)'
+    found_by: MySQL latest GA release version 2026 site:mysql.com
+  - url: https://dev.mysql.com/doc/refman/26.7/en/
+    tier: primary
+    title: 'MySQL :: MySQL 26.7 Reference Manual'
+    found_by: MySQL 26.7.0 release download dev.mysql.com
+  - url: https://blogs.oracle.com/mysql/mysql-july-2026-ga-releases-now-available
+    tier: primary
+    title: MySQL July 2026 GA Releases Now Available — Oracle MySQL Blog
+    found_by: MySQL new version release 2026 news
+  - url: https://www.infoq.com/news/2026/05/mysql-97-lts/
+    tier: news
+    title: 'MySQL 9.7: First Major LTS Since 8.4 Brings Enterprise Features to Community
+      Edition - InfoQ'
+    found_by: MySQL new version release 2026 news
+  - url: https://www.percona.com/blog/meet-mysql-26-7-a-new-versioning-era-begins/
+    tier: news
+    title: 'Meet MySQL 26.7: A New Versioning Era Begins - Percona'
+    found_by: MySQL 26.7.0 新版本发布 技术博客 2026
+  - url: https://jamsql.com/blog/2026-08-22-whats-new-mysql-26-7/
+    tier: news
+    title: What's New in MySQL 26.7 (and Why There's No 9.8) - JamSQL
+    found_by: MySQL 26.7.0 新版本发布 技术博客 2026
+  - url: https://en.wikipedia.org/wiki/MySQL
+    tier: aggregator
+    title: MySQL - Wikipedia
+    found_by: MySQL current stable version Wikipedia
+  - url: https://versionlog.com/mysql/26.7/
+    tier: aggregator
+    title: MySQL 26.7 - What's New, Support Lifecycle & EOL — VersionLog
+    found_by: MySQL 26.7.0 新版本发布 技术博客 2026
+  - url: https://www.jusdb.com/blog/mysql-26-calendar-versioning-which-version
+    tier: aggregator
+    title: 'MySQL 26.7 and Calendar Versioning: Which MySQL Should You Run Now? -
+      JusDB'
+    found_by: MySQL 26.7.0 新版本发布 技术博客 2026
+  rejected_sources: []
+- id: ubuntu-lts-version
+  question: What is the most recent Ubuntu LTS release version?
+  category: time_lag
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - Ubuntu
+  - LTS
+  - long-term support
+  - release
+  - latest
+  - '24.04'
+  sources:
+  - url: https://lists.ubuntu.com/archives/ubuntu-announce/2026-April/000323.html
+    tier: primary
+    title: Ubuntu 26.04 ("Resolute Raccoon") LTS released - ubuntu-announce mailing
+      list
+    found_by: Ubuntu 26.04 LTS Resolute Raccoon released 2026
+  - url: https://canonical.com/blog/canonical-releases-ubuntu-26-04-lts-resolute-raccoon
+    tier: primary
+    title: Canonical releases Ubuntu 26.04 LTS Resolute Raccoon - Canonical Blog
+    found_by: Ubuntu 26.04 LTS Resolute Raccoon released 2026
+  - url: https://discourse.ubuntu.com/t/ubuntu-26-04-1-lts-released/86808
+    tier: primary
+    title: Ubuntu 26.04.1 LTS released - Ubuntu Discourse Announcements
+    found_by: Ubuntu 26.04 LTS Resolute Raccoon released 2026
+  - url: https://computingforgeeks.com/ubuntu-2604-lts-features/
+    tier: news
+    title: 'Ubuntu 26.04 LTS Features: Kernel 7.0, GNOME 50 - ComputingForGeeks'
+    found_by: Ubuntu 26.04 LTS Resolute Raccoon released 2026
+  - url: https://ostechnix.com/ubuntu-26-04-lts-resolute-raccoon-features-release-notes/
+    tier: news
+    title: 'Ubuntu 26.04 LTS Released: Everything You Need to Know - OSTechNix'
+    found_by: Ubuntu 26.04 LTS Resolute Raccoon released 2026
+  - url: https://en.wikipedia.org/wiki/Ubuntu
+    tier: aggregator
+    title: Ubuntu - Wikipedia
+    found_by: Ubuntu LTS release Wikipedia
+  - url: https://serverpilot.io/docs/ubuntu/
+    tier: aggregator
+    title: Ubuntu release cycle - ServerPilot Docs
+    found_by: Ubuntu LTS latest release 2024 2025
+  - url: https://medhacloud.com/blog/ubuntu-lts
+    tier: aggregator
+    title: 'Ubuntu LTS: Release Schedule & Support Windows - MedhaCloud'
+    found_by: Ubuntu LTS latest release 2024 2025
+  rejected_sources: []
+- id: shanghai-population-scope
+  question: 上海的人口是多少？（常住人口 vs 户籍人口口径不同，数字有差异）
+  category: scope
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 上海
+  - 人口
+  - 常住人口
+  - 户籍人口
+  - 统计
+  - 普查
+  sources:
+  - url: https://www.shszgh.cn/ghwj/szyw/20250326/2655.html
+    tier: primary
+    title: 2024年上海常住人口2480.26万人 — 上海市总工会
+    found_by: 上海市统计局 2024年常住人口 户籍人口
+  - url: https://www.cna.com.tw/news/acn/202503260062.aspx
+    tier: news
+    title: 上海2024年人口減少 外來常住者首次低於千萬 — 中央社
+    found_by: 上海人口2024年最新数据 常住人口
+  - url: https://finance.sina.com.cn/roll/2025-06-03/doc-ineyuazf6856555.shtml
+    tier: news
+    title: 上海，人口之殇！— 新浪财经
+    found_by: 上海人口2024年最新数据 常住人口
+  - url: https://en.wikipedia.org/wiki/Demographics_of_Shanghai
+    tier: aggregator
+    title: Demographics of Shanghai — Wikipedia
+    found_by: Shanghai population 2024 Wikipedia
+  - url: https://www.hongheiku.com/lishishuju/20326.html
+    tier: aggregator
+    title: 上海市人口2024年总人口数常住人口户籍人口出生死亡数据 — 红黑人口库
+    found_by: 上海市统计局 2024年常住人口 户籍人口
+  rejected_sources:
+  - url: https://tjj.sh.gov.cn/tjgb/20250324/a7fe18c6d5c24d66bfca89c5bb4cdcfb.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+  - url: https://www.visiontimes.com/2025/04/03/shanghais-population-crisis-deepens-amid-migrant-exodus-dwindling-fertility-rates.html
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://zhuanlan.zhihu.com/p/1972392112826873026
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+- id: amazon-employee-count-scope
+  question: 'How many employees does Amazon have? (Note: full-time vs full-time-and-part-time
+    figures differ significantly.)'
+  category: scope
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - Amazon
+  - employees
+  - headcount
+  - full-time
+  - part-time
+  - workforce
+  - annual report
+  sources:
+  - url: https://s2.q4cdn.com/299287126/files/doc_financials/2025/ar/Amazon-2024-Annual-Report.pdf
+    tier: primary
+    title: Amazon 2024 Annual Report (Official PDF)
+    found_by: Amazon number of employees 2024 annual report official
+  - url: https://www.sec.gov/Archives/edgar/data/1018724/000110465925033453/tm254123d4_ars.pdf
+    tier: primary
+    title: Amazon.com Inc - Form ARS FY2024 (SEC Filing)
+    found_by: Amazon number of employees 2024 annual report official
+  - url: https://sqmagazine.co.uk/how-many-employees-does-amazon-have/
+    tier: news
+    title: 'Amazon''s Workforce in Numbers: How Many Employees It Has Now – SQ Magazine'
+    found_by: Amazon employees headcount 2024 2025 news
+  - url: https://sqmagazine.co.uk/how-many-people-work-at-amazon/
+    tier: news
+    title: 'How Many People Work At Amazon 2026: Headcount, Layoffs, Productivity
+      – SQ Magazine'
+    found_by: Amazon employees headcount 2024 2025 news
+  - url: https://www.makerstations.io/amazon-employee-statistics/
+    tier: news
+    title: 'Amazon Employee Statistics 2026: Workforce Size – MakerStations'
+    found_by: Amazon employees headcount 2024 2025 news
+  - url: https://en.wikipedia.org/wiki/Amazon_(company)
+    tier: aggregator
+    title: Amazon (company) – Wikipedia
+    found_by: Amazon number of employees Wikipedia
+  - url: https://explodingtopics.com/blog/amazon-employees
+    tier: aggregator
+    title: Number of Amazon Employees (2025) – Exploding Topics
+    found_by: Amazon number of employees 2024 annual report official
+  - url: https://bullfincher.io/companies/amazoncom/number-of-employees
+    tier: aggregator
+    title: Amazon.com Number of Employees 2016–2025 – Bullfincher
+    found_by: Amazon employees headcount 2024 2025 news
+  rejected_sources: []
+- id: usa-land-area-scope
+  question: What is the total area of the United States in square kilometers? (Figures
+    differ depending on whether inland water is included.)
+  category: scope
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - United States
+  - total area
+  - square kilometers
+  - land area
+  - water area
+  - CIA World Factbook
+  sources:
+  - url: https://www.census.gov/geographies/reference-files/2010/geo/state-area.html
+    tier: primary
+    title: State Area Measurements and Internal Point Coordinates - U.S. Census Bureau
+    found_by: United States land area square kilometers Census Bureau
+  - url: https://www2.census.gov/library/publications/2010/compendia/statab/130ed/tables/11s0355.pdf
+    tier: primary
+    title: 'Land and Water Area of States and Other Entities: 2008 - Census.gov'
+    found_by: United States land area square kilometers Census Bureau
+  - url: https://www.geographyrealm.com/population-geography-united-states/
+    tier: news
+    title: Population Geography of the United States - Geography Realm
+    found_by: United States land area square kilometers Census Bureau
+  - url: https://en.wikipedia.org/wiki/United_States
+    tier: aggregator
+    title: United States - Wikipedia
+    found_by: US total area km2 Wikipedia
+  - url: https://en.wikipedia.org/wiki/Geography_of_the_United_States
+    tier: aggregator
+    title: Geography of the United States - Wikipedia
+    found_by: US total area km2 Wikipedia
+  - url: https://www.worldatlas.com/maps/united-states
+    tier: aggregator
+    title: United States Map - World Atlas
+    found_by: United States total area square kilometers official
+  rejected_sources:
+  - url: https://www.britannica.com/place/United-States
+    reason: unusable_page
+    detail: empty_content
+- id: africa-country-count-scope
+  question: 非洲共有多少个国家？（不同口径：联合国承认 vs 非盟成员 vs 实际控制领土）
+  category: scope
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 非洲
+  - 国家
+  - 数量
+  - 联合国
+  - 非洲联盟
+  - 成员国
+  - '54'
+  - '55'
+  sources:
+  - url: https://au.int/en/overview
+    tier: primary
+    title: About the African Union – au.int (Official AU Website)
+    found_by: African Union member states total number 2024
+  - url: https://www.cfr.org/backgrounders/somaliland-horn-africas-breakaway-state
+    tier: news
+    title: 'Somaliland: The Horn of Africa''s Breakaway State – Council on Foreign
+      Relations'
+    found_by: Africa de facto states disputed territories Western Sahara Somaliland
+      2024
+  - url: https://defactostates.ut.ee/overview-of-2024-de-facto-states-clinging-to-sovereignty/
+    tier: news
+    title: 'Overview of 2024: De Facto States Clinging to Sovereignty – University
+      of Tartu De Facto States Research'
+    found_by: Africa de facto states disputed territories Western Sahara Somaliland
+      2024
+  - url: https://en.wikipedia.org/wiki/List_of_sovereign_states_and_dependent_territories_in_Africa
+    tier: aggregator
+    title: List of sovereign states and dependent territories in Africa – Wikipedia
+    found_by: United Nations recognized countries in Africa official list
+  - url: https://en.wikipedia.org/wiki/Member_states_of_the_African_Union
+    tier: aggregator
+    title: Member states of the African Union – Wikipedia
+    found_by: African Union member states total number 2024
+  - url: https://masatutours.com/articles/how-many-countries-in-africa
+    tier: aggregator
+    title: How Many Countries Are in Africa? (2026 Guide) – Masatu Tours
+    found_by: Africa de facto states disputed territories Western Sahara Somaliland
+      2024
+  rejected_sources:
+  - url: https://www.africanunion-un.org/memberstates
+    reason: unusable_page
+    detail: nav_skeleton
+  - url: https://www.un.org/dgacm/en/content/regional-groups
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: bitcoin-creator-reprint
+  question: 比特币白皮书的作者署名是什么？（转载常误写为其他形式）
+  category: reprint_error
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 比特币
+  - 白皮书
+  - 中本聪
+  - Nakamoto
+  sources:
+  - url: https://bitcoin.org/files/bitcoin-paper/bitcoin_es_latam.pdf
+    tier: primary
+    title: Bitcoin whitepaper Spanish translation – bitcoin.org official files（含原署名
+      Satoshi Nakamoto / satoshin@gmx.com）
+    found_by: bitcoin.org bitcoin whitepaper PDF Satoshi Nakamoto original
+  - url: https://www.jb51.net/blockchain/930565.html
+    tier: news
+    title: 澳本聪不是中本聪 也非比特币白皮书作者 – 脚本之家（报道英国法院裁决）
+    found_by: 比特币白皮书署名误写 中本聪 常见错误
+  - url: https://en.wikipedia.org/wiki/Satoshi_Nakamoto
+    tier: aggregator
+    title: Satoshi Nakamoto – Wikipedia
+    found_by: Bitcoin whitepaper original author name spelling
+  - url: https://en.wikipedia.org/wiki/Bitcoin
+    tier: aggregator
+    title: 'Bitcoin – Wikipedia（infobox 列明 Original author: Satoshi Nakamoto）'
+    found_by: Bitcoin whitepaper original author name spelling
+  - url: https://en.wikipedia.org/wiki/History_of_bitcoin
+    tier: aggregator
+    title: History of bitcoin – Wikipedia
+    found_by: Bitcoin whitepaper original author name spelling
+  rejected_sources:
+  - url: https://www.secrss.com/articles/2020
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://finance.sina.com.cn/blockchain/roll/2019-08-20/doc-ihytcitn0573842.shtml
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+- id: marie-curie-birth-year-reprint
+  question: Marie Curie's birth year is sometimes misprinted in secondary sources.
+    What is her correct birth year?
+  category: reprint_error
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - Marie Curie
+  - birth
+  - '1867'
+  sources:
+  - url: https://www.nobelprize.org/prizes/physics/1903/marie-curie/biographical/
+    tier: primary
+    title: Marie Curie – Biographical | Nobel Prize in Physics 1903
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://www.nobelprize.org/prizes/physics/1903/marie-curie/facts/
+    tier: primary
+    title: Marie Curie – Facts | Nobel Prize in Physics 1903
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://www.mariecurie.org.uk/about-us/our-history/marie-curie-the-scientist
+    tier: primary
+    title: Marie Curie the scientist | Marie Curie (charity)
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://www.biography.com/scientists/marie-curie
+    tier: news
+    title: 'Marie Curie: How She Broke Barriers as the First Woman to Win a Nobel
+      Prize | Biography.com'
+    found_by: Marie Curie birth year correct date
+  - url: https://www.history.com/this-day-in-history/december-10/curies-isolate-radium
+    tier: news
+    title: Marie and Pierre Curie are awarded Nobel Prize for their work with radium
+      | History.com
+    found_by: Marie Curie biography official Nobel Prize
+  - url: https://en.wikipedia.org/wiki/Marie_Curie
+    tier: aggregator
+    title: Marie Curie – Wikipedia
+    found_by: Marie Curie born 1867 Wikipedia
+  - url: https://simple.wikipedia.org/wiki/Marie_Curie
+    tier: aggregator
+    title: Marie Curie – Simple English Wikipedia
+    found_by: Marie Curie born 1867 Wikipedia
+  rejected_sources:
+  - url: https://www.britannica.com/biography/Marie-Curie
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.britannica.com/summary/Marie-Curie
+    reason: unusable_page
+    detail: empty_content
+- id: titanic-sinking-year-reprint
+  question: 泰坦尼克号沉没于哪一年？（部分转载文章错误写为 1911 年）
+  category: reprint_error
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 泰坦尼克
+  - 沉没
+  - '1912'
+  sources:
+  - url: https://www.noaa.gov/office-of-general-counsel/gc-international-section/rms-titanic-history-and-significance
+    tier: primary
+    title: R.M.S Titanic - History and Significance (NOAA)
+    found_by: Titanic sinking 1912 official history
+  - url: https://www.govinfo.gov/features/featured-content/sinking-of-titanic
+    tier: primary
+    title: Sinking of the R.M.S. Titanic (GovInfo - U.S. Government Publishing Office)
+    found_by: Titanic sinking 1912 official history
+  - url: https://www.history.com/articles/titanic
+    tier: news
+    title: 'The Titanic: Deaths, Dates, Sinking & Facts (HISTORY Channel)'
+    found_by: Titanic sinking 1912 official history
+  - url: https://en.wikipedia.org/wiki/Sinking_of_the_Titanic
+    tier: aggregator
+    title: Sinking of the Titanic - Wikipedia (English)
+    found_by: Titanic sinking year Wikipedia encyclopedia
+  - url: https://zh.wikipedia.org/zh-cn/%E9%90%B5%E9%81%94%E5%B0%BC%E8%99%9F%E6%B2%89%E6%B2%92%E4%BA%8B%E6%95%85
+    tier: aggregator
+    title: 泰坦尼克号沉没事故 - 维基百科（中文）
+    found_by: 泰坦尼克号沉没 1912年 新闻报道
+  rejected_sources:
+  - url: https://www.thepaper.cn/newsDetail_forward_30648990
+    reason: unusable_page
+    detail: too_short
+  - url: https://view.inews.qq.com/k/20250415A01ULD00?scene=wap&no-redirect=1
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.britannica.com/topic/Titanic
+    reason: unusable_page
+    detail: empty_content
+- id: dna-double-helix-discoverers-reprint
+  question: Who are credited as the discoverers of the DNA double helix structure?
+    (Some reprintings omit Rosalind Franklin or misattribute the discovery.)
+  category: reprint_error
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - DNA
+  - double helix
+  - Watson
+  - Crick
+  - Franklin
+  sources:
+  - url: https://www.genome.gov/25520255/online-education-kit-1953-dna-double-helix
+    tier: primary
+    title: '1953: DNA Double Helix – National Human Genome Research Institute (NHGRI)'
+    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
+  - url: https://profiles.nlm.nih.gov/spotlight/kr/feature/biographical-overview
+    tier: primary
+    title: Rosalind Franklin – Biographical Overview (NLM/NIH Profiles in Science)
+    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
+  - url: https://profiles.nlm.nih.gov/spotlight/sc/feature/doublehelix
+    tier: primary
+    title: The Discovery of the Double Helix, 1951–1953 (NLM Profiles in Science)
+    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
+  - url: https://www.scientificamerican.com/article/rosalind-franklin-deserves-a-posthumous-nobel-prize-for-co-discovering-dna-structure/
+    tier: news
+    title: Rosalind Franklin Deserves a Posthumous Nobel Prize for Co-discovering
+      DNA Structure – Scientific American
+    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
+  - url: https://theconversation.com/rosalind-franklin-still-doesnt-get-the-recognition-she-deserves-for-her-dna-discovery-95536
+    tier: news
+    title: Rosalind Franklin still doesn't get the recognition she deserves for her
+      DNA discovery – The Conversation
+    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
+  - url: https://www.nature.com/articles/d41586-019-02554-z
+    tier: news
+    title: The structure of DNA – Nature (news/history feature)
+    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
+  - url: https://www.sciencehistory.org/education/scientific-biographies/francis-crick-rosalind-franklin-james-watson-and-maurice-wilkins/
+    tier: aggregator
+    title: Francis Crick, Rosalind Franklin, James Watson, and Maurice Wilkins – Science
+      History Institute
+    found_by: DNA double helix discovery Watson Crick Franklin Wilkins credited discoverers
+  - url: https://www.nature.com/scitable/topicpage/discovery-of-dna-structure-and-function-watson-397/
+    tier: aggregator
+    title: 'Discovery of DNA Structure and Function: Watson and Crick – Nature Scitable'
+    found_by: DNA double helix discovery Watson Crick Franklin Wilkins credited discoverers
+  rejected_sources:
+  - url: https://www.britannica.com/question/Who-discovered-the-structure-of-DNA
+    reason: unusable_page
+    detail: empty_content
+- id: london-population-scope
+  question: 伦敦的人口是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - London population
+  - Greater London
+  - London metropolitan area
+  - City of London
+  - urban area
+  - census
+  sources:
+  - url: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/populationestimatesforenglandandwales/mid2025
+    tier: primary
+    title: 'Population estimates for England and Wales: mid-2025 - Office for National
+      Statistics'
+    found_by: ONS mid-year population estimates 2025 Greater London site:ons.gov.uk
+  - url: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2025
+    tier: primary
+    title: 'Population estimates for the UK, England, Wales, Scotland and Northern
+      Ireland: mid-2025 - Office for National Statistics'
+    found_by: ONS mid-year population estimates 2025 Greater London site:ons.gov.uk
+  - url: https://en.wikipedia.org/wiki/Greater_London
+    tier: aggregator
+    title: Greater London - Wikipedia
+    found_by: London population Wikipedia
+  - url: https://en.wikipedia.org/wiki/Demographics_of_London
+    tier: aggregator
+    title: Demographics of London - Wikipedia
+    found_by: London population Wikipedia
+  - url: https://www.propertyinvestmentsuk.co.uk/london-population/
+    tier: aggregator
+    title: 'London Population by Borough: How Many People Live in London - Property
+      Investments UK'
+    found_by: London population official statistics 2024 2025
+  rejected_sources:
+  - url: https://www.yahoo.com/news/world/articles/london-only-english-region-see-162741246.html
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.onlondon.co.uk/richard-brown-londons-population-fall-results-from-politicians-cutting-immigration/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://centreforlondon.org/blog/london-population-falling/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: eu-member-states-scope
+  question: How many member states does the European Union have?
+  category: scope
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - European Union
+  - member states
+  - EU members
+  - Brexit
+  - candidate countries
+  - accession
+  - 27 members
+  sources:
+  - url: https://eur-lex.europa.eu/EN/legal-content/glossary/member-states.html
+    tier: primary
+    title: Member States - EUR-Lex - European Union
+    found_by: European Union member states official europa.eu
+  - url: https://european-union.europa.eu/easy-read_en
+    tier: primary
+    title: Easy to read - The European Union (european-union.europa.eu)
+    found_by: European Union member states official europa.eu
+  - url: https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary%3AEuropean_Union_%28EU%29
+    tier: primary
+    title: Glossary:European Union (EU) - Statistics Explained - Eurostat
+    found_by: European Union member states official europa.eu
+  - url: https://www.polgeonow.com/2016/06/map-which-countries-are-in-the-eu.html
+    tier: news
+    title: 'Map: Which Countries are in the European Union in 2025, Which Aren''t,
+      and Which Want to Join? - Political Geography Now'
+    found_by: how many EU member states 2024 2025 news
+  - url: https://www.statista.com/statistics/1402650/eu-total-number-of-member-states/
+    tier: news
+    title: Number of member states of the EU 1957-2026 - Statista
+    found_by: European Union member states official europa.eu
+  - url: https://en.wikipedia.org/wiki/Member_state_of_the_European_Union
+    tier: aggregator
+    title: Member state of the European Union - Wikipedia
+    found_by: European Union member states Wikipedia
+  - url: https://en.wikipedia.org/wiki/European_Union
+    tier: aggregator
+    title: European Union - Wikipedia
+    found_by: European Union member states Wikipedia
+  - url: https://www.worlddata.info/alliances/european-union.php
+    tier: aggregator
+    title: Members of the European Union - World Data
+    found_by: European Union member states official europa.eu
+  rejected_sources: []
+- id: nba-team-count-scope
+  question: NBA currently has how many teams — 30 or 32?
+  category: scope
+  language: en
+  generated_on: '2026-11-20'
+  keywords:
+  - NBA
+  - teams
+  - number of teams
+  - franchises
+  - league expansion
+  - 30 teams
+  - 32 teams
+  sources:
+  - url: https://www.nba.com/news/about
+    tier: primary
+    title: About The NBA — NBA.com (Official)
+    found_by: NBA teams list official nba.com
+  - url: https://www.espn.com/nba/story/_/id/48994601/grading-bold-2025-26-nba-season-predictions-all-30-teams-playoffs-rookies-stats
+    tier: news
+    title: Grading bold 2025-26 season predictions for all 30 NBA teams — ESPN
+    found_by: NBA 30 teams 2025-26 season news
+  - url: https://www.espn.com/nba/story/_/id/50502518/first-month-lakers-knicks-spurs-celtics
+    tier: news
+    title: What the NBA's first month has revealed about all 30 teams — ESPN
+    found_by: NBA 30 teams 2025-26 season news
+  - url: https://en.wikipedia.org/wiki/National_Basketball_Association
+    tier: aggregator
+    title: National Basketball Association — Wikipedia
+    found_by: Wikipedia NBA number of franchises teams
+  - url: https://en.wikipedia.org/wiki/Expansion_of_the_NBA
+    tier: aggregator
+    title: Expansion of the NBA — Wikipedia
+    found_by: Wikipedia NBA number of franchises teams
+  - url: https://en.wikipedia.org/wiki/Forbes_list_of_the_most_valuable_NBA_teams
+    tier: aggregator
+    title: Forbes list of the most valuable NBA teams — Wikipedia
+    found_by: Wikipedia NBA number of franchises teams
+  rejected_sources:
+  - url: https://www.nba.com/news/nba-rosters-set-for-2025-26-regular-season
+    reason: unusable_page
+    detail: too_short
+- id: great-barrier-reef-area-scope
+  question: 大堡礁的面积是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-20'
+  keywords:
+  - 大堡礁
+  - 面积
+  - 平方公里
+  - 珊瑚礁
+  - 海洋公园
+  - 世界遗产
+  - coral reef
+  sources:
+  - url: https://www.gbrmpa.gov.au/learn/world-heritage-area
+    tier: primary
+    title: World Heritage Area - Great Barrier Reef Marine Park Authority (GBRMPA)
+    found_by: Great Barrier Reef area size official
+  - url: https://whc.unesco.org/en/list/154/
+    tier: primary
+    title: Great Barrier Reef - UNESCO World Heritage Centre
+    found_by: Great Barrier Reef area size official
+  - url: https://www.dcceew.gov.au/parks-heritage/heritage/places/national/great-barrier-reef
+    tier: primary
+    title: Great Barrier Reef - DCCEEW (Australian Government Department)
+    found_by: Great Barrier Reef area size official
+  - url: https://zh.wikipedia.org/zh-hans/%E5%A4%A7%E5%A0%A1%E7%A4%81
+    tier: aggregator
+    title: 大堡礁 - 维基百科（简体中文）
+    found_by: 大堡礁 面积 新闻报道
+  - url: https://en.wikipedia.org/wiki/Great_Barrier_Reef
+    tier: aggregator
+    title: Great Barrier Reef - Wikipedia (English)
+    found_by: Great Barrier Reef Wikipedia area square kilometers
+  rejected_sources:
+  - url: https://www.time-weekly.com/post/20217
+    reason: unusable_page
+    detail: error_page_title
+  - url: https://m.mp.oeeee.com/a/BAAFRD000020201028375077.html
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.britannica.com/facts/Great-Barrier-Reef
+    reason: unusable_page
+    detail: empty_content
+dropped:
+- id: imf-world-gdp-rank-2024
+  question: According to IMF data, which country has the largest GDP in the world?
+  category: time_lag
+  language: en
+  keywords:
+  - IMF
+  - GDP
+  - largest economy
+  - world ranking
+  - nominal GDP
+  - United States
+  - China
+  drop_reason: no_primary
+  drop_detail: 一手来源 0 个，至少要 1 个
+  rejected_sources:
+  - url: https://www.imf.org/external/datamapper/NGDPD@WEO/WEOWORLD
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.imf.org/-/media/files/publications/weo/2026/april/english/text.pdf
+    reason: unusable_page
+    detail: error_page_title
+- id: openai-ceo
+  question: Who is the current CEO of OpenAI?
+  category: time_lag
+  language: en
+  keywords:
+  - OpenAI
+  - CEO
+  - chief executive
+  - Sam Altman
+  - leadership
+  drop_reason: no_primary
+  drop_detail: 一手来源 0 个，至少要 1 个
+  rejected_sources:
+  - url: https://openai.com/index/sam-altman-returns-as-ceo-openai-has-a-new-initial-board/
+    reason: unusable_page
+    detail: empty_content
+  - url: https://openai.com/index/sam-altman-un-security-council-remarks/
+    reason: unusable_page
+    detail: empty_content
+- id: us-federal-minimum-wage
+  question: What is the current federal minimum wage in the United States (in USD
+    per hour)?
+  category: time_lag
+  language: en
+  keywords:
+  - federal minimum wage
+  - United States
+  - per hour
+  - FLSA
+  - Fair Labor Standards Act
+  - '7.25'
+  drop_reason: too_few_usable
+  drop_detail: time_lag 已满配额 8，多出来的不保留
+  rejected_sources: []
+- id: tokyo-population-scope
+  question: 东京的人口是多少？（请说明口径：都区部、东京都还是大东京都市圈）
+  category: scope
+  language: zh
+  keywords:
+  - 东京
+  - 人口
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources: []
+- id: great-wall-length-scope
+  question: 中国长城的长度是多少公里？（不同测量口径和朝代范围导致数字差异巨大）
+  category: scope
+  language: zh
+  keywords:
+  - 长城
+  - 长度
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources: []
+- id: apple-market-cap-scope
+  question: Apple's market capitalization varies depending on whether you use real-time
+    price, closing price, or fully diluted shares. What figure does Apple's investor
+    relations page cite?
+  category: scope
+  language: en
+  keywords:
+  - Apple
+  - market cap
+  - market capitalization
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources: []
+- id: nile-river-length-scope
+  question: 尼罗河的长度是多少公里？（不同测量起点导致数字从约 6650 km 到 6853 km 不等）
+  category: scope
+  language: zh
+  keywords:
+  - 尼罗河
+  - 长度
+  - 公里
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 1 个，少于 5
+  rejected_sources:
+  - url: https://sis.gov.eg/en/egypt/tourism/landmarks/the-river-nile/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://education.nationalgeographic.org/resource/nile-river/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://epko.gov.gr/arts/the-longest-river-on-earth-a-comprehensive-guide-nile-length-basin-facts
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.paramountgorilla.com/journal/river-nile-guide
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://smartwatermagazine.com/q-a/how-long-nile-river
+    reason: unusable_page
+    detail: too_short
+  - url: https://en.wikipedia.org/wiki/Nile
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://baike.baidu.com/item/%E5%B0%BC%E7%BD%97%E6%B2%B3/611
+    reason: unusable_page
+    detail: empty_content
+- id: china-gdp-scope
+  question: 中国2023年GDP总量是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 中国GDP
+  - 2023年
+  - 国内生产总值
+  - 现价美元
+  - 人民币
+  - 口径
+  - 世界银行
+  - 国家统计局
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.stats.gov.cn/sj/sjjd/202412/t20241227_1957914.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://www.gov.cn/yaowen/liebiao/202401/content_6926714.htm
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?locations=CN
+    reason: unusable_page
+    detail: empty_content
+  - url: https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BDGDP/6689443
+    reason: unusable_page
+    detail: empty_content
+  - url: https://fred.stlouisfed.org/series/MKTGDPCNA646NWDB
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: amazon-revenue-scope
+  question: Amazon's annual revenue in 2023 was how much?
+  category: scope
+  language: en
+  keywords:
+  - Amazon revenue 2023
+  - net sales
+  - AWS
+  - total revenue
+  - annual report
+  - operating income
+  - third-party
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources:
+  - url: https://www.seattletimes.com/business/amazon/amazon-reports-30b-net-income-for-2023-reversing-loss-in-prior-year/
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.macrotrends.net/stocks/charts/AMZN/amazon/revenue
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.businessofapps.com/data/amazon-statistics/
+    reason: unusable_page
+    detail: empty_content
+  - url: https://www.investing.com/academy/statistics/amazon-facts/
+    reason: unusable_page
+    detail: empty_content
+- id: india-area-scope
+  question: 印度的国土面积是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 印度面积
+  - 国土面积
+  - 争议领土
+  - 克什米尔
+  - 平方公里
+  - CIA
+  - 印度政府
+  - 口径
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources:
+  - url: https://eoibelgrade.gov.in/eoibl_pages/MjA,
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://in.mofcom.gov.cn/ydgk/jj/art/2023/art_5bd176aa14f44268b87ed65b10637dc8.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: http://politics.people.com.cn/n/2014/0910/c1001-25634245.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+  - url: https://finance.sina.com.cn/money/fund/jjzl/2020-03-03/doc-iimxxstf5940548.shtml
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://baike.baidu.com/item/%E5%8D%B0%E5%BA%A6/121904
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+- id: new-york-city-population-scope
+  question: 纽约市的人口是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 纽约市人口
+  - 五个行政区
+  - 纽约都市圈
+  - 大纽约地区
+  - census
+  - 人口统计
+  - 行政区划
+  drop_reason: too_few_usable
+  drop_detail: SourceFinder 没有返回任何候选
+  rejected_sources: []
+- id: australia-area-scope
+  question: 澳大利亚的国土面积是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 澳大利亚面积
+  - 陆地面积
+  - 总面积
+  - 领土
+  - 平方公里
+  - 海洋区域
+  - 国土
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 2 个，少于 5
+  rejected_sources:
+  - url: https://www.ga.gov.au/scientific-topics/national-location-information/dimensions/area-of-australia-states-and-territories
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://info.australia.gov.au/about-australia/our-country/the-australian-continent
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: http://politics.people.com.cn/n1/2017/0317/c1001-29152485.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      ''The scrape action could not load the target page — the site did not respond,
+      refused the connection, or presented an invalid certificate. Verify the URL
+      is reachable; this is not a Steel failure and was not charged.'', ''retryable'':
+      False}
+
+      {"error":"Unprocessable Entity","message":"The scrape action could not load
+      the target page — the site did not respond, refused the connection, or presented
+      an invalid certificate. Verify the URL is reachable; this is not a Steel failure
+      and was not charged.","retryable":false}'
+  - url: https://www.britannica.com/place/Australia
+    reason: unusable_page
+    detail: empty_content
+  - url: https://baike.baidu.com/item/%E6%BE%B3%E5%A4%A7%E5%88%A9%E4%BA%9A/146759
+    reason: unusable_page
+    detail: empty_content
+- id: beijing-population-scope
+  question: 北京市的人口是多少？（户籍人口与常住人口口径下数字不同）
+  category: scope
+  language: zh
+  keywords:
+  - 北京
+  - 人口
+  - 户籍人口
+  - 常住人口
+  - 北京市统计局
+  - 万人
+  - 口径
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.beijing.gov.cn/zhengce/zhengcefagui/202503/t20250320_4039431.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://www.beijing.gov.cn/renwen/bjgk/rk/202503/t20250325_4043973.html
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+  - url: https://news.qq.com/rain/a/20250320A04JBS00
+    reason: unusable_page
+    detail: too_short
+  - url: https://finance.sina.com.cn/jjxw/2024-12-08/doc-incytywr6837453.shtml
+    reason: fetch_failed
+    detail: 'Error code: 422 - {''error'': ''Unprocessable Entity'', ''message'':
+      "The hostname in ''url'' could not be resolved. Verify it is publicly reachable
+      and retry.", ''retryable'': False}
+
+      {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
+      be resolved. Verify it is publicly reachable and retry.","retryable":false}'

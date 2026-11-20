@@ -173,14 +173,40 @@ def _recorded_sources(content: Sequence[Any]) -> list[CandidateSource]:
         data = _block_dict(block)
         if data.get("type") == "tool_use" and data.get("name") == RECORD_TOOL:
             payload = data.get("input") or {}
-            return [_candidate(item) for item in payload.get("sources") or []]
+            if not isinstance(payload, dict):
+                return []
+            raw = payload.get("sources") or []
+            if not isinstance(raw, list):
+                return []
+            out: list[CandidateSource] = []
+            for item in raw:
+                candidate = _candidate(item)
+                if candidate is not None:
+                    out.append(candidate)
+            return out
     return []
 
 
-def _candidate(item: dict[str, Any]) -> CandidateSource:
+def _candidate(item: Any) -> CandidateSource | None:
+    """模型偶尔会交字符串 URL，或缺字段；坏条目丢掉，不让整次 find 崩掉。"""
+    if isinstance(item, str):
+        url = item.strip()
+        if not url:
+            return None
+        return CandidateSource(url=url, title=url, query="", suggested_tier=Tier.NEWS)
+    if not isinstance(item, dict):
+        return None
+    url = str(item.get("url") or "").strip()
+    if not url:
+        return None
+    tier_raw = str(item.get("suggested_tier") or Tier.NEWS.value)
+    try:
+        tier = Tier(tier_raw)
+    except ValueError:
+        tier = Tier.NEWS
     return CandidateSource(
-        url=str(item["url"]),
-        title=str(item.get("title") or item["url"]),
+        url=url,
+        title=str(item.get("title") or url),
         query=str(item.get("query") or ""),
-        suggested_tier=Tier(str(item["suggested_tier"])),
+        suggested_tier=tier,
     )

@@ -81,8 +81,15 @@ class FakeProposer:
     def __init__(self, questions):
         self._questions = questions
 
-    def propose(self, count, as_of):
-        return list(self._questions)[:count]
+    def propose(self, quotas, as_of):
+        left = dict(quotas)
+        out = []
+        for question in self._questions:
+            if left.get(question.category, 0) <= 0:
+                continue
+            out.append(question)
+            left[question.category] -= 1
+        return out
 
 
 class FakeFinder:
@@ -136,8 +143,11 @@ def test_build_drops_question_with_fewer_than_five_usable_sources():
     finder = FakeFinder({proposed.text: [candidate(u, Tier.PRIMARY if i < 2 else Tier.NEWS) for i, u in enumerate(urls)]})
     pages = {u: usable_page(u, "X 版本 发布") for u in urls}
     store = FakeStore()
-    builder = BuildQuestionBank(FakeProposer([proposed]), finder, FakeFetcher(pages), lambda _id: store, min_usable=5)
-    kept, dropped = builder.execute(1, AS_OF)
+    builder = BuildQuestionBank(
+        FakeProposer([proposed]), finder, FakeFetcher(pages), lambda _id: store, min_usable=5,
+        quotas={QuestionCategory.TIME_LAG: 1, QuestionCategory.SCOPE: 0, QuestionCategory.REPRINT_ERROR: 0},
+    )
+    kept, dropped = builder.execute(AS_OF)
     assert kept == []
     assert len(dropped) == 1 and dropped[0].reason is DropReason.TOO_FEW_USABLE
 
@@ -156,11 +166,109 @@ def test_build_rejects_pages_that_miss_keywords():
     pages = {c.url: usable_page(c.url, "东京 人口 统计") for c in good[:-1]}
     pages["https://bad.example/cook"] = usable_page("https://bad.example/cook", "番茄炒蛋 家常菜")
     store = FakeStore()
-    builder = BuildQuestionBank(FakeProposer([proposed]), FakeFinder({proposed.text: good}), FakeFetcher(pages), lambda _id: store)
-    kept, dropped = builder.execute(1, AS_OF)
+    builder = BuildQuestionBank(
+        FakeProposer([proposed]), FakeFinder({proposed.text: good}), FakeFetcher(pages), lambda _id: store,
+        quotas={QuestionCategory.TIME_LAG: 0, QuestionCategory.SCOPE: 1, QuestionCategory.REPRINT_ERROR: 0},
+    )
+    kept, dropped = builder.execute(AS_OF)
     assert len(kept) == 1
     assert all("cook" not in s.source.url for s in kept[0].sources)
     assert any(r.reason is DropReason.KEYWORD_MISS for r in kept[0].rejected)
+
+
+def test_build_drops_question_with_no_primary_source():
+    # 变异目标：如果 primary 门槛不生效，全是 news 的题也会进 kept。
+    proposed = ProposedQuestion(
+        id="no-primary",
+        text="Who is the CEO?",
+        category=QuestionCategory.TIME_LAG,
+        language="en",
+        keywords=("CEO", "company"),
+    )
+    # 凑满 5 个可用、但没有一手：news/aggregator 各 3，层级上限后仍够 5。
+    cands = [candidate(f"https://news.example/{i}", Tier.NEWS) for i in range(3)]
+    cands += [candidate(f"https://agg.example/{i}", Tier.AGGREGATOR) for i in range(3)]
+    pages = {c.url: usable_page(c.url, "CEO company news") for c in cands}
+    builder = BuildQuestionBank(
+        FakeProposer([proposed]), FakeFinder({proposed.text: cands}), FakeFetcher(pages), lambda _id: FakeStore(),
+        quotas={QuestionCategory.TIME_LAG: 1, QuestionCategory.SCOPE: 0, QuestionCategory.REPRINT_ERROR: 0},
+    )
+    kept, dropped = builder.execute(AS_OF)
+    assert kept == []
+    assert dropped[0].reason is DropReason.NO_PRIMARY
+
+
+def test_resume_retries_interrupted_and_reuses_kept():
+    from crossfire.domain import BankQuestion, KeptSource, Source
+
+    kept_q = BankQuestion(
+        id="already",
+        text="已有题",
+        category=QuestionCategory.TIME_LAG,
+        language="zh",
+        generated_on=AS_OF,
+        keywords=("版本",),
+        sources=tuple(
+            KeptSource(Source(f"https://ok.example/{i}", Tier.PRIMARY if i < 2 else Tier.NEWS), "t", "q")
+            for i in range(5)
+        ),
+        rejected=(),
+    )
+    retry = ProposedQuestion(
+        id="retry-me",
+        text="需要重做的题",
+        category=QuestionCategory.REPRINT_ERROR,
+        language="zh",
+        keywords=("白皮书", "作者"),
+    )
+    cands = [candidate(f"https://r.example/{i}", Tier.PRIMARY if i < 2 else Tier.AGGREGATOR) for i in range(5)]
+    pages = {c.url: usable_page(c.url, "白皮书 作者 署名") for c in cands}
+    calls = {"find": 0}
+
+    class CountingFinder(FakeFinder):
+        def find(self, question_text, as_of):
+            calls["find"] += 1
+            return super().find(question_text, as_of)
+
+    builder = BuildQuestionBank(
+        FakeProposer([]),
+        CountingFinder({retry.text: cands}),
+        FakeFetcher(pages),
+        lambda _id: FakeStore(),
+        quotas={QuestionCategory.TIME_LAG: 1, QuestionCategory.SCOPE: 0, QuestionCategory.REPRINT_ERROR: 1},
+    )
+    kept, dropped = builder.execute(AS_OF, kept=[kept_q], retry=[retry])
+    assert {q.id for q in kept} == {"already", "retry-me"}
+    assert calls["find"] == 1  # 只重做 interrupted，不重找出 already
+
+
+
+def test_recorded_sources_accepts_string_url_entries():
+    # 变异目标：如果字符串 URL 让解析崩掉，续跑会整段中断。
+    from crossfire.adapters.anthropic.source_finder import _recorded_sources
+
+    content = [
+        {
+            "type": "tool_use",
+            "name": "record_sources",
+            "input": {
+                "sources": [
+                    "https://string.example/a",
+                    {
+                        "url": "https://obj.example/b",
+                        "title": "B",
+                        "query": "q",
+                        "suggested_tier": "primary",
+                    },
+                    {"title": "missing url"},
+                    123,
+                ]
+            },
+        }
+    ]
+    found = _recorded_sources(content)
+    assert [c.url for c in found] == ["https://string.example/a", "https://obj.example/b"]
+    assert found[1].suggested_tier is Tier.PRIMARY
 
 
 def test_claude_source_finder_filters_hallucinated_urls_from_tool_payload():

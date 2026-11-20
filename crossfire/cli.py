@@ -17,7 +17,9 @@ import crossfire.composition as composition
 from crossfire.application.records import run_record
 from crossfire.application.use_cases import (
     Attempt,
+    BankBuildInterrupted,
     CaseOutcome,
+    apply_keep_rules,
     bench_runs,
     cross_model_agreement,
     estimate_bank_build,
@@ -25,6 +27,7 @@ from crossfire.application.use_cases import (
     estimate_pair_requests,
     estimate_requests,
     label_name,
+    remaining_quotas,
 )
 from crossfire.config import (
     DEFAULT_HAIKU,
@@ -39,7 +42,18 @@ from crossfire.config import (
     load_judge_inputs,
     load_questions,
 )
-from crossfire.domain import Mode, Question, RunResult, UnknownSnapshotDateError
+from crossfire.domain import (
+    BankQuestion,
+    DroppedQuestion,
+    DropReason,
+    Mode,
+    ProposedQuestion,
+    Question,
+    QuestionCategory,
+    RunResult,
+    UnknownSnapshotDateError,
+)
+from crossfire.domain.bank import CATEGORY_QUOTAS
 from crossfire.domain.evals import CaseKind, EvalCase, JudgeInput
 
 
@@ -89,9 +103,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     bank = commands.add_parser("bank", help="题库：自动出题、找来源、抓取过滤")
     bank_commands = bank.add_subparsers(dest="bank_command", required=True)
-    build = bank_commands.add_parser("build", help="生成试点题库（默认 20 道），写出 bank.yaml 和审查报告")
-    build.add_argument("--count", type=int, default=20, help="候选题目数，默认 20")
+    build = bank_commands.add_parser("build", help="按类别配额建题库；有进度文件则断点续跑")
     build.add_argument("--estimate-only", action="store_true", help="只打印预计搜索/请求/费用")
+    build.add_argument("--fresh", action="store_true", help="忽略进度文件，从头开始")
     return parser
 
 
@@ -130,7 +144,7 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
 
     if args.command == "bank":
         try:
-            return bank_build(settings, args.count, args.estimate_only, parser)
+            return bank_build(settings, args.estimate_only, args.fresh, parser)
         except SettingsError as error:
             print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
             return 2
@@ -480,26 +494,62 @@ def _save_consistency(settings: Settings, inputs, models, repeats, results) -> P
     return path
 
 
-def bank_build(settings: Settings, count: int, estimate_only: bool, parser: argparse.ArgumentParser) -> int:
-    if count < 1:
-        parser.error("--count 必须是正整数")
+def bank_build(settings: Settings, estimate_only: bool, fresh: bool, parser: argparse.ArgumentParser) -> int:
+    import yaml
+
+    as_of = composition.utc_today()
+    kept_prev, dropped_prev = ([], []) if fresh else _load_bank_progress(settings)
+    # 续跑前先按现行规则筛一遍，算出还能复用多少、要重做多少。
+    reusable: list[BankQuestion] = []
+    demoted: list[DroppedQuestion] = []
+    by_cat: dict[QuestionCategory, int] = {category: 0 for category in CATEGORY_QUOTAS}
+    for question in kept_prev:
+        failure = apply_keep_rules(question)
+        if failure is not None:
+            demoted.append(failure)
+            continue
+        if by_cat[question.category] >= CATEGORY_QUOTAS[question.category]:
+            demoted.append(
+                DroppedQuestion(
+                    proposed=ProposedQuestion(
+                        id=question.id,
+                        text=question.text,
+                        category=question.category,
+                        language=question.language,
+                        keywords=question.keywords,
+                    ),
+                    reason=DropReason.TOO_FEW_USABLE,
+                    detail=f"{question.category.value} 已满配额 {CATEGORY_QUOTAS[question.category]}，多出来的不保留",
+                    rejected=question.rejected,
+                )
+            )
+            continue
+        by_cat[question.category] += 1
+        reusable.append(question)
+    interrupted = [item.proposed for item in dropped_prev if item.reason is DropReason.INTERRUPTED]
+    need = remaining_quotas(reusable)
+    propose_n = sum(need.values())
     price = settings.price_for(settings.model_extract)
     estimate = estimate_bank_build(
-        count,
+        redo=len(interrupted),
+        propose=propose_n,
         searches_per_question=6,
         candidates_per_question=8,
         search_per_thousand_usd=WEB_SEARCH_PER_THOUSAND_USD,
         sonnet_input_per_mtok=price.input_per_mtok,
         sonnet_output_per_mtok=price.output_per_mtok,
         steel_per_scrape_usd=STEEL_SCRAPE_PER_THOUSAND_USD / 1000,
+        reuse=len(reusable),
     )
-    print("预计用量（上限，偏高）：")
-    print(f"  候选题目 {estimate.questions} 道")
-    print(f"  Claude 请求最多 {estimate.claude_requests} 次（1 次出题 + 每题 1 次找来源）")
-    print(f"  web_search 最多 {estimate.searches} 次（约 ${estimate.search_usd:.2f}）")
-    print(f"  Claude token 费用约 ${estimate.anthropic_usd:.2f}")
-    print(f"  Anthropic 合计约 ${estimate.total_anthropic_usd:.2f}")
-    print(f"  Steel 抓取最多 {estimate.steel_pages} 页（scrape 费约 ${estimate.steel_usd:.2f}，另加浏览器时间）")
+    print("续跑计划：")
+    print(f"  复用已成功 {len(reusable)} 道（另有 {len(demoted)} 道因新规则/超额降级）")
+    print(f"  重做中断 {len(interrupted)} 道：{[p.id for p in interrupted]}")
+    print(f"  配额缺口 {dict((c.value, n) for c, n in need.items() if n)} → 预计新出约 {propose_n} 道")
+    print(f"  合计新做最多 {estimate.redo} 道题")
+    print("预计费用（只计新做，偏高）：")
+    print(f"  Claude 请求最多 {estimate.claude_requests} 次，web_search 最多 {estimate.searches} 次")
+    print(f"  Anthropic 约 ${estimate.total_anthropic_usd:.2f}（token ${estimate.anthropic_usd:.2f} + 搜索 ${estimate.search_usd:.2f}）")
+    print(f"  Steel 抓取最多 {estimate.steel_pages} 页（scrape 约 ${estimate.steel_usd:.2f}）")
     if estimate.total_anthropic_usd > 3:
         print(
             f"Anthropic 预计 ${estimate.total_anthropic_usd:.2f}，超过 3 美元上限，没有开始运行。",
@@ -509,25 +559,66 @@ def bank_build(settings: Settings, count: int, estimate_only: bool, parser: argp
     if estimate_only:
         return 0
 
-    as_of = composition.utc_today()
-    builder = composition.build_question_bank_builder(settings)
+    def save_progress(kept: list, dropped: list) -> None:
+        _write_bank_progress(settings, as_of, kept, dropped)
+        _write_bank_yaml(settings.bank_file, kept)
+
+    avoid = tuple({q.id for q in reusable} | {d.proposed.id for d in demoted} | {d.proposed.id for d in dropped_prev})
+    builder = composition.build_question_bank_builder(settings, avoid_ids=avoid, on_progress=save_progress)
     print(f"开始生成题库（as_of {as_of}）…")
     try:
-        kept, dropped = builder.execute(count, as_of)
-    except Exception as error:
-        message = str(error)
-        if "credit balance" in message.lower() or "insufficient" in message.lower() or "402" in message:
-            print(f"余额不足，立刻停下：{error}", file=sys.stderr)
-            return 2
-        raise
+        kept, dropped = builder.execute(
+            as_of,
+            kept=reusable,
+            dropped=[*demoted, *[d for d in dropped_prev if d.reason is not DropReason.INTERRUPTED]],
+            retry=interrupted,
+        )
+    except BankBuildInterrupted as error:
+        print(f"余额不足或鉴权失败，立刻停下（当前题 {error.question_id}）：{error.detail}", file=sys.stderr)
+        return 2
 
-    _write_bank_yaml(settings.bank_file, kept)
+    save_progress(kept, dropped)
     _write_bank_review(settings.bank_review_file, kept, dropped, as_of)
     print(f"保留 {len(kept)} 道，丢弃 {len(dropped)} 道")
+    shortfall = remaining_quotas(kept)
+    if sum(shortfall.values()):
+        print(f"未凑满配额：{dict((c.value, n) for c, n in shortfall.items() if n)}")
+    else:
+        print(f"配额已满：{ {c.value: n for c, n in CATEGORY_QUOTAS.items()} }")
     print(f"题库：{settings.bank_file}")
+    print(f"进度：{settings.bank_progress_file}")
     print(f"审查报告：{settings.bank_review_file}")
     print("请先看 notes/bank-review.md，确认后再进入 5c-2。")
     return 0
+
+
+def _load_bank_progress(settings: Settings) -> tuple[list[BankQuestion], list[DroppedQuestion]]:
+    import yaml
+
+    path = settings.bank_progress_file
+    if not path.is_file():
+        # 兼容第一次中断留下的 bank.yaml：没有进度文件时从题库恢复 kept。
+        if settings.bank_file.is_file():
+            raw = yaml.safe_load(settings.bank_file.read_text(encoding="utf-8")) or []
+            return [BankQuestion.from_yaml_dict(item) for item in raw], []
+        return [], []
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    kept = [BankQuestion.from_yaml_dict(item) for item in data.get("kept") or []]
+    dropped = [DroppedQuestion.from_dict(item) for item in data.get("dropped") or []]
+    return kept, dropped
+
+
+def _write_bank_progress(settings: Settings, as_of, kept: Sequence, dropped: Sequence) -> None:
+    import yaml
+
+    path = settings.bank_progress_file
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "as_of": as_of.isoformat(),
+        "kept": [question.to_yaml_dict() for question in kept],
+        "dropped": [item.to_dict() for item in dropped],
+    }
+    path.write_text(yaml.safe_dump(payload, allow_unicode=True, sort_keys=False), encoding="utf-8")
 
 
 def _write_bank_yaml(path: Path, kept: Sequence) -> None:
@@ -542,11 +633,14 @@ def _write_bank_review(path: Path, kept: Sequence, dropped: Sequence, as_of) -> 
     from collections import Counter
 
     path.parent.mkdir(parents=True, exist_ok=True)
+    shortfall = remaining_quotas(kept)
     lines = [
         "# 题库审查报告",
         "",
         f"生成日期（as_of）：{as_of.isoformat()}",
         f"保留 {len(kept)} 道，丢弃 {len(dropped)} 道。",
+        f"类别配额：{ {c.value: n for c, n in CATEGORY_QUOTAS.items()} }",
+        f"未凑满：{ {c.value: n for c, n in shortfall.items() if n} or '无' }",
         "",
         "## 保留的题目",
         "",
@@ -577,19 +671,25 @@ def _write_bank_review(path: Path, kept: Sequence, dropped: Sequence, as_of) -> 
     by_language = Counter(q.language for q in kept)
     reject_reasons = Counter(r.reason.value for q in kept for r in q.rejected)
     reject_reasons.update(r.reason.value for d in dropped for r in d.rejected)
+    drop_reasons = Counter(d.reason.value for d in dropped)
     total_rejected = sum(reject_reasons.values())
     total_considered = total_rejected + sum(len(q.sources) for q in kept)
+    filter_line = (
+        f"- 被过滤的页面：{total_rejected} / {total_considered}（{total_rejected / total_considered:.0%}）"
+        if total_considered
+        else "- 被过滤的页面：0"
+    )
     lines += [
         "",
         "## 统计",
         "",
         f"- 按类别：{dict(by_category)}",
         f"- 按语言：{dict(by_language)}",
-        f"- 被过滤的页面：{total_rejected} / {total_considered or 1}"
-        f"（{total_rejected / total_considered:.0%}）" if total_considered else "- 被过滤的页面：0",
+        filter_line,
         f"- 过滤原因：{dict(reject_reasons)}",
+        f"- 丢题原因：{dict(drop_reasons)}",
         "",
-        "请确认：题目有确定答案、不是公认争议话题；来源层级有混搭；过滤比例可接受。",
+        "请确认：题目有确定答案、不是公认争议话题；来源层级有混搭；每题至少 1 个 primary；过滤比例可接受。",
         "确认后再进入 5c-2。",
         "",
     ]

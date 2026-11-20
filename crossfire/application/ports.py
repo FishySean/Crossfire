@@ -9,7 +9,7 @@ from typing import Protocol
 
 from crossfire.application.events import Event
 from crossfire.domain import Claim, Judgment, Mode, Page, Pair, Provenance, Question, RunResult, SourceIndex
-from crossfire.domain.bank import CandidateSource, ProposedQuestion
+from crossfire.domain.bank import CandidateSource, ProposedQuestion, QuestionCategory
 
 type OnPage = Callable[[SourceIndex, Page], None]
 type OnPair = Callable[[int, int, Pair], None]
@@ -119,8 +119,8 @@ class SourceFinder(Protocol):
 class QuestionProposer(Protocol):
     """按类别提出候选题目，不找来源。"""
 
-    def propose(self, count: int, as_of: date) -> list[ProposedQuestion]:
-        """提出大约 count 道题，三类尽量均匀，中英文都要有。"""
+    def propose(self, quotas: dict[QuestionCategory, int], as_of: date) -> list[ProposedQuestion]:
+        """按 quotas（类别 → 还缺几道）出题。中英文都要有。某一类配额是 0 就不要出。"""
         ...
 
 

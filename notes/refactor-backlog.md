@@ -158,7 +158,19 @@
 ## 第 5c-1 步（自动找来源、建题库）
 
 - SourceFinder 端口 + Claude web_search 适配器；BuildQuestionBank；`crossfire bank build`。
-- 试点曾因 Anthropic 余额中途不足而不完整；充值后需重跑。Steel 余额 API 查不到，须看 dashboard Wallet；免费额度按首次 session 2026-09-12 推算约 **2026-12-11** 到期。
+- 试点曾因 Anthropic 余额中途不足而不完整；已改断点续跑，中断标 `interrupted`，与真丢弃分开。
+- Steel 免费额度按首次 session 2026-09-12 推算约 **2026-12-11** 到期。
+
+### 第四次静默失败（共同模式）
+
+错误发生时被当成「正常的空结果」处理了：
+
+1. 解析失败被吞掉（第 2 步前）
+2. 抓取失败不进 `failures`（第 3 步修）
+3. `conflicts` 格式坏了被前端隐藏（第 2/7 步）
+4. **题库找来源：余额不足时 SourceFinder 返回空列表，题目被记成「找不到来源」悄悄丢掉**（第 5c-1 修：立刻抛错停下；进度里标 `interrupted`）
+
+以后新写的代码，遇到「空结果」都要检查：它到底是真的没有，还是出错了。
 
 ## 第 5c 步（批量跑题、导出数据集）
 

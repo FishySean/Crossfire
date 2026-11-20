@@ -124,15 +124,21 @@ def build_consistency_runner(settings: Settings):
     return MeasureConsistency(lambda model: build_pairer(settings, model))
 
 
-def build_question_bank_builder(settings: Settings) -> BuildQuestionBank:
+def build_question_bank_builder(
+    settings: Settings,
+    *,
+    avoid_ids: tuple[str, ...] = (),
+    on_progress=None,
+) -> BuildQuestionBank:
     """题库生成要出题、搜索、真实抓取。不改 VerifyQuestion 和已有四个业务端口。"""
     settings.require(Key.ANTHROPIC, Key.STEEL)
     client = ClaudeClient(settings.anthropic_api_key, settings.model_extract)
     return BuildQuestionBank(
-        proposer=ClaudeQuestionProposer(client),
+        proposer=ClaudeQuestionProposer(client, avoid_ids=avoid_ids),
         finder=ClaudeSourceFinder(client),
         fetcher=SteelPageFetcher(settings.steel_api_key, clock=SystemClock()),
         store_for=lambda question_id: CachePageStore(settings.cache_dir / question_id),
+        on_progress=on_progress,
     )
 
 

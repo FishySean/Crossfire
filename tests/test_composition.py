@@ -133,6 +133,14 @@ def test_missing_key_fails_before_anything_runs(tmp_path, mode, blank, named):
         build_verifier(settings(tmp_path, **{blank: ""}), QUESTION, mode)
 
 
+def test_extractor_gets_the_configured_concurrency(tmp_path, monkeypatch):
+    built = []
+    real = composition.ClaudeClaimExtractor
+    monkeypatch.setattr(composition, "ClaudeClaimExtractor", lambda client, concurrency: built.append(concurrency) or real(client, concurrency))
+    build_verifier(settings(tmp_path, CROSSFIRE_EXTRACT_CONCURRENCY="7"), QUESTION, Mode.CACHED)
+    assert built == [7]
+
+
 def test_pairer_setting_picks_the_claude_pairer(tmp_path):
     assert isinstance(build_pairer(settings(tmp_path, PAIRER="claude")), ClaudeClaimPairer)
 

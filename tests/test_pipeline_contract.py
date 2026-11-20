@@ -96,7 +96,8 @@ def offline_pipeline(monkeypatch, tmp_path):
         log = CallLog()
         deps = {
             "fetcher": FakeFetcher(failing_urls=failing_urls, unusable_urls=unusable_urls, mode=mode),
-            "extractor": FakeExtractor(log),
+            # 提取是并发的，claim_done 按完成顺序到。倒着完成是最容易暴露「拿完成顺序当来源下标」的情形。
+            "extractor": FakeExtractor(log, finish_in_reverse=True),
             "pairer": FakePairer(log, failing_pair_urls=failing_pair_urls),
             "judge": FakeJudge(log, trusted_url=URLS[0], delay=judge_delay),
         }
@@ -154,7 +155,10 @@ def test_claim_index_is_the_source_index_not_the_claim_count(offline_pipeline):
     fetch = [e for e in events if e["type"] == "fetch_done"]
     claim = [e for e in events if e["type"] == "claim_done"]
     assert sorted(e["index"] for e in fetch) == [0, 1, 2, 3]
-    assert [e["index"] for e in claim] == [0, 2, 3]
+    # 第 5b 步有意修改：[e["index"] for e in claim] == [0, 2, 3] → 排序后再比，并且实际到达顺序是倒的。
+    # 原因：提取改成并发，claim_done 按完成顺序发出；前端按 index 填卡片，不看到达顺序。
+    assert [e["index"] for e in claim] == [3, 2, 0]
+    assert sorted(e["index"] for e in claim) == [0, 2, 3]
 
     url_at = {e["index"]: e["url"] for e in fetch}
     for e in claim:

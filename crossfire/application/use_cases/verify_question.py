@@ -120,15 +120,16 @@ class VerifyQuestion:
 
     def _extract_claims(self, question: Question, pages: list[Page], as_of: AsOf) -> tuple[list[Claim], StepStats]:
         started = self._clock.monotonic()
-        claims: list[Claim] = []
-        for page in (page for page in pages if page.usable):
-            claim = self._extractor.extract(question, page, as_of)
-            claims.append(claim)
-            # index 必须是来源在 sources 里的下标，跟 fetch_done 对齐：前端按它往固定的卡片槽位里填。
-            # 用 claims 的长度会在有页面抓取失败时整体错位，把主张画到别的来源上。
-            index = question.index_of(page.url)
+        usable = [page for page in pages if page.usable]
+
+        def on_claim(position: int, claim: Claim) -> None:
+            # position 是在 usable 里的下标。事件里的 index 必须换成来源在 sources 里的下标，跟 fetch_done 对齐：
+            # 前端按它往固定的卡片槽位里填。直接用 position 会在有页面不可用时整体错位，把主张画到别的来源上。
+            index = question.index_of(usable[position].url)
             self._events.emit(ClaimDone(url=claim.source_url, claim=claim.text, tier=claim.tier.value, index=index))
             self._report(claim.failure)
+
+        claims = self._extractor.extract_all(question, usable, as_of, on_claim)
         return claims, StepStats.summing([claim.usage for claim in claims], self._seconds_since(started))
 
     def _pair_claims(self, question: Question, claims: list[Claim], as_of: AsOf) -> tuple[list[Pair], StepStats]:

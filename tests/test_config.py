@@ -16,6 +16,9 @@ ALL_NAMES = [
     "CROSSFIRE_RUNS_DIR",
     "CROSSFIRE_CACHE_DIR",
     "CROSSFIRE_QUESTIONS_FILE",
+    "CROSSFIRE_EVALS_DIR",
+    "CROSSFIRE_EVAL_RUNS_DIR",
+    "CROSSFIRE_EXTRACT_CONCURRENCY",
 ]
 
 
@@ -118,3 +121,11 @@ def test_load_questions(env_file, tmp_path):
 def test_missing_questions_file_gives_no_questions(env_file, tmp_path):
     settings = Settings.from_env(env_file(f"CROSSFIRE_QUESTIONS_FILE={tmp_path / 'nope.yaml'}\n"))
     assert load_questions(settings) == []
+
+
+def test_extract_concurrency_defaults_to_4_and_must_be_a_positive_integer(env_file):
+    assert Settings.from_env(env_file()).extract_concurrency == 4
+    assert Settings.from_env(env_file("CROSSFIRE_EXTRACT_CONCURRENCY=8\n")).extract_concurrency == 8
+    for bad in ["0", "-1", "many"]:
+        with pytest.raises(SettingsError, match="CROSSFIRE_EXTRACT_CONCURRENCY"):
+            Settings.from_env(env_file(f"CROSSFIRE_EXTRACT_CONCURRENCY={bad}\n"))

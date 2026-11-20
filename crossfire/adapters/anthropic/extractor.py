@@ -1,9 +1,16 @@
+import sys
+from collections.abc import Sequence
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import replace
 from datetime import date
 from typing import Any
 
-from crossfire.adapters.anthropic.client import ClaudeClient, prompt_version
-from crossfire.domain import Claim, Page, Provenance, Question, SourceType
+from crossfire.adapters.anthropic.client import ClaudeCallError, ClaudeClient, prompt_version
+from crossfire.application.ports import OnClaim
+from crossfire.domain import Claim, Failure, Page, Provenance, Question, SourceType, Usage
+
+# 同时在读的页面数。每页的 prompt 有上万 token，并发太高容易撞上账户的每分钟 token 限额（429 不重试）。
+DEFAULT_EXTRACT_CONCURRENCY = 4
 
 # 正文截断上限，保留开头。这个值基本等于关掉裁剪，只用来兜住极端长页面烧穿 token。
 # 千万不要设到 12000 到 18000 之间：实测在这个区间里，模型会读到半张版本表格，
@@ -72,14 +79,66 @@ _NO_USAGE = {"input_tokens": 0, "output_tokens": 0, "requests": 0}
 
 
 class ClaudeClaimExtractor:
-    def __init__(self, client: ClaudeClient) -> None:
+    """Claude 一次只能读一页，所以整批在内部用线程池并发发请求，并发数受 concurrency 限制。"""
+
+    def __init__(self, client: ClaudeClient, concurrency: int = DEFAULT_EXTRACT_CONCURRENCY) -> None:
         self._client = client
+        self._concurrency = concurrency
 
     @property
     def provenance(self) -> Provenance:
         return Provenance(model=self._client.model, prompt_version=prompt_version(EXTRACT_PROMPT, EXTRACT_SCHEMA))
 
+    def extract_all(
+        self,
+        question: Question,
+        pages: Sequence[Page],
+        as_of: date,
+        on_claim: OnClaim | None = None,
+    ) -> list[Claim]:
+        results: list[Claim | None] = [None] * len(pages)
+        executor = ThreadPoolExecutor(max_workers=self._concurrency)
+        try:
+            futures: dict[Future[Claim], int] = {
+                executor.submit(self._extract_or_fail, question, page, as_of): index for index, page in enumerate(pages)
+            }
+            # 回调在调用方线程里按完成顺序触发，事件推送方不用处理多线程。
+            for future in as_completed(futures):
+                index = futures[future]
+                claim = future.result()
+                results[index] = claim
+                if on_claim:
+                    on_claim(index, claim)
+        finally:
+            executor.shutdown(wait=True, cancel_futures=True)
+        return [claim for claim in results if claim is not None]
+
+    def _extract_or_fail(self, question: Question, page: Page, as_of: date) -> Claim:
+        # 端口约定 extract_all 不抛异常。网络重试用尽、鉴权失败、额度不足都落到这里。
+        try:
+            return self.extract(question, page, as_of)
+        except ClaudeCallError as e:
+            return self._failed(question, page, str(e), e.usage)
+        except Exception as e:
+            # 不是 API 抛的，不知道请求有没有发出去，请求数记成未知，不编一个数。
+            return self._failed(question, page, f"{type(e).__name__}: {e}", Usage(0, 0, None))
+
+    def _failed(self, question: Question, page: Page, detail: str, usage: Usage) -> Claim:
+        print(f"❌ [llm] extract 调用抛出异常，这一页记为失败：{detail}", file=sys.stderr)
+        return Claim(
+            source_url=page.url,
+            tier=question.source_of(page.url).tier,
+            text=None,
+            evidence=None,
+            source_type=None,
+            published_date=None,
+            confidence=None,
+            usage=usage,
+            failure=Failure(step="extract", detail=detail, raw=None),
+        )
+
     def extract(self, question: Question, page: Page, as_of: date) -> Claim:
+        """单页提取。结构化失败返回带 failure 的 Claim；API 异常照常抛 ClaudeCallError，由 extract_all 接住。"""
         source = question.source_of(page.url)
         prompt = EXTRACT_PROMPT.format(
             as_of=as_of.isoformat(),

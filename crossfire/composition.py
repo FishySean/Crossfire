@@ -37,7 +37,7 @@ def build_verifier(
     settings.require(*KEYS_FOR_MODE[mode])
     return assemble(
         fetcher=build_fetcher(settings, question, mode),
-        extractor=ClaudeClaimExtractor(ClaudeClient(settings.anthropic_api_key, settings.model_extract)),
+        extractor=build_extractor(settings),
         pairer=build_pairer(settings),
         judge=ClaudeVerdictJudge(ClaudeClient(settings.anthropic_api_key, settings.model_judge)),
         runs_dir=settings.runs_dir,
@@ -50,7 +50,7 @@ def build_eval_verifier(settings: Settings, case: EvalCase) -> VerifyQuestion:
     settings.require(*KEYS_FOR_MODE[Mode.CACHED])
     return assemble(
         fetcher=CachedPageFetcher(eval_snapshot_dir(settings, case)),
-        extractor=ClaudeClaimExtractor(ClaudeClient(settings.anthropic_api_key, settings.model_extract)),
+        extractor=build_extractor(settings),
         pairer=build_pairer(settings),
         judge=ClaudeVerdictJudge(ClaudeClient(settings.anthropic_api_key, settings.model_judge)),
         runs_dir=settings.eval_runs_dir / case.id,
@@ -88,6 +88,12 @@ def build_fetcher(settings: Settings, question: Question, mode: Mode) -> PageFet
     if mode is Mode.CACHED:
         return CachedPageFetcher(settings.cache_dir / question.id)
     return SteelPageFetcher(settings.steel_api_key, clock=SystemClock())
+
+
+def build_extractor(settings: Settings) -> ClaimExtractor:
+    return ClaudeClaimExtractor(
+        ClaudeClient(settings.anthropic_api_key, settings.model_extract), concurrency=settings.extract_concurrency
+    )
 
 
 def build_pairer(settings: Settings) -> ClaimPairer:

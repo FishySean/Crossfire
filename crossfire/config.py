@@ -56,6 +56,7 @@ class Settings:
     questions_file: Path
     evals_dir: Path
     eval_runs_dir: Path
+    extract_concurrency: int
     env_file: Path
 
     @classmethod
@@ -94,6 +95,7 @@ class Settings:
             questions_file=_path(get("CROSSFIRE_QUESTIONS_FILE", "questions/demo.yaml")),
             evals_dir=_path(get("CROSSFIRE_EVALS_DIR", "evals")),
             eval_runs_dir=_path(get("CROSSFIRE_EVAL_RUNS_DIR", "out/eval-runs")),
+            extract_concurrency=_positive_int("CROSSFIRE_EXTRACT_CONCURRENCY", get("CROSSFIRE_EXTRACT_CONCURRENCY", "4"), env_file),
             env_file=env_file,
         )
 
@@ -114,6 +116,16 @@ def _key(value: str | None) -> str | None:
     # .env.example 里的占位值 your_xxx_here 原样拷过来时算没配。
     value = (value or "").strip()
     return None if not value or value.startswith("your_") else value
+
+
+def _positive_int(name: str, value: str, env_file: Path) -> int:
+    try:
+        number = int(value)
+    except ValueError:
+        number = 0
+    if number < 1:
+        raise SettingsError(f"{name}={value} 不合法，要一个正整数。在 {env_file} 里改。")
+    return number
 
 
 def _path(value: str) -> Path:

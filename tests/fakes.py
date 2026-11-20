@@ -14,6 +14,7 @@ from crossfire.application.ports import (
     ClaimPairer,
     Clock,
     EventSink,
+    OnClaim,
     OnPage,
     OnPair,
     PageFetcher,
@@ -98,10 +99,26 @@ class FakeFetcher:
 class FakeExtractor:
     provenance = Provenance(model="fake-extractor", prompt_version="fake-e1")
 
-    def __init__(self, log: CallLog, texts: dict[str, str] | None = None) -> None:
+    def __init__(self, log: CallLog, texts: dict[str, str] | None = None, finish_in_reverse: bool = False) -> None:
         self.log = log
         self.texts = texts or {}
+        self.finish_in_reverse = finish_in_reverse
         self.as_of_seen: list[date | None] = []
+
+    def extract_all(
+        self,
+        question: Question,
+        pages: Sequence[Page],
+        as_of: date,
+        on_claim: OnClaim | None = None,
+    ) -> list[Claim]:
+        """逐页调用 extract。finish_in_reverse 模拟并发时后面的页面先完成：on_claim 倒着回调。"""
+        claims = [self.extract(question, page, as_of) for page in pages]
+        order = reversed(range(len(claims))) if self.finish_in_reverse else range(len(claims))
+        for index in order:
+            if on_claim:
+                on_claim(index, claims[index])
+        return claims
 
     def extract(self, question: Question, page: Page, as_of: date) -> Claim:
         self.log.record("extract")

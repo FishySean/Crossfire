@@ -113,7 +113,8 @@ def test_failed_pages_are_not_extracted_and_claim_index_stays_the_source_index(b
 
     assert [claim.source_url for claim in result.claims] == [URLS[0], URLS[2], URLS[3]]
     claim_done = [e.to_dict() for e in parts["events"].events if e.type == "claim_done"]
-    assert [e["index"] for e in claim_done] == [0, 2, 3]
+    # 第 5b 步有意修改：按到达顺序比 → 排序后比。原因：提取并发，claim_done 按完成顺序发出。
+    assert sorted(e["index"] for e in claim_done) == [0, 2, 3]
     errors = [e for e in parts["events"].events if isinstance(e, Error)]
     assert [(e.step, e.detail) for e in errors] == [("fetch", f"假的抓取失败 {URLS[1]}")]
 
@@ -155,6 +156,17 @@ def test_all_pages_failing_is_still_loud(build):
 
     assert result.claims == () and result.pairs == ()
     assert [f.step for f in result.failures] == ["fetch"] * 4
+
+
+def test_claims_finishing_out_of_order_land_on_their_own_source(build):
+    """并发提取时后面的页面可能先完成。claim_done 的 index 必须是那一页的来源下标，不是完成的先后。"""
+    use_case, parts = build(fetcher=FakeFetcher(unusable_urls={URLS[1]}))
+    parts["extractor"].finish_in_reverse = True
+    result = use_case.execute(QUESTION).result
+
+    claim_done = [e.to_dict() for e in parts["events"].events if e.type == "claim_done"]
+    assert [(e["index"], e["url"]) for e in claim_done] == [(3, URLS[3]), (2, URLS[2]), (0, URLS[0])]
+    assert [claim.source_url for claim in result.claims] == [URLS[0], URLS[2], URLS[3]]
 
 
 class RetryingExtractor(FakeExtractor):
@@ -199,7 +211,8 @@ def test_unusable_page_card_reaches_its_final_state(build):
     fetch_done = {e["index"]: e for e in events if e["type"] == "fetch_done"}
     assert fetch_done[2]["ok"] is False
     assert fetch_done[2]["chars"] > 0
-    assert [e["index"] for e in events if e["type"] == "claim_done"] == [0, 1, 3]
+    # 第 5b 步有意修改：按到达顺序比 → 排序后比，原因同上。
+    assert sorted(e["index"] for e in events if e["type"] == "claim_done") == [0, 1, 3]
     errors = [e for e in events if e["type"] == "error"]
     assert errors == [{"type": "error", "step": "usability", "detail": "too_short"}]
     assert events.index(errors[0]) == events.index(fetch_done[2]) + 1

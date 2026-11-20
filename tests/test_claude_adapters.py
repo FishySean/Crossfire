@@ -29,6 +29,8 @@ QUESTION = Question(
 
 AS_OF = date(2026, 9, 12)
 
+EXTRACTED = {"claim": "1.0", "evidence": "v1.0", "source_type": "news_article", "confidence": 0.8, "published_date": None}
+
 JUDGMENT = {
     "answer": "1.0",
     "confidence": 0.9,
@@ -249,6 +251,95 @@ def test_pair_all_with_no_pairs_makes_no_calls():
     assert messages.prompts == []
 
 
+# ---- 批量提取 ----
+
+PAGES = [Page(url=s.url, ok=True, title="t", markdown=f"正文 {s.url}") for s in QUESTION.sources]
+
+
+def claim_for_page(prompt):
+    url = prompt.split("网页 URL：")[1].split("\n")[0]
+    return {**EXTRACTED, "claim": f"{url} 的主张"}
+
+
+def test_extract_all_returns_claims_in_page_order_and_reports_each_with_its_page_index():
+    """后面的页面先完成：on_claim 的 index 必须是页面下标，不是完成先后。"""
+
+    def slow_first(prompt):
+        if PAGES[0].url in prompt:
+            time.sleep(0.05)
+        return claim_for_page(prompt)
+
+    client, _ = client_for(slow_first)
+    seen = []
+    caller = threading.get_ident()
+    claims = ClaudeClaimExtractor(client, concurrency=3).extract_all(
+        QUESTION, PAGES, AS_OF, on_claim=lambda index, claim: seen.append((index, claim.source_url, threading.get_ident()))
+    )
+
+    assert [c.source_url for c in claims] == [p.url for p in PAGES]
+    assert all(c.text == f"{c.source_url} 的主张" for c in claims)
+    assert seen[-1][0] == 0, "最慢的第 0 页应该最后完成"
+    assert all(url == PAGES[index].url for index, url, _ in seen)
+    assert {thread for _, _, thread in seen} == {caller}, "on_claim 必须在调用方线程里触发"
+
+
+def test_extract_all_never_exceeds_its_concurrency():
+    active = 0
+    peak = 0
+    lock = threading.Lock()
+
+    def slow(prompt):
+        nonlocal active, peak
+        with lock:
+            active += 1
+            peak = max(peak, active)
+        time.sleep(0.01)
+        with lock:
+            active -= 1
+        return EXTRACTED
+
+    client, _ = client_for(slow)
+    ClaudeClaimExtractor(client, concurrency=2).extract_all(QUESTION, PAGES * 3, AS_OF)
+    assert peak == 2
+
+
+def test_extract_all_turns_an_api_error_into_a_failed_claim_with_the_requests_it_spent(capsys):
+    def flaky(prompt):
+        if PAGES[1].url in prompt:
+            raise anthropic.APITimeoutError(request=httpx.Request("POST", "https://api.anthropic.invalid/"))
+        return EXTRACTED
+
+    client, _ = client_for(flaky)
+    seen = []
+    claims = ClaudeClaimExtractor(client).extract_all(QUESTION, PAGES, AS_OF, on_claim=lambda i, c: seen.append(i))
+
+    assert [c.failure is None for c in claims] == [True, False, True]
+    failed = claims[1]
+    assert failed.text is None and failed.tier is Tier.NEWS
+    assert failed.failure is not None and failed.failure.step == "extract" and "APITimeoutError" in failed.failure.detail
+    assert failed.usage.requests == 3
+    assert sorted(seen) == [0, 1, 2]
+    assert "❌" in capsys.readouterr().err
+
+
+def test_extract_all_marks_every_page_failed_when_the_whole_batch_fails():
+    def down(prompt):
+        raise anthropic.APIConnectionError(request=httpx.Request("POST", "https://api.anthropic.invalid/"))
+
+    client, _ = client_for(down)
+    seen = []
+    claims = ClaudeClaimExtractor(client).extract_all(QUESTION, PAGES, AS_OF, on_claim=lambda i, c: seen.append(i))
+    assert [c.source_url for c in claims] == [p.url for p in PAGES]
+    assert all(c.failure is not None and c.usage.requests == 3 for c in claims)
+    assert sorted(seen) == [0, 1, 2]
+
+
+def test_extract_all_with_no_pages_makes_no_calls():
+    client, messages = client_for(claim_for_page)
+    assert ClaudeClaimExtractor(client).extract_all(QUESTION, [], AS_OF) == []
+    assert messages.prompts == []
+
+
 # ---- 关系名只有 Relation 一个来源 ----
 
 
@@ -262,9 +353,6 @@ def test_pair_schema_and_prompt_take_relation_names_from_the_enum():
 
 
 # ---- 第 5a 步：告诉模型「今天」是哪天，记下模型和 prompt 版本 ----
-
-EXTRACTED = {"claim": "1.0", "evidence": "v1.0", "source_type": "news_article", "confidence": 0.8, "published_date": None}
-
 
 @pytest.mark.parametrize("as_of", [date(2026, 9, 12), date(2031, 1, 2)])
 def test_every_prompt_carries_the_date_it_was_given_not_today(as_of):

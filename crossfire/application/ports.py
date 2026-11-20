@@ -12,6 +12,7 @@ from crossfire.domain import Claim, Judgment, Mode, Page, Pair, Provenance, Ques
 
 type OnPage = Callable[[SourceIndex, Page], None]
 type OnPair = Callable[[int, int, Pair], None]
+type OnClaim = Callable[[int, Claim], None]
 
 
 class PageFetcher(Protocol):
@@ -35,12 +36,23 @@ class ClaimExtractor(Protocol):
         """产出主张的模型和 prompt 版本，写进结果文件。"""
         ...
 
-    def extract(self, question: Question, page: Page, as_of: date) -> Claim:
-        """从一个已抓到的页面里提取针对问题的主张。来源层级用 question.source_of(page.url) 查。
+    def extract_all(
+        self,
+        question: Question,
+        pages: Sequence[Page],
+        as_of: date,
+        on_claim: OnClaim | None = None,
+    ) -> list[Claim]:
+        """从一批已抓到的页面里各提取一条针对问题的主张，返回与 pages 一一对应、顺序相同的 Claim。
+        来源层级用 question.source_of(page.url) 查。
 
+        批量接口的理由同 ClaimPairer.pair_all：远程 API 在内部并发，本地模型可以凑批。
         as_of 是这次查证的「今天」，必须照实告诉模型。
         实现里不许自己取当前时间：cached 模式和评测时，「今天」是快照那天，不是运行那天。
-        失败时返回带 failure 的 Claim，不抛异常。
+
+        on_claim(index, claim) 在每页提取完成时调用一次，index 是该页在 pages 里的下标，调用顺序是完成顺序。
+        单页失败时返回带 failure 的 Claim，不抛异常；整批失败时每一页都返回带 failure 的 Claim，
+        并照常对每一页调用 on_claim。理由同 pair_all：抓取已经做完，抛异常会让整次运行作废。
         """
         ...
 

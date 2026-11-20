@@ -4,7 +4,7 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import replace
 from typing import Any
 
-from crossfire.adapters.anthropic.client import ClaudeClient, prompt_version
+from crossfire.adapters.anthropic.client import ClaudeCallError, ClaudeClient, prompt_version
 from crossfire.application.ports import OnPair
 from crossfire.domain import Claim, Failure, Pair, Provenance, Question, Relation, Usage
 
@@ -167,21 +167,14 @@ class ClaudeClaimPairer:
         def parse(data: dict[str, Any]) -> Pair:
             return Pair.from_dict({**data, "a": a.source_url, "b": b.source_url, "usage": _NO_USAGE})
 
+        # 端口约定 pair_all 不抛异常，见 ClaimPairer.pair_all。网络重试用尽、鉴权失败都落到这里。
         try:
             call = self._client.call(prompt, PAIR_SCHEMA, "pair", parse)
+        except ClaudeCallError as e:
+            return self._failed(a, b, str(e), e.usage)
         except Exception as e:
-            # 端口约定 pair_all 不抛异常，见 ClaimPairer.pair_all。网络重试用尽、鉴权失败都落到这里。
-            detail = f"{type(e).__name__}: {e}"
-            print(f"❌ [llm] pair 调用抛出异常，该对记为失败：{detail}", file=sys.stderr)
-            return Pair(
-                a_url=a.source_url,
-                b_url=b.source_url,
-                relation=None,
-                nature=None,
-                # 异常带不出已经发出去的请求数（网络重试用尽时其实发了 3 次），只能记 0，claude_calls 会少算。
-                usage=Usage(0, 0, 0),
-                failure=Failure(step="pair", detail=detail, raw=None),
-            )
+            # 不是 API 抛的，不知道请求有没有发出去，请求数记成未知，不编一个数。
+            return self._failed(a, b, f"{type(e).__name__}: {e}", Usage(0, 0, None))
         if call.value is not None:
             return replace(call.value, usage=call.usage)
         return Pair(
@@ -191,4 +184,15 @@ class ClaudeClaimPairer:
             nature=None,
             usage=call.usage,
             failure=call.failure,
+        )
+
+    def _failed(self, a: Claim, b: Claim, detail: str, usage: Usage) -> Pair:
+        print(f"❌ [llm] pair 调用抛出异常，该对记为失败：{detail}", file=sys.stderr)
+        return Pair(
+            a_url=a.source_url,
+            b_url=b.source_url,
+            relation=None,
+            nature=None,
+            usage=usage,
+            failure=Failure(step="pair", detail=detail, raw=None),
         )

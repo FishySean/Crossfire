@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from anthropic import Anthropic, APIConnectionError
+from anthropic import Anthropic, APIConnectionError, APIError
 
 from crossfire.domain import Failure, Usage
 
@@ -29,6 +29,19 @@ def prompt_version(template: str, schema: dict[str, Any]) -> str:
     """模板和输出 schema 一起哈希：两者任何一处改动都会改变模型的行为。"""
     body = template + "\n" + json.dumps(schema, ensure_ascii=False, sort_keys=True)
     return hashlib.sha256(body.encode()).hexdigest()[:12]
+
+
+class ClaudeCallError(Exception):
+    """调用抛出的 API 异常（网络重试用尽、鉴权、额度、请求非法），带着抛出之前已经发出的请求数和用掉的 token。
+
+    原始异常在 error 里，也是 __cause__。端口约定不许抛异常的调用方（比如比对器）靠 usage 记下真实花费，
+    不然一次网络重试用尽的调用实际发了 3 次请求，却会记成 0 次。
+    """
+
+    def __init__(self, error: Exception, usage: Usage) -> None:
+        super().__init__(f"{type(error).__name__}: {error}")
+        self.error = error
+        self.usage = usage
 
 
 @dataclass(frozen=True)
@@ -82,14 +95,18 @@ class ClaudeClient:
 
         for attempt in range(MAX_ATTEMPTS):
             text = prompt if attempt == 0 else prompt + RETRY_NOTE.format(error=detail, tool=TOOL_NAME)
-            message, sent = self._create(
-                step,
-                model=self.model,
-                max_tokens=max_tokens,
-                tools=tools,
-                tool_choice={"type": "tool", "name": TOOL_NAME},
-                messages=[{"role": "user", "content": text}],
-            )
+            try:
+                message, sent = self._create(
+                    step,
+                    model=self.model,
+                    max_tokens=max_tokens,
+                    tools=tools,
+                    tool_choice={"type": "tool", "name": TOOL_NAME},
+                    messages=[{"role": "user", "content": text}],
+                )
+            except ClaudeCallError as e:
+                spent = Usage(input_tokens, output_tokens, requests + (e.usage.requests or 0))
+                raise ClaudeCallError(e.error, spent) from e.error
             requests += sent
             input_tokens += message.usage.input_tokens
             output_tokens += message.usage.output_tokens
@@ -124,14 +141,15 @@ class ClaudeClient:
 
         APITimeoutError 继承自 APIConnectionError，所以捕获后者即可覆盖两者；
         RateLimitError、AuthenticationError、BadRequestError 都在 APIStatusError 分支上，
-        不会被这里捕获，仍然照原样往上抛——那些是代码或配置问题，重试只会掩盖 bug。
+        不重试，直接抛——那些是代码或配置问题，重试只会掩盖 bug。
+        抛出的一律是 ClaudeCallError，带着连同失败那次在内已经发出的请求数。
         """
         for attempt in range(NETWORK_RETRIES + 1):
             try:
                 return self._client.messages.create(**kwargs), attempt + 1
             except APIConnectionError as e:
                 if attempt == NETWORK_RETRIES:
-                    raise
+                    raise ClaudeCallError(e, Usage(0, 0, attempt + 1)) from e
                 delay = 2**attempt
                 print(
                     f"⚠️  [llm] {step} 遇到网络临时错误 {type(e).__name__}，"
@@ -139,4 +157,6 @@ class ClaudeClient:
                     file=sys.stderr,
                 )
                 self._sleep(delay)
+            except APIError as e:
+                raise ClaudeCallError(e, Usage(0, 0, attempt + 1)) from e
         raise AssertionError("unreachable")

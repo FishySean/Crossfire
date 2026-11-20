@@ -228,6 +228,18 @@ def test_pair_all_turns_exceptions_into_failed_pairs_instead_of_raising(capsys):
     assert "APITimeoutError" in pairs[1].failure.detail
     assert sorted(seen) == [0, 1, 2]
     assert "❌" in capsys.readouterr().err
+    # 网络重试用尽：一次原始请求加两次重试，都算。backlog「比对抛异常时请求数记成 0」。
+    assert pairs[1].usage.requests == 3
+
+
+def test_pair_all_records_unknown_requests_when_something_other_than_the_api_raises():
+    def broken(prompt):
+        raise RuntimeError("bug")
+
+    client, _ = client_for(broken)
+    [pair] = ClaudeClaimPairer(client).pair_all(QUESTION, PAIRS[:1])
+    assert pair.failure is not None and "RuntimeError" in pair.failure.detail
+    assert pair.usage.requests is None
 
 
 def test_pair_all_with_no_pairs_makes_no_calls():

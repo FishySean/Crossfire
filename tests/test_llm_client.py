@@ -12,6 +12,8 @@ import httpx
 import pytest
 
 from crossfire.adapters.anthropic import ClaudeClient
+from crossfire.adapters.anthropic.client import ClaudeCallError
+from crossfire.domain import Usage
 
 REQUEST = httpx.Request("POST", "https://api.anthropic.invalid/v1/messages")
 
@@ -103,8 +105,12 @@ def test_network_errors_retry_twice_with_backoff(structured, error, capsys):
 def test_network_errors_raise_after_retries_are_exhausted(structured):
     error = anthropic.APITimeoutError(request=REQUEST)
     call, messages, sleeps = structured([error, error, error])
-    with pytest.raises(anthropic.APITimeoutError):
+    # 第 5b 步有意修改：pytest.raises(anthropic.APITimeoutError) → ClaudeCallError，原异常在 error 里。
+    # 原因：backlog「比对抛异常时请求数记成 0」，异常要带出已经发出的请求数。
+    with pytest.raises(ClaudeCallError) as caught:
         call("问题", SCHEMA, "pair")
+    assert caught.value.error is error and caught.value.__cause__ is error
+    assert caught.value.usage.requests == 3
     assert len(messages.prompts) == 3
     assert sleeps == [1, 2]
 
@@ -120,10 +126,21 @@ def test_network_errors_raise_after_retries_are_exhausted(structured):
 )
 def test_other_api_errors_raise_immediately(structured, error):
     call, messages, sleeps = structured([error])
-    with pytest.raises(type(error)):
+    # 第 5b 步有意修改：pytest.raises(type(error)) → ClaudeCallError，原因同上。
+    with pytest.raises(ClaudeCallError) as caught:
         call("问题", SCHEMA, "pair")
+    assert caught.value.error is error
+    assert caught.value.usage.requests == 1
     assert len(messages.prompts) == 1
     assert sleeps == []
+
+
+def test_an_error_after_a_structural_retry_carries_both_requests_and_the_tokens_spent():
+    messages = ScriptedMessages([text_message(input_tokens=5, output_tokens=1), status_error(anthropic.BadRequestError, 400)])
+    client = ClaudeClient(client=SimpleNamespace(messages=messages), sleep=lambda delay: None)
+    with pytest.raises(ClaudeCallError) as caught:
+        client.call("问题", SCHEMA, "pair", parse=lambda data: data)
+    assert caught.value.usage == Usage(5, 1, 2)
 
 
 @pytest.mark.parametrize(

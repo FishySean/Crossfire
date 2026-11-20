@@ -30,6 +30,11 @@ MODEL_PRICES: dict[str, ModelPrice] = {
     "claude-sonnet-4-6": ModelPrice(input_per_mtok=3.0, output_per_mtok=15.0),
     "claude-haiku-4-5": ModelPrice(input_per_mtok=1.0, output_per_mtok=5.0),
 }
+# web_search 另计：$10 / 1000 次搜索（失败的不收费）。同页同日。
+WEB_SEARCH_PER_THOUSAND_USD = 10.0
+# Steel Launch 的 /scrape：$5 / 1000 次（另加按秒计的浏览器时间）。查自
+# https://steel.dev/docs/platform/pricing ，2026-11-20。浏览器时间估不进上限，只报页数。
+STEEL_SCRAPE_PER_THOUSAND_USD = 5.0
 
 
 class Pairer(StrEnum):
@@ -67,6 +72,8 @@ class Settings:
     evals_dir: Path
     eval_runs_dir: Path
     consistency_dir: Path
+    bank_file: Path
+    bank_review_file: Path
     extract_concurrency: int
     env_file: Path
 
@@ -107,6 +114,8 @@ class Settings:
             evals_dir=_path(get("CROSSFIRE_EVALS_DIR", "evals")),
             eval_runs_dir=_path(get("CROSSFIRE_EVAL_RUNS_DIR", "out/eval-runs")),
             consistency_dir=_path(get("CROSSFIRE_CONSISTENCY_DIR", "out/consistency")),
+            bank_file=_path(get("CROSSFIRE_BANK_FILE", "questions/bank.yaml")),
+            bank_review_file=_path(get("CROSSFIRE_BANK_REVIEW_FILE", "notes/bank-review.md")),
             extract_concurrency=_positive_int("CROSSFIRE_EXTRACT_CONCURRENCY", get("CROSSFIRE_EXTRACT_CONCURRENCY", "4"), env_file),
             env_file=env_file,
         )

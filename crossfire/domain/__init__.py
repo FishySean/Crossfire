@@ -1,5 +1,15 @@
 """Crossfire 的领域层：实体与业务规则。只允许依赖 Python 标准库。"""
 
+from crossfire.domain.bank import (
+    BankQuestion,
+    CandidateSource,
+    DroppedQuestion,
+    DropReason,
+    KeptSource,
+    ProposedQuestion,
+    QuestionCategory,
+    RejectedSource,
+)
 from crossfire.domain.models import (
     AsOf,
     Claim,
@@ -27,15 +37,23 @@ from crossfire.domain.usability import UnusableReason, is_usable_page
 
 __all__ = [
     "AsOf",
+    "BankQuestion",
+    "CandidateSource",
     "Claim",
+    "DroppedQuestion",
+    "DropReason",
     "Failure",
     "Judgment",
+    "KeptSource",
     "Link",
     "Mode",
     "Page",
     "Pair",
+    "ProposedQuestion",
     "Provenance",
     "Question",
+    "QuestionCategory",
+    "RejectedSource",
     "Relation",
     "RunResult",
     "Source",

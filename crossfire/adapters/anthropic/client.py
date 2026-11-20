@@ -136,13 +136,11 @@ class ClaudeClient:
             failure=Failure(step=step, detail=detail, raw=raw),
         )
 
-    def _create(self, step: str, **kwargs: Any) -> tuple[Any, int]:
-        """只对超时和连接这类临时性网络错误重试。返回响应和为它实际发出的请求数。
+    def create_message(self, step: str, **kwargs: Any) -> tuple[Any, int]:
+        """发一次 messages.create，带网络重试。返回 (响应, 实际请求数)。
 
-        APITimeoutError 继承自 APIConnectionError，所以捕获后者即可覆盖两者；
-        RateLimitError、AuthenticationError、BadRequestError 都在 APIStatusError 分支上，
-        不重试，直接抛——那些是代码或配置问题，重试只会掩盖 bug。
-        抛出的一律是 ClaudeCallError，带着连同失败那次在内已经发出的请求数。
+        给需要服务端工具（比如 web_search）或自定义 tool_choice 的适配器用。
+        结构化 tool_use 的常规路径继续走 call()。
         """
         for attempt in range(NETWORK_RETRIES + 1):
             try:
@@ -160,3 +158,6 @@ class ClaudeClient:
             except APIError as e:
                 raise ClaudeCallError(e, Usage(0, 0, attempt + 1)) from e
         raise AssertionError("unreachable")
+
+    def _create(self, step: str, **kwargs: Any) -> tuple[Any, int]:
+        return self.create_message(step, **kwargs)

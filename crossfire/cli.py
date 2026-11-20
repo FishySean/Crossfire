@@ -20,6 +20,7 @@ from crossfire.application.use_cases import (
     CaseOutcome,
     bench_runs,
     cross_model_agreement,
+    estimate_bank_build,
     estimate_pair_cost,
     estimate_pair_requests,
     estimate_requests,
@@ -29,6 +30,8 @@ from crossfire.config import (
     DEFAULT_HAIKU,
     DEFAULT_MODEL,
     MODEL_PRICES,
+    STEEL_SCRAPE_PER_THOUSAND_USD,
+    WEB_SEARCH_PER_THOUSAND_USD,
     Settings,
     SettingsError,
     load_consistency_inputs,
@@ -83,6 +86,12 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"逗号分隔的模型列表，默认 {DEFAULT_MODEL},{DEFAULT_HAIKU}",
     )
     consistency.add_argument("--estimate-only", action="store_true", help="只打印预计请求数和费用")
+
+    bank = commands.add_parser("bank", help="题库：自动出题、找来源、抓取过滤")
+    bank_commands = bank.add_subparsers(dest="bank_command", required=True)
+    build = bank_commands.add_parser("build", help="生成试点题库（默认 20 道），写出 bank.yaml 和审查报告")
+    build.add_argument("--count", type=int, default=20, help="候选题目数，默认 20")
+    build.add_argument("--estimate-only", action="store_true", help="只打印预计搜索/请求/费用")
     return parser
 
 
@@ -115,6 +124,13 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
     if args.command == "consistency":
         try:
             return consistency_command(settings, args.case, args.repeats, args.models, args.estimate_only, parser)
+        except SettingsError as error:
+            print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
+            return 2
+
+    if args.command == "bank":
+        try:
+            return bank_build(settings, args.count, args.estimate_only, parser)
         except SettingsError as error:
             print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
             return 2
@@ -462,6 +478,122 @@ def _save_consistency(settings: Settings, inputs, models, repeats, results) -> P
         }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
+
+
+def bank_build(settings: Settings, count: int, estimate_only: bool, parser: argparse.ArgumentParser) -> int:
+    if count < 1:
+        parser.error("--count 必须是正整数")
+    price = settings.price_for(settings.model_extract)
+    estimate = estimate_bank_build(
+        count,
+        searches_per_question=6,
+        candidates_per_question=8,
+        search_per_thousand_usd=WEB_SEARCH_PER_THOUSAND_USD,
+        sonnet_input_per_mtok=price.input_per_mtok,
+        sonnet_output_per_mtok=price.output_per_mtok,
+        steel_per_scrape_usd=STEEL_SCRAPE_PER_THOUSAND_USD / 1000,
+    )
+    print("预计用量（上限，偏高）：")
+    print(f"  候选题目 {estimate.questions} 道")
+    print(f"  Claude 请求最多 {estimate.claude_requests} 次（1 次出题 + 每题 1 次找来源）")
+    print(f"  web_search 最多 {estimate.searches} 次（约 ${estimate.search_usd:.2f}）")
+    print(f"  Claude token 费用约 ${estimate.anthropic_usd:.2f}")
+    print(f"  Anthropic 合计约 ${estimate.total_anthropic_usd:.2f}")
+    print(f"  Steel 抓取最多 {estimate.steel_pages} 页（scrape 费约 ${estimate.steel_usd:.2f}，另加浏览器时间）")
+    if estimate.total_anthropic_usd > 3:
+        print(
+            f"Anthropic 预计 ${estimate.total_anthropic_usd:.2f}，超过 3 美元上限，没有开始运行。",
+            file=sys.stderr,
+        )
+        return 2
+    if estimate_only:
+        return 0
+
+    as_of = composition.utc_today()
+    builder = composition.build_question_bank_builder(settings)
+    print(f"开始生成题库（as_of {as_of}）…")
+    try:
+        kept, dropped = builder.execute(count, as_of)
+    except Exception as error:
+        message = str(error)
+        if "credit balance" in message.lower() or "insufficient" in message.lower() or "402" in message:
+            print(f"余额不足，立刻停下：{error}", file=sys.stderr)
+            return 2
+        raise
+
+    _write_bank_yaml(settings.bank_file, kept)
+    _write_bank_review(settings.bank_review_file, kept, dropped, as_of)
+    print(f"保留 {len(kept)} 道，丢弃 {len(dropped)} 道")
+    print(f"题库：{settings.bank_file}")
+    print(f"审查报告：{settings.bank_review_file}")
+    print("请先看 notes/bank-review.md，确认后再进入 5c-2。")
+    return 0
+
+
+def _write_bank_yaml(path: Path, kept: Sequence) -> None:
+    import yaml
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = [question.to_yaml_dict() for question in kept]
+    path.write_text(yaml.safe_dump(payload, allow_unicode=True, sort_keys=False), encoding="utf-8")
+
+
+def _write_bank_review(path: Path, kept: Sequence, dropped: Sequence, as_of) -> None:
+    from collections import Counter
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "# 题库审查报告",
+        "",
+        f"生成日期（as_of）：{as_of.isoformat()}",
+        f"保留 {len(kept)} 道，丢弃 {len(dropped)} 道。",
+        "",
+        "## 保留的题目",
+        "",
+        "| id | 题目 | 类别 | 语言 | 可用 | primary | news | aggregator |",
+        "|---|---|---|---|---:|---:|---:|---:|",
+    ]
+    for question in kept:
+        tiers = Counter(item.source.tier.value for item in question.sources)
+        text = question.text.replace("|", "\\|")
+        lines.append(
+            f"| {question.id} | {text} | {question.category.value} | {question.language} | "
+            f"{len(question.sources)} | {tiers['primary']} | {tiers['news']} | {tiers['aggregator']} |"
+        )
+    lines += ["", "## 丢弃的题目", ""]
+    if not dropped:
+        lines.append("（没有）")
+    else:
+        lines.append("| id | 题目 | 类别 | 原因 | 说明 |")
+        lines.append("|---|---|---|---|---|")
+        for item in dropped:
+            text = item.proposed.text.replace("|", "\\|")
+            lines.append(
+                f"| {item.proposed.id} | {text} | {item.proposed.category.value} | "
+                f"{item.reason.value} | {item.detail.replace('|', '\\|')} |"
+            )
+
+    by_category = Counter(q.category.value for q in kept)
+    by_language = Counter(q.language for q in kept)
+    reject_reasons = Counter(r.reason.value for q in kept for r in q.rejected)
+    reject_reasons.update(r.reason.value for d in dropped for r in d.rejected)
+    total_rejected = sum(reject_reasons.values())
+    total_considered = total_rejected + sum(len(q.sources) for q in kept)
+    lines += [
+        "",
+        "## 统计",
+        "",
+        f"- 按类别：{dict(by_category)}",
+        f"- 按语言：{dict(by_language)}",
+        f"- 被过滤的页面：{total_rejected} / {total_considered or 1}"
+        f"（{total_rejected / total_considered:.0%}）" if total_considered else "- 被过滤的页面：0",
+        f"- 过滤原因：{dict(reject_reasons)}",
+        "",
+        "请确认：题目有确定答案、不是公认争议话题；来源层级有混搭；过滤比例可接受。",
+        "确认后再进入 5c-2。",
+        "",
+    ]
+    path.write_text("\n".join(lines), encoding="utf-8")
 
 
 def print_report(result: dict[str, Any], location: str) -> None:

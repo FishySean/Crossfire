@@ -9,6 +9,7 @@ from typing import Protocol
 
 from crossfire.application.events import Event
 from crossfire.domain import Claim, Judgment, Mode, Page, Pair, Provenance, Question, RunResult, SourceIndex
+from crossfire.domain.bank import CandidateSource, ProposedQuestion
 
 type OnPage = Callable[[SourceIndex, Page], None]
 type OnPair = Callable[[int, int, Pair], None]
@@ -101,6 +102,25 @@ class VerdictJudge(Protocol):
 
         失败时返回带 failure 的 Judgment，不抛异常。
         """
+        ...
+
+
+class SourceFinder(Protocol):
+    """给一道题找候选来源。实现必须上网搜，不许凭记忆编网址。"""
+
+    def find(self, question_text: str, as_of: date) -> list[CandidateSource]:
+        """返回候选网址列表。每个 URL 都必须来自真实的搜索结果。
+
+        as_of 是「今天」，搜索时要找截至这一天仍然相关的来源。
+        """
+        ...
+
+
+class QuestionProposer(Protocol):
+    """按类别提出候选题目，不找来源。"""
+
+    def propose(self, count: int, as_of: date) -> list[ProposedQuestion]:
+        """提出大约 count 道题，三类尽量均匀，中英文都要有。"""
         ...
 
 

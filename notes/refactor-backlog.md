@@ -155,6 +155,11 @@
 
 ---
 
+## 第 5c-1 步（自动找来源、建题库）
+
+- SourceFinder 端口 + Claude web_search 适配器；BuildQuestionBank；`crossfire bank build`。
+- 试点曾因 Anthropic 余额中途不足而不完整；充值后需重跑。Steel 余额 API 查不到，须看 dashboard Wallet；免费额度按首次 session 2026-09-12 推算约 **2026-12-11** 到期。
+
 ## 第 5c 步（批量跑题、导出数据集）
 
 ### 比对标签稳定性（从 5b 推迟过来，造数据之前必须先做）

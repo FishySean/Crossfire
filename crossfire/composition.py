@@ -5,11 +5,14 @@
 """
 
 import queue
+from datetime import UTC, date
 from pathlib import Path
 from typing import Any
 
 from crossfire.adapters.anthropic import ClaudeClaimExtractor, ClaudeClaimPairer, ClaudeClient, ClaudeVerdictJudge
 from crossfire.adapters.anthropic.judge import JUDGE_PROMPT, without_sources_over_memory
+from crossfire.adapters.anthropic.question_proposer import ClaudeQuestionProposer
+from crossfire.adapters.anthropic.source_finder import ClaudeSourceFinder
 from crossfire.adapters.event_sinks import NullEventSink, QueueEventSink
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.adapters.storage import CachePageStore, JsonRunRepository
@@ -17,6 +20,7 @@ from crossfire.adapters.system import SystemClock, ThreadTicker
 from crossfire.application.heartbeat import judge_with_heartbeat
 from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
 from crossfire.application.use_cases import PrefetchPages, RunEvals, RunJudgeEvals, VerifyQuestion
+from crossfire.application.use_cases.build_question_bank import BuildQuestionBank
 from crossfire.config import Key, Pairer, Settings, eval_snapshot_dir
 from crossfire.domain import Mode, Question
 from crossfire.domain.evals import EvalCase
@@ -118,6 +122,22 @@ def build_consistency_runner(settings: Settings):
 
     settings.require(*KEYS_FOR_MODE[Mode.CACHED])
     return MeasureConsistency(lambda model: build_pairer(settings, model))
+
+
+def build_question_bank_builder(settings: Settings) -> BuildQuestionBank:
+    """题库生成要出题、搜索、真实抓取。不改 VerifyQuestion 和已有四个业务端口。"""
+    settings.require(Key.ANTHROPIC, Key.STEEL)
+    client = ClaudeClient(settings.anthropic_api_key, settings.model_extract)
+    return BuildQuestionBank(
+        proposer=ClaudeQuestionProposer(client),
+        finder=ClaudeSourceFinder(client),
+        fetcher=SteelPageFetcher(settings.steel_api_key, clock=SystemClock()),
+        store_for=lambda question_id: CachePageStore(settings.cache_dir / question_id),
+    )
+
+
+def utc_today() -> date:
+    return SystemClock().now().astimezone(UTC).date()
 
 
 def build_prefetcher(settings: Settings, question: Question) -> PrefetchPages:

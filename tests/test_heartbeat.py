@@ -34,7 +34,7 @@ class ClockAdvancingJudge(FakeJudge):
         self.seconds = seconds
         self.error = error
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
         self.clock.advance(self.seconds)
         if self.error:
             raise self.error

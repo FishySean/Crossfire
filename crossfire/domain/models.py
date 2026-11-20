@@ -503,22 +503,33 @@ class Provenance:
         )
 
 
-type AsOf = date | None
+type AsOf = date
+
+
+class UnknownSnapshotDateError(ValueError):
+    """cached 模式下不知道快照是哪天抓的。"""
 
 
 def as_of_for(mode: Mode, started_at: datetime, pages: Sequence[Page]) -> AsOf:
     """告诉模型的「今天」。live 是运行当天；cached 是快照抓取的那天，不是运行当天。
 
     拿 9 月的快照配 11 月的日期，模型会以为 9 月的信息都过时了。抓到的页面里有哪一页不知道抓取时间，
-    就整体算不知道，不拿运行当天去顶。日期一律按 UTC 算。
+    就拒绝运行，不拿运行当天去顶：不告诉模型日期，它会按自己以为的今天判断，这正是第 5a 步修的错。
+    日期一律按 UTC 算。
     """
     if mode is Mode.LIVE:
         return started_at.astimezone(UTC).date()
-    stamps = [page.fetched_at for page in pages if page.ok]
-    known = [stamp for stamp in stamps if stamp is not None]
-    if not known or len(known) < len(stamps):
-        return None
-    return max(known).astimezone(UTC).date()
+    stamps = [(page.url, page.fetched_at) for page in pages if page.ok]
+    if not stamps:
+        raise UnknownSnapshotDateError("缓存里一页都没有，不知道快照是哪天的。先用 crossfire prefetch 抓一次。")
+    missing = [url for url, stamp in stamps if stamp is None]
+    if missing:
+        raise UnknownSnapshotDateError(
+            "这些缓存页面没有记录抓取时间，不知道快照是哪天的，不能告诉模型今天的日期："
+            + "、".join(missing)
+            + "。用 crossfire prefetch 重新抓一次。"
+        )
+    return max(stamp for _, stamp in stamps if stamp is not None).astimezone(UTC).date()
 
 
 def _sum_or_none(values: Iterable[int | None]) -> int | None:

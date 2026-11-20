@@ -126,6 +126,28 @@ def test_cached_verify_runs_without_steel(env):
     assert run("verify", "--question", "q1", "--mode", "cached", STEEL_API_KEY="") == 0
 
 
+def test_cached_verify_refuses_a_snapshot_without_fetch_time_and_says_why(env, monkeypatch, capsys):
+    run, tmp_path, _ = env
+    log = CallLog()
+
+    def undated_verifier(settings, question, mode, event_sink=None):
+        return composition.assemble(
+            FakeFetcher(mode=mode, fetched_at=None),
+            FakeExtractor(log),
+            FakePairer(log),
+            FakeJudge(log, trusted_url=question.sources[0].url),
+            runs_dir=settings.runs_dir,
+            event_sink=event_sink,
+        )
+
+    monkeypatch.setattr(composition, "build_verifier", undated_verifier)
+    assert run("verify", "--question", "q1", "--mode", "cached") == 2
+    err = capsys.readouterr().err
+    assert "没有记录抓取时间" in err and "crossfire prefetch" in err and "Traceback" not in err
+    assert log.steps == []
+    assert not (tmp_path / "runs").exists()
+
+
 def test_prefetch_writes_every_page_into_the_cache(env, capsys):
     run, tmp_path, _ = env
     assert run("prefetch", "--question", "q1", ANTHROPIC_API_KEY="") == 0

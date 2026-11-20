@@ -27,7 +27,7 @@ uv run crossfire prefetch --all
 
 提取和判断的 prompt 里会写明「今天的日期」（结果文件里的 `as_of`）：live 是运行当天，
 cached 是缓存页面抓取的那天（页面的 `fetched_at`），不是跑的那天。缓存里有页面没记抓取时间时，
-`as_of` 是 `null`，prompt 里写「未知」。结果文件的 `provenance` 记着每一步用的模型和 prompt 版本（模板的哈希）。
+cached 运行在调用模型之前就拒绝，提示用 `prefetch` 重新抓。旧结果文件里的 `as_of: null` 表示当时没告诉模型日期。结果文件的 `provenance` 记着每一步用的模型和 prompt 版本（模板的哈希）。
 
 ## 评测
 

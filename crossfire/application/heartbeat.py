@@ -31,7 +31,7 @@ class HeartbeatJudge:
     def provenance(self) -> Provenance:
         return self._inner.provenance
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
         started = self._clock.monotonic()
 
         def beat() -> None:

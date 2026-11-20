@@ -8,7 +8,7 @@ import pytest
 
 from crossfire.application.events import Done, Error
 from crossfire.application.use_cases import VerifyQuestion
-from crossfire.domain import Claim, Judgment, Mode, Pair, Provenance, Question, Usage
+from crossfire.domain import Claim, Judgment, Mode, Pair, Provenance, Question, UnknownSnapshotDateError, Usage
 from tests.fakes import (
     CallLog,
     FakeClock,
@@ -39,7 +39,7 @@ class SlowJudge(FakeJudge):
         self.clock = clock
         self.seconds = seconds
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
         self.clock.advance(self.seconds)
         return super().judge(question, claims, pairs, as_of)
 
@@ -238,11 +238,16 @@ def test_cached_runs_tell_the_model_the_day_of_the_snapshot_not_today(build):
     assert parts["judge"].as_of_seen == [date(2026, 9, 12)]
 
 
-def test_a_snapshot_without_fetch_time_is_an_unknown_day_not_today(build):
+def test_a_snapshot_without_fetch_time_is_refused_before_any_model_call(build):
+    """第 5b 步有意修改：原 test_a_snapshot_without_fetch_time_is_an_unknown_day_not_today 断言 as_of 为 None、
+    照常运行。原因：不告诉模型日期，它会按自己以为的今天判断，带着空日期跑出来的结果不可信。"""
     fetcher = FakeFetcher(mode=Mode.CACHED, fetched_at=None)
     use_case, parts = build(fetcher=fetcher, clock=FakeClock(NOVEMBER_RUN))
-    assert use_case.execute(QUESTION).result.as_of is None
-    assert parts["judge"].as_of_seen == [None]
+    with pytest.raises(UnknownSnapshotDateError, match="没有记录抓取时间"):
+        use_case.execute(QUESTION)
+    assert parts["extractor"].as_of_seen == []
+    assert parts["judge"].as_of_seen == []
+    assert parts["runs"].saved == []
 
 
 def test_the_result_records_which_model_and_prompt_produced_each_step(build):

@@ -35,10 +35,10 @@ class ClaimExtractor(Protocol):
         """产出主张的模型和 prompt 版本，写进结果文件。"""
         ...
 
-    def extract(self, question: Question, page: Page, as_of: date | None) -> Claim:
+    def extract(self, question: Question, page: Page, as_of: date) -> Claim:
         """从一个已抓到的页面里提取针对问题的主张。来源层级用 question.source_of(page.url) 查。
 
-        as_of 是这次查证的「今天」，必须照实告诉模型；None 表示不知道，也要明说不知道。
+        as_of 是这次查证的「今天」，必须照实告诉模型。
         实现里不许自己取当前时间：cached 模式和评测时，「今天」是快照那天，不是运行那天。
         失败时返回带 failure 的 Claim，不抛异常。
         """
@@ -80,7 +80,7 @@ class VerdictJudge(Protocol):
     @property
     def provenance(self) -> Provenance: ...
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
         """综合所有主张和比对结果下最终结论。as_of 的要求同 ClaimExtractor.extract。
 
         失败时返回带 failure 的 Judgment，不抛异常。

@@ -4,7 +4,7 @@ from dataclasses import replace
 from datetime import date
 from typing import Any
 
-from crossfire.adapters.anthropic.client import ClaudeClient, describe_date, prompt_version
+from crossfire.adapters.anthropic.client import ClaudeClient, prompt_version
 from crossfire.domain import Claim, Judgment, Pair, Provenance, Question, Relation
 
 # prompt 里出现的关系名一律从 Relation 填入，不手写字符串。
@@ -96,9 +96,9 @@ class ClaudeVerdictJudge:
     def provenance(self) -> Provenance:
         return Provenance(model=self._client.model, prompt_version=prompt_version(JUDGE_PROMPT, JUDGE_SCHEMA))
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
         prompt = JUDGE_PROMPT.format(
-            as_of=describe_date(as_of),
+            as_of=as_of.isoformat(),
             question=question.text,
             claims=json.dumps([claim.to_dict() for claim in claims], ensure_ascii=False, indent=2),
             pairs=json.dumps([pair.to_dict() for pair in pairs], ensure_ascii=False, indent=2),

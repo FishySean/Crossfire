@@ -262,14 +262,6 @@ def test_both_prompts_carry_the_date_they_were_given_not_today(as_of):
     assert [f"今天的日期：{as_of.isoformat()}" in prompt for prompt in messages.prompts] == [True, True]
 
 
-def test_unknown_date_is_said_out_loud():
-    client, messages = client_for(scripted(EXTRACTED, JUDGMENT))
-    page = Page(url="https://a.example/", ok=True, title="t", markdown="正文")
-    ClaudeClaimExtractor(client).extract(QUESTION, page, None)
-    ClaudeVerdictJudge(client).judge(QUESTION, [], [], None)
-    assert all("今天的日期：未知" in prompt for prompt in messages.prompts)
-
-
 def test_provenance_names_the_model_and_a_version_of_each_prompt():
     def adapters(model):
         client = ClaudeClient(client=SimpleNamespace(messages=None), model=model)

@@ -2,7 +2,7 @@ from dataclasses import replace
 from datetime import date
 from typing import Any
 
-from crossfire.adapters.anthropic.client import ClaudeClient, describe_date, prompt_version
+from crossfire.adapters.anthropic.client import ClaudeClient, prompt_version
 from crossfire.domain import Claim, Page, Provenance, Question, SourceType
 
 # 正文截断上限，保留开头。这个值基本等于关掉裁剪，只用来兜住极端长页面烧穿 token。
@@ -79,10 +79,10 @@ class ClaudeClaimExtractor:
     def provenance(self) -> Provenance:
         return Provenance(model=self._client.model, prompt_version=prompt_version(EXTRACT_PROMPT, EXTRACT_SCHEMA))
 
-    def extract(self, question: Question, page: Page, as_of: date | None) -> Claim:
+    def extract(self, question: Question, page: Page, as_of: date) -> Claim:
         source = question.source_of(page.url)
         prompt = EXTRACT_PROMPT.format(
-            as_of=describe_date(as_of),
+            as_of=as_of.isoformat(),
             question=question.text,
             url=page.url,
             title=page.title or "(无标题)",

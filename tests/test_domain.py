@@ -30,6 +30,7 @@ from crossfire.domain import (
     SourceType,
     StepStats,
     Tier,
+    UnknownSnapshotDateError,
     UnknownSourceError,
     UnusableReason,
     Usage,
@@ -550,9 +551,19 @@ def test_as_of_for_cached_is_the_latest_snapshot_day_and_ignores_failed_pages():
     assert as_of_for(Mode.CACHED, datetime(2030, 1, 1, tzinfo=timezone.utc), pages) == date(2026, 9, 13)
 
 
-@pytest.mark.parametrize("pages", [[], [_page("a", ok=False, fetched_at=None)], [_page("a"), _page("b", fetched_at=None)]])
-def test_as_of_for_cached_is_unknown_when_any_snapshot_page_has_no_fetch_time(pages):
-    assert as_of_for(Mode.CACHED, datetime(2030, 1, 1, tzinfo=timezone.utc), pages) is None
+@pytest.mark.parametrize(
+    ("pages", "reason"),
+    [
+        ([], "一页都没有"),
+        ([_page("a", ok=False, fetched_at=None)], "一页都没有"),
+        ([_page("a"), _page("b", fetched_at=None)], "没有记录抓取时间.*日期：b。"),
+    ],
+)
+def test_as_of_for_cached_refuses_when_the_snapshot_day_is_unknown(pages, reason):
+    """第 5b 步有意修改：原 test_as_of_for_cached_is_unknown_when_any_snapshot_page_has_no_fetch_time 断言返回 None。
+    原因：cached 模式不知道快照日期时拒绝运行，不再带着空日期继续跑。"""
+    with pytest.raises(UnknownSnapshotDateError, match=reason):
+        as_of_for(Mode.CACHED, datetime(2030, 1, 1, tzinfo=timezone.utc), pages)
 
 
 def test_as_of_and_provenance_round_trip_and_may_be_null():

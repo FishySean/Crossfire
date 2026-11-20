@@ -15,7 +15,7 @@ import crossfire.composition as composition
 from crossfire.application.records import run_record
 from crossfire.application.use_cases import Attempt, CaseOutcome, estimate_requests
 from crossfire.config import Settings, SettingsError, load_eval_cases, load_questions
-from crossfire.domain import Mode, Question
+from crossfire.domain import Mode, Question, UnknownSnapshotDateError
 
 
 def parse_mode(value: str) -> Mode:
@@ -84,6 +84,9 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
     except SettingsError as error:
         print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
         return 2
+    except UnknownSnapshotDateError as error:
+        print(f"没有调用模型就停下了：\n{error}", file=sys.stderr)
+        return 2
     return 0
 
 
@@ -93,6 +96,8 @@ def verify(settings: Settings, targets: Sequence[Question], mode: Mode) -> None:
         verifier = composition.build_verifier(settings, question, mode)
         try:
             saved = verifier.execute(question)
+        except UnknownSnapshotDateError:
+            raise
         except Exception:
             traceback.print_exc()
             raise

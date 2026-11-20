@@ -103,7 +103,7 @@ class FakeExtractor:
         self.texts = texts or {}
         self.as_of_seen: list[date | None] = []
 
-    def extract(self, question: Question, page: Page, as_of: date | None) -> Claim:
+    def extract(self, question: Question, page: Page, as_of: date) -> Claim:
         self.log.record("extract")
         self.as_of_seen.append(as_of)
         return Claim(
@@ -190,7 +190,7 @@ class FakeJudge:
         self.delay = delay
         self.as_of_seen: list[date | None] = []
 
-    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date | None) -> Judgment:
+    def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
         self.log.record("judge")
         self.as_of_seen.append(as_of)
         time.sleep(self.delay)

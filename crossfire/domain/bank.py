@@ -1,17 +1,54 @@
 """题库：自动生成的候选题、找来的来源、过滤原因。"""
 
+import re
 from dataclasses import dataclass
 from datetime import date
 from enum import StrEnum
 from typing import Any, Self, cast
 
-from crossfire.domain.models import Source, Tier
+from crossfire.domain.models import Question, Source, Tier
 
 
 class QuestionCategory(StrEnum):
     TIME_LAG = "time_lag"
     SCOPE = "scope"
     REPRINT_ERROR = "reprint_error"
+
+
+# 题目里一旦出现这些，就会把分歧答案提前告诉 extract/pair，标签会被提示出来。
+# 简称展开（如 LTS（长期支持））允许；长注释、vs、候选数字 or、转载/口径暗示一律拒绝。
+_HINT_IN_PARENS = re.compile(
+    r"[（(]([^）)]{0,200})[）)]",
+)
+_HINT_KEYWORDS = re.compile(
+    r"vs\.?|口径|差异|转载|误写|抄错|错误写为|misprint|misattribut|figures?\s+differ|"
+    r"differ\s+significantly|Note:|full-time|inland\s+water|联合国承认|非盟|实际控制|"
+    r"sometimes\s+misprinted|omit\s+Rosalind|candidate|30\s+or\s+32",
+    re.IGNORECASE,
+)
+_CANDIDATE_OR = re.compile(r"\b\d+\s+or\s+\d+\b", re.IGNORECASE)
+_VS_OUTSIDE = re.compile(r"\bvs\.?\b", re.IGNORECASE)
+
+
+def question_text_hint_reason(text: str) -> str | None:
+    """若题目文字含答案提示/分歧暗示，返回原因；干净则返回 None。
+
+    真实用户不会在括号里写「口径不同」或「转载误写 1911」。这类提示会泄漏进 extract/pair。
+    """
+    if _CANDIDATE_OR.search(text):
+        return "候选答案 or"
+    if _VS_OUTSIDE.search(text):
+        return "vs 对照"
+    if _HINT_KEYWORDS.search(text):
+        return "暗示分歧或答案"
+    for match in _HINT_IN_PARENS.finditer(text):
+        inner = match.group(1).strip()
+        if _HINT_KEYWORDS.search(inner):
+            return "括号里的答案提示"
+        # 超过约 12 个字的括号多半是出题注释，不是简称展开。
+        if len(inner) > 12:
+            return "括号注释"
+    return None
 
 
 class DropReason(StrEnum):
@@ -70,15 +107,19 @@ class ProposedQuestion:
     category: QuestionCategory
     language: str
     keywords: tuple[str, ...]
+    design_note: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload = {
             "id": self.id,
             "question": self.text,
             "category": self.category.value,
             "language": self.language,
             "keywords": list(self.keywords),
         }
+        if self.design_note:
+            payload["design_note"] = self.design_note
+        return payload
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
@@ -92,6 +133,7 @@ class ProposedQuestion:
             category=QuestionCategory(str(data["category"])),
             language=str(data["language"]),
             keywords=keywords,
+            design_note=str(data.get("design_note") or ""),
         )
 
 
@@ -132,10 +174,16 @@ class BankQuestion:
     keywords: tuple[str, ...]
     sources: tuple[KeptSource, ...]
     rejected: tuple[RejectedSource, ...]
+    # 只给人看的出题意图（口径差异、常见转载错误等）。绝不进流水线 prompt。
+    design_note: str = ""
+
+    def to_pipeline_question(self) -> Question:
+        """给 extract / pair / judge 用的题目：只有 id、正文、来源，不含 design_note。"""
+        return Question(id=self.id, text=self.text, sources=tuple(item.source for item in self.sources))
 
     def to_yaml_dict(self) -> dict[str, Any]:
         """写入 questions/bank.yaml 的形态，sources 与 demo.yaml 兼容，额外字段跟在后面。"""
-        return {
+        payload: dict[str, Any] = {
             "id": self.id,
             "question": self.text,
             "category": self.category.value,
@@ -145,6 +193,9 @@ class BankQuestion:
             "sources": [item.to_dict() for item in self.sources],
             "rejected_sources": [item.to_dict() for item in self.rejected],
         }
+        if self.design_note:
+            payload["design_note"] = self.design_note
+        return payload
 
     @classmethod
     def from_yaml_dict(cls, data: dict[str, Any]) -> Self:
@@ -167,15 +218,20 @@ class BankQuestion:
             keywords: tuple[str, ...] = ()
         else:
             keywords = tuple(str(item) for item in cast(list[object], raw_keywords))
+        text = str(data["question"])
+        reason = question_text_hint_reason(text)
+        if reason is not None:
+            raise ValueError(f"{data.get('id')}: 题目含答案提示（{reason}）：{text}")
         return cls(
             id=str(data["id"]),
-            text=str(data["question"]),
+            text=text,
             category=QuestionCategory(str(data["category"])),
             language=str(data["language"]),
             generated_on=date.fromisoformat(str(data["generated_on"])),
             keywords=keywords,
             sources=sources,
             rejected=rejected,
+            design_note=str(data.get("design_note") or ""),
         )
 
 

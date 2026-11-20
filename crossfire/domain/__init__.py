@@ -10,6 +10,7 @@ from crossfire.domain.bank import (
     ProposedQuestion,
     QuestionCategory,
     RejectedSource,
+    question_text_hint_reason,
 )
 from crossfire.domain.models import (
     AsOf,
@@ -69,4 +70,5 @@ __all__ = [
     "Usage",
     "as_of_for",
     "is_usable_page",
+    "question_text_hint_reason",
 ]

@@ -22,12 +22,16 @@ from crossfire.application.use_cases import (
     apply_keep_rules,
     bench_runs,
     cross_model_agreement,
+    dataset_readme,
     estimate_bank_build,
+    estimate_batch,
     estimate_pair_cost,
     estimate_pair_requests,
     estimate_requests,
+    export_pair_dataset,
     label_name,
     remaining_quotas,
+    split_question_ids,
 )
 from crossfire.config import (
     DEFAULT_HAIKU,
@@ -37,6 +41,7 @@ from crossfire.config import (
     WEB_SEARCH_PER_THOUSAND_USD,
     Settings,
     SettingsError,
+    load_bank_questions,
     load_consistency_inputs,
     load_eval_cases,
     load_judge_inputs,
@@ -106,6 +111,18 @@ def build_parser() -> argparse.ArgumentParser:
     build = bank_commands.add_parser("build", help="按类别配额建题库；有进度文件则断点续跑")
     build.add_argument("--estimate-only", action="store_true", help="只打印预计搜索/请求/费用")
     build.add_argument("--fresh", action="store_true", help="忽略进度文件，从头开始")
+
+    batch = commands.add_parser("batch", help="对题库批量跑完整流水线（默认 cached）")
+    batch.add_argument("--bank", metavar="PATH", help="题库 YAML，默认 questions/bank.yaml")
+    batch.add_argument("--estimate-only", action="store_true", help="只打印预计请求数和费用")
+    batch.add_argument("--fresh", action="store_true", help="忽略进度，从头开始")
+    batch.add_argument("--budget", type=float, default=12.0, help="Anthropic 预算上限（美元），默认 12")
+
+    dataset = commands.add_parser("dataset", help="训练数据")
+    dataset_commands = dataset.add_subparsers(dest="dataset_command", required=True)
+    export_cmd = dataset_commands.add_parser("export", help="从批量运行导出 data/pairs.jsonl")
+    export_cmd.add_argument("--bank", metavar="PATH", help="题库 YAML，默认 questions/bank.yaml")
+    export_cmd.add_argument("--seed", default="crossfire-5c2-2026-11-20", help="按题切分的随机种子")
     return parser
 
 
@@ -145,6 +162,22 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
     if args.command == "bank":
         try:
             return bank_build(settings, args.estimate_only, args.fresh, parser)
+        except SettingsError as error:
+            print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
+            return 2
+
+    if args.command == "batch":
+        try:
+            bank_path = Path(args.bank) if args.bank else settings.bank_file
+            return batch_command(settings, bank_path, args.estimate_only, args.fresh, args.budget, parser)
+        except SettingsError as error:
+            print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
+            return 2
+
+    if args.command == "dataset":
+        try:
+            bank_path = Path(args.bank) if getattr(args, "bank", None) else settings.bank_file
+            return dataset_export_command(settings, bank_path, args.seed, parser)
         except SettingsError as error:
             print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
             return 2
@@ -694,6 +727,196 @@ def _write_bank_review(path: Path, kept: Sequence, dropped: Sequence, as_of) -> 
         "",
     ]
     path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def batch_command(
+    settings: Settings,
+    bank_path: Path,
+    estimate_only: bool,
+    fresh: bool,
+    budget: float,
+    parser: argparse.ArgumentParser,
+) -> int:
+    import yaml
+
+    from crossfire.application.use_cases import RunBatch
+
+    bank = load_bank_questions(settings, bank_path)
+    # design_note 不得进流水线：to_pipeline_question 已剥离；这里再扫一遍正文。
+    for question in bank:
+        if question.design_note and question.design_note in question.text:
+            parser.error(f"{question.id}: design_note 写进了题目正文")
+
+    done: list[str] = []
+    if not fresh and settings.batch_progress_file.is_file():
+        progress = yaml.safe_load(settings.batch_progress_file.read_text(encoding="utf-8")) or {}
+        done = [str(item) for item in progress.get("done") or []]
+    pending = [question for question in bank if question.id not in set(done)]
+    estimate = estimate_batch(pending, price=settings.price_for(settings.model_extract))
+    print("批量运行计划：")
+    print(f"  题库 {bank_path}：共 {len(bank)} 道，已完成 {len(done)}，待跑 {len(pending)}")
+    print(f"  预计请求：提取 {estimate.extracts} + 比对 {estimate.pairs} + 判决 {estimate.judges} = {estimate.requests}")
+    print(f"  预计 Anthropic 约 ${estimate.anthropic_usd:.2f}（按近期中位 token）")
+    if estimate.anthropic_usd > budget:
+        print(
+            f"预计 ${estimate.anthropic_usd:.2f} 超过预算上限 ${budget:.2f}，没有开始运行。",
+            file=sys.stderr,
+        )
+        return 2
+    if estimate_only or not pending:
+        if not pending:
+            print("没有待跑的题目。")
+        return 0
+
+    settings.batch_dir.mkdir(parents=True, exist_ok=True)
+
+    def save_progress(ids: list[str]) -> None:
+        settings.batch_progress_file.parent.mkdir(parents=True, exist_ok=True)
+        settings.batch_progress_file.write_text(
+            yaml.safe_dump({"done": ids, "bank": str(bank_path)}, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
+
+    def on_saved(question, saved) -> None:
+        # 额外按题号存一份，方便 dataset export / consistency 取用。
+        target = settings.batch_dir / f"{question.id}.json"
+        target.write_text(
+            json.dumps(run_record(saved.result), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"  ✓ {question.id} → {saved.location}（副本 {target.name}）")
+
+    runner = RunBatch(
+        verifier_for=lambda question: composition.build_verifier(settings, question, Mode.CACHED),
+        on_progress=save_progress,
+        on_saved=on_saved,
+    )
+    print(f"开始批量运行（cached，预算 ${budget:.2f}）…")
+    try:
+        results = runner.execute(pending, done_ids=done)
+    except Exception as error:
+        detail = str(error).lower()
+        if any(token in detail for token in ("credit balance", "insufficient", "authentication", "401", "403", "402")):
+            print(f"余额不足或鉴权失败，立刻停下：{error}", file=sys.stderr)
+            return 2
+        raise
+    print(f"本轮完成 {len(results)} 道。进度：{settings.batch_progress_file}")
+    return 0
+
+
+def dataset_export_command(settings: Settings, bank_path: Path, seed: str, parser: argparse.ArgumentParser) -> int:
+    from crossfire.domain import RunResult
+
+    bank = load_bank_questions(settings, bank_path)
+    runs: dict[str, RunResult] = {}
+    for question in bank:
+        path = settings.batch_dir / f"{question.id}.json"
+        if not path.is_file():
+            parser.error(f"缺少批量结果 {path}，先跑 crossfire batch")
+        runs[question.id] = RunResult.from_dict(json.loads(path.read_text(encoding="utf-8")))
+
+    sonnet_consistency = _load_batch_consistency(settings, settings.model_pair)
+    export = export_pair_dataset(
+        bank,
+        runs,
+        sonnet_consistency=sonnet_consistency,
+        split=split_question_ids([question.id for question in bank], seed=seed),
+        seed=seed,
+        pair_model=settings.model_pair,
+    )
+    settings.dataset_dir.mkdir(parents=True, exist_ok=True)
+    pairs_path = settings.dataset_dir / "pairs.jsonl"
+    with pairs_path.open("w", encoding="utf-8") as handle:
+        for example in export.examples:
+            handle.write(json.dumps(example.to_jsonl_dict(), ensure_ascii=False) + "\n")
+    readme = dataset_readme(export)
+    (settings.dataset_dir / "README.md").write_text(readme, encoding="utf-8")
+    print(readme)
+    print(f"已写入 {pairs_path}（{len(export.examples)} 条）")
+    return 0
+
+
+def _load_batch_consistency(settings: Settings, model: str):
+    """若存在 out/consistency/batch-5c2.json，读出该模型的 ModelConsistency。"""
+    path = settings.consistency_dir / "batch-5c2.json"
+    if not path.is_file():
+        return None
+    from crossfire.application.use_cases.measure_consistency import ModelConsistency, PairSummary, PairTrial
+    from crossfire.domain import Relation
+
+    def parse_relation(value: object) -> Relation | None:
+        if value is None or value == "None" or value == "":
+            return None
+        return Relation(str(value))
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    raw = data.get("results", {}).get(model)
+    if not raw:
+        return None
+    pairs = []
+    for item in raw["pairs"]:
+        if "trials" in item:
+            trials = tuple(
+                PairTrial(relation=parse_relation(trial.get("relation")), nature=trial.get("nature"))
+                for trial in item["trials"]
+            )
+        else:
+            votes = item.get("votes") or []
+            natures = item.get("natures") or [None] * len(votes)
+            trials = tuple(
+                PairTrial(relation=parse_relation(vote), nature=nature)
+                for vote, nature in zip(votes, natures, strict=True)
+            )
+        pairs.append(
+            PairSummary(
+                case_id=item["case_id"],
+                a_url=item["a_url"],
+                b_url=item["b_url"],
+                a_claim=item["a_claim"],
+                b_claim=item["b_claim"],
+                trials=trials,
+                majority=parse_relation(item.get("majority")),
+                majority_count=int(item["majority_count"]),
+            )
+        )
+    return ModelConsistency(
+        model=model,
+        pairs=tuple(pairs),
+        input_tokens=int(raw.get("input_tokens") or 0),
+        output_tokens=int(raw.get("output_tokens") or 0),
+        requests=int(raw.get("requests") or 0),
+        cost_usd=float(raw.get("cost_usd") or 0),
+    )
+
+
+def write_consistency_inputs_from_batch(settings: Settings, case_ids: Sequence[str]) -> list[Path]:
+    """从批量结果抽出冻结主张，写成 consistency 可读的输入文件。"""
+    from crossfire.domain import RunResult
+
+    out_dir = settings.consistency_dir / "inputs"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+    for case_id in case_ids:
+        run_path = settings.batch_dir / f"{case_id}.json"
+        if not run_path.is_file():
+            raise SettingsError(f"写稳定性输入失败：缺少 {run_path}")
+        result = RunResult.from_dict(json.loads(run_path.read_text(encoding="utf-8")))
+        claims = [claim for claim in result.claims if claim.answered]
+        if len(claims) < 2:
+            print(f"跳过 {case_id}：可比对主张不足 2 条", file=sys.stderr)
+            continue
+        payload = {
+            "case_id": case_id,
+            "question_id": result.question.id,
+            "question": result.question.text,
+            "as_of": None if result.as_of is None else result.as_of.isoformat(),
+            "source_run": str(run_path),
+            "claims": [claim.to_dict() for claim in claims],
+        }
+        path = out_dir / f"{case_id}.json"
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        written.append(path)
+    return written
 
 
 def print_report(result: dict[str, Any], location: str) -> None:

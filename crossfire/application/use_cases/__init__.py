@@ -8,6 +8,14 @@ from crossfire.application.use_cases.build_question_bank import (
     remaining_quotas,
     select_by_tier_mix,
 )
+from crossfire.application.use_cases.export_dataset import (
+    EVAL_OVERLAP_IDS,
+    DatasetExport,
+    PairExample,
+    dataset_readme,
+    export_pair_dataset,
+    split_question_ids,
+)
 from crossfire.application.use_cases.measure_consistency import (
     MeasureConsistency,
     ModelConsistency,
@@ -19,6 +27,7 @@ from crossfire.application.use_cases.measure_consistency import (
     majority_label,
 )
 from crossfire.application.use_cases.prefetch_pages import PrefetchPages, StoredPage
+from crossfire.application.use_cases.run_batch import BatchEstimate, RunBatch, estimate_batch
 from crossfire.application.use_cases.run_evals import Attempt, CaseOutcome, RunEvals, RunJudgeEvals, estimate_requests
 from crossfire.application.use_cases.verify_question import SavedRun, VerifyQuestion
 from crossfire.domain.evals import ConsistencyInput
@@ -26,14 +35,19 @@ from crossfire.domain.evals import ConsistencyInput
 __all__ = [
     "Attempt",
     "BankBuildInterrupted",
+    "BatchEstimate",
     "BenchReport",
     "BuildQuestionBank",
     "CaseOutcome",
     "ConsistencyInput",
+    "DatasetExport",
+    "EVAL_OVERLAP_IDS",
     "MeasureConsistency",
     "ModelConsistency",
+    "PairExample",
     "PairSummary",
     "PrefetchPages",
+    "RunBatch",
     "RunBench",
     "RunEvals",
     "RunJudgeEvals",
@@ -44,13 +58,17 @@ __all__ = [
     "apply_keep_rules",
     "bench_runs",
     "cross_model_agreement",
+    "dataset_readme",
     "estimate_bank_build",
+    "estimate_batch",
     "estimate_pair_cost",
     "estimate_pair_requests",
     "estimate_requests",
+    "export_pair_dataset",
     "label_name",
     "majority_label",
     "page_mentions_topic",
     "remaining_quotas",
     "select_by_tier_mix",
+    "split_question_ids",
 ]

@@ -23,7 +23,7 @@ from crossfire.domain import (
     Source,
     Tier,
 )
-from crossfire.domain.bank import CATEGORY_QUOTAS
+from crossfire.domain.bank import CATEGORY_QUOTAS, question_text_hint_reason
 
 MIN_USABLE_SOURCES = 5
 MIN_PRIMARY_SOURCES = 1
@@ -266,6 +266,14 @@ class BuildQuestionBank:
         self._save(kept_list, dropped_list)
 
     def _process(self, proposed: ProposedQuestion, today: AsOf) -> BankQuestion | DroppedQuestion:
+        hint = question_text_hint_reason(proposed.text)
+        if hint is not None:
+            return DroppedQuestion(
+                proposed=proposed,
+                reason=DropReason.TOO_FEW_USABLE,
+                detail=f"题目含答案提示（{hint}），拒绝入库",
+                rejected=(),
+            )
         try:
             found = self._finder.find(proposed.text, today)
         except Exception as error:

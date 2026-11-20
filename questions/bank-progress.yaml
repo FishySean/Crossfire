@@ -383,7 +383,7 @@ kept:
     found_by: Ubuntu LTS latest release 2024 2025
   rejected_sources: []
 - id: shanghai-population-scope
-  question: 上海的人口是多少？（常住人口 vs 户籍人口口径不同，数字有差异）
+  question: 上海的人口是多少？
   category: scope
   language: zh
   generated_on: '2026-11-20'
@@ -443,9 +443,9 @@ kept:
       the target page — the site did not respond, refused the connection, or presented
       an invalid certificate. Verify the URL is reachable; this is not a Steel failure
       and was not charged.","retryable":false}'
+  design_note: 设计意图：常住人口 vs 户籍人口口径不同，数字有差异。
 - id: amazon-employee-count-scope
-  question: 'How many employees does Amazon have? (Note: full-time vs full-time-and-part-time
-    figures differ significantly.)'
+  question: How many employees does Amazon have?
   category: scope
   language: en
   generated_on: '2026-11-20'
@@ -492,9 +492,9 @@ kept:
     title: Amazon.com Number of Employees 2016–2025 – Bullfincher
     found_by: Amazon employees headcount 2024 2025 news
   rejected_sources: []
+  design_note: 'Design note: full-time vs full-time-and-part-time figures differ significantly.'
 - id: usa-land-area-scope
-  question: What is the total area of the United States in square kilometers? (Figures
-    differ depending on whether inland water is included.)
+  question: What is the total area of the United States in square kilometers?
   category: scope
   language: en
   generated_on: '2026-11-20'
@@ -534,8 +534,9 @@ kept:
   - url: https://www.britannica.com/place/United-States
     reason: unusable_page
     detail: empty_content
+  design_note: 'Design note: figures differ depending on whether inland water is included.'
 - id: africa-country-count-scope
-  question: 非洲共有多少个国家？（不同口径：联合国承认 vs 非盟成员 vs 实际控制领土）
+  question: 非洲共有多少个国家？
   category: scope
   language: zh
   generated_on: '2026-11-20'
@@ -585,8 +586,9 @@ kept:
   - url: https://www.un.org/dgacm/en/content/regional-groups
     reason: keyword_miss
     detail: 正文未出现任何关键词
+  design_note: 设计意图：不同口径——联合国承认 vs 非盟成员 vs 实际控制领土。
 - id: bitcoin-creator-reprint
-  question: 比特币白皮书的作者署名是什么？（转载常误写为其他形式）
+  question: 比特币白皮书的作者署名是什么？
   category: reprint_error
   language: zh
   generated_on: '2026-11-20'
@@ -638,9 +640,9 @@ kept:
       the target page — the site did not respond, refused the connection, or presented
       an invalid certificate. Verify the URL is reachable; this is not a Steel failure
       and was not charged.","retryable":false}'
+  design_note: 设计意图：转载常误写署名形式；一手来源应能锚定正确署名。
 - id: marie-curie-birth-year-reprint
-  question: Marie Curie's birth year is sometimes misprinted in secondary sources.
-    What is her correct birth year?
+  question: What year was Marie Curie born?
   category: reprint_error
   language: en
   generated_on: '2026-11-20'
@@ -686,8 +688,10 @@ kept:
   - url: https://www.britannica.com/summary/Marie-Curie
     reason: unusable_page
     detail: empty_content
+  design_note: 'Design note: secondary sources sometimes misprint her birth year;
+    primary sources should anchor the correct year.'
 - id: titanic-sinking-year-reprint
-  question: 泰坦尼克号沉没于哪一年？（部分转载文章错误写为 1911 年）
+  question: 泰坦尼克号沉没于哪一年？
   category: reprint_error
   language: zh
   generated_on: '2026-11-20'
@@ -726,58 +730,7 @@ kept:
   - url: https://www.britannica.com/topic/Titanic
     reason: unusable_page
     detail: empty_content
-- id: dna-double-helix-discoverers-reprint
-  question: Who are credited as the discoverers of the DNA double helix structure?
-    (Some reprintings omit Rosalind Franklin or misattribute the discovery.)
-  category: reprint_error
-  language: en
-  generated_on: '2026-11-20'
-  keywords:
-  - DNA
-  - double helix
-  - Watson
-  - Crick
-  - Franklin
-  sources:
-  - url: https://www.genome.gov/25520255/online-education-kit-1953-dna-double-helix
-    tier: primary
-    title: '1953: DNA Double Helix – National Human Genome Research Institute (NHGRI)'
-    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
-  - url: https://profiles.nlm.nih.gov/spotlight/kr/feature/biographical-overview
-    tier: primary
-    title: Rosalind Franklin – Biographical Overview (NLM/NIH Profiles in Science)
-    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
-  - url: https://profiles.nlm.nih.gov/spotlight/sc/feature/doublehelix
-    tier: primary
-    title: The Discovery of the Double Helix, 1951–1953 (NLM Profiles in Science)
-    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
-  - url: https://www.scientificamerican.com/article/rosalind-franklin-deserves-a-posthumous-nobel-prize-for-co-discovering-dna-structure/
-    tier: news
-    title: Rosalind Franklin Deserves a Posthumous Nobel Prize for Co-discovering
-      DNA Structure – Scientific American
-    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
-  - url: https://theconversation.com/rosalind-franklin-still-doesnt-get-the-recognition-she-deserves-for-her-dna-discovery-95536
-    tier: news
-    title: Rosalind Franklin still doesn't get the recognition she deserves for her
-      DNA discovery – The Conversation
-    found_by: Rosalind Franklin DNA discovery credit history Nobel Prize
-  - url: https://www.nature.com/articles/d41586-019-02554-z
-    tier: news
-    title: The structure of DNA – Nature (news/history feature)
-    found_by: Watson Crick 1953 Nature paper DNA double helix original publication
-  - url: https://www.sciencehistory.org/education/scientific-biographies/francis-crick-rosalind-franklin-james-watson-and-maurice-wilkins/
-    tier: aggregator
-    title: Francis Crick, Rosalind Franklin, James Watson, and Maurice Wilkins – Science
-      History Institute
-    found_by: DNA double helix discovery Watson Crick Franklin Wilkins credited discoverers
-  - url: https://www.nature.com/scitable/topicpage/discovery-of-dna-structure-and-function-watson-397/
-    tier: aggregator
-    title: 'Discovery of DNA Structure and Function: Watson and Crick – Nature Scitable'
-    found_by: DNA double helix discovery Watson Crick Franklin Wilkins credited discoverers
-  rejected_sources:
-  - url: https://www.britannica.com/question/Who-discovered-the-structure-of-DNA
-    reason: unusable_page
-    detail: empty_content
+  design_note: 设计意图：部分转载可能写错年份；不能在题目里点名错误数字。
 - id: london-population-scope
   question: 伦敦的人口是多少？
   category: scope
@@ -873,9 +826,9 @@ kept:
     found_by: European Union member states official europa.eu
   rejected_sources: []
 - id: nba-team-count-scope
-  question: NBA currently has how many teams — 30 or 32?
-  category: scope
-  language: en
+  question: NBA 目前有多少支球队？
+  category: time_lag
+  language: zh
   generated_on: '2026-11-20'
   keywords:
   - NBA
@@ -914,6 +867,7 @@ kept:
   - url: https://www.nba.com/news/nba-rosters-set-for-2025-26-regular-season
     reason: unusable_page
     detail: too_short
+  design_note: 设计意图：球队数量随扩军变化过，属时间差；原题写 30 or 32 等于给候选答案。
 - id: great-barrier-reef-area-scope
   question: 大堡礁的面积是多少？
   category: scope

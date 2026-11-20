@@ -75,6 +75,9 @@ class Settings:
     bank_file: Path
     bank_review_file: Path
     bank_progress_file: Path
+    batch_dir: Path
+    batch_progress_file: Path
+    dataset_dir: Path
     extract_concurrency: int
     env_file: Path
 
@@ -118,6 +121,9 @@ class Settings:
             bank_file=_path(get("CROSSFIRE_BANK_FILE", "questions/bank.yaml")),
             bank_review_file=_path(get("CROSSFIRE_BANK_REVIEW_FILE", "notes/bank-review.md")),
             bank_progress_file=_path(get("CROSSFIRE_BANK_PROGRESS_FILE", "questions/bank-progress.yaml")),
+            batch_dir=_path(get("CROSSFIRE_BATCH_DIR", "out/batch-runs")),
+            batch_progress_file=_path(get("CROSSFIRE_BATCH_PROGRESS_FILE", "out/batch-progress.yaml")),
+            dataset_dir=_path(get("CROSSFIRE_DATASET_DIR", "data")),
             extract_concurrency=_positive_int("CROSSFIRE_EXTRACT_CONCURRENCY", get("CROSSFIRE_EXTRACT_CONCURRENCY", "4"), env_file),
             env_file=env_file,
         )
@@ -175,6 +181,17 @@ def load_questions(settings: Settings) -> list[Question]:
     return [Question.from_dict(item) for item in data]
 
 
+def load_bank_questions(settings: Settings, path: Path | None = None) -> list:
+    """读题库（含 category / design_note）。缺文件时报错。"""
+    from crossfire.domain import BankQuestion
+
+    bank_path = path or settings.bank_file
+    if not bank_path.is_file():
+        raise SettingsError(f"找不到题库文件 {bank_path}")
+    data: Any = yaml.safe_load(bank_path.read_text(encoding="utf-8")) or []
+    return [BankQuestion.from_yaml_dict(item) for item in data]
+
+
 def load_eval_cases(settings: Settings) -> list[EvalCase]:
     """读 evals/cases/*.yaml，每个文件一道题，按 id 排序。文件名必须等于 id，快照目录也按 id 找。"""
     cases: list[EvalCase] = []
@@ -203,15 +220,22 @@ def load_judge_inputs(settings: Settings, case: EvalCase) -> list[JudgeInput]:
 
 
 def load_consistency_inputs(settings: Settings, case_ids: Iterable[str] | None = None) -> list[ConsistencyInput]:
-    """evals/consistency_inputs/<id>.json。"""
-    directory = settings.evals_dir / "consistency_inputs"
-    paths = sorted(directory.glob("*.json"))
+    """先读 out/consistency/inputs/（批量导出），再读 evals/consistency_inputs/。同 id 时批量优先。"""
+    directories = [settings.consistency_dir / "inputs", settings.evals_dir / "consistency_inputs"]
+    by_stem: dict[str, Path] = {}
+    for directory in directories:
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.glob("*.json")):
+            by_stem.setdefault(path.stem, path)
+    paths = sorted(by_stem.values(), key=lambda path: path.stem)
     if case_ids is not None:
         wanted = set(case_ids)
         paths = [path for path in paths if path.stem in wanted]
         missing = wanted - {path.stem for path in paths}
         if missing:
-            raise SettingsError(f"找不到稳定性输入：{', '.join(sorted(missing))}（目录 {directory}）")
+            searched = "、".join(str(directory) for directory in directories)
+            raise SettingsError(f"找不到稳定性输入：{', '.join(sorted(missing))}（查过 {searched}）")
     inputs: list[ConsistencyInput] = []
     for path in paths:
         try:

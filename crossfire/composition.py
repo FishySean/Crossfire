@@ -107,10 +107,17 @@ def build_extractor(settings: Settings) -> ClaimExtractor:
     )
 
 
-def build_pairer(settings: Settings) -> ClaimPairer:
+def build_pairer(settings: Settings, model: str | None = None) -> ClaimPairer:
     match settings.pairer:
         case Pairer.CLAUDE:
-            return ClaudeClaimPairer(ClaudeClient(settings.anthropic_api_key, settings.model_pair))
+            return ClaudeClaimPairer(ClaudeClient(settings.anthropic_api_key, model or settings.model_pair))
+
+
+def build_consistency_runner(settings: Settings):
+    from crossfire.application.use_cases.measure_consistency import MeasureConsistency
+
+    settings.require(*KEYS_FOR_MODE[Mode.CACHED])
+    return MeasureConsistency(lambda model: build_pairer(settings, model))
 
 
 def build_prefetcher(settings: Settings, question: Question) -> PrefetchPages:

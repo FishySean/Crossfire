@@ -16,11 +16,20 @@ import yaml
 from dotenv import dotenv_values
 
 from crossfire.domain import Question
-from crossfire.domain.evals import EvalCase, JudgeInput
+from crossfire.domain.evals import ConsistencyInput, EvalCase, JudgeInput
+from crossfire.domain.pricing import ModelPrice
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = ROOT / ".env"
 DEFAULT_MODEL = "claude-sonnet-4-6"
+DEFAULT_HAIKU = "claude-haiku-4-5"
+
+# 单价查自 https://docs.anthropic.com/en/docs/about-claude/pricing ，2026-11-20。
+# 只列本仓库默认会用到的模型。换模型时在这里加一行；查不到官方价就不要凭记忆填。
+MODEL_PRICES: dict[str, ModelPrice] = {
+    "claude-sonnet-4-6": ModelPrice(input_per_mtok=3.0, output_per_mtok=15.0),
+    "claude-haiku-4-5": ModelPrice(input_per_mtok=1.0, output_per_mtok=5.0),
+}
 
 
 class Pairer(StrEnum):
@@ -57,6 +66,7 @@ class Settings:
     questions_file: Path
     evals_dir: Path
     eval_runs_dir: Path
+    consistency_dir: Path
     extract_concurrency: int
     env_file: Path
 
@@ -96,9 +106,21 @@ class Settings:
             questions_file=_path(get("CROSSFIRE_QUESTIONS_FILE", "questions/demo.yaml")),
             evals_dir=_path(get("CROSSFIRE_EVALS_DIR", "evals")),
             eval_runs_dir=_path(get("CROSSFIRE_EVAL_RUNS_DIR", "out/eval-runs")),
+            consistency_dir=_path(get("CROSSFIRE_CONSISTENCY_DIR", "out/consistency")),
             extract_concurrency=_positive_int("CROSSFIRE_EXTRACT_CONCURRENCY", get("CROSSFIRE_EXTRACT_CONCURRENCY", "4"), env_file),
             env_file=env_file,
         )
+
+    def price_for(self, model: str) -> ModelPrice:
+        try:
+            return MODEL_PRICES[model]
+        except KeyError:
+            known = "、".join(MODEL_PRICES) or "（空）"
+            raise SettingsError(
+                f"不知道模型 {model} 的单价。已登记的：{known}。"
+                f"去 https://docs.anthropic.com/en/docs/about-claude/pricing 查到后加进 config.MODEL_PRICES，"
+                f"并写上查询日期。"
+            ) from None
 
     def missing(self, *keys: Key) -> list[Key]:
         present = {Key.ANTHROPIC: self.anthropic_api_key, Key.STEEL: self.steel_api_key}
@@ -166,4 +188,23 @@ def load_judge_inputs(settings: Settings, case: EvalCase) -> list[JudgeInput]:
     inputs = [JudgeInput.from_dict(item) for item in data["inputs"]]
     if not inputs:
         raise SettingsError(f"{path} 里没有输入")
+    return inputs
+
+
+def load_consistency_inputs(settings: Settings, case_ids: Iterable[str] | None = None) -> list[ConsistencyInput]:
+    """evals/consistency_inputs/<id>.json。"""
+    directory = settings.evals_dir / "consistency_inputs"
+    paths = sorted(directory.glob("*.json"))
+    if case_ids is not None:
+        wanted = set(case_ids)
+        paths = [path for path in paths if path.stem in wanted]
+        missing = wanted - {path.stem for path in paths}
+        if missing:
+            raise SettingsError(f"找不到稳定性输入：{', '.join(sorted(missing))}（目录 {directory}）")
+    inputs: list[ConsistencyInput] = []
+    for path in paths:
+        try:
+            inputs.append(ConsistencyInput.from_dict(json.loads(path.read_text(encoding="utf-8")), source=str(path)))
+        except (KeyError, TypeError, ValueError) as error:
+            raise SettingsError(f"读 {path} 失败：{error}") from error
     return inputs

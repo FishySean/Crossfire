@@ -1,0 +1,107 @@
+{
+  "case_id": "tokyo-2026-09",
+  "question_id": "tokyo-population",
+  "question": "东京的人口是多少？",
+  "as_of": "2026-09-12",
+  "source_run": "out/eval-runs/tokyo-2026-09/tokyo-population_20261119T234450Z.json",
+  "claims": [
+    {
+      "url": "https://www.toukei.metro.tokyo.jp/jsuikei/js-index.htm",
+      "tier": "primary",
+      "claim": "截至2026年8月1日，东京都的推计人口（总数）为14,303,513人。",
+      "evidence": "8月　14,303,513　6,994,078　7,309,435",
+      "source_type": "official_documentation",
+      "confidence": 0.95,
+      "published_date": "2026-08-01",
+      "usage": {
+        "input_tokens": 5928,
+        "output_tokens": 162,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.metro.tokyo.lg.jp/information/press/2026/05/2026052914",
+      "tier": "primary",
+      "claim": "截至令和7年（2025年）10月1日，东京都的人口为14,246,219人，比令和2年增加约20万人。",
+      "evidence": "東京都の人口は14,246,219人で、令和2年より約20万人増",
+      "source_type": "official_documentation",
+      "confidence": 0.99,
+      "published_date": "2026-05-29",
+      "usage": {
+        "input_tokens": 3483,
+        "output_tokens": 179,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://asia.nikkei.com/business/transportation/railway-development-drives-tokyo-s-growth-as-world-s-largest-metro-area",
+      "tier": "news",
+      "claim": "截至2025年10月13日（该文发布时），东京都市圈人口为3700万，是世界上最大的都市圈，约占日本总人口的三分之一。",
+      "evidence": "solidifying its status as the world's largest with 37 million people -- about a third of Japan's total population.",
+      "source_type": "news_article",
+      "confidence": 0.95,
+      "published_date": "2025-10-13",
+      "usage": {
+        "input_tokens": 4600,
+        "output_tokens": 190,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Demographics_of_Tokyo",
+      "tier": "aggregator",
+      "claim": "截至2025年，东京的总人口为14,195,730人，占日本总人口的11.5%。",
+      "evidence": "As of 2025, the total population of Tokyo is 14,195,730 and had the largest population (11.5 percent of the total population).",
+      "source_type": "encyclopedia",
+      "confidence": 0.85,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 22364,
+        "output_tokens": 172,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Greater_Tokyo_area",
+      "tier": "aggregator",
+      "claim": "截至2026年，大东京地区（Greater Tokyo Area）的总人口为36,954,512，其中东京都市圈（Tokyo Metropolis）的人口约为13,479,000（2015年数据）。",
+      "evidence": "As of 2026, the United Nations estimates the total population at 36,954,512, making it the third-most populous urban area in the world.",
+      "source_type": "encyclopedia",
+      "confidence": 0.72,
+      "published_date": "2026-09-12",
+      "usage": {
+        "input_tokens": 16053,
+        "output_tokens": 202,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.citypopulation.de/en/japan/tokyo/",
+      "tier": "aggregator",
+      "claim": "东京都（Metropolitan Prefecture）2025年普查（初步结果）人口为14,246,219人，2020年普查人口为14,047,594人。",
+      "evidence": "14,246,219 Population [2025] – census; 14,047,594 Population [2020] – census",
+      "source_type": "other",
+      "confidence": 0.95,
+      "published_date": "2025-10-01",
+      "usage": {
+        "input_tokens": 6227,
+        "output_tokens": 181,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.storyfactory.org.au/story/tokyo-worlds-largest-city-by-joshua/",
+      "tier": "aggregator",
+      "claim": "东京城市人口为3700万。",
+      "evidence": "The city thrives economically, with 37 million residing in the city and a GDP of US$1.8 trillion",
+      "source_type": "blog",
+      "confidence": 0.95,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 2619,
+        "output_tokens": 143,
+        "requests": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "case_id": "nodejs-2026-09",
+  "question_id": "nodejs-lts-version",
+  "question": "Node.js 目前处于 Active LTS 的版本是哪一个？",
+  "as_of": "2026-09-12",
+  "source_run": "out/eval-runs/nodejs-2026-09/nodejs-lts-version_20261119T233930Z.json",
+  "claims": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "tier": "primary",
+      "claim": "目前处于 LTS（Active LTS）状态的 Node.js 版本有 v24（Krypton）和 v22（Jod）两个。",
+      "evidence": "v24 Krypton, Status: LTS; v22 Jod, Status: LTS",
+      "source_type": "official_documentation",
+      "confidence": 0.85,
+      "published_date": "2026-09-09",
+      "usage": {
+        "input_tokens": 3526,
+        "output_tokens": 180,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://github.com/nodejs/release",
+      "tier": "primary",
+      "claim": "目前 Node.js 处于 Active LTS 状态的版本是 24.x（代号 Krypton）。",
+      "evidence": "| [24.x] | **Active LTS** | [Krypton] | 2025-05-06 | 2025-10-28 | 2026-10-20 | 2028-04-30 |",
+      "source_type": "official_documentation",
+      "confidence": 0.99,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 5921,
+        "output_tokens": 197,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "tier": "news",
+      "claim": "截至2024年10月29日（该文发布时），Node.js v22（22.x）是处于 Active LTS 状态的版本。",
+      "evidence": "With Node.js v22.11.0, the 22.x release line has officially moved into **Active LTS**.",
+      "source_type": "blog",
+      "confidence": 0.98,
+      "published_date": "2024-10-29",
+      "usage": {
+        "input_tokens": 4340,
+        "output_tokens": 177,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "tier": "news",
+      "claim": "截至 2024-10-29（该文发布时），Node.js 22.x（版本 22.11.0，代号 'Jod'）处于 Active LTS 状态。",
+      "evidence": "The 22.x release line now moves into \"Active LTS\" and will remain so until October 2025.",
+      "source_type": "official_documentation",
+      "confidence": 0.95,
+      "published_date": "2024-10-29",
+      "usage": {
+        "input_tokens": 1849,
+        "output_tokens": 188,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "tier": "news",
+      "claim": "截至2026-07-24，Node.js 24 \"Krypton\" 是处于 Active LTS 状态的版本。",
+      "evidence": "As of 2026-07-24, the supported (non-EOL) lines are Node.js 22 (Maintenance LTS), Node.js 24 (Active LTS), and Node.js 26 (Current).",
+      "source_type": "blog",
+      "confidence": 0.99,
+      "published_date": "2026-07-24",
+      "usage": {
+        "input_tokens": 9925,
+        "output_tokens": 199,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://endoflife.date/nodejs",
+      "tier": "aggregator",
+      "claim": "根据该页面，目前处于 Active LTS 状态的 Node.js 版本是 24（LTS），其 Active Support 尚未结束（结束于 2026 年 10 月 20 日），而 Node.js 22 的 Active Support 已于 2025 年 10 月 21 日结束，进入 Maintenance LTS 阶段。",
+      "evidence": "| 24 (LTS) | 1 year and 4 months ago (06 May 2025) | Ends in 1 month and 1 week (20 Oct 2026) |",
+      "source_type": "other",
+      "confidence": 0.9,
+      "published_date": "2026-09-12",
+      "usage": {
+        "input_tokens": 5478,
+        "output_tokens": 262,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "tier": "aggregator",
+      "claim": "该页面未具体说明哪个版本处于 Active LTS 状态，仅提到应使用 LTS 版本用于生产项目。",
+      "evidence": "For stability, use an **LTS (Long Term Support)** version for production projects.",
+      "source_type": "other",
+      "confidence": 0.95,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 5880,
+        "output_tokens": 166,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "tier": "aggregator",
+      "claim": "该页面未明确指出哪个版本当前处于 Active LTS 状态，仅对 Active LTS 进行了定义，未在版本表中标注各版本的 LTS 状态。",
+      "evidence": "Active LTS: A stable version that receives critical bug fixes, security updates, and non-breaking improvements. This is recommended for production environments.",
+      "source_type": "blog",
+      "confidence": 0.9,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 3146,
+        "output_tokens": 191,
+        "requests": 1
+      }
+    }
+  ]
+}

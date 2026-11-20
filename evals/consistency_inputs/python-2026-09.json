@@ -1,0 +1,65 @@
+{
+  "case_id": "python-2026-09",
+  "question_id": "python-latest-version",
+  "question": "Python 目前的最新稳定版本是哪一个？",
+  "as_of": "2026-09-12",
+  "source_run": "out/eval-runs/python-2026-09/python-latest-version_20261119T234210Z.json",
+  "claims": [
+    {
+      "url": "https://www.python.org/downloads/",
+      "tier": "primary",
+      "claim": "Python 目前的最新稳定版本是 Python 3.14.7",
+      "evidence": "Download the latest Python 3 source. (链接指向 https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tar.xz)",
+      "source_type": "official_documentation",
+      "confidence": 0.95,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 2893,
+        "output_tokens": 174,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://devguide.python.org/versions/",
+      "tier": "primary",
+      "claim": "Python 目前处于 bugfix（稳定）状态的最新版本是 Python 3.14，于 2025-10-07 首次发布。",
+      "evidence": "3.14 | PEP 745 | bugfix | 2025-10-07 | *2030-10* | Hugo van Kemenade",
+      "source_type": "official_documentation",
+      "confidence": 0.85,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 15992,
+        "output_tokens": 187,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://realpython.com/python313-new-features/",
+      "tier": "news",
+      "claim": "截至该文发布时，Python 的最新稳定版本是 Python 3.13，于 2024 年 10 月 7 日发布。",
+      "evidence": "Python 3.13 was published on October 7, 2024.",
+      "source_type": "blog",
+      "confidence": 0.85,
+      "published_date": "2024-10-07",
+      "usage": {
+        "input_tokens": 12449,
+        "output_tokens": 169,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.w3schools.com/python/python_intro.asp",
+      "tier": "aggregator",
+      "claim": "该页面指出Python最新主要版本是Python 3，但未提及具体的最新稳定版本号。",
+      "evidence": "The most recent major version of Python is Python 3, which we shall be using in this tutorial.",
+      "source_type": "encyclopedia",
+      "confidence": 0.85,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 7114,
+        "output_tokens": 158,
+        "requests": 1
+      }
+    }
+  ]
+}

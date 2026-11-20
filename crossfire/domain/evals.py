@@ -15,7 +15,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Any, Protocol, Self
 
-from crossfire.domain.models import Claim, Pair
+from crossfire.domain.models import Claim, Pair, Question, Source
 
 
 class Rule(Protocol):
@@ -207,6 +207,38 @@ class JudgeInput:
             source=str(data["source"]),
             claims=tuple(Claim.from_dict(claim) for claim in data["claims"]),
             pairs=tuple(Pair.from_dict(pair) for pair in data["pairs"]),
+        )
+
+
+@dataclass(frozen=True)
+class ConsistencyInput:
+    """稳定性实验的冻结主张。claims 至少两条。source 写明取自哪次运行或哪个文件。"""
+
+    case_id: str
+    question: Question
+    as_of: date
+    claims: tuple[Claim, ...]
+    source: str
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any], *, source: str | None = None) -> Self:
+        claims = tuple(Claim.from_dict(claim) for claim in data["claims"])
+        if len(claims) < 2:
+            raise ValueError("主张少于 2 条，没法比对")
+        question = Question(
+            id=str(data["question_id"]),
+            text=str(data["question"]),
+            sources=tuple(Source(url=claim.source_url, tier=claim.tier) for claim in claims),
+        )
+        as_of = data["as_of"]
+        if not isinstance(as_of, date):
+            as_of = date.fromisoformat(str(as_of))
+        return cls(
+            case_id=str(data["case_id"]),
+            question=question,
+            as_of=as_of,
+            claims=claims,
+            source=source or str(data.get("source_run") or ""),
         )
 
 

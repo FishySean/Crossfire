@@ -24,6 +24,13 @@ dev = [
     "pyright[nodejs]>=1.1.414",
     "pytest>=8.3.0",
 ]
+# 训练 / 微调：体积大，不进默认 sync。装法：uv sync --group train
+# 然后：uv run pytest tests/training
+train = [
+    "torch==2.15.0",
+    "transformers==5.23.0",
+    "sentencepiece==0.2.3",  # mDeBERTa 分词器需要
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -32,12 +39,19 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["crossfire"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# 默认从 tests/ 递归时跳过名为 training 的子目录（不是 skip）。
+# 训练测试要 torch：uv sync --group train && uv run pytest tests/training
+norecursedirs = [".*", "build", "dist", "CVS", "_darcs", "{arch}", "*.egg", "venv", "training"]
+
 [tool.pyright]
 pythonVersion = "3.12"
 venvPath = "."
 venv = ".venv"
 # 不检查 web/fake_events.py：手写的彩排事件剧本，几百个 dict 字面量混着 str 和 float，
 # 要过检查只能逐个标成 dict[str, Any]，没有产品价值；它只在 /api/fake-run 和前端彩排里用。
+# training/ 用 torch，不进主程序类型检查。
 include = ["crossfire", "tests/fakes.py", "web/server.py", "app.py", "scripts"]
 typeCheckingMode = "standard"
 strict = ["crossfire/domain", "crossfire/application"]

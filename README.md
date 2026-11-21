@@ -75,8 +75,20 @@ uv run uvicorn web.server:app --reload --port 8765
 ## 测试和开发工具
 
 ```bash
-uv run pytest                                  # 离线跑：零网络、零 API key
+uv sync                                        # 主程序 + 开发测试依赖（不含 torch）
+uv run pytest                                  # 离线跑：零网络、零 API key；不含训练测试
 uv run python scripts/capture_page_fixtures.py # 需要联网，重新采集 tests/fixtures/pages 下的快照
 uv run python scripts/probe.py --test 1        # Steel 可用性探测，需要 STEEL_API_KEY
 uv run python scripts/migrate_runs.py          # 把旧结果文件迁到当前格式，默认只演练；--apply 才写（先整目录备份）
 ```
+
+### 训练依赖和训练测试
+
+`torch` / `transformers` 很大，不进默认依赖。需要微调或跑训练测试时：
+
+```bash
+uv sync --group train                 # 在现有环境里加上训练组（版本见 pyproject.toml）
+uv run pytest tests/training          # 只跑训练相关测试（默认 pytest 会忽略这个目录）
+```
+
+训练代码在 `training/`，与 `crossfire/` 主程序分开；主程序（含 `crossfire/adapters/nli/encoding.py`）不 import torch。

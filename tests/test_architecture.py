@@ -244,3 +244,48 @@ def test_the_checker_catches_a_violation(tmp_path, monkeypatch):
         "crossfire/domain/bad.py imports anthropic",
         "crossfire/domain/bad.py imports crossfire.adapters.steel",
     ]
+
+
+# 主程序不依赖 torch：流水线在没装训练组的环境里必须能跑。
+# adapters/nli/ 里将来可以有加载模型的适配器；encoding.py 只做字符串拼接，禁止碰它们。
+TORCH_BANNED_ROOTS = ("torch", "transformers")
+
+
+def _imports_torch_or_transformers(module: str) -> bool:
+    top = module.split(".")[0]
+    return top in TORCH_BANNED_ROOTS
+
+
+def _nli_file_may_import_torch(path: Path) -> bool:
+    nli = PACKAGE / "adapters" / "nli"
+    if not path.is_relative_to(nli):
+        return False
+    return path.name not in {"encoding.py", "__init__.py"}
+
+
+def torch_import_offenders() -> list[str]:
+    bad: list[str] = []
+    for path in sorted(PACKAGE.rglob("*.py")):
+        if _nli_file_may_import_torch(path):
+            continue
+        for module in imports_of(path):
+            if _imports_torch_or_transformers(module):
+                bad.append(f"{relative(path)} imports {module}")
+    return bad
+
+
+def test_crossfire_does_not_import_torch_or_transformers_outside_nli_model_adapter():
+    assert torch_import_offenders() == []
+
+
+def test_nli_encoding_must_not_import_torch(tmp_path, monkeypatch):
+    """对照组：encoding.py 即使在 nli/ 下也不能 import torch。"""
+    monkeypatch.setattr(sys.modules[__name__], "PACKAGE", tmp_path / "crossfire")
+    monkeypatch.setattr(sys.modules[__name__], "ROOT", tmp_path)
+    nli = tmp_path / "crossfire" / "adapters" / "nli"
+    nli.mkdir(parents=True)
+    (nli / "encoding.py").write_text("import torch\n", encoding="utf-8")
+    (nli / "model.py").write_text("import torch\n", encoding="utf-8")
+    offenders = torch_import_offenders()
+    assert "crossfire/adapters/nli/encoding.py imports torch" in offenders
+    assert "crossfire/adapters/nli/model.py imports torch" not in offenders

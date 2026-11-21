@@ -89,6 +89,8 @@ uv run python scripts/migrate_runs.py          # 把旧结果文件迁到当前�
 ```bash
 uv sync --group train                 # 在现有环境里加上训练组（版本见 pyproject.toml）
 uv run pytest tests/training          # 只跑训练相关测试（默认 pytest 会忽略这个目录）
+uv run python -m training.overfit_check   # CPU：8 条样例反复训练，损失应降到接近 0
+uv run python -m training.smoke_train     # CPU：正式设置跑几步，确认整条链路
 ```
 
 训练代码在 `training/`，与 `crossfire/` 主程序分开；主程序（含 `crossfire/adapters/nli/encoding.py`）不 import torch。

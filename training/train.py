@@ -38,7 +38,7 @@ from training.loop import (
 )
 from training.metrics import macro_f1, summarize_seed_scores
 from training.pack import pack_run_artifacts
-from training.plot_curves import plot_loss_curves
+from training.plot_curves import try_plot_loss_curves
 from training.prepare import prepare_from_pairs
 from training.resize_head import load_four_way_model
 
@@ -113,7 +113,7 @@ class SeedResult:
     best_val_loss: float
     history: list[dict[str, Any]]
     checkpoint_dir: Path
-    curve_path: Path
+    curve_path: Path | None
 
 
 def _val_macro_f1(model, rows, tokenizer, max_length: int) -> float:
@@ -224,7 +224,7 @@ def train_one_seed(
                 print(f"早停：验证损失连续 {patience} 轮未刷新最优（最优 epoch={best_epoch}）")
                 break
 
-    curve = plot_loss_curves(
+    curve = try_plot_loss_curves(
         history,
         seed_dir / "loss_curve.png",
         best_epoch=best_epoch,

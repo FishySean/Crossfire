@@ -51,6 +51,30 @@ def test_plot_loss_curves_writes_png(tmp_path: Path) -> None:
     assert out.stat().st_size > 1000
 
 
+def test_plot_survives_invalid_mplbackend_env(tmp_path: Path, monkeypatch) -> None:
+    # Colab: MPLBACKEND=module://matplotlib_inline... 且 uv 环境没有该包
+    monkeypatch.setenv("MPLBACKEND", "module://matplotlib_inline.backend_inline_DOES_NOT_EXIST")
+    history = [
+        {"epoch": 1, "train_loss": 1.0, "val_weighted_loss": 1.1},
+        {"epoch": 2, "train_loss": 0.5, "val_weighted_loss": 0.8},
+    ]
+    out = plot_loss_curves(history, tmp_path / "curve.png", best_epoch=2)
+    assert out.is_file()
+    assert out.stat().st_size > 500
+
+
+def test_try_plot_returns_none_instead_of_raising(tmp_path: Path, monkeypatch, capsys) -> None:
+    from training.plot_curves import try_plot_loss_curves
+
+    def boom(*_args, **_kwargs):
+        raise RuntimeError("simulated plot failure")
+
+    monkeypatch.setattr("training.plot_curves.plot_loss_curves", boom)
+    result = try_plot_loss_curves([], tmp_path / "x.png", best_epoch=1)
+    assert result is None
+    assert "警告" in capsys.readouterr().out
+
+
 def test_default_config_has_three_seeds_and_documented_defaults() -> None:
     assert DEFAULT_CONFIG.seeds == (42, 43, 44)
     assert DEFAULT_CONFIG.batch_size == 16

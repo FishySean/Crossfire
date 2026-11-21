@@ -93,4 +93,6 @@ uv run python -m training.overfit_check   # CPU：8 条样例反复训练，损�
 uv run python -m training.smoke_train     # CPU：正式设置跑几步，确认整条链路
 ```
 
+在 **RunPod RTX 4090** 上正式训练（三种子、早停、打包下载、Terminate）：见 [`training/README.md`](training/README.md)。
+
 训练代码在 `training/`，与 `crossfire/` 主程序分开；主程序（含 `crossfire/adapters/nli/encoding.py`）不 import torch。

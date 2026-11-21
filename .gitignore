@@ -12,3 +12,12 @@ wheels/
 # Secrets & local artifacts
 .env
 out/
+
+# Training checkpoints / weights (large; never commit — results live under out/)
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+checkpoints/
+wandb/

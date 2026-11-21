@@ -30,6 +30,7 @@ train = [
     "torch==2.15.0",
     "transformers==5.23.0",
     "sentencepiece==0.2.3",  # mDeBERTa 分词器需要
+    "matplotlib==3.10.8",  # 损失曲线 PNG
 ]
 
 [build-system]

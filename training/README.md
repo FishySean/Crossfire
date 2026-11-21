@@ -18,13 +18,15 @@
 
 ### 为什么是 T4 + fp16
 
-T4 比较老，**不支持 bf16**。训练脚本会自动：
+T4 算力 **7.5**，**没有硬件 bf16**。不要看 `torch.cuda.is_bf16_supported()` 的默认结果——它在新版 torch 里会把软件模拟也算进去，T4 会误报 True。我们按 `get_device_capability()`：**主版本 ≥ 8 才用 bf16**，否则 fp16 + GradScaler。
 
-- **T4 等老卡** → `fp16 autocast` + `GradScaler`
-- **4090 等 Ampere+** → `bf16 autocast`（不用 GradScaler）
+- **T4 等（算力 &lt; 8）** → `fp16 autocast` + `GradScaler`
+- **4090 等 Ampere+（算力 ≥ 8）** → `bf16 autocast`（不用 GradScaler）
 
 两种都是「计算用低精度、**参数本体仍是 fp32**」。  
 这和第 6 步禁止的「用 fp16 权重直接训练」不是一回事。
+
+笔记本进 git 前清掉输出：`uv run python scripts/strip_notebook_outputs.py`（测试会检查 `training/*.ipynb` 没有 outputs）。
 
 ### T4 上大概多久
 

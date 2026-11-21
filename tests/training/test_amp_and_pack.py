@@ -20,6 +20,47 @@ def test_cpu_amp_is_fp32_without_scaler() -> None:
     assert make_grad_scaler(choice, "cpu") is None
 
 
+def test_t4_capability_75_uses_fp16_scaler_not_emulated_bf16(monkeypatch) -> None:
+    # 变异目标：若仍用 is_bf16_supported() 默认值，T4 会误选 bf16。
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "get_device_capability", lambda device=None: (7, 5))
+    monkeypatch.setattr(torch.cuda, "get_device_name", lambda device=None: "Tesla T4")
+    monkeypatch.setattr(torch.cuda, "is_bf16_supported", lambda **kwargs: True)  # 模拟带 emulation 的 True
+    choice = choose_amp(torch.device("cuda"))
+    assert choice.name == "fp16+scaler"
+    assert choice.dtype == torch.float16
+    assert choice.use_grad_scaler is True
+    assert "7.5" in choice.reason
+    assert "bf16" in choice.reason.lower() or "8.0" in choice.reason
+
+
+def test_ampere_capability_89_uses_bf16(monkeypatch) -> None:
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "get_device_capability", lambda device=None: (8, 9))
+    monkeypatch.setattr(torch.cuda, "get_device_name", lambda device=None: "NVIDIA GeForce RTX 4090")
+    choice = choose_amp(torch.device("cuda"))
+    assert choice.name == "bf16"
+    assert choice.dtype == torch.bfloat16
+    assert choice.use_grad_scaler is False
+    assert "8.9" in choice.reason
+
+
+def test_notebooks_have_no_saved_outputs() -> None:
+    """进 git 的笔记本不得带执行输出，避免 Colab 回写把大段 stdout 推进仓库。"""
+    root = Path(__file__).resolve().parents[2]
+    offenders: list[str] = []
+    for path in sorted((root / "training").glob("*.ipynb")):
+        nb = json.loads(path.read_text(encoding="utf-8"))
+        for index, cell in enumerate(nb.get("cells", [])):
+            if cell.get("cell_type") != "code":
+                continue
+            if cell.get("outputs"):
+                offenders.append(f"{path.name} cell[{index}] has outputs")
+            if cell.get("execution_count") not in (None, 0):
+                offenders.append(f"{path.name} cell[{index}] execution_count={cell.get('execution_count')}")
+    assert offenders == []
+
+
 def test_require_gpu_exits_without_allowance(monkeypatch) -> None:
     monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
     try:

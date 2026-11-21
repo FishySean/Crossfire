@@ -4,12 +4,9 @@ import pytest
 import torch
 from torch import nn
 
+from training.amp import choose_amp, training_autocast_dtype
 from training.labels import LABEL2ID, LABELS
-from training.resize_head import (
-    assert_trainable_float32,
-    resize_classifier,
-    training_autocast_dtype,
-)
+from training.resize_head import assert_trainable_float32, resize_classifier
 
 
 def test_resize_keeps_old_rows_and_adds_scope() -> None:
@@ -64,3 +61,7 @@ def test_assert_trainable_float32_accepts_float32() -> None:
 
 def test_cpu_autocast_stays_pure_fp32() -> None:
     assert training_autocast_dtype("cpu") is None
+    choice = choose_amp("cpu")
+    assert choice.dtype is None
+    assert choice.use_grad_scaler is False
+    assert choice.name == "fp32"

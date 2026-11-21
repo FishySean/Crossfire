@@ -13,16 +13,17 @@ from pathlib import Path
 import torch
 from transformers import AutoTokenizer
 
+from training.amp import choose_amp, make_grad_scaler
 from training.loop import assert_ready_to_train, batch_encode, class_weight_tensor, train_step
 from training.prepare import prepare_from_pairs
-from training.resize_head import BASE_MODEL_ID, load_four_way_model, training_autocast_dtype
+from training.resize_head import BASE_MODEL_ID, load_four_way_model
 
 # 过拟合检查是「能不能背下来」，不是正式训练：
 # lr 略大、关掉 weight decay、不用类别权重（权重会把稀有类损失抬住，不容易贴到 0）。
 DEFAULT_STEPS = 60
 DEFAULT_LR = 2e-4
 DEFAULT_N_EXAMPLES = 8
-DEFAULT_MAX_LENGTH = 256
+DEFAULT_MAX_LENGTH = 160
 LOSS_OK_BELOW = 0.05
 
 
@@ -70,13 +71,24 @@ def run_overfit(
     # 过拟合检查用均匀权重；正式训练仍用 prepare 里的 balanced 权重。
     weights = class_weight_tensor([1.0] * 4)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.0)
-    autocast = training_autocast_dtype(device)
+    amp = choose_amp(device)
+    scaler = make_grad_scaler(amp, device)
 
     history: list[dict[str, float | int]] = []
-    print(f"过拟合检查：{n_examples} 条样例，{steps} 步，lr={lr}，device={device}，autocast={autocast}")
+    print(
+        f"过拟合检查：{n_examples} 条样例，{steps} 步，lr={lr}，"
+        f"device={device}，amp={amp.name}"
+    )
     print("标签：", [row["label"] for row in examples])
     for step in range(1, steps + 1):
-        loss = train_step(model, batch, optimizer, class_weights=weights, autocast_dtype=autocast)
+        loss = train_step(
+            model,
+            batch,
+            optimizer,
+            class_weights=weights,
+            autocast_dtype=amp.dtype,
+            scaler=scaler,
+        )
         history.append({"step": step, "loss": loss})
         if step == 1 or step % 5 == 0 or step == steps:
             print(f"第 {step:>3} 步   loss = {loss:.4f}")

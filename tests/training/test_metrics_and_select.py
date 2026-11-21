@@ -57,3 +57,4 @@ def test_default_config_has_three_seeds_and_documented_defaults() -> None:
     assert DEFAULT_CONFIG.learning_rate == 2e-5
     assert DEFAULT_CONFIG.early_stop_patience == 3
     assert DEFAULT_CONFIG.max_epochs == 12
+    assert DEFAULT_CONFIG.max_length == 160

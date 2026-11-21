@@ -1,6 +1,6 @@
-"""正式训练入口：三种子、早停、打包结果。不要在本机偷偷跑完整训练——在 RunPod 上跑。
+"""正式训练入口：三种子、早停、打包结果。
 
-用法见 training/README.md。
+主线在 Google Colab（免费 T4）；也可用 RunPod。用法见 training/README.md。
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
+from training.amp import choose_amp, describe_device, make_grad_scaler
 from training.config import DEFAULT_CONFIG, TrainConfig, config_to_dict
 from training.evaluate import (
     always_agree_preds,
@@ -35,10 +36,11 @@ from training.loop import (
     eval_weighted_loss,
     train_step,
 )
-from training.metrics import classification_report, macro_f1, summarize_seed_scores
+from training.metrics import macro_f1, summarize_seed_scores
+from training.pack import pack_run_artifacts
 from training.plot_curves import plot_loss_curves
 from training.prepare import prepare_from_pairs
-from training.resize_head import load_four_way_model, training_autocast_dtype
+from training.resize_head import load_four_way_model
 
 
 class PairDataset(Dataset):
@@ -74,6 +76,36 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def require_gpu(*, smoke: bool, allow_cpu: bool) -> torch.device:
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if smoke or allow_cpu:
+        print("警告：未检测到 GPU，按 --smoke / --allow-cpu 继续用 CPU（会很慢）。")
+        return torch.device("cpu")
+    raise SystemExit(
+        "未检测到 GPU。正式训练必须在 GPU 上跑。\n"
+        "Colab：菜单「代码执行程序 → 更改运行时类型」选 T4 GPU 后重跑。\n"
+        "若只是本机冒烟，请加 --smoke 或 --allow-cpu。"
+    )
+
+
+def sync_seed_snapshot(run_dir: Path, seed: int, mirror_dir: Path | None) -> None:
+    """每个种子结束后立刻镜像到 mirror（例如 Google Drive），断线不丢。"""
+    if mirror_dir is None:
+        return
+    src = run_dir / "seeds" / f"seed_{seed}"
+    dest = mirror_dir / "seeds" / f"seed_{seed}"
+    if dest.exists():
+        shutil.rmtree(dest)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dest)
+    # 也刷新 run_meta，方便中途查看
+    meta = run_dir / "run_meta.json"
+    if meta.exists():
+        shutil.copy2(meta, mirror_dir / "run_meta.json")
+    print(f"已同步 seed={seed} → {dest}")
+
+
 @dataclass
 class SeedResult:
     seed: int
@@ -84,14 +116,9 @@ class SeedResult:
     curve_path: Path
 
 
-def _predict_on_rows(model, rows, tokenizer, max_length: int) -> tuple[list[str], list[str]]:
+def _val_macro_f1(model, rows, tokenizer, max_length: int) -> float:
     y_true = [str(row["label"]) for row in rows]
     y_pred = predict_labels(model, rows, tokenizer, max_length=max_length)
-    return y_true, y_pred
-
-
-def _val_macro_f1(model, rows, tokenizer, max_length: int) -> float:
-    y_true, y_pred = _predict_on_rows(model, rows, tokenizer, max_length)
     return macro_f1(y_true, y_pred)
 
 
@@ -103,11 +130,19 @@ def train_one_seed(
     seed: int,
     device: torch.device,
     smoke: bool,
+    mirror_dir: Path | None,
 ) -> SeedResult:
     set_seed(seed)
     seed_dir = run_dir / "seeds" / f"seed_{seed}"
     ckpt_dir = seed_dir / "best_checkpoint"
     seed_dir.mkdir(parents=True, exist_ok=True)
+
+    amp = choose_amp(device)
+    print(
+        f"\n=== seed={seed} ===\n"
+        f"设备：{describe_device(device)} ({device})\n"
+        f"混合精度：{amp.name} — {amp.reason}"
+    )
 
     model = load_four_way_model(config.model_id)
     model.to(device)
@@ -117,7 +152,7 @@ def train_one_seed(
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay
     )
-    autocast = training_autocast_dtype(device)
+    scaler = make_grad_scaler(amp, device)
 
     train_loader = DataLoader(
         PairDataset(list(prepared.train_augmented)),
@@ -135,14 +170,18 @@ def train_one_seed(
     best_epoch = 0
     stale = 0
 
-    print(f"\n=== seed={seed} device={device} autocast={autocast} epochs≤{max_epochs} ===")
     for epoch in range(1, max_epochs + 1):
         model.train()
         running = 0.0
         n_batches = 0
         for batch_index, batch in enumerate(train_loader, start=1):
             loss = train_step(
-                model, batch, optimizer, class_weights=weights, autocast_dtype=autocast
+                model,
+                batch,
+                optimizer,
+                class_weights=weights,
+                autocast_dtype=amp.dtype,
+                scaler=scaler,
             )
             running += loss
             n_batches += 1
@@ -170,6 +209,8 @@ def train_one_seed(
             best_val = val_loss
             best_epoch = epoch
             stale = 0
+            if ckpt_dir.exists():
+                shutil.rmtree(ckpt_dir)
             ckpt_dir.mkdir(parents=True, exist_ok=True)
             model.save_pretrained(ckpt_dir)
             tokenizer.save_pretrained(ckpt_dir)
@@ -195,6 +236,7 @@ def train_one_seed(
                 "seed": seed,
                 "best_epoch": best_epoch,
                 "best_val_weighted_loss": best_val,
+                "amp": amp.name,
                 "history": history,
             },
             ensure_ascii=False,
@@ -202,7 +244,7 @@ def train_one_seed(
         ),
         encoding="utf-8",
     )
-    return SeedResult(
+    result = SeedResult(
         seed=seed,
         best_epoch=best_epoch,
         best_val_loss=best_val,
@@ -210,6 +252,8 @@ def train_one_seed(
         checkpoint_dir=ckpt_dir,
         curve_path=curve,
     )
+    sync_seed_snapshot(run_dir, seed, mirror_dir)
+    return result
 
 
 def _load_four_way_from_dir(path: Path, device: torch.device):
@@ -228,10 +272,9 @@ def evaluate_all_seeds_on_test(
     device: torch.device,
     run_dir: Path,
 ) -> dict[str, Any]:
-    """测试集只在这里评估一次（每种子各评一遍）；选模型仍只看验证损失。"""
+    """测试集只在这里评估一次；选模型仍只看验证损失。"""
     test_rows = list(prepared.test_rows)
     test_no_ident = drop_identical(test_rows)
-    # 对照组：永远 agree + 基座原生格式（加载一次基座）
     base = AutoModelForSequenceClassification.from_pretrained(
         config.model_id, dtype=torch.float32
     )
@@ -239,7 +282,7 @@ def evaluate_all_seeds_on_test(
     base_tok = AutoTokenizer.from_pretrained(config.model_id)
     y_true = [str(r["label"]) for r in test_rows]
     y_agree = always_agree_preds(test_rows)
-    y_native = base_native_preds(test_rows, base, base_tok, max_length=min(160, config.max_length))
+    y_native = base_native_preds(test_rows, base, base_tok, max_length=config.max_length)
 
     per_seed: list[dict[str, Any]] = []
     for result in seed_results:
@@ -268,7 +311,6 @@ def evaluate_all_seeds_on_test(
             json.dumps(entry, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
-    # 最终模型：验证损失最低的种子（平局取更小 seed）
     winner = min(seed_results, key=lambda item: (item.best_val_loss, item.seed))
     final_dir = run_dir / "final_model"
     if final_dir.exists():
@@ -338,25 +380,51 @@ def _write_test_report_md(path: Path, summary: dict, winner_entry: dict) -> None
             f"- {label}: P={scores['precision']:.3f} R={scores['recall']:.3f} "
             f"F1={scores['f1']:.3f} support={int(scores['support'])}"
         )
-    lines.extend(["", "## 混淆矩阵（行=真，列=预测）", "```", json.dumps(model["confusion_matrix"], indent=2, ensure_ascii=False), "```", ""])
+    lines.extend(
+        [
+            "",
+            "## 混淆矩阵（行=真，列=预测）",
+            "```",
+            json.dumps(model["confusion_matrix"], indent=2, ensure_ascii=False),
+            "```",
+            "",
+        ]
+    )
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def run_training(config: TrainConfig, *, smoke: bool = False) -> Path:
+def run_training(
+    config: TrainConfig,
+    *,
+    smoke: bool = False,
+    allow_cpu: bool = False,
+    mirror_dir: Path | None = None,
+) -> Path:
     pairs_path = Path(config.pairs_path)
     if not pairs_path.is_file():
         raise FileNotFoundError(pairs_path)
 
+    device = require_gpu(smoke=smoke, allow_cpu=allow_cpu)
+    amp = choose_amp(device)
+    print(f"设备：{describe_device(device)}")
+    print(f"混合精度：{amp.name} — {amp.reason}")
+
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    run_dir = Path(f"{config.output_dir}-{stamp}" if not smoke else f"{config.output_dir}-smoke-{stamp}")
+    run_dir = Path(
+        f"{config.output_dir}-{stamp}" if not smoke else f"{config.output_dir}-smoke-{stamp}"
+    )
     run_dir.mkdir(parents=True, exist_ok=True)
+    if mirror_dir is not None:
+        mirror_dir = Path(mirror_dir)
+        mirror_dir.mkdir(parents=True, exist_ok=True)
 
     prepared = prepare_from_pairs(pairs_path, seed=config.val_split_seed)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     meta = {
         "config": config_to_dict(config),
         "pairs_sha256": file_sha256(pairs_path),
         "device": str(device),
+        "device_name": describe_device(device),
+        "amp": {"name": amp.name, "reason": amp.reason},
         "smoke": smoke,
         "split": {
             "train_ids": list(prepared.split.train_ids),
@@ -370,19 +438,35 @@ def run_training(config: TrainConfig, *, smoke: bool = False) -> Path:
         "id2label": ID2LABEL,
     }
     (run_dir / "run_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    if mirror_dir is not None:
+        shutil.copy2(run_dir / "run_meta.json", mirror_dir / "run_meta.json")
+
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
 
     seeds = config.seeds[:1] if smoke else config.seeds
-    seed_results = [
-        train_one_seed(
-            config=config,
-            prepared=prepared,
-            run_dir=run_dir,
-            seed=seed,
-            device=device,
-            smoke=smoke,
+    seed_results = []
+    for seed in seeds:
+        seed_results.append(
+            train_one_seed(
+                config=config,
+                prepared=prepared,
+                run_dir=run_dir,
+                seed=seed,
+                device=device,
+                smoke=smoke,
+                mirror_dir=mirror_dir,
+            )
         )
-        for seed in seeds
-    ]
+
+    if device.type == "cuda":
+        peak_mb = torch.cuda.max_memory_allocated(device) / (1024 * 1024)
+        print(f"峰值显存：{peak_mb:.0f} MB")
+        meta["peak_memory_mb"] = round(peak_mb, 1)
+        (run_dir / "run_meta.json").write_text(
+            json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
     evaluate_all_seeds_on_test(
         seed_results=seed_results,
         prepared=prepared,
@@ -390,8 +474,32 @@ def run_training(config: TrainConfig, *, smoke: bool = False) -> Path:
         device=device,
         run_dir=run_dir,
     )
+
+    pack_dir = run_dir / "package"
+    pack_meta = pack_run_artifacts(
+        run_dir,
+        pack_dir,
+        pairs_path=pairs_path,
+        max_length=config.max_length,
+        device=device,
+    )
+    meta["package"] = pack_meta
+    (run_dir / "run_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if mirror_dir is not None:
+        # 最终整包同步到 Drive
+        dest_pack = mirror_dir / "package"
+        if dest_pack.exists():
+            shutil.rmtree(dest_pack)
+        shutil.copytree(pack_dir, dest_pack)
+        for name in ("summary.json", "test_report.json", "test_report.md", "run_meta.json"):
+            src = run_dir / name
+            if src.exists():
+                shutil.copy2(src, mirror_dir / name)
+        print(f"已同步完整结果 → {mirror_dir}")
+
     print(f"\n结果目录：{run_dir.resolve()}")
-    print("下载整个目录后，在 RunPod 上 Terminate（不是 Stop）以免硬盘继续计费。")
+    print(f"下载包：{pack_dir.resolve()}（约 {pack_meta['size_mb']} MB）")
     return run_dir
 
 
@@ -410,9 +518,19 @@ def main(argv: list[str] | None = None) -> int:
         help="逗号分隔，例如 42,43,44",
     )
     parser.add_argument(
+        "--mirror-dir",
+        default=None,
+        help="每个种子结束后同步到此目录（Colab 上指向 Google Drive）",
+    )
+    parser.add_argument(
         "--smoke",
         action="store_true",
-        help="GPU 冒烟：1 个种子、1 个 epoch、每轮只跑少量 batch，确认 CUDA 正常",
+        help="冒烟：1 个种子、1 个 epoch、少量 batch",
+    )
+    parser.add_argument(
+        "--allow-cpu",
+        action="store_true",
+        help="没有 GPU 时允许用 CPU（仅调试；正式训练不要用）",
     )
     args = parser.parse_args(argv)
     seeds = tuple(int(part.strip()) for part in args.seeds.split(",") if part.strip())
@@ -426,7 +544,12 @@ def main(argv: list[str] | None = None) -> int:
         early_stop_patience=args.patience,
         seeds=seeds,
     )
-    run_training(config, smoke=args.smoke)
+    run_training(
+        config,
+        smoke=args.smoke,
+        allow_cpu=args.allow_cpu,
+        mirror_dir=Path(args.mirror_dir) if args.mirror_dir else None,
+    )
     return 0
 
 

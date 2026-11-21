@@ -93,6 +93,6 @@ uv run python -m training.overfit_check   # CPU：8 条样例反复训练，损�
 uv run python -m training.smoke_train     # CPU：正式设置跑几步，确认整条链路
 ```
 
-在 **RunPod RTX 4090** 上正式训练（三种子、早停、打包下载、Terminate）：见 [`training/README.md`](training/README.md)。
+正式训练主线是 **Google Colab（免费 T4）**：打开 [`training/colab_train.ipynb`](training/colab_train.ipynb)（[在 Colab 中打开](https://colab.research.google.com/github/FishySean/Crossfire/blob/main/training/colab_train.ipynb)）。说明见 [`training/README.md`](training/README.md)。
 
 训练代码在 `training/`，与 `crossfire/` 主程序分开；主程序（含 `crossfire/adapters/nli/encoding.py`）不 import torch。

@@ -27,7 +27,7 @@ def batch_encode(
     rows: Sequence[Mapping[str, Any]],
     tokenizer: PreTrainedTokenizerBase,
     *,
-    max_length: int = 256,
+    max_length: int = 160,
 ) -> dict[str, torch.Tensor]:
     premises: list[str] = []
     hypotheses: list[str] = []
@@ -64,8 +64,12 @@ def train_step(
     *,
     class_weights: torch.Tensor | None = None,
     autocast_dtype: torch.dtype | None = None,
+    scaler: torch.amp.GradScaler | None = None,
 ) -> float:
-    """一步：清梯度 → 前向 → 加权损失 → 反向 → 更新。返回标量 loss。"""
+    """一步：清梯度 → 前向 → 加权损失 → 反向 → 更新。返回标量 loss。
+
+    scaler 只在 fp16 混合精度时使用。参数本体始终是 fp32。
+    """
     model.train()
     optimizer.zero_grad(set_to_none=True)
     device = next(model.parameters()).device
@@ -77,14 +81,21 @@ def train_step(
     if autocast_dtype is None:
         logits = model(**inputs).logits
         loss = weighted_ce_loss(logits, labels, weights)
+        loss.backward()
+        optimizer.step()
     else:
         with torch.autocast(device_type=device.type, dtype=autocast_dtype):
             logits = model(**inputs).logits
             loss = weighted_ce_loss(logits, labels, weights)
+        if scaler is None:
+            loss.backward()
+            optimizer.step()
+        else:
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
-    loss.backward()
-    optimizer.step()
-    return float(loss.detach().cpu())
+    return float(loss.detach().float().cpu())
 
 
 def eval_weighted_loss(
@@ -104,7 +115,7 @@ def eval_weighted_loss(
     with torch.no_grad():
         logits = model(**inputs).logits
         loss = weighted_ce_loss(logits, labels, weights)
-    return float(loss.cpu())
+    return float(loss.float().cpu())
 
 
 def class_weight_tensor(weight_list: Sequence[float]) -> torch.Tensor:

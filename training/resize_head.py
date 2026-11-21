@@ -7,8 +7,8 @@
 再把 bias 略压低一点，避免一上来就抢过旧类。
 
 加载一律强制 float32：checkpoint 虽是 fp16 存盘，直接拿 fp16 权重训练会
-把微小梯度舍入掉（损失不降且不报错）或溢出成 NaN。GPU 上再用 bf16 autocast
-提速，参数本体始终保持 fp32。
+把微小梯度舍入掉（损失不降且不报错）或溢出成 NaN。GPU 上再用混合精度
+（bf16 或 fp16+GradScaler）提速，参数本体始终保持 fp32。见 training/amp.py。
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ import torch
 from torch import nn
 from transformers import AutoConfig, AutoModelForSequenceClassification
 
+from training.amp import choose_amp, training_autocast_dtype  # noqa: F401 — 兼容旧 import
 from training.labels import BASE_ROW_FOR_LABEL, ID2LABEL, LABEL2ID, LABELS
 
 BASE_MODEL_ID = "MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7"
@@ -78,14 +79,6 @@ def load_four_way_model(model_id: str = BASE_MODEL_ID):
     model.num_labels = len(LABELS)
     assert_trainable_float32(model)
     return model
-
-
-def training_autocast_dtype(device: torch.device | str) -> torch.dtype | None:
-    """GPU 用 bf16 混合精度；CPU 返回 None（纯 fp32，不用 autocast）。"""
-    device = torch.device(device)
-    if device.type == "cuda" and torch.cuda.is_available() and torch.cuda.is_bf16_supported():
-        return torch.bfloat16
-    return None
 
 
 def head_summary(model) -> dict[str, object]:

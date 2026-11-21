@@ -1,6 +1,6 @@
 """正式训练的默认超参数。每个数字旁边写了为什么这么选。
 
-在 RunPod RTX 4090 上用这些默认值；改的时候先改这里，再改命令行。
+默认面向 Google Colab T4；在 RunPod 4090 上同样适用（会自动选 bf16）。
 """
 
 from __future__ import annotations
@@ -20,13 +20,13 @@ class TrainConfig:
     # AdamW 的权重衰减：轻微正则，减轻小数据死记硬背。过拟合检查时曾关掉。
     weight_decay: float = 0.01
 
-    # 批大小：4090 有 24GB，mDeBERTa-base + max_length=256 用 16 很轻松；
-    # 再大收益有限，且我们总样本只有四百级，太大等于每轮更新次数太少。
+    # 批大小：T4 16GB + max_length=160 用 16 留有余量；4090 也合适。
+    # 再大收益有限，且总样本只有四百级，太大等于每轮更新次数太少。
     batch_size: int = 16
 
-    # 序列最长：我们的 premise+hypothesis（问题+两主张+日期）多数远短于 256；
-    # 再长浪费显存和算力，截断风险却几乎没有。
-    max_length: int = 256
+    # 序列最长：第 3 步统计拼接后最长约 146 token；当前 pairs.jsonl 实测最长 139。
+    # 取 160 留余量，比 256 更省显存/时间，且不会截断现有数据。
+    max_length: int = 160
 
     # 最多训练轮数：数据少，超过这个几乎必定过拟合；真正停点靠早停。
     max_epochs: int = 12

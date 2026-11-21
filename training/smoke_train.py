@@ -18,7 +18,8 @@ from training.loop import (
     train_step,
 )
 from training.prepare import prepare_from_pairs
-from training.resize_head import BASE_MODEL_ID, load_four_way_model, training_autocast_dtype
+from training.amp import choose_amp, make_grad_scaler
+from training.resize_head import BASE_MODEL_ID, load_four_way_model
 
 
 class PairDataset(Dataset):
@@ -45,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--steps", type=int, default=5, help="只跑几步冒烟")
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--lr", type=float, default=2e-5, help="正式训练常用量级")
-    parser.add_argument("--max-length", type=int, default=256)
+    parser.add_argument("--max-length", type=int, default=160)
     parser.add_argument("--out", type=Path, default=None)
     args = parser.parse_args(argv)
 
@@ -57,7 +58,8 @@ def main(argv: list[str] | None = None) -> int:
     tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_ID)
     weights = class_weight_tensor(prepared.class_weight_list)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
-    autocast = training_autocast_dtype(device)
+    amp = choose_amp(device)
+    scaler = make_grad_scaler(amp, device)
 
     train_loader = DataLoader(
         PairDataset(list(prepared.train_augmented)),
@@ -81,7 +83,12 @@ def main(argv: list[str] | None = None) -> int:
             train_iter = iter(train_loader)
             batch = next(train_iter)
         train_loss = train_step(
-            model, batch, optimizer, class_weights=weights, autocast_dtype=autocast
+            model,
+            batch,
+            optimizer,
+            class_weights=weights,
+            autocast_dtype=amp.dtype,
+            scaler=scaler,
         )
         val_loss = eval_weighted_loss(model, val_batch, class_weights=weights)
         history.append({"step": step, "train_loss": train_loss, "val_weighted_loss": val_loss})

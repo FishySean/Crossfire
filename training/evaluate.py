@@ -19,7 +19,7 @@ def predict_labels(
     rows: Sequence[Mapping[str, Any]],
     tokenizer: PreTrainedTokenizerBase,
     *,
-    max_length: int = 256,
+    max_length: int = 160,
     batch_size: int = 16,
 ) -> list[str]:
     model.eval()

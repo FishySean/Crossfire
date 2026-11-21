@@ -8,6 +8,7 @@ from typing import Any
 from crossfire.adapters.anthropic.client import ClaudeCallError, ClaudeClient, prompt_version
 from crossfire.application.ports import OnClaim
 from crossfire.domain import Claim, Failure, Page, Provenance, Question, SourceType, Usage
+from crossfire.domain.published_dates import scrub_as_of_published_date
 
 # 同时在读的页面数。每页的 prompt 有上万 token，并发太高容易撞上账户的每分钟 token 限额（429 不重试）。
 DEFAULT_EXTRACT_CONCURRENCY = 4
@@ -43,6 +44,10 @@ EXTRACT_PROMPT = """你在为一个事实查证引擎工作。下面给你一个
    只有页面本身是持续更新的状态页（比如状态表、下载页、实时统计），才可以说「目前」。
 
 published_date 很重要，很多来源之间的矛盾其实是时间差造成的，请尽力在正文里寻找日期线索。
+硬性规则：published_date 只能来自页面原文里写明的发布日、更新日或「最后编辑于」。
+页面上找不到就填 null。绝对不能用上面的「今天的日期」或 as_of 代替。
+维基百科词条通常没有单一发布日，除非原文明确写了 last edited 日期，否则填 null。
+
 confidence 衡量的是「这确实是该网页的立场」，不是对主张本身真假的判断。
 
 请通过 record 工具返回结果。"""
@@ -69,7 +74,10 @@ EXTRACT_SCHEMA: dict[str, Any] = {
         },
         "published_date": {
             "type": ["string", "null"],
-            "description": "页面发布或最后更新日期，格式 YYYY-MM-DD。找不到为 null",
+            "description": (
+                "页面原文中的发布或最后更新日期，格式 YYYY-MM-DD。"
+                "找不到为 null；禁止用今天的日期或 as_of 代替"
+            ),
         },
     },
     "required": ["claim", "evidence", "source_type", "confidence", "published_date"],
@@ -153,7 +161,12 @@ class ClaudeClaimExtractor:
 
         call = self._client.call(prompt, EXTRACT_SCHEMA, "extract", parse)
         if call.value is not None:
-            return replace(call.value, usage=call.usage)
+            claim = replace(call.value, usage=call.usage)
+            cleaned, warning = scrub_as_of_published_date(claim.published_date, as_of, page.markdown)
+            if warning:
+                print(f"⚠️  [llm] extract {page.url}：{warning}", file=sys.stderr)
+                claim = replace(claim, published_date=cleaned)
+            return claim
         return Claim(
             source_url=page.url,
             tier=source.tier,

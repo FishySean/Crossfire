@@ -34,6 +34,7 @@ from crossfire.domain.models import (
     Usage,
     as_of_for,
 )
+from crossfire.domain.published_dates import published_date_appears_on_page, scrub_as_of_published_date
 from crossfire.domain.relations import Relation
 from crossfire.domain.usability import UnusableReason, is_usable_page
 
@@ -70,5 +71,7 @@ __all__ = [
     "Usage",
     "as_of_for",
     "is_usable_page",
+    "published_date_appears_on_page",
     "question_text_hint_reason",
+    "scrub_as_of_published_date",
 ]

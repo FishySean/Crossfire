@@ -155,6 +155,20 @@
 
 ---
 
+## 第 5a / 5c-2 副作用：提取把 as_of 填进 published_date
+
+- **现象**：EXTRACT_PROMPT 告知「今天的日期：{as_of}」后，页面无发布日时模型常把 as_of 填进 `published_date`。5c-2 题库里 13 条等于 2026-11-20 的日期，核对缓存后 12 条为编造（多维基/ESPN），牵连 62 对标签。
+- **影响**：比对把旧文当成「今天发布」，时间差判断失真；只改日期不重判会导致输入与标签不一致。
+- **修法**：prompt 禁止用 as_of 代替；`scrub_as_of_published_date` 在 extract 后核对原文，找不到则改 null 并警告；受影响配对重跑比对。测试：`tests/test_published_dates.py`。
+
+## 训练后错误分析：contradict 是否被 mysql 模式主导
+
+- **现象**：训练集里约六成 `contradict` 来自 `mysql-latest-ga` 一道题（19/34）。MySQL 有 Innovation / LTS 两条并行版本线，很多「数字冲突」更接近口径不同，而不是同一事实上的真矛盾。
+- **风险**：微调后模型对 contradict 的内部图像，可能主要是「两个版本号互相打架」，迁移到员工数、球队数等真矛盾时会偏。
+- **待做**：完整训练结束后做错误分析时，按题目拆开看 contradict 的 precision/recall；专门抽查非 mysql 的矛盾对，确认不是只会抄 mysql 的样子。验证集选型已改为少挪走难题，mysql 留在训练集里——这更要求事后检查。
+
+---
+
 ## 第 5c-1 步（自动找来源、建题库）
 
 - SourceFinder 端口 + Claude web_search 适配器；BuildQuestionBank；`crossfire bank build`。

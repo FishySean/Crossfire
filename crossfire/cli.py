@@ -250,18 +250,23 @@ def ask_command(
             allowed = "、".join(p.value for p in Pairer)
             parser.error(f"不认识的 pairer：{pairer_arg}，可选：{allowed}")
 
+    from crossfire.config import Fetcher
+
     asker = composition.build_ask_question(settings, pairer=run_pairer)
     estimate = asker.estimate(text)
     print("预计费用（偏高估）：")
     print(f"  搜索约 {estimate.searches} 次 ${estimate.search_usd:.3f}")
-    print(f"  Steel 抓取约 {estimate.steel_pages} 页 ${estimate.steel_usd:.3f}")
+    if settings.fetcher is Fetcher.HTTP:
+        print(f"  HTTP 抓取约 {estimate.steel_pages} 页 $0.000（FETCHER=http）")
+    else:
+        print(f"  Steel 抓取约 {estimate.steel_pages} 页 ${estimate.steel_usd:.3f}")
     print(f"  Anthropic（找来源+提取+汇总）约 ${estimate.anthropic_usd:.3f}")
     if estimate.pairer_free:
         print("  比对：NLI 本地免费")
     else:
         print(f"  比对：Claude 约 ${estimate.pair_usd:.3f}")
     print(f"  合计约 ${estimate.total_usd:.2f}（上限 ${estimate.max_cost_usd:.2f}）")
-    print(f"  比对器：{run_pairer.value}")
+    print(f"  比对器：{run_pairer.value}    抓取器：{settings.fetcher.value}")
     if estimate.over_budget:
         print(
             f"预计 ${estimate.total_usd:.2f} 超过上限 ${estimate.max_cost_usd:.2f}，没有开始运行。",

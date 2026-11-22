@@ -7,6 +7,7 @@ import pytest
 
 from crossfire import composition
 from crossfire.adapters.anthropic import ClaudeClaimPairer
+from crossfire.adapters.http import HttpPageFetcher
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.adapters.storage import CachePageStore, JsonRunRepository
 from crossfire.application.events import Start
@@ -48,10 +49,18 @@ def settings(tmp_path, **values):
     return Settings.from_mapping({**base, **values}, env_file=tmp_path / ".env")
 
 
-@pytest.mark.parametrize(("mode", "kind"), [(Mode.LIVE, SteelPageFetcher), (Mode.CACHED, CachedPageFetcher)])
-def test_mode_selects_the_fetcher(tmp_path, mode, kind):
+@pytest.mark.parametrize(
+    ("mode", "fetcher_setting", "kind"),
+    [
+        (Mode.LIVE, "http", HttpPageFetcher),
+        (Mode.LIVE, "steel", SteelPageFetcher),
+        (Mode.CACHED, "http", CachedPageFetcher),
+    ],
+)
+def test_mode_selects_the_fetcher(tmp_path, mode, fetcher_setting, kind):
     # 第 4 步从 test_pipeline_contract.py 挪过来：选哪种抓取方式从 _wiring 挪到了组合根。
-    fetcher = build_fetcher(settings(tmp_path), QUESTION, mode)
+    # 第 7d：live 再按 FETCHER 分支。
+    fetcher = build_fetcher(settings(tmp_path, FETCHER=fetcher_setting), QUESTION, mode)
     assert isinstance(fetcher, kind)
     assert fetcher.mode is mode
     if mode is Mode.CACHED:
@@ -121,16 +130,21 @@ def test_cached_runs_do_not_need_steel(tmp_path):
 
 
 @pytest.mark.parametrize(
-    ("mode", "blank", "named"),
+    ("mode", "extra", "blank", "named"),
     [
-        (Mode.CACHED, "ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
-        (Mode.LIVE, "STEEL_API_KEY", "STEEL_API_KEY"),
-        (Mode.LIVE, "ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
+        (Mode.CACHED, {}, "ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
+        (Mode.LIVE, {"FETCHER": "steel"}, "STEEL_API_KEY", "STEEL_API_KEY"),
+        (Mode.LIVE, {"FETCHER": "http"}, "ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
+        (Mode.LIVE, {"FETCHER": "steel"}, "ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY"),
     ],
 )
-def test_missing_key_fails_before_anything_runs(tmp_path, mode, blank, named):
+def test_missing_key_fails_before_anything_runs(tmp_path, mode, extra, blank, named):
     with pytest.raises(SettingsError, match=named):
-        build_verifier(settings(tmp_path, **{blank: ""}), QUESTION, mode)
+        build_verifier(settings(tmp_path, **extra, **{blank: ""}), QUESTION, mode)
+
+
+def test_live_http_does_not_need_steel(tmp_path):
+    build_verifier(settings(tmp_path, FETCHER="http", STEEL_API_KEY=""), QUESTION, Mode.LIVE)
 
 
 def test_extractor_gets_the_configured_concurrency(tmp_path, monkeypatch):
@@ -151,14 +165,19 @@ def test_pairer_nli_fails_before_pairing_when_model_missing(tmp_path, monkeypatc
         build_pairer(settings(tmp_path, PAIRER="nli", NLI_MODEL=str(tmp_path / "nope")))
 
 
-def test_prefetch_needs_only_steel(tmp_path, monkeypatch):
+def test_prefetch_steel_needs_only_steel(tmp_path, monkeypatch):
     stores = []
     monkeypatch.setattr(composition, "CachePageStore", lambda cache_dir: stores.append(cache_dir) or CachePageStore(cache_dir))
-    prefetcher = build_prefetcher(settings(tmp_path, ANTHROPIC_API_KEY=""), QUESTION)
+    prefetcher = build_prefetcher(settings(tmp_path, FETCHER="steel", ANTHROPIC_API_KEY=""), QUESTION)
     assert isinstance(prefetcher, PrefetchPages)
     assert stores == [tmp_path / "cache" / "comp-q"]
     with pytest.raises(SettingsError, match="STEEL_API_KEY"):
-        build_prefetcher(settings(tmp_path, STEEL_API_KEY=""), QUESTION)
+        build_prefetcher(settings(tmp_path, FETCHER="steel", STEEL_API_KEY=""), QUESTION)
+
+
+def test_prefetch_http_needs_no_keys(tmp_path):
+    prefetcher = build_prefetcher(settings(tmp_path, FETCHER="http", ANTHROPIC_API_KEY="", STEEL_API_KEY=""), QUESTION)
+    assert isinstance(prefetcher, PrefetchPages)
 
 
 def test_eval_never_fetches_live_and_reads_the_case_snapshot(tmp_path):

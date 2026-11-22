@@ -14,6 +14,15 @@ cp .env.example .env   # 填 ANTHROPIC_API_KEY 和 STEEL_API_KEY，其余设置�
 
 只有 `crossfire/config.py` 读 `.env` 和环境变量；同名环境变量优先于文件。
 
+### 抓取器：HTTP 或 Steel
+
+| 配置 | 行为 |
+|---|---|
+| `FETCHER=http`（默认） | 本机用 httpx 下载 HTML，trafilatura 抽正文。**免费、不过期**。如实声明 User-Agent（`Crossfire/…`），不伪装浏览器；遇 403/反爬/需 JS 渲染的站会失败，换来源即可 |
+| `FETCHER=steel` | 走 Steel 云端浏览器，能处理 JS 壳页和较严的反爬，但要额度/付费（免费额度约 2026-12-11 到期） |
+
+`verify --mode cached` 和评测只读磁盘缓存/快照，不走上述 live 抓取器。
+
 ### 比对器：Claude 或本地 NLI
 
 | 配置 | 行为 |
@@ -42,8 +51,10 @@ uv run crossfire prefetch --question python-latest-version               # 实�
 uv run crossfire prefetch --all
 ```
 
-`verify --mode cached` 只要 `ANTHROPIC_API_KEY`；`prefetch` 只要 `STEEL_API_KEY`；`live` 两个都要。
+`verify --mode cached` 只要 `ANTHROPIC_API_KEY`。`live` / `prefetch` / `ask`：默认 `FETCHER=http` 时只要 Anthropic（抓取免费）；`FETCHER=steel` 时还要 `STEEL_API_KEY`。
 缺 key 时在开始运行之前报错，说明缺哪个、去哪里设置。结果写进 `out/runs/`。
+
+对比两种抓取器（不调 Claude）：`uv run python scripts/compare_fetchers.py`。
 
 提取和判断的 prompt 里会写明「今天的日期」（结果文件里的 `as_of`）：live 是运行当天，
 cached 是缓存页面抓取的那天（页面的 `fetched_at`），不是跑的那天。缓存里有页面没记抓取时间时，

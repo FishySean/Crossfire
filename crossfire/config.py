@@ -51,6 +51,13 @@ class Pairer(StrEnum):
     NLI = "nli"
 
 
+class Fetcher(StrEnum):
+    """live 抓取用哪种实现。加实现：这里加一个值，composition.build_live_fetcher 里加一个分支。"""
+
+    HTTP = "http"
+    STEEL = "steel"
+
+
 class Key(StrEnum):
     ANTHROPIC = "ANTHROPIC_API_KEY"
     STEEL = "STEEL_API_KEY"
@@ -58,7 +65,7 @@ class Key(StrEnum):
 
 KEY_PURPOSES = {
     Key.ANTHROPIC: "Claude 调用（提取主张、两两比对、最终判断）",
-    Key.STEEL: "Steel 云端浏览器实时抓取网页（live 模式和预抓取）",
+    Key.STEEL: "Steel 云端浏览器实时抓取网页（FETCHER=steel 时的 live / 预抓取）",
 }
 
 
@@ -74,6 +81,7 @@ class Settings:
     model_pair: str
     model_judge: str
     pairer: Pairer
+    fetcher: Fetcher
     nli_model: str
     nli_model_revision: str
     nli_batch_size: int
@@ -118,6 +126,13 @@ class Settings:
             allowed = "、".join(p.value for p in Pairer)
             raise SettingsError(f"PAIRER={pairer_name} 不认识，可选值：{allowed}。在 {env_file} 里改。") from None
 
+        fetcher_name = get("FETCHER", Fetcher.HTTP.value)
+        try:
+            fetcher = Fetcher(fetcher_name)
+        except ValueError:
+            allowed = "、".join(f.value for f in Fetcher)
+            raise SettingsError(f"FETCHER={fetcher_name} 不认识，可选值：{allowed}。在 {env_file} 里改。") from None
+
         return cls(
             anthropic_api_key=_key(values.get(Key.ANTHROPIC.value)),
             steel_api_key=_key(values.get(Key.STEEL.value)),
@@ -125,6 +140,7 @@ class Settings:
             model_pair=get("MODEL_PAIR", DEFAULT_MODEL),
             model_judge=get("MODEL_JUDGE", DEFAULT_MODEL),
             pairer=pairer,
+            fetcher=fetcher,
             nli_model=get("NLI_MODEL", DEFAULT_NLI_MODEL),
             nli_model_revision=get("NLI_MODEL_REVISION", DEFAULT_NLI_MODEL_REVISION),
             nli_batch_size=_positive_int(

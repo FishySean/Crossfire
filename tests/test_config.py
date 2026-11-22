@@ -107,6 +107,13 @@ def test_nli_pairer_is_a_valid_setting(env_file):
     assert settings.nli_model == "models/crossfire-pairer-v1"
 
 
+def test_fetcher_defaults_to_http_and_rejects_unknown(env_file):
+    assert Settings.from_env(env_file()).fetcher.value == "http"
+    assert Settings.from_env(env_file("FETCHER=steel\n")).fetcher.value == "steel"
+    with pytest.raises(SettingsError, match="FETCHER"):
+        Settings.from_env(env_file("FETCHER=browser\n"))
+
+
 def test_settings_are_frozen(env_file):
     settings = Settings.from_env(env_file())
     with pytest.raises(AttributeError):

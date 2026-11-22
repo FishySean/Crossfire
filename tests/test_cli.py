@@ -153,7 +153,7 @@ def test_targets_are_required_and_exclusive(env, argv):
 
 def test_missing_key_prints_where_to_set_it_without_a_traceback(env, capsys):
     run, tmp_path, _ = env
-    assert run("verify", "--question", "q1", "--mode", "live", STEEL_API_KEY="") == 2
+    assert run("verify", "--question", "q1", "--mode", "live", FETCHER="steel", STEEL_API_KEY="") == 2
     err = capsys.readouterr().err
     assert "STEEL_API_KEY" in err and "Traceback" not in err
     assert not (tmp_path / "runs").exists()

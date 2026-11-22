@@ -233,12 +233,9 @@
 - **为什么重要**：现在只能从下拉框选预置题，只是演示；做完才能变成真正能用的工具。
 - **零件**：5c-1 的 SourceFinder 已有。费用约 $0.3–0.5/题（搜索+提取+汇总；NLI 比对免费）。开始前要显示预计费用并确认。
 
-### 【高优先级】Steel 免费额度约 2026-12-11 到期 → 非 Steel PageFetcher
+### ~~【高优先级】Steel 免费额度约 2026-12-11 到期 → 非 Steel PageFetcher~~ 已修（7d）
 
-- **现象**：自提问必须真实抓网页，当前实现绑 Steel。免费额度从 2025-09-12 起约 90 天，大约 **2026-12-11** 到期；到期后 live 抓取不可用。
-- **怎么修**：新增一个不依赖 Steel 的 `PageFetcher`：直接 HTTP 下载 + 转成 markdown（如 `httpx` + `trafilatura` / `readability`）。在组合根按配置分支注入；**流水线一行不改**。
-- **代价**：反爬严的站会抓不到，多数普通网页够用。
-- **时机**：7c 做完后立刻做，赶在 12 月 11 日前。
+- **修法**：`adapters/http/HttpPageFetcher`（httpx + trafilatura），`FETCHER=http|steel`（默认 http）。组合根 `build_live_fetcher` 分支；VerifyQuestion / AskQuestion 未改。User-Agent 如实为 Crossfire，403/429 不重试绕过。
 
 ### 设计图里其余项
 

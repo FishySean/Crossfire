@@ -14,6 +14,7 @@ from crossfire.adapters.anthropic.judge import JUDGE_PROMPT, without_sources_ove
 from crossfire.adapters.anthropic.question_proposer import ClaudeQuestionProposer
 from crossfire.adapters.anthropic.source_finder import ClaudeSourceFinder
 from crossfire.adapters.event_sinks import NullEventSink, QueueEventSink
+from crossfire.adapters.http import HttpPageFetcher
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
 from crossfire.adapters.storage import CachePageStore, JsonRunRepository, annotate_run_ask_cost
 from crossfire.adapters.system import SystemClock, ThreadTicker
@@ -27,6 +28,7 @@ from dataclasses import replace
 from crossfire.config import (
     WEB_SEARCH_PER_THOUSAND_USD,
     STEEL_SCRAPE_PER_THOUSAND_USD,
+    Fetcher,
     Key,
     Pairer,
     Settings,
@@ -39,6 +41,23 @@ from crossfire.domain.evals import EvalCase
 
 HEARTBEAT_SECONDS = 5
 
+
+def keys_for_mode(settings: Settings, mode: Mode) -> tuple[Key, ...]:
+    """live 是否要 Steel，取决于 FETCHER；cached 只要 Anthropic。"""
+    if mode is Mode.CACHED:
+        return (Key.ANTHROPIC,)
+    if settings.fetcher is Fetcher.STEEL:
+        return (Key.ANTHROPIC, Key.STEEL)
+    return (Key.ANTHROPIC,)
+
+
+def keys_for_prefetch(settings: Settings) -> tuple[Key, ...]:
+    if settings.fetcher is Fetcher.STEEL:
+        return (Key.STEEL,)
+    return ()
+
+
+# 兼容旧测试：默认按 steel live 理解（显式 FETCHER=steel 时的钥匙集合）。
 KEYS_FOR_MODE = {Mode.LIVE: (Key.ANTHROPIC, Key.STEEL), Mode.CACHED: (Key.ANTHROPIC,)}
 KEYS_FOR_PREFETCH = (Key.STEEL,)
 
@@ -56,7 +75,7 @@ def build_verifier(
     if pairer is not None and not isinstance(pairer, Pairer):
         raise TypeError(f"pairer 必须是 Pairer，收到 {pairer!r}")
     effective = settings if pairer is None else replace(settings, pairer=pairer)
-    effective.require(*KEYS_FOR_MODE[mode])
+    effective.require(*keys_for_mode(effective, mode))
     return assemble(
         fetcher=build_fetcher(effective, question, mode),
         extractor=build_extractor(effective),
@@ -97,7 +116,7 @@ def pairer_availability(settings: Settings) -> list[dict[str, object]]:
 
 def build_eval_verifier(settings: Settings, case: EvalCase) -> VerifyQuestion:
     """评测只读这道题的冻结快照，结果写进单独的目录，不混进 out/runs 的历史记录。"""
-    settings.require(*KEYS_FOR_MODE[Mode.CACHED])
+    settings.require(*keys_for_mode(settings, Mode.CACHED))
     return assemble(
         fetcher=CachedPageFetcher(eval_snapshot_dir(settings, case)),
         extractor=build_extractor(settings),
@@ -144,10 +163,21 @@ def assemble(
     )
 
 
+def build_live_fetcher(settings: Settings) -> PageFetcher:
+    """按 FETCHER 选 live 抓取实现。VerifyQuestion / AskQuestion 只认 PageFetcher 端口。"""
+    match settings.fetcher:
+        case Fetcher.HTTP:
+            return HttpPageFetcher(clock=SystemClock())
+        case Fetcher.STEEL:
+            return SteelPageFetcher(settings.steel_api_key, clock=SystemClock())
+        case _:
+            raise SettingsError(f"不支持的 FETCHER={settings.fetcher}")
+
+
 def build_fetcher(settings: Settings, question: Question, mode: Mode) -> PageFetcher:
     if mode is Mode.CACHED:
         return CachedPageFetcher(settings.cache_dir / question.id)
-    return SteelPageFetcher(settings.steel_api_key, clock=SystemClock())
+    return build_live_fetcher(settings)
 
 
 def build_extractor(settings: Settings) -> ClaimExtractor:
@@ -192,11 +222,12 @@ def build_ask_question(
     pairer: Pairer | None = None,
     event_sink: EventSink | None = None,
 ) -> AskQuestion:
-    """用户自提问：必须 live（搜索 + Steel 抓取）。"""
+    """用户自提问：live 搜索 + 按 FETCHER 抓取。"""
     effective = settings if pairer is None else replace(settings, pairer=pairer)
-    effective.require(Key.ANTHROPIC, Key.STEEL)
+    effective.require(*keys_for_mode(effective, Mode.LIVE))
     client = ClaudeClient(effective.anthropic_api_key, effective.model_extract)
     pairer_free = effective.pairer is Pairer.NLI
+    scrape_usd = 0.0 if effective.fetcher is Fetcher.HTTP else STEEL_SCRAPE_PER_THOUSAND_USD / 1000
 
     def build_verifier(question: Question, *, has_primary: bool = True) -> VerifyQuestion:
         note = (
@@ -221,7 +252,7 @@ def build_ask_question(
 
     return AskQuestion(
         finder=ClaudeSourceFinder(client),
-        fetcher=SteelPageFetcher(effective.steel_api_key, clock=SystemClock()),
+        fetcher=build_live_fetcher(effective),
         store_for=lambda question_id: CachePageStore(effective.cache_dir / question_id),
         build_verifier=build_verifier,
         save_question=lambda question, has_primary: str(
@@ -232,7 +263,7 @@ def build_ask_question(
         max_cost_usd=effective.max_cost_per_question,
         pairer_free=pairer_free,
         search_per_thousand_usd=WEB_SEARCH_PER_THOUSAND_USD,
-        steel_per_scrape_usd=STEEL_SCRAPE_PER_THOUSAND_USD / 1000,
+        steel_per_scrape_usd=scrape_usd,
         sonnet_price=effective.price_for(effective.model_extract),
         pair_price=None if pairer_free else effective.price_for(effective.model_pair),
         clock=utc_today,
@@ -246,12 +277,12 @@ def build_question_bank_builder(
     on_progress=None,
 ) -> BuildQuestionBank:
     """题库生成要出题、搜索、真实抓取。不改 VerifyQuestion 和已有四个业务端口。"""
-    settings.require(Key.ANTHROPIC, Key.STEEL)
+    settings.require(*keys_for_mode(settings, Mode.LIVE))
     client = ClaudeClient(settings.anthropic_api_key, settings.model_extract)
     return BuildQuestionBank(
         proposer=ClaudeQuestionProposer(client, avoid_ids=avoid_ids),
         finder=ClaudeSourceFinder(client),
-        fetcher=SteelPageFetcher(settings.steel_api_key, clock=SystemClock()),
+        fetcher=build_live_fetcher(settings),
         store_for=lambda question_id: CachePageStore(settings.cache_dir / question_id),
         on_progress=on_progress,
     )
@@ -262,9 +293,9 @@ def utc_today() -> date:
 
 
 def build_prefetcher(settings: Settings, question: Question) -> PrefetchPages:
-    settings.require(*KEYS_FOR_PREFETCH)
+    settings.require(*keys_for_prefetch(settings))
     return PrefetchPages(
-        fetcher=SteelPageFetcher(settings.steel_api_key, clock=SystemClock()),
+        fetcher=build_live_fetcher(settings),
         store=CachePageStore(settings.cache_dir / question.id),
     )
 

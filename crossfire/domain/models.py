@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from enum import StrEnum
 from typing import Any, NewType, Self, cast
+from urllib.parse import urlparse
 
 from crossfire.domain.relations import Relation
 from crossfire.domain.usability import UnusableReason, is_usable_page
@@ -109,10 +110,34 @@ class UnknownSourceError(KeyError):
     """URL 不在这个问题的来源列表里。"""
 
 
+class InvalidSourceUrlError(ValueError):
+    """来源 URL 不合法：空白、非 http(s)、或没有主机名。"""
+
+
+def clean_source_url(url: object) -> str:
+    """清洗并校验来源 URL。去掉首尾空白；中间有空白、非 http(s)、没有主机名则拒绝。"""
+    if not isinstance(url, str):
+        raise InvalidSourceUrlError(f"URL 必须是字符串，实际是 {type(url).__name__}")
+    cleaned = url.strip()
+    if not cleaned:
+        raise InvalidSourceUrlError("URL 为空")
+    if any(character.isspace() for character in cleaned):
+        raise InvalidSourceUrlError(f"URL 中间有空白字符：{cleaned!r}")
+    parsed = urlparse(cleaned)
+    if parsed.scheme not in {"http", "https"}:
+        raise InvalidSourceUrlError(f"URL 必须是 http 或 https，实际是 {parsed.scheme!r}：{cleaned!r}")
+    if not parsed.netloc:
+        raise InvalidSourceUrlError(f"URL 没有主机名：{cleaned!r}")
+    return cleaned
+
+
 @dataclass(frozen=True)
 class Source:
     url: str
     tier: Tier
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "url", clean_source_url(self.url))
 
     def to_dict(self) -> dict[str, Any]:
         return {"url": self.url, "tier": self.tier.value}

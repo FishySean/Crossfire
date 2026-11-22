@@ -18,7 +18,7 @@ from crossfire.domain import Link, Mode, Page, SourceIndex
 try:
     PACKAGE_VERSION = version("crossfire")
 except PackageNotFoundError:
-    PACKAGE_VERSION = "0.1.0"
+    PACKAGE_VERSION = "1.0.0"
 
 # 如实表明身份。变异目标：若伪装成 Mozilla/Chrome，测试会红。
 USER_AGENT = f"Crossfire/{PACKAGE_VERSION} (+https://github.com/FishySean/Crossfire)"
@@ -201,6 +201,14 @@ class HttpPageFetcher:
         )
 
     async def _download(self, client: httpx.AsyncClient, url: str, fetched_at) -> Page:
+        # 入口层已校验；这里再挡一层，避免缓存/旧数据把空白 URL 送进 httpx。
+        if any(character.isspace() for character in url):
+            return failed_page(
+                url,
+                error=f"非法 URL（含空白字符）：{url!r}",
+                status_code=None,
+                fetched_at=fetched_at,
+            )
         async with client.stream("GET", url) as response:
             status = response.status_code
             if status in NO_RETRY_STATUSES:

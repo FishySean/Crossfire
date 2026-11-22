@@ -10,7 +10,7 @@ from typing import Any
 from urllib.parse import urldefrag
 
 from crossfire.adapters.anthropic.client import ClaudeCallError, ClaudeClient
-from crossfire.domain import CandidateSource, Tier, Usage
+from crossfire.domain import CandidateSource, InvalidSourceUrlError, Tier, Usage, clean_source_url
 
 # web_search 单价：$10 / 1000 次搜索（另加 token）。查自
 # https://docs.anthropic.com/en/docs/about-claude/pricing ，2026-11-20。
@@ -58,8 +58,8 @@ RECORD_SCHEMA: dict[str, Any] = {
 
 
 def normalize_url(url: str) -> str:
-    """去掉 fragment，末尾斜杠统一，便于和搜索结果比对。"""
-    cleaned, _ = urldefrag(url.strip())
+    """校验 + 去掉 fragment，末尾斜杠统一，便于和搜索结果比对。"""
+    cleaned, _ = urldefrag(clean_source_url(url))
     if len(cleaned) > 1 and cleaned.endswith("/"):
         cleaned = cleaned[:-1]
     return cleaned
@@ -78,7 +78,10 @@ def search_urls_from_content(content: Sequence[Any]) -> set[str]:
         for item in result:
             entry = item if isinstance(item, dict) else _block_dict(item)
             if entry.get("type") == "web_search_result" and entry.get("url"):
-                urls.add(normalize_url(str(entry["url"])))
+                try:
+                    urls.add(normalize_url(str(entry["url"])))
+                except InvalidSourceUrlError:
+                    continue
     return urls
 
 
@@ -91,7 +94,11 @@ def filter_to_searched(candidates: Sequence[CandidateSource], searched: set[str]
     kept: list[CandidateSource] = []
     seen: set[str] = set()
     for candidate in candidates:
-        key = normalize_url(candidate.url)
+        try:
+            key = normalize_url(candidate.url)
+        except InvalidSourceUrlError as error:
+            print(f"[llm] source_find 丢掉非法 URL：{error}", file=sys.stderr)
+            continue
         if key not in searched or key in seen:
             continue
         seen.add(key)
@@ -190,23 +197,24 @@ def _recorded_sources(content: Sequence[Any]) -> list[CandidateSource]:
 def _candidate(item: Any) -> CandidateSource | None:
     """模型偶尔会交字符串 URL，或缺字段；坏条目丢掉，不让整次 find 崩掉。"""
     if isinstance(item, str):
-        url = item.strip()
-        if not url:
-            return None
-        return CandidateSource(url=url, title=url, query="", suggested_tier=Tier.NEWS)
-    if not isinstance(item, dict):
-        return None
-    url = str(item.get("url") or "").strip()
-    if not url:
-        return None
-    tier_raw = str(item.get("suggested_tier") or Tier.NEWS.value)
-    try:
-        tier = Tier(tier_raw)
-    except ValueError:
+        raw_url = item
+        title = item
+        query = ""
         tier = Tier.NEWS
-    return CandidateSource(
-        url=url,
-        title=str(item.get("title") or url),
-        query=str(item.get("query") or ""),
-        suggested_tier=tier,
-    )
+    elif isinstance(item, dict):
+        raw_url = str(item.get("url") or "")
+        title = str(item.get("title") or raw_url)
+        query = str(item.get("query") or "")
+        tier_raw = str(item.get("suggested_tier") or Tier.NEWS.value)
+        try:
+            tier = Tier(tier_raw)
+        except ValueError:
+            tier = Tier.NEWS
+    else:
+        return None
+    try:
+        url = clean_source_url(raw_url)
+    except InvalidSourceUrlError as error:
+        print(f"[llm] source_find 丢掉非法 URL：{error}", file=sys.stderr)
+        return None
+    return CandidateSource(url=url, title=title or url, query=query, suggested_tier=tier)

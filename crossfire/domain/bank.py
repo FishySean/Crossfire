@@ -80,6 +80,12 @@ class CandidateSource:
     query: str
     suggested_tier: Tier
 
+    def __post_init__(self) -> None:
+        # 延迟导入，避免 bank ↔ models 循环依赖在类型检查期纠缠。
+        from crossfire.domain.models import clean_source_url
+
+        object.__setattr__(self, "url", clean_source_url(self.url))
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "url": self.url,

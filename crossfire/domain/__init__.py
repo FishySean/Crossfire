@@ -13,6 +13,8 @@ from crossfire.domain.bank import (
     question_text_hint_reason,
 )
 from crossfire.domain.models import (
+    InvalidSourceUrlError,
+    clean_source_url,
     AsOf,
     Claim,
     Failure,
@@ -47,6 +49,7 @@ __all__ = [
     "DroppedQuestion",
     "DropReason",
     "Failure",
+    "InvalidSourceUrlError",
     "Judgment",
     "KeptSource",
     "Link",
@@ -70,6 +73,7 @@ __all__ = [
     "UnusableReason",
     "Usage",
     "as_of_for",
+    "clean_source_url",
     "is_usable_page",
     "published_date_appears_on_page",
     "question_text_hint_reason",

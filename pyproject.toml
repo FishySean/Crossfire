@@ -1,7 +1,7 @@
 [project]
 name = "crossfire"
-version = "0.1.0"
-description = "查证引擎：多源抓取、矛盾检测与置信度结论"
+version = "1.0.0"
+description = "Fact-checking engine: multi-source fetch, pairwise conflict detection, confidence-tagged answers"
 readme = "README.md"
 authors = [
     { name = "Shaoheng Fan", email = "seanceazy15@gmail.com" }

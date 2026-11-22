@@ -79,9 +79,12 @@ jobs:
       - name: Install Chromium + system deps
         run: |
           uv run python -m playwright install chromium
-          uv run python -m playwright install-deps chromium
+          sudo uv run python -m playwright install-deps chromium
       - name: Playwright tests
         run: uv run pytest tests/e2e -q --tb=short
+        env:
+          # 避免把本机已有的浏览器缓存路径带进 CI
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4

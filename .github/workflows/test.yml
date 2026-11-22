@@ -76,8 +76,10 @@ jobs:
           python-version: "3.12"
       - name: Install with e2e group
         run: uv sync --group e2e
-      - name: Install Chromium
-        run: uv run playwright install --with-deps chromium
+      - name: Install Chromium + system deps
+        run: |
+          uv run python -m playwright install chromium
+          uv run python -m playwright install-deps chromium
       - name: Playwright tests
         run: uv run pytest tests/e2e -q --tb=short
       - name: Upload screenshots

@@ -76,6 +76,22 @@ const STRINGS = {
     emptyRuns: "No JSON result files found under out/runs/.",
     loadFailed: (name, msg) => `Failed to load ${name}: ${msg}`,
     listFailed: (msg) => `Failed to load the run list: ${msg}`,
+    pairerClaude: "Claude",
+    pairerNli: "Local NLI",
+    pairerUnavailable: (reason) => `Unavailable: ${reason}`,
+    pairerLabel: "Pairer",
+    pairerUnknown: "Not recorded",
+    extractFailed: "Extract failed",
+    contentUnusable: (reason) => `Content unusable: ${reason}`,
+    formatWarningConflicts:
+      "Warning: conflicts is not an array in this run’s verdict — format may be corrupted.",
+    formatWarningTrusted:
+      "Warning: trusted_sources is not an array in this run’s verdict — format may be corrupted.",
+    failureHeadBreakdown: (fetch, usability, model) => {
+      const n = fetch + usability + model;
+      return `${n} failure${n === 1 ? "" : "s"} (fetch ${fetch} · unusable ${usability} · model ${model})`;
+    },
+    scoresHint: "Class probabilities",
   },
   zh: {
     tagline: "查证结果查看器",
@@ -142,6 +158,20 @@ const STRINGS = {
     emptyRuns: "out/runs/ 下没有找到任何 JSON 结果文件。",
     loadFailed: (name, msg) => `读取 ${name} 失败：${msg}`,
     listFailed: (msg) => `加载运行列表失败：${msg}`,
+    pairerClaude: "Claude",
+    pairerNli: "本地模型（NLI）",
+    pairerUnavailable: (reason) => `不可用：${reason}`,
+    pairerLabel: "比对器",
+    pairerUnknown: "未记录",
+    extractFailed: "提取失败",
+    contentUnusable: (reason) => `内容不可用：${reason}`,
+    formatWarningConflicts: "警告：本次结果的 conflicts 不是数组，格式可能损坏。",
+    formatWarningTrusted: "警告：trusted_sources 不是数组，格式可能损坏。",
+    failureHeadBreakdown: (fetch, usability, model) => {
+      const n = fetch + usability + model;
+      return `本次运行有 ${n} 处失败（抓取 ${fetch} · 不可用 ${usability} · 模型 ${model}）`;
+    },
+    scoresHint: "类别概率",
   },
 };
 
@@ -163,6 +193,13 @@ function applyStaticStrings() {
   el("run-button").textContent = live.active ? t("runningButton") : t("runButton");
   for (const button of document.querySelectorAll("#mode-toggle button")) {
     button.textContent = button.dataset.mode === "live" ? t("modeLive") : t("modeCached");
+  }
+  for (const button of document.querySelectorAll("#pairer-toggle button")) {
+    button.textContent = button.dataset.pairer === "nli" ? t("pairerNli") : t("pairerClaude");
+    if (button.disabled) {
+      const opt = pairerOptions.find((o) => o.id === button.dataset.pairer);
+      if (opt?.reason) button.title = t("pairerUnavailable", opt.reason);
+    }
   }
   if (live.stage) el("progress-stage").textContent = t(live.stage.key, ...live.stage.args);
   if (!el("stall-banner").classList.contains("hidden")) {
@@ -227,7 +264,7 @@ async function loadRuns() {
   for (const run of runs) {
     const option = document.createElement("option");
     option.value = run.name;
-    option.textContent = run.name;
+    option.textContent = `${run.name} · ${run.pairer || t("pairerUnknown")}`;
     select.appendChild(option);
   }
   select.onchange = () => loadRun(select.value);
@@ -300,6 +337,27 @@ function parseFailures(run) {
   return failures;
 }
 
+function failureBucket(step, parse) {
+  if (parse) return "model";
+  const s = (step || "").toLowerCase();
+  if (s === "fetch") return "fetch";
+  if (s === "usability") return "usability";
+  if (["extract", "pair", "judge", "pipeline"].includes(s)) return "model";
+  return "model";
+}
+
+function normalizeFailure(failure) {
+  if (!failure) return null;
+  if (failure.parse) return { parse: true, stage: failure.stage, url: failure.url };
+  if (typeof failure === "string") return { step: "", detail: failure, raw: null };
+  if (failure.step != null && failure.detail != null) {
+    return { step: failure.step, detail: failure.detail, raw: failure.raw ?? null };
+  }
+  const step = failure.stage || failure.step || "";
+  const detail = [failure.url, failure.error || failure.message].filter(Boolean).join(" — ");
+  return { step, detail: detail || step || JSON.stringify(failure), raw: failure.raw ?? null };
+}
+
 function renderFailures(run) {
   const banner = el("failure-banner");
   const declared = Array.isArray(run.failures) ? run.failures : run.failures ? [run.failures] : [];
@@ -309,24 +367,59 @@ function renderFailures(run) {
     banner.innerHTML = "";
     return;
   }
+  const counts = { fetch: 0, usability: 0, model: 0 };
+  for (const failure of failures) {
+    const norm = normalizeFailure(failure);
+    if (!norm) continue;
+    const bucket = failureBucket(norm.step, Boolean(norm.parse));
+    counts[bucket] += 1;
+  }
   banner.innerHTML = "";
   const head = text("div", null);
-  head.appendChild(text("strong", null, t("failureHead", failures.length)));
+  head.appendChild(
+    text("strong", null, t("failureHeadBreakdown", counts.fetch, counts.usability, counts.model)),
+  );
   banner.appendChild(head);
   const list = document.createElement("ul");
   for (const failure of failures) {
-    if (failure && failure.parse) {
-      list.appendChild(text("li", null, t("parseFailure", failure.stage, failure.url)));
+    const norm = normalizeFailure(failure);
+    if (!norm) continue;
+    if (norm.parse) {
+      list.appendChild(text("li", null, t("parseFailure", norm.stage, norm.url)));
       continue;
     }
-    const parts =
-      typeof failure === "string"
-        ? [failure]
-        : [failure.stage, failure.url, failure.error || failure.message].filter(Boolean);
-    list.appendChild(text("li", null, parts.join(" — ") || JSON.stringify(failure)));
+    const li = document.createElement("li");
+    li.appendChild(text("span", null, t("stepError", norm.step, norm.detail)));
+    if (norm.raw) {
+      const details = document.createElement("details");
+      details.appendChild(text("summary", null, "raw"));
+      const pre = document.createElement("pre");
+      pre.textContent = norm.raw;
+      details.appendChild(pre);
+      li.appendChild(details);
+    }
+    list.appendChild(li);
   }
   banner.appendChild(list);
   banner.classList.remove("hidden");
+}
+
+function pairerLabelFromRun(run) {
+  const provenance = run.provenance;
+  if (!provenance || typeof provenance !== "object") return t("pairerUnknown");
+  const pair = provenance.pair;
+  if (!pair || typeof pair !== "object") return t("pairerUnknown");
+  if (pair.implementation === "nli") {
+    const model = String(pair.model || "nli");
+    const short =
+      model.includes("/") || model.startsWith(".") ? model.split(/[/\\]/).filter(Boolean).pop() : model;
+    const rev = pair.revision;
+    if (typeof rev === "string" && rev) return `NLI · ${short} @ ${rev.slice(0, 7)}`;
+    return `NLI · ${short}`;
+  }
+  const model = pair.model;
+  if (typeof model === "string" && /claude/i.test(model)) return t("pairerClaude");
+  return t("pairerUnknown");
 }
 
 function renderQuestion(run) {
@@ -339,6 +432,7 @@ function renderQuestion(run) {
   if (run.elapsed_seconds !== undefined) bits.push(t("elapsed", run.elapsed_seconds));
   if (run.pages_fetched !== undefined) bits.push(t("fetched", run.pages_fetched));
   if (run.pages_failed) bits.push(t("fetchFailedCount", run.pages_failed));
+  bits.push(`${t("pairerLabel")} ${pairerLabelFromRun(run)}`);
   for (const bit of bits) meta.appendChild(text("span", null, bit));
 }
 
@@ -356,6 +450,7 @@ function sourceRows(run) {
     const claim = claims.find((c) => c.url === url) || {};
     const page = pages.find((p) => p.url === url) || {};
     const configuredSource = configured.find((s) => s.url === url) || {};
+    const unusableReason = page.usable === false ? page.unusable_reason || null : null;
     return {
       url,
       tier: claim.tier || configuredSource.tier || null,
@@ -365,7 +460,9 @@ function sourceRows(run) {
       sourceType: claim.source_type || null,
       publishedDate: claim.published_date || null,
       confidence: claim.confidence,
-      fetchError: page.ok === false ? page.error || "" : null,
+      extractFailed: Boolean(claim.failure),
+      unusableReason,
+      fetchError: page.ok === false && !unusableReason ? page.error || "" : null,
     };
   });
 }
@@ -397,10 +494,15 @@ function renderSources(run) {
     const tier = tierClass(row.tier);
     tags.appendChild(text("span", `tag ${tier}`, row.tier || "unknown"));
     if (row.sourceType) tags.appendChild(text("span", "tag plain", row.sourceType));
-    if (row.fetchError !== null) tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
+    if (row.unusableReason) {
+      tags.appendChild(text("span", "tag conflict-flag", t("contentUnusable", row.unusableReason)));
+    } else if (row.fetchError !== null) {
+      tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
+    }
     card.appendChild(tags);
 
-    const claimNode = text("div", row.claim ? "claim" : "claim empty", row.claim || t("noClaim"));
+    const emptyClaim = row.extractFailed ? t("extractFailed") : t("noClaim");
+    const claimNode = text("div", row.claim ? "claim" : "claim empty", row.claim || emptyClaim);
     card.appendChild(labeled(t("claim"), claimNode));
 
     if (row.evidence) {
@@ -475,6 +577,9 @@ function conflictGroup(run, cards, pairs, relation) {
     head.appendChild(text("span", null, labelFor(pair.b, bInfo)));
     item.appendChild(head);
 
+    const scoreTip = scoresTitle(pair.scores, pair.relation);
+    if (scoreTip) item.title = scoreTip;
+
     item.appendChild(text("div", "conflict-nature", pair.nature || t("noNature")));
 
     const claimA = claims.find((c) => c.url === pair.a);
@@ -522,6 +627,17 @@ function markPartner(target, partner, relation) {
 
 function labelFor(url, info) {
   return info ? `S${info.index + 1} ${domainOf(url)}` : domainOf(url);
+}
+
+function scoresTitle(scores, topRelation) {
+  if (!scores || typeof scores !== "object") return null;
+  const lines = Object.entries(scores)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([label, value]) => {
+      const mark = topRelation && label === topRelation ? " ←" : "";
+      return `${label}: ${Number(value).toFixed(3)}${mark}`;
+    });
+  return `${t("scoresHint")}\n${lines.join("\n")}`;
 }
 
 // The card whose links are being traced, so a redraw can restore the trace.
@@ -644,6 +760,8 @@ function drawLinks(pairs, cards) {
     path.setAttribute("d", d);
     path.dataset.a = pair.a;
     path.dataset.b = pair.b;
+    const scoreTip = scoresTitle(pair.scores, pair.relation);
+    if (scoreTip) path.setAttribute("title", scoreTip);
     svg.appendChild(path);
     for (const info of [a, b]) {
       info.card.onmouseenter = () => traceFromCard(info.card.dataset.url, cards);
@@ -683,11 +801,16 @@ function renderJudgment(run) {
   if (judgment.reasoning) {
     main.appendChild(labeled(t("reasoning"), text("div", "reasoning", judgment.reasoning)));
   }
-  if (Array.isArray(judgment.conflicts) && judgment.conflicts.length) {
+  if ("conflicts" in judgment && !Array.isArray(judgment.conflicts)) {
+    main.appendChild(text("div", "format-warning", t("formatWarningConflicts")));
+  } else if (Array.isArray(judgment.conflicts) && judgment.conflicts.length) {
     const list = document.createElement("ul");
     list.className = "judge-conflicts";
     for (const conflict of judgment.conflicts) list.appendChild(text("li", null, conflict));
     main.appendChild(labeled(t("recordedConflicts"), list));
+  }
+  if ("trusted_sources" in judgment && !Array.isArray(judgment.trusted_sources)) {
+    main.appendChild(text("div", "format-warning", t("formatWarningTrusted")));
   }
   const trusted = text("div", "trusted");
   const sources = Array.isArray(judgment.trusted_sources) ? judgment.trusted_sources : [];
@@ -760,6 +883,8 @@ const FAKE_SCENARIO = new URLSearchParams(location.search).get("fake");
 const FAKE_SPEED = new URLSearchParams(location.search).get("speed") || "1";
 
 let mode = "cached";
+let pairer = "claude";
+let pairerOptions = [];
 
 const live = {
   active: false,
@@ -785,6 +910,34 @@ function setMode(next) {
   mode = next === "live" ? "live" : "cached";
   for (const button of document.querySelectorAll("#mode-toggle button")) {
     button.classList.toggle("active", button.dataset.mode === mode);
+  }
+}
+
+function setPairer(next) {
+  pairer = next === "nli" ? "nli" : "claude";
+  for (const button of document.querySelectorAll("#pairer-toggle button")) {
+    button.classList.toggle("active", button.dataset.pairer === pairer);
+  }
+}
+
+async function loadPairers() {
+  try {
+    const data = await fetchJSON("/api/pairers");
+    pairerOptions = data.options || [];
+    pairer = data.default || "claude";
+    const selected = pairerOptions.find((o) => o.id === pairer);
+    if (selected && !selected.available) pairer = "claude";
+    for (const button of document.querySelectorAll("#pairer-toggle button")) {
+      const id = button.dataset.pairer;
+      const opt = pairerOptions.find((o) => o.id === id);
+      const available = opt ? Boolean(opt.available) : id === "claude";
+      button.disabled = !available;
+      button.title = !available && opt?.reason ? t("pairerUnavailable", opt.reason) : "";
+    }
+    setPairer(pairer);
+    applyStaticStrings();
+  } catch {
+    setPairer(pairer);
   }
 }
 
@@ -875,7 +1028,7 @@ function streamUrl(questionId) {
   if (FAKE_SCENARIO) {
     return `/api/fake-run/${encodeURIComponent(FAKE_SCENARIO)}?speed=${encodeURIComponent(FAKE_SPEED)}`;
   }
-  return `/api/run/${encodeURIComponent(questionId)}?mode=${mode}`;
+  return `/api/run/${encodeURIComponent(questionId)}?mode=${mode}&pairer=${encodeURIComponent(pairer)}`;
 }
 
 function startRun() {
@@ -975,6 +1128,8 @@ function buildSkeletons(count) {
       chars: 0,
       fetchCounted: false,
       claimCounted: false,
+      unusableReason: null,
+      extractFailed: false,
     };
     live.slots.push(slot);
     paintSlot(slot);
@@ -1015,11 +1170,16 @@ function paintSlot(slot) {
   } else if (slot.ok !== false) {
     tags.appendChild(text("span", "tag plain", t("fetchedChars", slot.chars)));
   }
-  if (slot.ok === false) tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
+  if (slot.unusableReason) {
+    tags.appendChild(text("span", "tag conflict-flag", t("contentUnusable", slot.unusableReason)));
+  } else if (slot.ok === false) {
+    tags.appendChild(text("span", "tag conflict-flag", t("fetchFailed")));
+  }
   card.appendChild(tags);
 
   if (slot.claimed) {
-    const block = labeled(t("claim"), text("div", slot.claim ? "claim" : "claim empty", slot.claim || t("noClaim")));
+    const emptyClaim = slot.extractFailed ? t("extractFailed") : t("noClaim");
+    const block = labeled(t("claim"), text("div", slot.claim ? "claim" : "claim empty", slot.claim || emptyClaim));
     block.className = "claim-block";
     card.appendChild(block);
   } else {
@@ -1062,6 +1222,7 @@ function onFetchDone(event) {
   slot.url = event.url;
   slot.ok = event.ok !== false;
   slot.chars = event.chars || 0;
+  slot.unusableReason = event.unusable_reason || null;
   slot.card.dataset.url = event.url;
   live.cards.set(event.url, { card: slot.card, index: slot.index });
   // A source that failed to fetch never produces a claim, so it is already in
@@ -1087,6 +1248,7 @@ function onClaimDone(event) {
   if (!slot) return;
   slot.claim = event.claim || null;
   slot.tier = event.tier || null;
+  slot.extractFailed = Boolean(event.failed);
   if (!slot.url) {
     slot.url = event.url;
     slot.card.dataset.url = event.url;
@@ -1122,6 +1284,7 @@ function onPairDone(event) {
     b: event.b_url,
     relation: event.relation,
     nature: event.nature,
+    scores: event.scores ?? null,
   });
   if (event.total) live.totalPairs = event.total;
   el("pair-progress").textContent = t("pairProgress", live.pairs.size, live.totalPairs);
@@ -1139,7 +1302,13 @@ function renderLiveConflicts() {
 }
 
 function claimRows() {
-  return live.slots.filter((slot) => slot.url).map((slot) => ({ url: slot.url, claim: slot.claim, tier: slot.tier }));
+  return live.slots
+    .filter((slot) => slot.url)
+    .map((slot) => {
+      const row = { url: slot.url, claim: slot.claim, tier: slot.tier };
+      if (slot.extractFailed) row.failure = { step: "extract", detail: "", raw: null };
+      return row;
+    });
 }
 
 function onJudgeStart() {
@@ -1161,14 +1330,37 @@ function onDone(event) {
     elapsed_seconds: event.elapsed,
     run_file: event.run_file,
     sources: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, tier: s.tier })),
-    pages: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, ok: s.ok !== false, error: "" })),
+    pages: live.slots.filter((s) => s.url).map((s) => ({
+      url: s.url,
+      ok: s.ok !== false,
+      error: s.ok === false ? s.unusableReason || "" : "",
+      usable: !s.unusableReason,
+      unusable_reason: s.unusableReason || "",
+    })),
     claims: claimRows(),
     pairs: orderedPairs(),
     judgment: event.judgment || null,
-    failures: live.errors.map((e) => ({ stage: e.step, error: e.detail })),
+    failures: live.errors.map((e) => ({ step: e.step, detail: e.detail })),
   };
   render(currentRun);
   el("pair-progress").classList.add("hidden");
+  // 结果文件里有完整 provenance（含 NLI revision）。假剧本的 run_file 可能不存在，失败时保留上面的合成结果。
+  if (event.run_file) {
+    const name = String(event.run_file).split(/[/\\]/).pop();
+    if (name) {
+      fetchJSON(`/api/runs/${encodeURIComponent(name)}`)
+        .then((run) => {
+          currentRun = run;
+          hideError();
+          render(run);
+          return loadRuns().then(() => {
+            const select = el("run-select");
+            if ([...select.options].some((opt) => opt.value === name)) select.value = name;
+          });
+        })
+        .catch(() => {});
+    }
+  }
 }
 
 function onStepError(event) {
@@ -1177,7 +1369,7 @@ function onStepError(event) {
 }
 
 function onStepErrorRender() {
-  renderFailures({ failures: live.errors.map((e) => ({ stage: e.step, error: e.detail })) });
+  renderFailures({ failures: live.errors.map((e) => ({ step: e.step, detail: e.detail })) });
 }
 
 function switchToCached() {
@@ -1223,6 +1415,11 @@ for (const button of document.querySelectorAll("#lang-toggle button")) {
 for (const button of document.querySelectorAll("#mode-toggle button")) {
   button.onclick = () => setMode(button.dataset.mode);
 }
+for (const button of document.querySelectorAll("#pairer-toggle button")) {
+  button.onclick = () => {
+    if (!button.disabled) setPairer(button.dataset.pairer);
+  };
+}
 el("run-button").onclick = startRun;
 el("stall-switch").onclick = switchToCached;
 
@@ -1237,4 +1434,5 @@ window.addEventListener("keydown", (event) => {
 setMode("cached");
 applyStaticStrings();
 loadQuestions().catch(() => {});
+loadPairers().catch(() => {});
 loadRuns().catch((e) => showError("listFailed", e.message));

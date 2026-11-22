@@ -21,7 +21,9 @@ from crossfire.application.heartbeat import judge_with_heartbeat
 from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
 from crossfire.application.use_cases import PrefetchPages, RunEvals, RunJudgeEvals, VerifyQuestion
 from crossfire.application.use_cases.build_question_bank import BuildQuestionBank
-from crossfire.config import Key, Pairer, Settings, eval_snapshot_dir
+from dataclasses import replace
+
+from crossfire.config import Key, Pairer, Settings, SettingsError, eval_snapshot_dir
 from crossfire.domain import Mode, Question
 from crossfire.domain.evals import EvalCase
 
@@ -36,18 +38,51 @@ def build_verifier(
     question: Question,
     mode: Mode,
     event_sink: EventSink | None = None,
+    *,
+    pairer: Pairer | None = None,
 ) -> VerifyQuestion:
     if not isinstance(mode, Mode):
         raise TypeError(f"mode 必须是 Mode，收到 {mode!r}；字符串请在入口处用 Mode(...) 转换")
-    settings.require(*KEYS_FOR_MODE[mode])
+    if pairer is not None and not isinstance(pairer, Pairer):
+        raise TypeError(f"pairer 必须是 Pairer，收到 {pairer!r}")
+    effective = settings if pairer is None else replace(settings, pairer=pairer)
+    effective.require(*KEYS_FOR_MODE[mode])
     return assemble(
-        fetcher=build_fetcher(settings, question, mode),
-        extractor=build_extractor(settings),
-        pairer=build_pairer(settings),
-        judge=ClaudeVerdictJudge(ClaudeClient(settings.anthropic_api_key, settings.model_judge)),
-        runs_dir=settings.runs_dir,
+        fetcher=build_fetcher(effective, question, mode),
+        extractor=build_extractor(effective),
+        pairer=build_pairer(effective),
+        judge=ClaudeVerdictJudge(ClaudeClient(effective.anthropic_api_key, effective.model_judge)),
+        runs_dir=effective.runs_dir,
         event_sink=event_sink,
     )
+
+
+def pairer_availability(settings: Settings) -> list[dict[str, object]]:
+    """给前端：每个比对器是否可用，以及不可用时的原因。不抛异常。"""
+    from crossfire.adapters.nli.resolve import require_nli_ready
+
+    claude_ok = bool(settings.anthropic_api_key)
+    nli_reason: str | None = None
+    try:
+        require_nli_ready(replace(settings, pairer=Pairer.NLI))
+    except SettingsError as error:
+        nli_reason = str(error)
+    return [
+        {
+            "id": Pairer.CLAUDE.value,
+            "label": "Claude",
+            "available": claude_ok,
+            "reason": None if claude_ok else "缺少 ANTHROPIC_API_KEY",
+        },
+        {
+            "id": Pairer.NLI.value,
+            "label": "本地模型（NLI）",
+            "available": nli_reason is None,
+            "reason": nli_reason,
+            "model": settings.nli_model,
+            "revision": settings.nli_model_revision or None,
+        },
+    ]
 
 
 def build_eval_verifier(settings: Settings, case: EvalCase) -> VerifyQuestion:

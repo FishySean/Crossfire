@@ -41,6 +41,11 @@ train = [
     "matplotlib==3.10.8",  # 损失曲线 PNG
     "huggingface-hub>=0.30.0",  # scripts/publish_model.py 上传用
 ]
+# 浏览器端到端：Playwright。装法：uv sync --group e2e && uv run playwright install chromium
+e2e = [
+    "playwright==1.56.0",
+    "pytest-playwright==0.7.1",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -53,7 +58,7 @@ packages = ["crossfire"]
 testpaths = ["tests"]
 # 默认从 tests/ 递归时跳过名为 training 的子目录（不是 skip）。
 # 训练测试要 torch：uv sync --group train && uv run pytest tests/training
-norecursedirs = [".*", "build", "dist", "CVS", "_darcs", "{arch}", "*.egg", "venv", "training"]
+norecursedirs = [".*", "build", "dist", "CVS", "_darcs", "{arch}", "*.egg", "venv", "training", "e2e"]
 
 [tool.pyright]
 pythonVersion = "3.12"

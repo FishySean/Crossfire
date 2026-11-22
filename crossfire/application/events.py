@@ -32,6 +32,8 @@ class FetchDone(_Event):
     ok: bool
     chars: int
     index: int
+    # 第 7 步新增：内容不可用时填原因（如 too_short）；抓取失败或成功时为 None。
+    unusable_reason: str | None = None
 
 
 @dataclass(frozen=True)
@@ -41,6 +43,8 @@ class ClaimDone(_Event):
     claim: str | None
     tier: str
     index: int
+    # 第 7 步新增：提取失败时为 True；「没回答」时 claim 为 None 且 failed 为 False。
+    failed: bool = False
 
 
 @dataclass(frozen=True)
@@ -58,6 +62,8 @@ class PairDone(_Event):
     nature: str | None
     index: int
     total: int
+    # 第 7 步新增：NLI 比对器填写四类概率；Claude 为 None。
+    scores: dict[str, float] | None = None
 
 
 @dataclass(frozen=True)

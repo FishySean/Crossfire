@@ -21,12 +21,19 @@ JUDGMENT = Judgment("1.0", 0.9, "一手源", (), ("https://a.example/",), Usage(
 # 键的顺序照着改造前 pipeline.run 里各个 dict 字面量的写法手抄，不要改成从代码里反推。
 EXPECTED = [
     (Start("问题", 4), ["type", "question", "total_sources"]),
-    (FetchDone("https://a.example/", True, 120, 0), ["type", "url", "ok", "chars", "index"]),
-    (ClaimDone("https://a.example/", "1.0", "primary", 0), ["type", "url", "claim", "tier", "index"]),
+    # 第 7 步有意修改：末尾新增字段（见 EVENT_FIELDS 注释）。
+    (
+        FetchDone("https://a.example/", True, 120, 0),
+        ["type", "url", "ok", "chars", "index", "unusable_reason"],
+    ),
+    (
+        ClaimDone("https://a.example/", "1.0", "primary", 0),
+        ["type", "url", "claim", "tier", "index", "failed"],
+    ),
     (PairStart(6), ["type", "total_pairs"]),
     (
         PairDone("https://a.example/", "https://b.example/", "agree", "粒度不同", 0, 6),
-        ["type", "a_url", "b_url", "relation", "nature", "index", "total"],
+        ["type", "a_url", "b_url", "relation", "nature", "index", "total", "scores"],
     ),
     (JudgeStart(), ["type"]),
     (Heartbeat("judge", 5.0), ["type", "step", "elapsed"]),
@@ -53,6 +60,7 @@ def test_done_carries_the_judgment_as_a_plain_dict():
 
 
 def test_values_are_passed_through_unchanged():
+    # 第 7 步有意修改：pair_done 多 scores=None；默认值写进契约。
     assert PairDone("a", "b", None, None, 3, 6).to_dict() == {
         "type": "pair_done",
         "a_url": "a",
@@ -61,4 +69,11 @@ def test_values_are_passed_through_unchanged():
         "nature": None,
         "index": 3,
         "total": 6,
+        "scores": None,
     }
+
+
+def test_new_optional_event_fields_carry_values():
+    assert FetchDone("u", False, 10, 1, unusable_reason="too_short").to_dict()["unusable_reason"] == "too_short"
+    assert ClaimDone("u", None, "primary", 0, failed=True).to_dict()["failed"] is True
+    assert PairDone("a", "b", "agree", "n", 0, 1, scores={"agree": 0.9}).to_dict()["scores"] == {"agree": 0.9}

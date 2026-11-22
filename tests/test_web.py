@@ -53,7 +53,8 @@ def web_env(monkeypatch, tmp_path):
     questions_file.write_text(yaml.safe_dump(QUESTIONS, allow_unicode=True), encoding="utf-8")
 
     def install(crash=False):
-        def build(settings, question, mode, event_sink=None):
+        def build(settings, question, mode, event_sink=None, *, pairer=None):
+            del pairer  # 测试里用假比对器，忽略入口传来的选择
             log = CallLog()
             return assemble(
                 FakeFetcher(mode=mode),
@@ -175,7 +176,9 @@ def test_runs_lists_json_files_newest_first(web_env):
 
     runs = client.get("/api/runs").json()
     assert [r["name"] for r in runs] == ["new.json", "mid.json", "old.json"]
-    assert set(runs[0]) == {"name", "modified_at"}
+    # 第 7 步有意修改：列表项多 pairer 字段（旧文件为「未记录」）。
+    assert set(runs[0]) == {"name", "modified_at", "pairer"}
+    assert runs[0]["pairer"] == "未记录"
     assert runs[0]["modified_at"] == 3000
 
 

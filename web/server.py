@@ -1,5 +1,7 @@
 """HTTP 和 SSE。组装交给 composition，配置交给 config，这里只管请求、响应和事件流。"""
 
+from __future__ import annotations
+
 import asyncio
 import json
 import queue
@@ -17,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 import crossfire.composition as composition
 from crossfire.application.events import Error
 from crossfire.application.use_cases import VerifyQuestion
-from crossfire.config import Settings, load_questions
+from crossfire.config import Pairer, Settings, load_questions
 from crossfire.domain import Mode, Question
 from web.fake_events import SCENARIOS, scenario_events
 
@@ -26,11 +28,33 @@ READ_RETRIES = 3
 RETRY_DELAY_SECONDS = 0.15
 SSE_HEADERS = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
 
-BuildVerifier = Callable[[Settings, Question, Mode, Any], VerifyQuestion]
+BuildVerifier = Callable[..., VerifyQuestion]
 
 
 def _frame(event: dict[str, Any]) -> str:
     return f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+
+
+def _pairer_label(data: dict[str, Any]) -> str:
+    """从结果文件里读比对器显示名；旧文件没有 provenance 时返回「未记录」。"""
+    provenance = data.get("provenance")
+    if not isinstance(provenance, dict):
+        return "未记录"
+    pair = provenance.get("pair")
+    if not isinstance(pair, dict):
+        return "未记录"
+    implementation = pair.get("implementation")
+    if implementation == "nli":
+        model = str(pair.get("model") or "nli")
+        short = Path(model).name if "/" in model or model.startswith(".") else model
+        rev = pair.get("revision")
+        if isinstance(rev, str) and rev:
+            return f"NLI · {short} @ {rev[:7]}"
+        return f"NLI · {short}"
+    model = pair.get("model")
+    if isinstance(model, str) and model:
+        return f"Claude · {model}"
+    return "未记录"
 
 
 def create_app(settings: Settings | None = None, build_verifier: BuildVerifier | None = None) -> FastAPI:
@@ -44,7 +68,15 @@ def create_app(settings: Settings | None = None, build_verifier: BuildVerifier |
     def list_runs() -> list[dict[str, Any]]:
         if not runs_dir.is_dir():
             return []
-        runs = [{"name": path.name, "modified_at": path.stat().st_mtime} for path in runs_dir.glob("*.json")]
+        runs: list[dict[str, Any]] = []
+        for path in runs_dir.glob("*.json"):
+            pairer = "未记录"
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                pairer = _pairer_label(data)
+            except (OSError, json.JSONDecodeError, TypeError):
+                pairer = "未记录"
+            runs.append({"name": path.name, "modified_at": path.stat().st_mtime, "pairer": pairer})
         return sorted(runs, key=lambda r: (r["modified_at"], r["name"]), reverse=True)
 
     @app.get("/api/runs/{name}")
@@ -68,8 +100,19 @@ def create_app(settings: Settings | None = None, build_verifier: BuildVerifier |
             {"id": q.id, "question": q.text, "total_sources": len(q.sources)} for q in load_questions(settings)
         ]
 
+    @app.get("/api/pairers")
+    def list_pairers() -> dict[str, Any]:
+        return {
+            "default": Pairer.CLAUDE.value,
+            "options": composition.pairer_availability(settings),
+        }
+
     @app.get("/api/run/{question_id}")
-    async def run_question(question_id: str, mode: str = "cached") -> StreamingResponse:
+    async def run_question(
+        question_id: str,
+        mode: str = "cached",
+        pairer: str = Pairer.CLAUDE.value,
+    ) -> StreamingResponse:
         """用例是同步阻塞的（Steel 适配器内部还会自己调 asyncio.run），所以不能在这里 await：
         它跑在独立线程里，事件进线程安全队列，下面的生成器从队列取出来转成 SSE。
         """
@@ -77,6 +120,11 @@ def create_app(settings: Settings | None = None, build_verifier: BuildVerifier |
             run_mode = Mode(mode)
         except ValueError:
             raise HTTPException(status_code=400, detail=f"unknown mode: {mode}") from None
+        try:
+            run_pairer = Pairer(pairer)
+        except ValueError:
+            allowed = "、".join(p.value for p in Pairer)
+            raise HTTPException(status_code=400, detail=f"unknown pairer: {pairer}（可选：{allowed}）") from None
         question = next((q for q in load_questions(settings) if q.id == question_id), None)
         if question is None:
             raise HTTPException(status_code=404, detail=f"unknown question: {question_id}")
@@ -88,7 +136,13 @@ def create_app(settings: Settings | None = None, build_verifier: BuildVerifier |
 
             def work() -> None:
                 try:
-                    build(settings, question, run_mode, composition.queue_event_sink(events)).execute(question)
+                    build(
+                        settings,
+                        question,
+                        run_mode,
+                        composition.queue_event_sink(events),
+                        pairer=run_pairer,
+                    ).execute(question)
                 except Exception as e:
                     traceback.print_exc()
                     # 前端把「done 之前流就断了」当成事件流中断报错，所以失败也必须以 done 收尾。

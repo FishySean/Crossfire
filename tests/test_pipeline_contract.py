@@ -41,10 +41,12 @@ USAGE = {"input_tokens": 10, "output_tokens": 2}
 # 这张表是照着当初定死的事件格式手写的，不要改成从代码里反推。
 EVENT_FIELDS = {
     "start": {"type", "question", "total_sources"},
-    "fetch_done": {"type", "url", "ok", "chars", "index"},
-    "claim_done": {"type", "url", "claim", "tier", "index"},
+    # 第 7 步有意修改：fetch_done 末尾加 unusable_reason；claim_done 加 failed；pair_done 加 scores。
+    # 已有键不动，只新增。原因：前端要区分内容不可用 / 提取失败，并显示 NLI 概率。
+    "fetch_done": {"type", "url", "ok", "chars", "index", "unusable_reason"},
+    "claim_done": {"type", "url", "claim", "tier", "index", "failed"},
     "pair_start": {"type", "total_pairs"},
-    "pair_done": {"type", "a_url", "b_url", "relation", "nature", "index", "total"},
+    "pair_done": {"type", "a_url", "b_url", "relation", "nature", "index", "total", "scores"},
     "judge_start": {"type"},
     "heartbeat": {"type", "step", "elapsed"},
     "done": {"type", "judgment", "run_file", "elapsed"},

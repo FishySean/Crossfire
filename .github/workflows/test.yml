@@ -62,3 +62,28 @@ jobs:
         run: uv sync --group train
       - name: Training tests
         run: uv run pytest tests/training -q --tb=short
+
+  e2e:
+    name: e2e (playwright + fake_events)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install with e2e group
+        run: uv sync --group e2e
+      - name: Install Chromium
+        run: uv run playwright install --with-deps chromium
+      - name: Playwright tests
+        run: uv run pytest tests/e2e -q --tb=short
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: docs/screenshots/*.png
+          if-no-files-found: ignore

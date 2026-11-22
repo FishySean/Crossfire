@@ -117,9 +117,14 @@ UV_PROJECT_ENVIRONMENT=.venv-clean uv run pytest   # 必须全部通过、0 skip
 ```bash
 uv sync --group nli                   # 推理：PAIRER=nli 时需要
 uv sync --group train                 # 训练：在 nli 之上多 matplotlib 等
+uv sync --group e2e                   # 浏览器端到端（Playwright）
+uv run playwright install chromium
 uv run pytest                         # 主测试：不装推理依赖也必须全部通过、0 skipped
 uv run pytest tests/training          # 训练测试（默认 pytest 会忽略这个目录）
+uv run pytest tests/e2e               # 前端 e2e（截图写入 docs/screenshots/）
 ```
+
+CI（`.github/workflows/test.yml`）跑四个任务：`core` / `nli` / `train` / `e2e`。以后以 CI 全绿为准，不以本机结果为准。
 
 正式训练主线是 **Google Colab（免费 T4）**：打开 [`training/colab_train.ipynb`](training/colab_train.ipynb)。说明见 [`training/README.md`](training/README.md)。
 

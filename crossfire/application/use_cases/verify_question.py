@@ -115,7 +115,17 @@ class VerifyQuestion:
     def _on_page(self, index: SourceIndex, page: Page) -> None:
         # 不可用的页面也报 ok=false：前端据此把卡片直接画成终态，不再等一条永远不会来的 claim_done。
         failure = page.failure
-        self._events.emit(FetchDone(url=page.url, ok=failure is None, chars=len(page.markdown or ""), index=index))
+        # 第 7 步：内容不可用时带上原因；纯抓取失败 unusable_reason 仍为 None。
+        unusable = failure.detail if failure is not None and failure.step == "usability" else None
+        self._events.emit(
+            FetchDone(
+                url=page.url,
+                ok=failure is None,
+                chars=len(page.markdown or ""),
+                index=index,
+                unusable_reason=unusable,
+            )
+        )
         self._report(failure)
 
     def _extract_claims(self, question: Question, pages: list[Page], as_of: AsOf) -> tuple[list[Claim], StepStats]:
@@ -126,7 +136,15 @@ class VerifyQuestion:
             # position 是在 usable 里的下标。事件里的 index 必须换成来源在 sources 里的下标，跟 fetch_done 对齐：
             # 前端按它往固定的卡片槽位里填。直接用 position 会在有页面不可用时整体错位，把主张画到别的来源上。
             index = question.index_of(usable[position].url)
-            self._events.emit(ClaimDone(url=claim.source_url, claim=claim.text, tier=claim.tier.value, index=index))
+            self._events.emit(
+                ClaimDone(
+                    url=claim.source_url,
+                    claim=claim.text,
+                    tier=claim.tier.value,
+                    index=index,
+                    failed=claim.failure is not None,
+                )
+            )
             self._report(claim.failure)
 
         claims = self._extractor.extract_all(question, usable, as_of, on_claim)
@@ -141,7 +159,17 @@ class VerifyQuestion:
 
     def _on_pair(self, index: int, total: int, pair: Pair) -> None:
         relation = None if pair.relation is None else pair.relation.value
-        self._events.emit(PairDone(pair.a_url, pair.b_url, relation, pair.nature, index=index, total=total))
+        self._events.emit(
+            PairDone(
+                pair.a_url,
+                pair.b_url,
+                relation,
+                pair.nature,
+                index=index,
+                total=total,
+                scores=None if pair.scores is None else dict(pair.scores),
+            )
+        )
         self._report(pair.failure)
 
     def _reach_verdict(

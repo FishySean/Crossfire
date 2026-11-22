@@ -7,7 +7,19 @@ without the pipeline, and so odd orderings can be reproduced on demand.
 
 from itertools import combinations
 
-SCENARIOS = ("normal", "shuffled", "with-error", "stall", "scope", "dense")
+SCENARIOS = (
+    "normal",
+    "shuffled",
+    "with-error",
+    "stall",
+    "scope",
+    "dense",
+    # 第 7 步：前端彩排用的新场景
+    "nli-scores",
+    "extract-fail",
+    "unusable",
+    "bad-conflicts",
+)
 
 # The real judge step is one long call that emits nothing else for 15-27s, so the
 # scripted runs reproduce that gap along with the heartbeats that keep the
@@ -140,7 +152,16 @@ SCOPE_JUDGMENT = {
 
 
 def _pairs(sources):
-    return list(combinations([source["url"] for source in sources], 2))
+    """只配对抓取成功、内容可用、且给出主张（或提取失败仍无主张）以外真正回答了的来源。"""
+    urls = [
+        source["url"]
+        for source in sources
+        if source.get("fetch_ok", True)
+        and not source.get("unusable_reason")
+        and source.get("claim")
+        and not source.get("extract_failed")
+    ]
+    return list(combinations(urls, 2))
 
 
 def _relation(a, b):
@@ -270,15 +291,26 @@ def _run_events(*, question, sources, relation_of, judgment, run_file, elapsed):
         ok = source.get("fetch_ok", True)
         if not ok:
             events.append((0.4, {"type": "error", "step": "fetch", "detail": f"timeout after 30s on {source['url']}"}))
+        unusable = source.get("unusable_reason")
+        fetch_ok = ok and not unusable
+        if unusable:
+            events.append((0.2, {"type": "error", "step": "usability", "detail": unusable}))
         events.append(
             (
-                0.05 if not ok else 0.45,
-                {"type": "fetch_done", "url": source["url"], "ok": ok, "chars": source["chars"], "index": index},
+                0.05 if not fetch_ok else 0.45,
+                {
+                    "type": "fetch_done",
+                    "url": source["url"],
+                    "ok": fetch_ok,
+                    "chars": source["chars"],
+                    "index": index,
+                    "unusable_reason": unusable,
+                },
             )
         )
 
     for index, source in enumerate(sources):
-        if not source.get("fetch_ok", True):
+        if not source.get("fetch_ok", True) or source.get("unusable_reason"):
             continue
         events.append(
             (
@@ -286,9 +318,10 @@ def _run_events(*, question, sources, relation_of, judgment, run_file, elapsed):
                 {
                     "type": "claim_done",
                     "url": source["url"],
-                    "claim": source["claim"],
+                    "claim": source.get("claim"),
                     "tier": source["tier"],
                     "index": index,
+                    "failed": bool(source.get("extract_failed")),
                 },
             )
         )
@@ -296,6 +329,9 @@ def _run_events(*, question, sources, relation_of, judgment, run_file, elapsed):
     events.append((0.3, {"type": "pair_start", "total_pairs": len(pairs)}))
     for index, (a, b) in enumerate(pairs):
         relation, nature = relation_of(a, b)
+        scores = None
+        if relation_of.__name__ == "_nli_relation" or getattr(relation_of, "with_scores", False):
+            scores = _scores_for(relation)
         events.append(
             (
                 0.3,
@@ -307,6 +343,7 @@ def _run_events(*, question, sources, relation_of, judgment, run_file, elapsed):
                     "nature": nature,
                     "index": index,
                     "total": len(pairs),
+                    "scores": scores,
                 },
             )
         )
@@ -343,15 +380,49 @@ def _base_events(*, error_steps=()):
     for index, source in enumerate(SOURCES):
         if "fetch" in error_steps and index == 2:
             events.append((0.45, {"type": "error", "step": "fetch", "detail": f"Steel 429 on {source['url']}"}))
-            events.append((0.05, {"type": "fetch_done", "url": source["url"], "ok": False, "chars": 0, "index": index}))
+            events.append(
+                (
+                    0.05,
+                    {
+                        "type": "fetch_done",
+                        "url": source["url"],
+                        "ok": False,
+                        "chars": 0,
+                        "index": index,
+                        "unusable_reason": None,
+                    },
+                )
+            )
             continue
         events.append(
-            (0.45, {"type": "fetch_done", "url": source["url"], "ok": True, "chars": source["chars"], "index": index})
+            (
+                0.45,
+                {
+                    "type": "fetch_done",
+                    "url": source["url"],
+                    "ok": True,
+                    "chars": source["chars"],
+                    "index": index,
+                    "unusable_reason": None,
+                },
+            )
         )
 
     for index, source in enumerate(SOURCES):
         if "fetch" in error_steps and index == 2:
-            events.append((0.3, {"type": "claim_done", "url": source["url"], "claim": None, "tier": source["tier"], "index": index}))
+            events.append(
+                (
+                    0.3,
+                    {
+                        "type": "claim_done",
+                        "url": source["url"],
+                        "claim": None,
+                        "tier": source["tier"],
+                        "index": index,
+                        "failed": False,
+                    },
+                )
+            )
             continue
         events.append(
             (
@@ -362,6 +433,7 @@ def _base_events(*, error_steps=()):
                     "claim": source["claim"],
                     "tier": source["tier"],
                     "index": index,
+                    "failed": False,
                 },
             )
         )
@@ -371,7 +443,19 @@ def _base_events(*, error_steps=()):
         if "pair" in error_steps and index == 1:
             events.append((0.3, {"type": "error", "step": "pair", "detail": f"model response was not valid JSON for {a} / {b}"}))
             events.append(
-                (0.05, {"type": "pair_done", "a_url": a, "b_url": b, "relation": None, "nature": "", "index": index, "total": len(pairs)})
+                (
+                    0.05,
+                    {
+                        "type": "pair_done",
+                        "a_url": a,
+                        "b_url": b,
+                        "relation": None,
+                        "nature": "",
+                        "index": index,
+                        "total": len(pairs),
+                        "scores": None,
+                    },
+                )
             )
             continue
         relation, nature = _relation(a, b)
@@ -386,6 +470,7 @@ def _base_events(*, error_steps=()):
                     "nature": nature,
                     "index": index,
                     "total": len(pairs),
+                    "scores": None,
                 },
             )
         )
@@ -409,6 +494,27 @@ def _shuffle_pair_events(events):
     for slot, item in zip(pair_indices, reordered, strict=True):
         events[slot] = item
     return events
+
+
+def _scores_for(relation: str) -> dict[str, float]:
+    base = {
+        "agree": 0.05,
+        "contradict": 0.05,
+        "same_question_different_scope": 0.05,
+        "unrelated": 0.05,
+    }
+    if relation in base:
+        base[relation] = 0.85
+    total = sum(base.values())
+    return {key: round(value / total, 3) for key, value in base.items()}
+
+
+def _nli_relation(a: str, b: str):
+    relation, nature = _relation(a, b)
+    return relation, f"本地 NLI：{relation}（模拟）"
+
+
+_nli_relation.with_scores = True  # type: ignore[attr-defined]
 
 
 def scenario_events(scenario):
@@ -436,4 +542,48 @@ def scenario_events(scenario):
         return _base_events(error_steps=("fetch", "pair"))
     if scenario == "shuffled":
         return _shuffle_pair_events(_base_events())
+    if scenario == "nli-scores":
+        return _run_events(
+            question=QUESTION,
+            sources=SOURCES,
+            relation_of=_nli_relation,
+            judgment=JUDGMENT,
+            run_file="out/runs/python-latest-version_nli_fake.json",
+            elapsed=4.2,
+        )
+    if scenario == "extract-fail":
+        sources = [dict(s) for s in SOURCES]
+        sources[2] = {**sources[2], "claim": None, "extract_failed": True}
+        return _run_events(
+            question=QUESTION,
+            sources=sources,
+            relation_of=_relation,
+            judgment=JUDGMENT,
+            run_file="out/runs/python-extract-fail_fake.json",
+            elapsed=8.0,
+        )
+    if scenario == "unusable":
+        sources = [dict(s) for s in SOURCES]
+        sources[1] = {**sources[1], "unusable_reason": "nav_skeleton", "claim": None}
+        return _run_events(
+            question=QUESTION,
+            sources=sources,
+            relation_of=_relation,
+            judgment=JUDGMENT,
+            run_file="out/runs/python-unusable_fake.json",
+            elapsed=7.5,
+        )
+    if scenario == "bad-conflicts":
+        events = _base_events()
+        for i, (delay, event) in enumerate(events):
+            if event["type"] == "done":
+                broken = dict(event)
+                broken["judgment"] = {
+                    **JUDGMENT,
+                    "conflicts": '{"not": "an array"}',
+                    "trusted_sources": "https://www.python.org/downloads/",
+                }
+                events[i] = (delay, broken)
+                break
+        return events
     return _base_events()

@@ -66,7 +66,11 @@ def web_env(monkeypatch, tmp_path):
             )
 
         settings = Settings.from_mapping(
-            {"CROSSFIRE_RUNS_DIR": str(runs_dir), "CROSSFIRE_QUESTIONS_FILE": str(questions_file)},
+            {
+                "CROSSFIRE_RUNS_DIR": str(runs_dir),
+                "CROSSFIRE_QUESTIONS_FILE": str(questions_file),
+                "CROSSFIRE_USER_QUESTIONS_DIR": str(tmp_path / "user-questions"),
+            },
             env_file=tmp_path / ".env",
         )
         monkeypatch.setattr(server, "RETRY_DELAY_SECONDS", 0)

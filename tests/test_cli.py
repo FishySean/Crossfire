@@ -34,6 +34,7 @@ def env(tmp_path, monkeypatch):
         "CROSSFIRE_RUNS_DIR": str(tmp_path / "runs"),
         "CROSSFIRE_CACHE_DIR": str(tmp_path / "cache"),
         "CROSSFIRE_QUESTIONS_FILE": str(questions),
+        "CROSSFIRE_USER_QUESTIONS_DIR": str(tmp_path / "user-questions"),
     }
     built = []
 

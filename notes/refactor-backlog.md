@@ -161,6 +161,12 @@
 - **影响**：比对把旧文当成「今天发布」，时间差判断失真；只改日期不重判会导致输入与标签不一致。
 - **修法**：prompt 禁止用 as_of 代替；`scrub_as_of_published_date` 在 extract 后核对原文，找不到则改 null 并警告；受影响配对重跑比对。测试：`tests/test_published_dates.py`。
 
+## 第 7b 步：`published_date` / `content_date` 拆分
+
+- **原因**：收紧 `published_date` 后，realpython 等页的「内容时间点」丢了；训练集却是在收紧前造的 → train/serve skew。
+- **规则**：`published_date` = 页面元数据式发布/更新日；`content_date` + `content_date_evidence` = 主张所述时间点。两者都 scrub as_of。
+- **NLI**：`encoding.effective_date`：有 published 用 published，否则 content_date；训练/推理共用 `encode_pair`。
+
 ## 训练后错误分析：contradict 是否被 mysql 模式主导
 
 - **现象**：训练集里约六成 `contradict` 来自 `mysql-latest-ga` 一道题（19/34）。MySQL 有 Innovation / LTS 两条并行版本线，很多「数字冲突」更接近口径不同，而不是同一事实上的真矛盾。
@@ -230,5 +236,6 @@
 - scope 召回只有 0.25（8 条找出 2 条），3 条被判成 unrelated → 先看权重修完的效果，不行再补 scope 数据（约 8 美元）
 - contradict F1 0.679，跟基座不训练时的 0.689 基本一样，微调没有带来提升
 - 需要一个错误分析脚本，列出所有判错的样例（`error_analysis.py`；尚未实现，先登记）
+- **模型置信度没有校准（calibration）**：真实运行里 python.org（3.14.7）对 devguide（3.14 bugfix）实际更接近 agree，NLI 却判成 contradict 且 p=0.995。把握高不等于答对。之后可考虑温度缩放（temperature scaling）等校准方法。界面已加「模型自估，未经校准」提示；校准本身（如温度缩放）仍待做。
 - 原则：一次只改一样东西
 

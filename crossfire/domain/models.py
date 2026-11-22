@@ -318,6 +318,9 @@ class Claim:
     confidence: float | None
     usage: Usage
     failure: Failure | None = None
+    # 主张所描述情况的时间点（可与页面发布日不同）。旧文件没有这两个键，读成 None。
+    content_date: str | None = None
+    content_date_evidence: str | None = None
 
     @property
     def answered(self) -> bool:
@@ -325,19 +328,22 @@ class Claim:
         return bool(self.text)
 
     def to_dict(self) -> dict[str, Any]:
-        return _with_failure(
-            {
-                "url": self.source_url,
-                "tier": self.tier.value,
-                "claim": self.text,
-                "evidence": self.evidence,
-                "source_type": None if self.source_type is None else self.source_type.value,
-                "confidence": self.confidence,
-                "published_date": self.published_date,
-                "usage": self.usage.to_dict(),
-            },
-            self.failure,
-        )
+        body: dict[str, Any] = {
+            "url": self.source_url,
+            "tier": self.tier.value,
+            "claim": self.text,
+            "evidence": self.evidence,
+            "source_type": None if self.source_type is None else self.source_type.value,
+            "confidence": self.confidence,
+            "published_date": self.published_date,
+            "usage": self.usage.to_dict(),
+        }
+        # 只新增键：有值才写出，旧结果文件没有这两项仍能 round-trip。
+        if self.content_date is not None:
+            body["content_date"] = self.content_date
+        if self.content_date_evidence is not None:
+            body["content_date_evidence"] = self.content_date_evidence
+        return _with_failure(body, self.failure)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
@@ -351,6 +357,12 @@ class Claim:
             confidence=_optional_number(data["confidence"], "confidence"),
             usage=Usage.from_dict(data["usage"]),
             failure=_failure_from(data),
+            content_date=_optional_str(data["content_date"], "content_date")
+            if "content_date" in data
+            else None,
+            content_date_evidence=_optional_str(data["content_date_evidence"], "content_date_evidence")
+            if "content_date_evidence" in data
+            else None,
         )
 
 

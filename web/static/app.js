@@ -10,7 +10,7 @@ const LINK_CROWD_LIMIT = 8;
 
 const STRINGS = {
   en: {
-    tagline: "verification results viewer",
+    tagline: "Multi-source. Multi-perspective. Fact-based.",
     runLabel: "History",
     questionLabel: "Question",
     runButton: "Run",
@@ -51,8 +51,13 @@ const STRINGS = {
     fetchFailed: "Fetch failed",
     noClaim: "This source makes no claim about the question",
     published: (date) => `Published ${date}`,
+    contentDated: (date) => `Content as of ${date}`,
     unknown: "unknown",
+    dateUnknown: "date unknown",
     sourceConfidence: (pct) => `Source confidence ${pct}%`,
+    scoresCalibrationShort: "model estimate, uncalibrated",
+    scoresCalibrationHover:
+      "This number is the model’s own estimate, not real accuracy. The model can be wrong and still assign a very high probability.",
     conflictWith: (id) => `conflicts with ${id}`,
     noNature: "(difference not described)",
     noConflicts: "No contradictions found — no source contradicts another",
@@ -92,9 +97,16 @@ const STRINGS = {
       return `${n} failure${n === 1 ? "" : "s"} (fetch ${fetch} · unusable ${usability} · model ${model})`;
     },
     scoresHint: "Class probabilities",
+    scoresCalibration:
+      "Model estimate, uncalibrated — a high score does not mean the label is correct.",
+    metricSources: "Sources",
+    metricComparisons: "Comparisons",
+    metricContradictions: "Contradictions",
+    metricScope: "Scope differences",
+    questionEyebrow: "Fact-check analysis",
   },
   zh: {
-    tagline: "查证结果查看器",
+    tagline: "多来源 · 多视角 · 讲证据",
     runLabel: "历史结果",
     questionLabel: "问题",
     runButton: "开始查证",
@@ -133,9 +145,14 @@ const STRINGS = {
     evidence: "证据原文",
     fetchFailed: "抓取失败",
     noClaim: "该来源未就此问题给出主张",
-    published: (date) => `发布日期 ${date}`,
+    published: (date) => `发布于 ${date}`,
+    contentDated: (date) => `内容所述时间 ${date}`,
     unknown: "unknown",
+    dateUnknown: "日期未知",
     sourceConfidence: (pct) => `来源置信度 ${pct}%`,
+    scoresCalibrationShort: "模型自估，未经校准",
+    scoresCalibrationHover:
+      "这个数字是模型自己的估计，不等于实际准确率；模型判错时也可能给出很高的概率。",
     conflictWith: (id) => `矛盾于 ${id}`,
     noNature: "（未说明差异所在）",
     noConflicts: "未发现矛盾 — 各来源之间没有互相抵触的主张",
@@ -172,6 +189,12 @@ const STRINGS = {
       return `本次运行有 ${n} 处失败（抓取 ${fetch} · 不可用 ${usability} · 模型 ${model}）`;
     },
     scoresHint: "类别概率",
+    scoresCalibration: "模型自估，未经校准——数值高不等于判断正确。",
+    metricSources: "来源",
+    metricComparisons: "比对",
+    metricContradictions: "矛盾",
+    metricScope: "口径差异",
+    questionEyebrow: "查证分析",
   },
 };
 
@@ -190,6 +213,10 @@ function applyStaticStrings() {
   el("tagline").textContent = t("tagline");
   el("run-label").textContent = t("runLabel");
   el("question-label").textContent = t("questionLabel");
+  el("question-eyebrow").textContent = t("questionEyebrow");
+  const calib = el("scores-calibration");
+  calib.textContent = t("scoresCalibrationShort");
+  calib.title = t("scoresCalibrationHover");
   el("run-button").textContent = live.active ? t("runningButton") : t("runButton");
   for (const button of document.querySelectorAll("#mode-toggle button")) {
     button.textContent = button.dataset.mode === "live" ? t("modeLive") : t("modeCached");
@@ -252,14 +279,15 @@ function labeled(label, node) {
   return box;
 }
 
-async function loadRuns() {
+async function refreshRunList({ selectName = null, loadSelected = true } = {}) {
   const runs = await fetchJSON("/api/runs");
   const select = el("run-select");
+  const previous = selectName || select.value;
   select.innerHTML = "";
   if (!runs.length) {
     showError("emptyRuns");
-    el("content").classList.add("hidden");
-    return;
+    if (loadSelected) el("content").classList.add("hidden");
+    return [];
   }
   for (const run of runs) {
     const option = document.createElement("option");
@@ -268,7 +296,15 @@ async function loadRuns() {
     select.appendChild(option);
   }
   select.onchange = () => loadRun(select.value);
-  await loadRun(runs[0].name);
+  const chosen =
+    previous && [...select.options].some((opt) => opt.value === previous) ? previous : runs[0].name;
+  select.value = chosen;
+  if (loadSelected) await loadRun(chosen);
+  return runs;
+}
+
+async function loadRuns() {
+  await refreshRunList({ loadSelected: true });
 }
 
 async function fetchJSON(url) {
@@ -316,9 +352,32 @@ function render(run) {
   el("content").classList.remove("hidden");
   renderFailures(run);
   renderQuestion(run);
+  renderMetrics(run);
   const cards = renderSources(run);
   renderConflicts(run, cards);
   renderJudgment(run);
+}
+
+function renderMetrics(run) {
+  const strip = el("metrics-strip");
+  strip.innerHTML = "";
+  const pairs = run.pairs || [];
+  const sources = sourceRows(run).length;
+  const comparisons = pairs.length;
+  const contradictions = pairs.filter((p) => p.relation === RELATION_CONTRADICT).length;
+  const scoped = pairs.filter((p) => p.relation === RELATION_SCOPE).length;
+  const items = [
+    { value: sources, label: t("metricSources"), className: "" },
+    { value: comparisons, label: t("metricComparisons"), className: "" },
+    { value: contradictions, label: t("metricContradictions"), className: "danger" },
+    { value: scoped, label: t("metricScope"), className: "scope" },
+  ];
+  for (const item of items) {
+    const cell = text("div", `metric ${item.className}`.trim());
+    cell.appendChild(text("div", "metric-value", String(item.value)));
+    cell.appendChild(text("div", "metric-label", item.label));
+    strip.appendChild(cell);
+  }
 }
 
 function parseFailures(run) {
@@ -419,11 +478,59 @@ function pairerLabelFromRun(run) {
   }
   const model = pair.model;
   if (typeof model === "string" && /claude/i.test(model)) return t("pairerClaude");
+  if (pair.implementation === "claude") return t("pairerClaude");
   return t("pairerUnknown");
 }
 
+function provisionalProvenance() {
+  if (pairer === "nli") {
+    const opt = pairerOptions.find((o) => o.id === "nli") || {};
+    return {
+      pair: {
+        implementation: "nli",
+        model: opt.model || "nli",
+        revision: opt.revision || null,
+      },
+    };
+  }
+  return { pair: { implementation: "claude", model: "claude" } };
+}
+
+function questionText(run) {
+  const q = run.question;
+  if (typeof q === "string") return q;
+  if (q && typeof q === "object" && typeof q.text === "string") return q.text;
+  return "";
+}
+
+function escapeHtml(raw) {
+  return String(raw ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function safeMarkdownHtml(raw) {
+  // 先全部转义，再只恢复一小撮安全格式，避免模型输出里的 <script>/onerror 被执行。
+  let html = escapeHtml(raw);
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
+  );
+  html = html.replace(/(^|\n)- (.+)(?=\n|$)/g, "$1• $2");
+  html = html.replace(/\n/g, "<br>");
+  return html;
+}
+
+function renderSafeMarkdown(target, raw) {
+  target.innerHTML = safeMarkdownHtml(raw);
+}
+
 function renderQuestion(run) {
-  el("question").textContent = run.question || t("noQuestion");
+  el("question").textContent = questionText(run) || t("noQuestion");
   const meta = el("run-meta");
   meta.innerHTML = "";
   const bits = [];
@@ -432,8 +539,10 @@ function renderQuestion(run) {
   if (run.elapsed_seconds !== undefined) bits.push(t("elapsed", run.elapsed_seconds));
   if (run.pages_fetched !== undefined) bits.push(t("fetched", run.pages_fetched));
   if (run.pages_failed) bits.push(t("fetchFailedCount", run.pages_failed));
-  bits.push(`${t("pairerLabel")} ${pairerLabelFromRun(run)}`);
   for (const bit of bits) meta.appendChild(text("span", null, bit));
+  meta.appendChild(
+    text("span", "pairer-meta", `${t("pairerLabel")} ${pairerLabelFromRun(run)}`),
+  );
 }
 
 function sourceRows(run) {
@@ -459,6 +568,8 @@ function sourceRows(run) {
       evidence: claim.evidence || null,
       sourceType: claim.source_type || null,
       publishedDate: claim.published_date || null,
+      contentDate: claim.content_date || null,
+      contentDateEvidence: claim.content_date_evidence || null,
       confidence: claim.confidence,
       extractFailed: Boolean(claim.failure),
       unusableReason,
@@ -513,12 +624,18 @@ function renderSources(run) {
     }
 
     const foot = text("div", "card-foot");
-    const dateNode = text(
-      "span",
-      row.publishedDate ? null : "unknown-date",
-      t("published", row.publishedDate || t("unknown")),
-    );
-    foot.appendChild(dateNode);
+    if (row.publishedDate || row.contentDate) {
+      if (row.publishedDate) {
+        foot.appendChild(text("span", null, t("published", row.publishedDate)));
+      }
+      if (row.contentDate) {
+        const contentNode = text("span", null, t("contentDated", row.contentDate));
+        if (row.contentDateEvidence) contentNode.title = row.contentDateEvidence;
+        foot.appendChild(contentNode);
+      }
+    } else {
+      foot.appendChild(text("span", "unknown-date", t("dateUnknown")));
+    }
     if (typeof row.confidence === "number") {
       foot.appendChild(text("span", null, t("sourceConfidence", Math.round(row.confidence * 100))));
     }
@@ -539,6 +656,8 @@ function renderConflicts(run, cards) {
   const unresolved = all.filter((p) => !p.relation).length;
   el("conflict-count").textContent = t("relationCount", contradictions.length, scoped.length);
   renderLegend(contradictions.length + scoped.length > LINK_CROWD_LIMIT);
+  const hasScores = all.some((p) => p.scores && typeof p.scores === "object");
+  el("scores-calibration").classList.toggle("hidden", !hasScores);
 
   for (const { card } of cards.values()) card.classList.remove("conflicted", "scoped");
 
@@ -581,6 +700,7 @@ function conflictGroup(run, cards, pairs, relation) {
     if (scoreTip) item.title = scoreTip;
 
     item.appendChild(text("div", "conflict-nature", pair.nature || t("noNature")));
+    appendScoreChips(item, pair.scores, pair.relation);
 
     const claimA = claims.find((c) => c.url === pair.a);
     const claimB = claims.find((c) => c.url === pair.b);
@@ -637,7 +757,24 @@ function scoresTitle(scores, topRelation) {
       const mark = topRelation && label === topRelation ? " ←" : "";
       return `${label}: ${Number(value).toFixed(3)}${mark}`;
     });
-  return `${t("scoresHint")}\n${lines.join("\n")}`;
+  return `${t("scoresHint")}\n${lines.join("\n")}\n\n${t("scoresCalibrationHover")}`;
+}
+
+function appendScoreChips(parent, scores, topRelation) {
+  if (!scores || typeof scores !== "object") return false;
+  const row = text("div", "conflict-scores");
+  const hint = text("span", "score-chip calib-hint", t("scoresCalibrationShort"));
+  hint.title = t("scoresCalibrationHover");
+  row.appendChild(hint);
+  const entries = Object.entries(scores).sort((a, b) => Number(b[1]) - Number(a[1]));
+  for (const [label, value] of entries) {
+    const top = topRelation && label === topRelation;
+    row.appendChild(
+      text("span", `score-chip${top ? " top" : ""}`, `${label} ${Number(value).toFixed(3)}`),
+    );
+  }
+  parent.appendChild(row);
+  return true;
 }
 
 // The card whose links are being traced, so a redraw can restore the trace.
@@ -797,9 +934,13 @@ function renderJudgment(run) {
   const judgment = run.judgment || {};
 
   const main = text("div", null);
-  main.appendChild(text("div", "answer", judgment.answer || t("noVerdict")));
+  const answer = text("div", "answer");
+  renderSafeMarkdown(answer, judgment.answer || t("noVerdict"));
+  main.appendChild(answer);
   if (judgment.reasoning) {
-    main.appendChild(labeled(t("reasoning"), text("div", "reasoning", judgment.reasoning)));
+    const reasoning = text("div", "reasoning");
+    renderSafeMarkdown(reasoning, judgment.reasoning);
+    main.appendChild(labeled(t("reasoning"), reasoning));
   }
   if ("conflicts" in judgment && !Array.isArray(judgment.conflicts)) {
     main.appendChild(text("div", "format-warning", t("formatWarningConflicts")));
@@ -839,7 +980,7 @@ function confidenceRing(confidence) {
   const value = typeof confidence === "number" ? Math.max(0, Math.min(1, confidence)) : null;
   const radius = 58;
   const circumference = 2 * Math.PI * radius;
-  const color = value === null ? "#8c98ad" : value >= 0.75 ? "#4ade80" : value >= 0.45 ? "#ffb347" : "#ff5c6c";
+  const color = value === null ? "#6b6560" : value >= 0.75 ? "#2f6b3a" : value >= 0.45 ? "#9a6b16" : "#b71c2b";
 
   const svg = document.createElementNS(SVG_NS, "svg");
   svg.setAttribute("class", "ring");
@@ -1329,6 +1470,7 @@ function onDone(event) {
     question: live.question,
     elapsed_seconds: event.elapsed,
     run_file: event.run_file,
+    provenance: provisionalProvenance(),
     sources: live.slots.filter((s) => s.url).map((s) => ({ url: s.url, tier: s.tier })),
     pages: live.slots.filter((s) => s.url).map((s) => ({
       url: s.url,
@@ -1353,10 +1495,8 @@ function onDone(event) {
           currentRun = run;
           hideError();
           render(run);
-          return loadRuns().then(() => {
-            const select = el("run-select");
-            if ([...select.options].some((opt) => opt.value === name)) select.value = name;
-          });
+          // 只刷新历史下拉，避免 loadRuns → loadRun 再清一次画面抢掉刚补上的 provenance。
+          return refreshRunList({ selectName: name, loadSelected: false });
         })
         .catch(() => {});
     }

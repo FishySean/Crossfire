@@ -8,7 +8,7 @@ from typing import Any
 from crossfire.adapters.anthropic.client import ClaudeCallError, ClaudeClient, prompt_version
 from crossfire.application.ports import OnClaim
 from crossfire.domain import Claim, Failure, Page, Provenance, Question, SourceType, Usage
-from crossfire.domain.published_dates import scrub_as_of_published_date
+from crossfire.domain.published_dates import scrub_as_of_date
 
 # 同时在读的页面数。每页的 prompt 有上万 token，并发太高容易撞上账户的每分钟 token 限额（429 不重试）。
 DEFAULT_EXTRACT_CONCURRENCY = 4
@@ -43,10 +43,22 @@ EXTRACT_PROMPT = """你在为一个事实查证引擎工作。下面给你一个
    claim 要写成「截至 YYYY-MM-DD（该文发布时），……」，不要改写成「目前……」。
    只有页面本身是持续更新的状态页（比如状态表、下载页、实时统计），才可以说「目前」。
 
-published_date 很重要，很多来源之间的矛盾其实是时间差造成的，请尽力在正文里寻找日期线索。
-硬性规则：published_date 只能来自页面原文里写明的发布日、更新日或「最后编辑于」。
-页面上找不到就填 null。绝对不能用上面的「今天的日期」或 as_of 代替。
-维基百科词条通常没有单一发布日，除非原文明确写了 last edited 日期，否则填 null。
+日期分成两个字段，不要混：
+
+1) published_date —— 网页自己写明的发布日、更新日或「最后编辑于」。
+   只认页面元数据式的日期。找不到就填 null。
+   例：页面页脚写「Updated 2024-10-07」→ published_date=2024-10-07。
+   维基百科词条通常没有单一发布日，除非原文明确写了 last edited 日期，否则填 null。
+
+2) content_date —— 主张所描述的情况对应的时间点，从正文读出；
+   同时必须填写 content_date_evidence（原文里支撑该日期的那句话，照抄）。
+   读不出来就两个都填 null。
+   例：Real Python 介绍 Python 3.13 的文章正文写
+   「Python 3.13 was published on October 7, 2024」，但页面没有文章发布日 →
+   published_date=null，content_date=2024-10-07，
+   content_date_evidence 填那句原文。
+
+两个字段都绝对不能用上面的「今天的日期」或 as_of 代替。
 
 confidence 衡量的是「这确实是该网页的立场」，不是对主张本身真假的判断。
 
@@ -75,12 +87,35 @@ EXTRACT_SCHEMA: dict[str, Any] = {
         "published_date": {
             "type": ["string", "null"],
             "description": (
-                "页面原文中的发布或最后更新日期，格式 YYYY-MM-DD。"
-                "找不到为 null；禁止用今天的日期或 as_of 代替"
+                "页面写明的发布或最后更新日期，格式 YYYY-MM-DD。"
+                "找不到为 null；禁止用今天的日期或 as_of 代替；"
+                "不要把正文里的事件日期填到这里"
+            ),
+        },
+        "content_date": {
+            "type": ["string", "null"],
+            "description": (
+                "主张描述情况的时间点，格式 YYYY-MM-DD。"
+                "从正文读取；读不出为 null；禁止用 as_of 代替"
+            ),
+        },
+        "content_date_evidence": {
+            "type": ["string", "null"],
+            "description": (
+                "支撑 content_date 的原文句子，照抄。"
+                "content_date 非 null 时必填；content_date 为 null 时为 null"
             ),
         },
     },
-    "required": ["claim", "evidence", "source_type", "confidence", "published_date"],
+    "required": [
+        "claim",
+        "evidence",
+        "source_type",
+        "confidence",
+        "published_date",
+        "content_date",
+        "content_date_evidence",
+    ],
 }
 
 _NO_USAGE = {"input_tokens": 0, "output_tokens": 0, "requests": 0}
@@ -162,10 +197,7 @@ class ClaudeClaimExtractor:
         call = self._client.call(prompt, EXTRACT_SCHEMA, "extract", parse)
         if call.value is not None:
             claim = replace(call.value, usage=call.usage)
-            cleaned, warning = scrub_as_of_published_date(claim.published_date, as_of, page.markdown)
-            if warning:
-                print(f"⚠️  [llm] extract {page.url}：{warning}", file=sys.stderr)
-                claim = replace(claim, published_date=cleaned)
+            claim = self._scrub_dates(claim, as_of, page.markdown, page.url)
             return claim
         return Claim(
             source_url=page.url,
@@ -177,4 +209,31 @@ class ClaudeClaimExtractor:
             confidence=None,
             usage=call.usage,
             failure=call.failure,
+        )
+
+    def _scrub_dates(self, claim: Claim, as_of: date, markdown: str | None, url: str) -> Claim:
+        published, pub_warn = scrub_as_of_date(
+            claim.published_date, as_of, markdown, field_name="published_date"
+        )
+        content, content_warn = scrub_as_of_date(
+            claim.content_date, as_of, markdown, field_name="content_date"
+        )
+        evidence = claim.content_date_evidence
+        # 有日期必须有原文依据；缺一边就两边都清掉，避免半截证据。
+        if content and not (evidence or "").strip():
+            content_warn = (
+                f"content_date={content} 但缺少 content_date_evidence，已改为 null"
+            )
+            content, evidence = None, None
+        elif evidence and not content:
+            content_warn = "有 content_date_evidence 但 content_date 为空，已改为 null"
+            content, evidence = None, None
+        for warning in (pub_warn, content_warn):
+            if warning:
+                print(f"⚠️  [llm] extract {url}：{warning}", file=sys.stderr)
+        return replace(
+            claim,
+            published_date=published,
+            content_date=content,
+            content_date_evidence=evidence,
         )

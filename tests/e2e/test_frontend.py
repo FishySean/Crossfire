@@ -30,12 +30,18 @@ def test_pairer_toggle_and_nli_disabled_when_unavailable(page, app_server):
 
 def test_fake_nli_scores_hover(page, app_server):
     page.goto(f"{app_server}/?fake=nli-scores&speed=40")
+    page.click("#lang-toggle button[data-lang='zh']")
     page.click("#run-button")
     page.wait_for_selector(".conflict", timeout=20000)
     conflict = page.locator(".conflict").first
     conflict.hover()
     title = conflict.get_attribute("title") or ""
     assert "contradict" in title or "agree" in title or "概率" in title or "0." in title
+    assert "未经校准" in (page.locator("#scores-calibration").inner_text())
+    assert page.locator(".score-chip").count() >= 1
+    meta = page.locator("#run-meta").inner_text()
+    # 合成结果也应立刻标出当前选中的比对器，不能停在「未记录」
+    assert "未记录" not in meta
     _shot(page, "02-nli-scores")
 
 
@@ -88,4 +94,16 @@ def test_nli_history_label(page, app_server):
     page.wait_for_selector("#question")
     meta = page.locator("#run-meta").inner_text()
     assert "NLI" in meta and "0517c59" in meta
+    assert page.locator(".answer strong").count() >= 1
+    assert "**" not in page.locator(".answer").inner_text()
+    assert page.locator("#metrics-strip .metric").count() == 4
+    foot = page.locator(".card-foot").all_inner_texts()
+    assert any("内容所述时间" in text or "Content as of" in text for text in foot)
+    # XSS：尖括号必须转义成文字；原文里的 onerror 可以出现在文本里，但不能变成真实属性
+    answer_html = page.locator(".answer").inner_html()
+    assert "<script" not in answer_html.lower()
+    assert "<img" not in answer_html.lower()
+    assert "&lt;script" in answer_html.lower()
+    assert "&lt;img" in answer_html.lower()
+    assert page.evaluate("window.__xss") is None
     _shot(page, "07-nli-history")

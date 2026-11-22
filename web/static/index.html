@@ -4,16 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Crossfire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">◈</span>
-      <span class="brand-name">Crossfire</span>
-      <span class="brand-sub" id="tagline">verification results viewer</span>
+  <header class="masthead">
+    <div class="masthead-brand">
+      <span class="brand-mark" aria-hidden="true">★</span>
+      <div class="brand-text">
+        <div class="brand-name">CROSSFIRE</div>
+        <div class="brand-sub" id="tagline">Multi-source. Multi-perspective. Fact-based.</div>
+      </div>
     </div>
-    <div class="topbar-right">
+    <div class="masthead-controls">
       <label class="run-picker">
         <span id="question-label">Question</span>
         <select id="question-select"></select>
@@ -28,7 +33,7 @@
       </div>
       <button type="button" id="run-button" class="run-button">Run</button>
       <label class="run-picker">
-        <span id="run-label">Run</span>
+        <span id="run-label">History</span>
         <select id="run-select"></select>
       </label>
       <div class="lang-toggle" id="lang-toggle">
@@ -55,10 +60,12 @@
 
   <main id="content" class="content hidden">
     <section class="question-block">
-      <div class="section-eyebrow" id="question-eyebrow">Question</div>
+      <div class="section-eyebrow" id="question-eyebrow">Fact-check analysis</div>
       <h1 id="question"></h1>
       <div id="run-meta" class="run-meta"></div>
     </section>
+
+    <section id="metrics-strip" class="metrics-strip" aria-label="Run metrics"></section>
 
     <section class="panel">
       <div class="panel-head">
@@ -78,10 +85,11 @@
         <span id="pair-progress" class="count pair-progress hidden"></span>
       </div>
       <div id="conflict-legend" class="legend"></div>
+      <p id="scores-calibration" class="scores-calibration hidden"></p>
       <div id="conflicts" class="conflicts"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel verdict-panel">
       <div class="panel-head"><h2 id="judgment-title">Verdict</h2></div>
       <div id="judgment" class="judgment"></div>
     </section>

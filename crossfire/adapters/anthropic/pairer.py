@@ -25,21 +25,25 @@ PAIR_PROMPT = """你在为一个事实查证引擎比对两个来源对同一个
 
 今天的日期：{as_of}。下面说的「当前」「当前时刻」都指今天。
 来源描述的事可能发生在你的训练数据之后，比你所知更新的版本号、日期、数字本身不是判断依据；
-只比较两个来源写了什么。发布日期是来源自己的日期，「未知」表示来源没写。
+只比较两个来源写了什么。
+「页面发布日」是网页自己写明的发布/更新日；「内容所述时间」是主张描述情况的时间点。
+「未知」表示该字段没有。
 
 问题：{question}
 
 来源 A
 URL: {a_url}
 层级: {a_tier}
-发布日期: {a_date}
+页面发布日: {a_date}
+内容所述时间: {a_content_date}
 主张: {a_claim}
 原文依据: {a_evidence}
 
 来源 B
 URL: {b_url}
 层级: {b_tier}
-发布日期: {b_date}
+页面发布日: {b_date}
+内容所述时间: {b_content_date}
 主张: {b_claim}
 原文依据: {b_evidence}
 
@@ -163,11 +167,13 @@ class ClaudeClaimPairer:
             a_url=a.source_url,
             a_tier=a.tier.value,
             a_date=a.published_date or UNKNOWN_DATE,
+            a_content_date=a.content_date or UNKNOWN_DATE,
             a_claim=a.text,
             a_evidence=a.evidence or NO_EVIDENCE,
             b_url=b.source_url,
             b_tier=b.tier.value,
             b_date=b.published_date or UNKNOWN_DATE,
+            b_content_date=b.content_date or UNKNOWN_DATE,
             b_claim=b.text,
             b_evidence=b.evidence or NO_EVIDENCE,
             **RELATION_NAMES,

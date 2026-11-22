@@ -66,7 +66,7 @@ CONTRADICTS = {
 }
 
 JUDGMENT = {
-    "answer": "Python 3.13 is the latest stable release (3.13.1 at the time of the run).",
+    "answer": "**Python 3.13** is the latest stable release (3.13.1 at the time of the run).",
     "confidence": 0.86,
     "reasoning": (
         "Both primary sources (python.org and the developer guide) agree on the 3.13 line. "

@@ -53,6 +53,8 @@ def test_extractor_scrubs_fabricated_as_of_dates(capsys):
         "source_type": "news_article",
         "confidence": 0.9,
         "published_date": "2026-11-20",
+        "content_date": "2026-11-20",
+        "content_date_evidence": "as of today",
     }
 
     class FakeMessages:
@@ -82,5 +84,7 @@ def test_extractor_scrubs_fabricated_as_of_dates(capsys):
     )
     result = ClaudeClaimExtractor(client).extract(question, page, AS_OF)
     assert result.published_date is None
+    assert result.content_date is None
     err = capsys.readouterr().err
     assert "published_date" in err and "null" in err
+    assert "content_date" in err

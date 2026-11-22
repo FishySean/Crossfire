@@ -29,7 +29,15 @@ QUESTION = Question(
 
 AS_OF = date(2026, 9, 12)
 
-EXTRACTED = {"claim": "1.0", "evidence": "v1.0", "source_type": "news_article", "confidence": 0.8, "published_date": None}
+EXTRACTED = {
+    "claim": "1.0",
+    "evidence": "v1.0",
+    "source_type": "news_article",
+    "confidence": 0.8,
+    "published_date": None,
+    "content_date": None,
+    "content_date_evidence": None,
+}
 
 JUDGMENT = {
     "answer": "1.0",
@@ -365,13 +373,20 @@ def test_every_prompt_carries_the_date_it_was_given_not_today(as_of):
 
 
 def test_pair_prompt_shows_both_publication_dates_and_says_when_one_is_missing():
+    # 第 7b 步有意修改：prompt 改成「页面发布日 / 内容所述时间」两行。
     client, messages = client_for(scripted({"relation": "contradict", "nature": "时间不同"}))
-    dated = replace(claim("https://a.example/", "最新是 3.13"), published_date="2024-10-07")
+    dated = replace(
+        claim("https://a.example/", "最新是 3.13"),
+        published_date="2024-10-07",
+        content_date="2024-10-01",
+    )
     undated = claim("https://b.example/", "最新是 3.15.2")
     ClaudeClaimPairer(client).pair_all(QUESTION, [(dated, undated)], AS_OF)
     [prompt] = messages.prompts
-    assert "发布日期: 2024-10-07" in prompt
-    assert "发布日期: 未知" in prompt and "None" not in prompt
+    assert "页面发布日: 2024-10-07" in prompt
+    assert "内容所述时间: 2024-10-01" in prompt
+    assert "页面发布日: 未知" in prompt and "内容所述时间: 未知" in prompt
+    assert "None" not in prompt
 
 
 def test_provenance_names_the_model_and_a_version_of_each_prompt():

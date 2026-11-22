@@ -200,6 +200,8 @@ class NliClaimPairer:
                 b.text or "",
                 published_date_a=a.published_date,
                 published_date_b=b.published_date,
+                content_date_a=a.content_date,
+                content_date_b=b.content_date,
             )
             premises.append(encoded.premise)
             hypotheses.append(encoded.hypothesis)

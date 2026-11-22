@@ -66,25 +66,19 @@ jobs:
   e2e:
     name: e2e (playwright + fake_events)
     runs-on: ubuntu-latest
+    # 官方镜像已带 Chromium 与系统依赖，避免 runner 上 install-deps 失败。
+    # 版本需与 pyproject.toml 里 playwright==1.56.0 对齐。
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.56.0-jammy
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
       - name: Install with e2e group
         run: uv sync --group e2e
-      - name: Install Chromium + system deps
-        run: |
-          uv run python -m playwright install chromium
-          sudo uv run python -m playwright install-deps chromium
       - name: Playwright tests
         run: uv run pytest tests/e2e -q --tb=short
-        env:
-          # 避免把本机已有的浏览器缓存路径带进 CI
-          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/ms-playwright
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4

@@ -65,16 +65,20 @@ uv sync --group nli
 # NLI_MODEL_REVISION is already locked in config; leave it unless you publish a new model
 ```
 
+`uv sync --group X` replaces the environment with default deps plus that group. To keep several optional groups at once: `uv sync --group nli --group e2e`.
+
 Run tests (offline, no API keys):
 
 ```bash
 uv run pytest
 ```
 
-Start the UI (checks `.env`, picks a free port from 8765, opens the browser):
+Start the UI (checks `.env`, picks a free port from 8765, opens the browser).
+With `FETCHER=http`, an empty `out/cache/` and no `STEEL_API_KEY` are fine — Ask / live do not need them.
 
 ```bash
 uv run python app.py
+# or: uv run python app.py --no-browser
 ```
 
 Or ask from the CLI (prints a cost estimate and waits for confirmation unless `--yes`):
@@ -101,6 +105,8 @@ Estimates use Sonnet pricing and a floor of 4 usable sources (`FETCHER=http`). M
 |---|---|---|---|
 | NLI (pairing free) | ~$0.18 | ~$0.21 | ~$0.24 |
 | Claude pairing | ~$0.22 | ~$0.31 | ~$0.43 |
+
+The confirm dialog uses the **4-source floor** (~$0.18 with NLI). More usable sources → higher actual spend (still usually under $0.50 with NLI + HTTP). First `PAIRER=nli` run downloads weights from Hugging Face (~550MB) into the HF cache.
 
 Breakdown: web search + find/extract/judge tokens; Steel adds ~$0.005/page if you switch `FETCHER=steel`. `MAX_COST_PER_QUESTION` (default `$1`) rejects runs over the estimate before they start.
 
@@ -147,9 +153,10 @@ From [`notes/demo-findings.md`](notes/demo-findings.md):
 ```bash
 uv sync                         # core + pytest (no torch)
 uv run pytest                   # must pass with 0 skipped offline
-uv sync --group nli             # local pairer
+uv sync --group nli             # local pairer (replaces env — see note under Quick start)
 uv sync --group train           # training extras
 uv sync --group e2e && uv run playwright install chromium
+# keep more than one optional group: uv sync --group nli --group e2e
 uv run pytest tests/training
 uv run pytest tests/e2e
 ```

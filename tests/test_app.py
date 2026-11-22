@@ -7,7 +7,7 @@ import app
 
 @pytest.fixture
 def env_file(monkeypatch, tmp_path):
-    for name in ["ANTHROPIC_API_KEY", "STEEL_API_KEY", "PAIRER"]:
+    for name in ["ANTHROPIC_API_KEY", "STEEL_API_KEY", "PAIRER", "FETCHER"]:
         monkeypatch.delenv(name, raising=False)
     path = tmp_path / ".env"
 
@@ -18,13 +18,20 @@ def env_file(monkeypatch, tmp_path):
     return write
 
 
-def test_missing_key_is_reported_but_does_not_block_startup(env_file, capsys):
-    settings = app.load_settings(env_file("ANTHROPIC_API_KEY=sk-test\n"))
+def test_http_fetcher_does_not_require_steel_key(env_file, capsys):
+    settings = app.load_settings(env_file("ANTHROPIC_API_KEY=sk-test\nFETCHER=http\n"))
     out = capsys.readouterr().out
     assert settings is not None
     assert "ANTHROPIC_API_KEY 已配置" in out
-    assert "缺少 STEEL_API_KEY" in out
+    assert "缺少 STEEL_API_KEY" not in out
     assert "sk-test" not in out
+
+
+def test_steel_fetcher_reports_missing_steel_key_but_still_starts(env_file, capsys):
+    settings = app.load_settings(env_file("ANTHROPIC_API_KEY=sk-test\nFETCHER=steel\n"))
+    out = capsys.readouterr().out
+    assert settings is not None
+    assert "缺少 STEEL_API_KEY" in out
 
 
 def test_all_keys_present(env_file, capsys):

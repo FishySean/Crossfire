@@ -73,11 +73,11 @@ def ensure_project_root():
 
 
 def load_settings(env_file=None):
-    """读配置并检查两个 key。缺 key 不阻止启动：看历史结果和 ?fake= 彩排都不需要 key，只有真跑一次才需要。
+    """读配置并检查当前抓取器真正需要的 key。缺 key 不阻止启动（看历史 / ?fake= 彩排仍可用）。
 
     配置写错（比如 PAIRER 不认识）就返回 None，不启动。
     """
-    from crossfire.config import ENV_FILE, KEY_PURPOSES, Key, Settings, SettingsError
+    from crossfire.config import ENV_FILE, KEY_PURPOSES, Fetcher, Key, Settings, SettingsError
 
     env_file = env_file or ENV_FILE
     try:
@@ -85,14 +85,21 @@ def load_settings(env_file=None):
     except SettingsError as error:
         print(BAD + _indent(str(error)))
         return None
-    for key in Key:
+    needed = [Key.ANTHROPIC]
+    if settings.fetcher is Fetcher.STEEL:
+        needed.append(Key.STEEL)
+    for key in needed:
         if key not in settings.missing(key):
             print(OK + f"{key.value} 已配置 —— 用于{KEY_PURPOSES[key]}")
     try:
-        Settings.from_env(env_file, require=list(Key))
+        Settings.from_env(env_file, require=needed)
     except SettingsError as error:
         print(BAD + _indent(str(error)))
-        print(INFO + "没有也能启动：查看历史结果、?fake= 假事件彩排都不需要密钥，只有真跑一次查证需要。")
+        print(INFO + "没有也能启动：查看历史结果、?fake= 假事件彩排都不需要密钥。")
+        if settings.fetcher is Fetcher.HTTP:
+            print(INFO + "当前 FETCHER=http：live 提问只要 ANTHROPIC_API_KEY，不需要 STEEL_API_KEY。")
+        else:
+            print(INFO + "当前 FETCHER=steel：live / prefetch 还需要 STEEL_API_KEY。")
     return settings
 
 
@@ -116,8 +123,8 @@ def check_cache(cache_dir):
         print(OK + f"抓取缓存：{len(cached)} 个问题有缓存（{', '.join(sorted(cached))}）")
     else:
         print(BAD + f"{cache_dir} 下没有抓取缓存")
-        print(INFO + "cached 模式下没有缓存的来源会记为抓取失败，用 live 模式则需要 STEEL_API_KEY。")
-        print(INFO + "先跑 `uv run crossfire prefetch --all` 把来源抓进缓存，演示才稳。")
+        print(INFO + "cached 模式会读这里；Ask / live 不依赖已有缓存。")
+        print(INFO + "若要离线演示预置题：uv run crossfire prefetch --all（FETCHER=steel 时才要 STEEL_API_KEY）。")
     return cached
 
 

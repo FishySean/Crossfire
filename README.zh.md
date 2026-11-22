@@ -65,16 +65,20 @@ uv sync --group nli
 # NLI_MODEL_REVISION 已在 config 里锁死；除非你发布了新模型，否则不用改
 ```
 
+`uv sync --group X` 会把环境收成「默认依赖 + 该组」。要同时保留多组可选依赖：`uv sync --group nli --group e2e`。
+
 跑测试（离线、不需要 API key）：
 
 ```bash
 uv run pytest
 ```
 
-启动界面（检查 `.env`、从 8765 起选空闲端口、自动开浏览器）：
+启动界面（检查 `.env`、从 8765 起选空闲端口、自动开浏览器）。
+`FETCHER=http` 时，没有 `out/cache/`、没有 `STEEL_API_KEY` 都没问题——Ask / live 不依赖它们。
 
 ```bash
 uv run python app.py
+# 或者：uv run python app.py --no-browser
 ```
 
 或用命令行提问（会先打印预计费用，除非加 `--yes`）：
@@ -101,6 +105,8 @@ uv run crossfire ask "当前稳定版 Python 是哪个？" --pairer nli
 |---|---|---|---|
 | NLI（比对免费） | ~$0.18 | ~$0.21 | ~$0.24 |
 | Claude 比对 | ~$0.22 | ~$0.31 | ~$0.43 |
+
+确认对话框按 **4 个来源的下限**估（NLI 约 $0.18）。可用来源更多时实际花费更高（NLI + HTTP 通常仍低于 $0.50）。第一次 `PAIRER=nli` 会从 Hugging Face 下载约 550MB 权重到 HF 缓存。
 
 构成：web search + 找来源/提取/判决的 token；若改 `FETCHER=steel`，大约再加 $0.005/页。`MAX_COST_PER_QUESTION`（默认 `$1`）会在开跑前按估算拒绝超限请求。
 
@@ -147,9 +153,10 @@ uv run crossfire eval --case python-2026-11
 ```bash
 uv sync                         # 主程序 + pytest（不含 torch）
 uv run pytest                   # 离线必须全绿、0 skipped
-uv sync --group nli             # 本地比对器
+uv sync --group nli             # 本地比对器（会重写环境——见快速开始里的说明）
 uv sync --group train           # 训练额外依赖
 uv sync --group e2e && uv run playwright install chromium
+# 同时保留多组：uv sync --group nli --group e2e
 uv run pytest tests/training
 uv run pytest tests/e2e
 ```

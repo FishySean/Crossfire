@@ -116,7 +116,7 @@ def create_app(
     @app.get("/api/pairers")
     def list_pairers() -> dict[str, Any]:
         return {
-            "default": Pairer.CLAUDE.value,
+            "default": settings.pairer.value,
             "options": composition.pairer_availability(settings),
         }
 

@@ -115,6 +115,23 @@ def build_pairer(settings: Settings, model: str | None = None) -> ClaimPairer:
     match settings.pairer:
         case Pairer.CLAUDE:
             return ClaudeClaimPairer(ClaudeClient(settings.anthropic_api_key, model or settings.model_pair))
+        case Pairer.NLI:
+            from crossfire.adapters.nli.pairer import NliClaimPairer
+            from crossfire.adapters.nli.resolve import require_nli_ready
+            from crossfire.config import ROOT
+
+            require_nli_ready(settings)
+            model_ref = settings.nli_model
+            candidate = Path(model_ref).expanduser()
+            if not candidate.is_absolute():
+                candidate = ROOT / candidate
+            if candidate.exists():
+                model_ref = str(candidate.resolve())
+            return NliClaimPairer(
+                model_ref,
+                revision=settings.nli_model_revision or None,
+                batch_size=settings.nli_batch_size,
+            )
 
 
 def build_consistency_runner(settings: Settings):

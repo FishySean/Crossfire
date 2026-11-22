@@ -21,3 +21,8 @@ out/
 *.onnx
 checkpoints/
 wandb/
+
+# Local model weights / HF cache copies (≈550MB). Only README model cards may be tracked.
+models/**
+!models/**/
+!models/**/README.md

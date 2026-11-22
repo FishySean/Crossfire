@@ -23,6 +23,11 @@ ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = ROOT / ".env"
 DEFAULT_MODEL = "claude-sonnet-4-6"
 DEFAULT_HAIKU = "claude-haiku-4-5"
+# 默认走 Hugging Face；开发可用 NLI_MODEL=models/crossfire-pairer-v1 覆盖。
+# NLI_MODEL_REVISION 在模型上传后由 publish_model.py 打印的 commit hash 填死，保证可复现。
+DEFAULT_NLI_MODEL = "FishySean/crossfire-pairer"
+DEFAULT_NLI_MODEL_REVISION = ""
+DEFAULT_NLI_BATCH_SIZE = 16
 
 # 单价查自 https://docs.anthropic.com/en/docs/about-claude/pricing ，2026-11-20。
 # 只列本仓库默认会用到的模型。换模型时在这里加一行；查不到官方价就不要凭记忆填。
@@ -38,9 +43,10 @@ STEEL_SCRAPE_PER_THOUSAND_USD = 5.0
 
 
 class Pairer(StrEnum):
-    """比对器用哪种实现。以后加本地 NLI 模型：这里加一个值，composition.build_pairer 里加一个分支。"""
+    """比对器用哪种实现。加实现：这里加一个值，composition.build_pairer 里加一个分支。"""
 
     CLAUDE = "claude"
+    NLI = "nli"
 
 
 class Key(StrEnum):
@@ -66,6 +72,9 @@ class Settings:
     model_pair: str
     model_judge: str
     pairer: Pairer
+    nli_model: str
+    nli_model_revision: str
+    nli_batch_size: int
     runs_dir: Path
     cache_dir: Path
     questions_file: Path
@@ -112,6 +121,11 @@ class Settings:
             model_pair=get("MODEL_PAIR", DEFAULT_MODEL),
             model_judge=get("MODEL_JUDGE", DEFAULT_MODEL),
             pairer=pairer,
+            nli_model=get("NLI_MODEL", DEFAULT_NLI_MODEL),
+            nli_model_revision=get("NLI_MODEL_REVISION", DEFAULT_NLI_MODEL_REVISION),
+            nli_batch_size=_positive_int(
+                "NLI_BATCH_SIZE", get("NLI_BATCH_SIZE", str(DEFAULT_NLI_BATCH_SIZE)), env_file
+            ),
             runs_dir=_path(get("CROSSFIRE_RUNS_DIR", "out/runs")),
             cache_dir=_path(get("CROSSFIRE_CACHE_DIR", "out/cache")),
             questions_file=_path(get("CROSSFIRE_QUESTIONS_FILE", "questions/demo.yaml")),

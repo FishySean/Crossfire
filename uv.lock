@@ -176,7 +176,13 @@ dev = [
     { name = "pyright", extra = ["nodejs"] },
     { name = "pytest" },
 ]
+nli = [
+    { name = "sentencepiece" },
+    { name = "torch" },
+    { name = "transformers" },
+]
 train = [
+    { name = "huggingface-hub" },
     { name = "matplotlib" },
     { name = "sentencepiece" },
     { name = "torch" },
@@ -198,7 +204,13 @@ dev = [
     { name = "pyright", extras = ["nodejs"], specifier = ">=1.1.414" },
     { name = "pytest", specifier = ">=8.3.0" },
 ]
+nli = [
+    { name = "sentencepiece", specifier = "==0.2.3" },
+    { name = "torch", specifier = "==2.15.0" },
+    { name = "transformers", specifier = "==5.23.0" },
+]
 train = [
+    { name = "huggingface-hub", specifier = ">=0.30.0" },
     { name = "matplotlib", specifier = "==3.10.8" },
     { name = "sentencepiece", specifier = "==0.2.3" },
     { name = "torch", specifier = "==2.15.0" },

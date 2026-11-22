@@ -285,7 +285,7 @@ def test_nli_encoding_must_not_import_torch(tmp_path, monkeypatch):
     nli = tmp_path / "crossfire" / "adapters" / "nli"
     nli.mkdir(parents=True)
     (nli / "encoding.py").write_text("import torch\n", encoding="utf-8")
-    (nli / "model.py").write_text("import torch\n", encoding="utf-8")
+    (nli / "pairer.py").write_text("import torch\n", encoding="utf-8")
     offenders = torch_import_offenders()
     assert "crossfire/adapters/nli/encoding.py imports torch" in offenders
-    assert "crossfire/adapters/nli/model.py imports torch" not in offenders
+    assert "crossfire/adapters/nli/pairer.py imports torch" not in offenders

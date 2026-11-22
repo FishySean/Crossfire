@@ -12,6 +12,24 @@ cp .env.example .env   # 填 ANTHROPIC_API_KEY 和 STEEL_API_KEY，其余设置�
 
 只有 `crossfire/config.py` 读 `.env` 和环境变量；同名环境变量优先于文件。
 
+### 比对器：Claude 或本地 NLI
+
+| 配置 | 行为 |
+|---|---|
+| `PAIRER=claude`（默认） | 比对调 Claude，准，每次花钱 |
+| `PAIRER=nli` | 比对用自训小模型，**免费、在本机跑**；提取和判决仍用 Claude |
+
+```bash
+uv sync --group nli          # 只要推理：torch + transformers + sentencepiece（不含训练用的 matplotlib）
+# .env 里：
+# PAIRER=nli
+# NLI_MODEL=FishySean/crossfire-pairer          # 默认；第一次运行自动下载约 550MB 到 HF 缓存
+# NLI_MODEL_REVISION=<上传后的 commit hash>     # 锁版本，必填（HF 模式）
+# 开发时可覆盖为本地目录：NLI_MODEL=models/crossfire-pairer-v1
+```
+
+`nli` 组与 `train` 组共用同一套 torch/transformers 版本；`train` 额外包含 matplotlib（画损失曲线）和上传用的 huggingface-hub。只跑比对不必装 `train`。
+
 ## 命令行
 
 ```bash
@@ -82,17 +100,25 @@ uv run python scripts/probe.py --test 1        # Steel 可用性探测，需要 
 uv run python scripts/migrate_runs.py          # 把旧结果文件迁到当前格式，默认只演练；--apply 才写（先整目录备份）
 ```
 
-### 训练依赖和训练测试
+### 推理依赖（本地 NLI 比对）与训练依赖
 
-`torch` / `transformers` 很大，不进默认依赖。需要微调或跑训练测试时：
+`torch` / `transformers` 很大，不进默认依赖。
 
 ```bash
-uv sync --group train                 # 在现有环境里加上训练组（版本见 pyproject.toml）
-uv run pytest tests/training          # 只跑训练相关测试（默认 pytest 会忽略这个目录）
-uv run python -m training.overfit_check   # CPU：8 条样例反复训练，损失应降到接近 0
-uv run python -m training.smoke_train     # CPU：正式设置跑几步，确认整条链路
+uv sync --group nli                   # 推理：PAIRER=nli 时需要
+uv sync --group train                 # 训练：在 nli 之上多 matplotlib 等
+uv run pytest                         # 主测试：不装推理依赖也必须全部通过、0 skipped
+uv run pytest tests/training          # 训练测试（默认 pytest 会忽略这个目录）
 ```
 
-正式训练主线是 **Google Colab（免费 T4）**：打开 [`training/colab_train.ipynb`](training/colab_train.ipynb)（[在 Colab 中打开](https://colab.research.google.com/github/FishySean/Crossfire/blob/main/training/colab_train.ipynb)）。说明见 [`training/README.md`](training/README.md)。
+正式训练主线是 **Google Colab（免费 T4）**：打开 [`training/colab_train.ipynb`](training/colab_train.ipynb)。说明见 [`training/README.md`](training/README.md)。
 
-训练代码在 `training/`，与 `crossfire/` 主程序分开；主程序（含 `crossfire/adapters/nli/encoding.py`）不 import torch。
+发布模型到 Hugging Face（**由你自己登录并执行上传**，默认私有）：
+
+```bash
+uv run --group train hf auth login    # Write token：https://huggingface.co/settings/tokens
+uv run --group train python scripts/publish_model.py --re-eval
+# 把打印的 commit hash 填进 config.DEFAULT_NLI_MODEL_REVISION，再在网页上改成公开
+```
+
+训练代码在 `training/`，与 `crossfire/` 主程序分开；只有 `crossfire/adapters/nli/pairer.py` 允许延迟导入 torch。

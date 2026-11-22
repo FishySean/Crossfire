@@ -33,5 +33,5 @@ def test_all_keys_present(env_file, capsys):
 
 
 def test_invalid_setting_blocks_startup(env_file, capsys):
-    assert app.load_settings(env_file("PAIRER=nli\n")) is None
-    assert "PAIRER=nli" in capsys.readouterr().out
+    assert app.load_settings(env_file("PAIRER=bogus\n")) is None
+    assert "PAIRER=bogus" in capsys.readouterr().out

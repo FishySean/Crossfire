@@ -97,8 +97,14 @@ def test_every_missing_key_is_named(env_file):
 
 
 def test_unknown_pairer_is_rejected_with_the_allowed_values(env_file):
-    with pytest.raises(SettingsError, match="nli.*claude"):
-        Settings.from_env(env_file("PAIRER=nli\n"))
+    with pytest.raises(SettingsError, match="bogus.*claude"):
+        Settings.from_env(env_file("PAIRER=bogus\n"))
+
+
+def test_nli_pairer_is_a_valid_setting(env_file):
+    settings = Settings.from_env(env_file("PAIRER=nli\nNLI_MODEL=models/crossfire-pairer-v1\n"))
+    assert settings.pairer.value == "nli"
+    assert settings.nli_model == "models/crossfire-pairer-v1"
 
 
 def test_settings_are_frozen(env_file):

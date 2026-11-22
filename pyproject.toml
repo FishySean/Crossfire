@@ -24,6 +24,14 @@ dev = [
     "pyright[nodejs]>=1.1.414",
     "pytest>=8.3.0",
 ]
+# 推理（PAIRER=nli）：只要跑本地比对器。装法：uv sync --group nli
+# 与 train 共用同一套 torch/transformers 版本；train 多一个 matplotlib（画损失曲线）。
+# 只推理不训练时装 nli 即可，不必装 train。
+nli = [
+    "torch==2.15.0",
+    "transformers==5.23.0",
+    "sentencepiece==0.2.3",  # mDeBERTa 分词器需要
+]
 # 训练 / 微调：体积大，不进默认 sync。装法：uv sync --group train
 # 然后：uv run pytest tests/training
 train = [
@@ -31,6 +39,7 @@ train = [
     "transformers==5.23.0",
     "sentencepiece==0.2.3",  # mDeBERTa 分词器需要
     "matplotlib==3.10.8",  # 损失曲线 PNG
+    "huggingface-hub>=0.30.0",  # scripts/publish_model.py 上传用
 ]
 
 [build-system]

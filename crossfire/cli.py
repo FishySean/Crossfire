@@ -205,6 +205,24 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
 
 
 def verify(settings: Settings, targets: Sequence[Question], mode: Mode) -> None:
+    from crossfire.config import Pairer
+
+    if settings.pairer is Pairer.NLI:
+        # 比对在本地，不计 Anthropic；只估提取 + 判决。
+        extracts = sum(len(q.sources) for q in targets)
+        judges = len(targets)
+        price = settings.price_for(settings.model_extract)
+        # 粗估：提取约 4k in / 200 out，判决约 3k in / 400 out（与近期中位数同量级）
+        usd = (
+            extracts * price.cost_usd(4000, 200)
+            + judges * settings.price_for(settings.model_judge).cost_usd(3000, 400)
+        )
+        print(
+            f"PAIRER=nli：比对在本地免费；预计 Claude 调用最多 "
+            f"提取 {extracts} + 判决 {judges} = {extracts + judges} 次，约 ${usd:.2f}（不含重试）"
+        )
+        print(f"NLI 模型：{settings.nli_model}" + (f" @ {settings.nli_model_revision}" if settings.nli_model_revision else ""))
+
     started = time.monotonic()
     for question in targets:
         verifier = composition.build_verifier(settings, question, mode)

@@ -7,7 +7,7 @@ to_dict/from_dict 放在实体上，是因为字段名和 JSON 键名并不一�
 from_dict 读的是本项目自己写出的结构，键缺失、枚举值不认识、标量类型不对都直接抛错，不做兜底。
 """
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from enum import StrEnum
@@ -356,7 +356,11 @@ class Claim:
 
 @dataclass(frozen=True)
 class Pair:
-    """两个已回答主张之间的比对。比对失败时 relation 和 nature 为 None，failure 非空。"""
+    """两个已回答主张之间的比对。比对失败时 relation 和 nature 为 None，failure 非空。
+
+    scores 是可选的：本地 NLI 比对器填写四类概率；Claude 比对器留空。
+    序列化时只在有值时多写一个键，旧文件没有 scores 仍能读。
+    """
 
     a_url: str
     b_url: str
@@ -364,21 +368,33 @@ class Pair:
     nature: str | None
     usage: Usage
     failure: Failure | None = None
+    scores: dict[str, float] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return _with_failure(
-            {
-                "a": self.a_url,
-                "b": self.b_url,
-                "relation": None if self.relation is None else self.relation.value,
-                "nature": self.nature,
-                "usage": self.usage.to_dict(),
-            },
-            self.failure,
-        )
+        body: dict[str, Any] = {
+            "a": self.a_url,
+            "b": self.b_url,
+            "relation": None if self.relation is None else self.relation.value,
+            "nature": self.nature,
+            "usage": self.usage.to_dict(),
+        }
+        if self.scores is not None:
+            body["scores"] = dict(self.scores)
+        return _with_failure(body, self.failure)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
+        raw_scores = data.get("scores")
+        scores: dict[str, float] | None
+        if raw_scores is None:
+            scores = None
+        elif isinstance(raw_scores, dict):
+            score_items = cast(Mapping[object, object], raw_scores)
+            scores = {
+                _str(key, "scores.key"): _number(value, "scores.value") for key, value in score_items.items()
+            }
+        else:
+            raise TypeError("scores 必须是对象或省略")
         return cls(
             a_url=_str(data["a"], "a"),
             b_url=_str(data["b"], "b"),
@@ -386,6 +402,7 @@ class Pair:
             nature=_optional_str(data["nature"], "nature"),
             usage=Usage.from_dict(data["usage"]),
             failure=_failure_from(data),
+            scores=scores,
         )
 
 
@@ -487,19 +504,33 @@ class Provenance:
     """一个步骤的结果是谁产出的：哪个模型、哪一版 prompt。
 
     造训练数据时每条标签都要能查到这两项。不调模型的实现 model 写实现名，没有 prompt 时 prompt_version 为 None。
+    本地 NLI 还可选写 implementation / weights_sha256 / revision；旧文件没有这些键仍能读。
     """
 
     model: str
     prompt_version: str | None
+    implementation: str | None = None
+    weights_sha256: str | None = None
+    revision: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {"model": self.model, "prompt_version": self.prompt_version}
+        body: dict[str, Any] = {"model": self.model, "prompt_version": self.prompt_version}
+        if self.implementation is not None:
+            body["implementation"] = self.implementation
+        if self.weights_sha256 is not None:
+            body["weights_sha256"] = self.weights_sha256
+        if self.revision is not None:
+            body["revision"] = self.revision
+        return body
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
         return cls(
             model=_str(data["model"], "model"),
             prompt_version=_optional_str(data["prompt_version"], "prompt_version"),
+            implementation=_optional_str(data.get("implementation"), "implementation"),
+            weights_sha256=_optional_str(data.get("weights_sha256"), "weights_sha256"),
+            revision=_optional_str(data.get("revision"), "revision"),
         )
 
 

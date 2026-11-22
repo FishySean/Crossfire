@@ -145,6 +145,12 @@ def test_pairer_setting_picks_the_claude_pairer(tmp_path):
     assert isinstance(build_pairer(settings(tmp_path, PAIRER="claude")), ClaudeClaimPairer)
 
 
+def test_pairer_nli_fails_before_pairing_when_model_missing(tmp_path, monkeypatch):
+    monkeypatch.setattr("crossfire.adapters.nli.resolve.nli_deps_missing", lambda: [])
+    with pytest.raises(SettingsError, match="不存在|找不到"):
+        build_pairer(settings(tmp_path, PAIRER="nli", NLI_MODEL=str(tmp_path / "nope")))
+
+
 def test_prefetch_needs_only_steel(tmp_path, monkeypatch):
     stores = []
     monkeypatch.setattr(composition, "CachePageStore", lambda cache_dir: stores.append(cache_dir) or CachePageStore(cache_dir))

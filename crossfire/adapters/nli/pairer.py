@@ -7,6 +7,7 @@ torch / transformers 只在本模块内延迟导入，主程序未装推理依�
 from __future__ import annotations
 
 import hashlib
+import importlib
 import sys
 from collections.abc import Sequence
 from datetime import date
@@ -56,23 +57,24 @@ def _sha256_file(path: Path) -> str:
 
 
 def _import_torch() -> Any:
+    # 用 importlib，不用 `import torch`：torch 是可选依赖（--group nli）。
+    # 静态 `import` 会让没装 nli 组的干净环境里 pyright 报 reportMissingImports；
+    # 字符串模块名不会。这里不整体关掉缺失导入检查。
     try:
-        import torch
+        return importlib.import_module("torch")
     except ImportError as error:
         raise ImportError(
             "缺少 torch。PAIRER=nli 需要推理依赖：uv sync --group nli"
         ) from error
-    return torch
 
 
 def _import_transformers() -> Any:
     try:
-        import transformers
+        return importlib.import_module("transformers")
     except ImportError as error:
         raise ImportError(
             "缺少 transformers。PAIRER=nli 需要推理依赖：uv sync --group nli"
         ) from error
-    return transformers
 
 
 class NliClaimPairer:

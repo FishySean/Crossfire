@@ -32,9 +32,9 @@ Crossfire 查证引擎里的**主张两两比对**小模型：给定同一问题
 
 ## 训练数据
 
-- **335 对**主张，来自 **19 道**真实网页查证题（`data/pairs.jsonl`）
+- **335 对**主张，来自 **19 道**真实网页查证题（[data/pairs.jsonl](https://github.com/FishySean/Crossfire/blob/main/data/pairs.jsonl)）
 - 训练集 / 验证集 / 测试集按**题目**切分（同一题的配对不会跨集合），避免泄漏
-- 训练时对少数类做了主张 A/B 对调增强；验证与测试不做对调
+- 训练时对训练集**全部**配对做主张 A/B 对调增强（A、B 文字完全相同的除外）；验证与测试不做对调
 - 入选种子：**44**（仅按验证集加权损失选型；测试分只用于报告）
 
 ## 测试成绩（入选模型，seed 44）
@@ -90,6 +90,7 @@ encoded = encode_pair(
 
 ## 复现与版本
 
-- 训练代码：本仓库 `training/`
+- 训练代码：[FishySean/Crossfire](https://github.com/FishySean/Crossfire) 仓库的 [`training/`](https://github.com/FishySean/Crossfire/tree/main/training)（本 Hugging Face 仓库只放推理权重与说明）
+- 训练数据：[data/pairs.jsonl](https://github.com/FishySean/Crossfire/blob/main/data/pairs.jsonl)
 - 权重锁定：请使用发布时的 **revision（commit hash）**，对应环境变量 `NLI_MODEL_REVISION`
 - 包内 `test_report.json` / `summary.json` 为同一次评测快照

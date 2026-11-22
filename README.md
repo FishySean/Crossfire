@@ -100,6 +100,14 @@ uv run python scripts/probe.py --test 1        # Steel 可用性探测，需要 
 uv run python scripts/migrate_runs.py          # 把旧结果文件迁到当前格式，默认只演练；--apply 才写（先整目录备份）
 ```
 
+**每次提交前**：在干净环境里跑一遍主测试（只 `uv sync`，不要装 `nli` / `train`）。本机若已装过 torch，现有 `.venv` 会掩盖「缺依赖时类型检查 / 启动检查」类问题。
+
+```bash
+rm -rf .venv-clean
+UV_PROJECT_ENVIRONMENT=.venv-clean uv sync
+UV_PROJECT_ENVIRONMENT=.venv-clean uv run pytest   # 必须全部通过、0 skipped
+```
+
 ### 推理依赖（本地 NLI 比对）与训练依赖
 
 `torch` / `transformers` 很大，不进默认依赖。

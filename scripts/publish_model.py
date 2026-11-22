@@ -29,11 +29,16 @@ DEFAULT_REPO = "FishySean/crossfire-pairer"
 DEFAULT_LOCAL = ROOT / "models" / "crossfire-pairer-v1"
 
 # 只上传推理与说明需要的文件；不要把优化器状态或训练中间产物传上去。
+# DebertaV2：快分词器用 tokenizer.json；慢分词器（use_fast=False）要 spm.model
+# 以及 special_tokens_map.json / added_tokens.json（与基座一致）。
 ALLOW = {
     "config.json",
     "model.safetensors",
     "tokenizer.json",
     "tokenizer_config.json",
+    "spm.model",
+    "special_tokens_map.json",
+    "added_tokens.json",
     "README.md",
     "test_report.json",
     "test_report.md",
@@ -42,6 +47,8 @@ ALLOW = {
     "run_meta.json",
     "fp16_vs_fp32.json",
 }
+
+WEIGHT_NAMES = frozenset({"model.safetensors", "pytorch_model.bin"})
 
 FORBIDDEN_SUBSTRINGS = ("optimizer", "scheduler", "rng_state", "train_state", ".pt", ".pth")
 
@@ -117,17 +124,50 @@ def main() -> int:
     parser.add_argument("--private", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--re-eval", action="store_true", help="上传前用测试集重评（较慢）")
     parser.add_argument("--dry-run", action="store_true", help="只检查，不上传")
+    parser.add_argument(
+        "--only",
+        nargs="+",
+        metavar="NAME",
+        help="只上传列出的文件名（例如 README.md spm.model），不传权重。用于补丁更新。",
+    )
+    parser.add_argument(
+        "--skip-weights",
+        action="store_true",
+        help="上传 ALLOW 里除模型权重以外的全部文件",
+    )
     args = parser.parse_args()
 
     package = args.package if args.package.is_absolute() else ROOT / args.package
     _check_local(package)
-    _check_test_report(package, args.re_eval)
+    if not args.only and not args.skip_weights:
+        _check_test_report(package, args.re_eval)
+    elif args.re_eval:
+        _check_test_report(package, True)
 
-    files = [p for p in package.iterdir() if p.is_file() and p.name in ALLOW]
-    missing = ALLOW - {p.name for p in files}
-    for required in ("README.md", "model.safetensors", "config.json", "tokenizer.json"):
-        if required in missing:
-            raise SystemExit(f"缺少必需文件：{required}")
+    present = {p.name: p for p in package.iterdir() if p.is_file() and p.name in ALLOW}
+    for required in ("README.md", "model.safetensors", "config.json", "tokenizer.json", "spm.model"):
+        if required not in present:
+            raise SystemExit(f"缺少必需文件：{required}（DebertaV2 慢分词器需要 spm.model）")
+
+    if args.only:
+        unknown = [name for name in args.only if name not in ALLOW]
+        if unknown:
+            raise SystemExit(f"--only 含不在 ALLOW 里的文件：{unknown}")
+        missing_only = [name for name in args.only if name not in present]
+        if missing_only:
+            raise SystemExit(f"--only 指定的文件本地不存在：{missing_only}")
+        files = [present[name] for name in args.only]
+        allow_patterns = list(args.only)
+        commit_message = "Update " + ", ".join(args.only)
+    elif args.skip_weights:
+        files = [path for name, path in present.items() if name not in WEIGHT_NAMES]
+        allow_patterns = [path.name for path in files]
+        commit_message = "Update model card and tokenizer files (no weights)"
+    else:
+        files = list(present.values())
+        allow_patterns = sorted(ALLOW)
+        commit_message = "Add crossfire-pairer-v1 inference package"
+
     print("将上传：")
     for path in sorted(files, key=lambda p: p.name):
         print(f"  {path.name}\t{path.stat().st_size / 1e6:.1f} MB")
@@ -160,8 +200,8 @@ def main() -> int:
         folder_path=str(package),
         repo_id=args.repo,
         repo_type="model",
-        allow_patterns=sorted(ALLOW),
-        commit_message="Add crossfire-pairer-v1 inference package",
+        allow_patterns=allow_patterns,
+        commit_message=commit_message,
     )
     rev = getattr(commit, "oid", None) or getattr(commit, "commit_hash", None) or str(commit)
     url = f"https://huggingface.co/{args.repo}"

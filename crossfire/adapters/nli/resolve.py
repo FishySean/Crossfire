@@ -32,9 +32,16 @@ def is_local_model_ref(ref: str) -> bool:
     return False
 
 
-def require_nli_ready(settings: Settings) -> None:
-    """PAIRER=nli 时在组装阶段调用：缺依赖或模型不可用立刻报错。"""
-    missing = nli_deps_missing()
+def require_nli_ready(
+    settings: Settings,
+    *,
+    missing_deps: list[str] | None = None,
+) -> None:
+    """PAIRER=nli 时在组装阶段调用：缺依赖或模型不可用立刻报错。
+
+    missing_deps 可注入（测试用）：None 表示现场探测；传列表则跳过探测，用注入结果。
+    """
+    missing = list(missing_deps) if missing_deps is not None else nli_deps_missing()
     if missing:
         raise SettingsError(
             "PAIRER=nli 需要推理依赖，当前缺少："

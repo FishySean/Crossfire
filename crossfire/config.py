@@ -26,7 +26,8 @@ DEFAULT_HAIKU = "claude-haiku-4-5"
 # 默认走 Hugging Face；开发可用 NLI_MODEL=models/crossfire-pairer-v1 覆盖。
 # NLI_MODEL_REVISION 在模型上传后由 publish_model.py 打印的 commit hash 填死，保证可复现。
 DEFAULT_NLI_MODEL = "FishySean/crossfire-pairer"
-DEFAULT_NLI_MODEL_REVISION = ""
+# 锁定到「model card + spm.model 等分词器补丁」之后的 revision（全新用户验证已通过）。
+DEFAULT_NLI_MODEL_REVISION = "0517c59dfa13038226b4b66c3fa6b605b9215df5"
 DEFAULT_NLI_BATCH_SIZE = 16
 
 # 单价查自 https://docs.anthropic.com/en/docs/about-claude/pricing ，2026-11-20。

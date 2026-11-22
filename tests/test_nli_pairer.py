@@ -226,8 +226,25 @@ def test_provenance_marks_nli_and_zero_api_usage(monkeypatch):
     assert pair.usage.requests == 0
 
 
+def test_require_nli_ready_fails_when_deps_missing(tmp_path):
+    """缺推理依赖时立刻报错；不依赖本机是否真装了 torch。"""
+    settings = Settings.from_mapping(
+        {
+            "PAIRER": "nli",
+            "NLI_MODEL": str(tmp_path / "whatever"),
+            "ANTHROPIC_API_KEY": "sk",
+        },
+        env_file=tmp_path / ".env",
+    )
+    with pytest.raises(SettingsError, match="缺少.*torch"):
+        require_nli_ready(settings, missing_deps=["torch", "transformers", "sentencepiece"])
+
+
 def test_require_nli_ready_fails_when_local_path_missing(tmp_path):
-    """变异目标：PAIRER=nli 但模型不存在时没有提前报错。"""
+    """变异目标：依赖齐全但模型路径不存在时没有提前报错。
+
+    依赖检查可注入，结果不随本机是否安装 torch 而变。
+    """
     settings = Settings.from_mapping(
         {
             "PAIRER": "nli",
@@ -237,7 +254,7 @@ def test_require_nli_ready_fails_when_local_path_missing(tmp_path):
         env_file=tmp_path / ".env",
     )
     with pytest.raises(SettingsError, match="不存在"):
-        require_nli_ready(settings)
+        require_nli_ready(settings, missing_deps=[])
 
 
 def test_build_pairer_nli_fails_fast_when_model_missing(tmp_path, monkeypatch):

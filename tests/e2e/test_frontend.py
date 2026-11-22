@@ -99,11 +99,15 @@ def test_nli_history_label(page, app_server):
     assert page.locator("#metrics-strip .metric").count() == 4
     foot = page.locator(".card-foot").all_inner_texts()
     assert any("内容所述时间" in text or "Content as of" in text for text in foot)
-    # XSS：尖括号必须转义成文字；原文里的 onerror 可以出现在文本里，但不能变成真实属性
+    # XSS：尖括号必须转义；javascript: 不得变成可点链接；https 可以
     answer_html = page.locator(".answer").inner_html()
     assert "<script" not in answer_html.lower()
     assert "<img" not in answer_html.lower()
     assert "&lt;script" in answer_html.lower()
     assert "&lt;img" in answer_html.lower()
+    assert page.locator(".answer a[href^='javascript:']").count() == 0
+    assert page.locator(".answer a[href='https://example.com/safe']").count() == 1
     assert page.evaluate("window.__xss") is None
+    # provenance：真实格式结果文件要显示 NLI 与 revision 前 7 位
+    assert "NLI" in meta and "0517c59" in meta
     _shot(page, "07-nli-history")

@@ -503,30 +503,9 @@ function questionText(run) {
   return "";
 }
 
-function escapeHtml(raw) {
-  return String(raw ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function safeMarkdownHtml(raw) {
-  // 先全部转义，再只恢复一小撮安全格式，避免模型输出里的 <script>/onerror 被执行。
-  let html = escapeHtml(raw);
-  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
-    '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
-  );
-  html = html.replace(/(^|\n)- (.+)(?=\n|$)/g, "$1• $2");
-  html = html.replace(/\n/g, "<br>");
-  return html;
-}
-
 function renderSafeMarkdown(target, raw) {
-  target.innerHTML = safeMarkdownHtml(raw);
+  // 先转义再恢复安全子集，见 web/static/safe_markdown.js（单元测试覆盖 XSS）。
+  target.innerHTML = CrossfireSafeMarkdown.safeMarkdownHtml(raw);
 }
 
 function renderQuestion(run) {

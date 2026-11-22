@@ -138,7 +138,13 @@ def app_server(tmp_path_factory):
                     }
                 ],
                 "judgment": {
-                    "answer": "最新稳定版是 **Python 3.14.7**。<script>window.__xss=1</script><img src=x onerror=window.__xss=1>",
+                    "answer": (
+                        "最新稳定版是 **Python 3.14.7**。"
+                        "<script>window.__xss=1</script>"
+                        "<img src=x onerror=window.__xss=1>"
+                        "[坏链](javascript:window.__xss=1)"
+                        "[好链](https://example.com/safe)"
+                    ),
                     "confidence": 0.9,
                     "reasoning": "采信一手来源。",
                     "conflicts": ["3.14.7 vs 3.13"],

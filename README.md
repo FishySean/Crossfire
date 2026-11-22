@@ -1,5 +1,7 @@
 # Crossfire
 
+[![test](https://github.com/FishySean/Crossfire/actions/workflows/test.yml/badge.svg)](https://github.com/FishySean/Crossfire/actions/workflows/test.yml)
+
 查证引擎（hackathon）：用 [Steel.dev](https://steel.dev) 云端浏览器抓取多个来源，让 Claude 逐页提取主张、
 两两比对找矛盾，最后给出带置信度的结论。
 

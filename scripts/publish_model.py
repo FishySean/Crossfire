@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import sys
 from pathlib import Path
@@ -77,8 +78,9 @@ def _check_local(package: Path) -> None:
 
 def _recheck_macro_f1(package: Path) -> float:
     """用仓库里的测试切分对 package 再评一次宏平均 F1。"""
-    import torch
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+    # importlib：torch/transformers 是可选依赖，静态 import 会让干净环境里 pyright 报红。
+    torch = importlib.import_module("torch")
+    transformers = importlib.import_module("transformers")
 
     from training.evaluate import predict_labels
     from training.metrics import macro_f1
@@ -87,9 +89,9 @@ def _recheck_macro_f1(package: Path) -> float:
     prepared = prepare_from_pairs(ROOT / "data" / "pairs.jsonl")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dtype = torch.float16 if device.type != "cpu" else torch.float32
-    tokenizer = AutoTokenizer.from_pretrained(package, local_files_only=True)
-    model = AutoModelForSequenceClassification.from_pretrained(
-        package, local_files_only=True, torch_dtype=dtype
+    tokenizer = transformers.AutoTokenizer.from_pretrained(package, local_files_only=True)
+    model = transformers.AutoModelForSequenceClassification.from_pretrained(
+        package, local_files_only=True, dtype=dtype
     )
     model.to(device)
     model.eval()
@@ -177,12 +179,12 @@ def main() -> int:
         return 0
 
     try:
-        from huggingface_hub import HfApi
+        hub = importlib.import_module("huggingface_hub")
     except ImportError:
         print("需要 huggingface_hub：uv sync --group train", file=sys.stderr)
         return 2
 
-    api = HfApi()
+    api = hub.HfApi()
     try:
         me = api.whoami()
     except Exception as error:

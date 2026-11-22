@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import importlib
 import importlib.util
 from pathlib import Path
 
@@ -92,14 +93,14 @@ def require_nli_ready(
             "或开发时改用本地路径：NLI_MODEL=models/crossfire-pairer-v1"
         )
     try:
-        from huggingface_hub import model_info
+        hub = importlib.import_module("huggingface_hub")
     except ImportError as error:
         raise SettingsError(
             "检查 Hugging Face 仓库需要 huggingface_hub（随 transformers 安装）。\n"
             "请先：uv sync --group nli"
         ) from error
     try:
-        model_info(ref, revision=revision)
+        hub.model_info(ref, revision=revision)
     except Exception as error:
         raise SettingsError(
             f"无法从 Hugging Face 读取 {ref} @ {revision}：{type(error).__name__}: {error}\n"

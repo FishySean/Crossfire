@@ -1,0 +1,64 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+# 离线保险：不注入任何 API key。测试本身也不该联网下模型。
+env:
+  ANTHROPIC_API_KEY: ""
+  STEEL_API_KEY: ""
+  HF_HUB_OFFLINE: "1"
+  TRANSFORMERS_OFFLINE: "1"
+
+jobs:
+  core:
+    name: core (uv sync only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install (no nli / train)
+        run: uv sync
+      - name: Prove optional deps absent
+        run: |
+          uv run python -c "import importlib.util as u; assert u.find_spec('torch') is None; assert u.find_spec('transformers') is None; assert u.find_spec('huggingface_hub') is None; print('optional deps absent')"
+      - name: Pytest
+        run: uv run pytest -q --tb=short
+
+  nli:
+    name: nli (uv sync --group nli)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install with nli group
+        run: uv sync --group nli
+      - name: Pytest
+        run: uv run pytest -q --tb=short
+
+  train:
+    name: train (uv sync --group train)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install with train group
+        run: uv sync --group train
+      - name: Training tests
+        run: uv run pytest tests/training -q --tb=short

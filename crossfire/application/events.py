@@ -98,4 +98,70 @@ class Error(_Event):
     detail: str
 
 
-type Event = Start | FetchDone | ClaimDone | PairStart | PairDone | JudgeStart | Heartbeat | Done | Error
+# ---- 第 7c 步：用户自提问 / 找来源（只新增，不改已有事件）----
+
+
+@dataclass(frozen=True)
+class SourceSearchStart(_Event):
+    type: ClassVar[str] = "source_search_start"
+    question: str
+    question_id: str
+
+
+@dataclass(frozen=True)
+class SourceCandidate(_Event):
+    type: ClassVar[str] = "source_candidate"
+    url: str
+    title: str
+    tier: str
+
+
+@dataclass(frozen=True)
+class SourceFiltered(_Event):
+    type: ClassVar[str] = "source_filtered"
+    url: str
+    reason: str
+    detail: str
+
+
+@dataclass(frozen=True)
+class SourcesReady(_Event):
+    type: ClassVar[str] = "sources_ready"
+    count: int
+    has_primary: bool
+    urls: list[str]
+
+
+@dataclass(frozen=True)
+class SourcesInsufficient(_Event):
+    type: ClassVar[str] = "sources_insufficient"
+    kept: int
+    found: int
+    filtered: int
+    detail: str
+
+
+@dataclass(frozen=True)
+class AskCostRejected(_Event):
+    type: ClassVar[str] = "ask_cost_rejected"
+    total_usd: float
+    max_cost_usd: float
+
+
+type Event = (
+    Start
+    | FetchDone
+    | ClaimDone
+    | PairStart
+    | PairDone
+    | JudgeStart
+    | Heartbeat
+    | Done
+    | Error
+    | SourceSearchStart
+    | SourceCandidate
+    | SourceFiltered
+    | SourcesReady
+    | SourcesInsufficient
+    | AskCostRejected
+)

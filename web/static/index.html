@@ -51,6 +51,40 @@
     </div>
   </div>
 
+  <section id="ask-panel" class="ask-panel">
+    <div class="ask-head">
+      <h2 id="ask-title">Ask a question</h2>
+      <p id="ask-lead" class="ask-lead"></p>
+    </div>
+    <div class="ask-row">
+      <input id="ask-input" type="text" maxlength="300" autocomplete="off" />
+      <button type="button" id="ask-button" class="run-button ask-button">Ask</button>
+    </div>
+    <div id="ask-examples" class="ask-examples"></div>
+    <p id="ask-unsuitable" class="ask-unsuitable"></p>
+  </section>
+
+  <div id="ask-dialog" class="ask-dialog hidden" role="dialog" aria-modal="true">
+    <div class="ask-dialog-card">
+      <h3 id="ask-dialog-title">Confirm run</h3>
+      <p id="ask-dialog-question" class="ask-dialog-question"></p>
+      <p id="ask-dialog-estimate" class="ask-dialog-estimate"></p>
+      <p id="ask-dialog-pairer" class="ask-dialog-pairer"></p>
+      <div class="ask-dialog-actions">
+        <button type="button" id="ask-cancel" class="inline-button">Cancel</button>
+        <button type="button" id="ask-confirm" class="run-button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="source-find-panel" class="source-find-panel hidden">
+    <div class="panel-head">
+      <h2 id="source-find-title">Finding sources</h2>
+      <span id="source-find-count" class="count"></span>
+    </div>
+    <ul id="source-find-list" class="source-find-list"></ul>
+  </div>
+
   <div id="stall-banner" class="banner hidden">
     <span id="stall-text"></span>
     <button type="button" id="stall-switch" class="inline-button"></button>

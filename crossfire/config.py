@@ -29,6 +29,7 @@ DEFAULT_NLI_MODEL = "FishySean/crossfire-pairer"
 # 锁定到「model card + spm.model 等分词器补丁」之后的 revision（全新用户验证已通过）。
 DEFAULT_NLI_MODEL_REVISION = "0517c59dfa13038226b4b66c3fa6b605b9215df5"
 DEFAULT_NLI_BATCH_SIZE = 16
+DEFAULT_MAX_COST_PER_QUESTION = 1.0
 
 # 单价查自 https://docs.anthropic.com/en/docs/about-claude/pricing ，2026-11-20。
 # 只列本仓库默认会用到的模型。换模型时在这里加一行；查不到官方价就不要凭记忆填。
@@ -88,6 +89,8 @@ class Settings:
     batch_dir: Path
     batch_progress_file: Path
     dataset_dir: Path
+    user_questions_dir: Path
+    max_cost_per_question: float
     extract_concurrency: int
     env_file: Path
 
@@ -139,6 +142,12 @@ class Settings:
             batch_dir=_path(get("CROSSFIRE_BATCH_DIR", "out/batch-runs")),
             batch_progress_file=_path(get("CROSSFIRE_BATCH_PROGRESS_FILE", "out/batch-progress.yaml")),
             dataset_dir=_path(get("CROSSFIRE_DATASET_DIR", "data")),
+            user_questions_dir=_path(get("CROSSFIRE_USER_QUESTIONS_DIR", "questions/user")),
+            max_cost_per_question=_positive_float(
+                "MAX_COST_PER_QUESTION",
+                get("MAX_COST_PER_QUESTION", str(DEFAULT_MAX_COST_PER_QUESTION)),
+                env_file,
+            ),
             extract_concurrency=_positive_int("CROSSFIRE_EXTRACT_CONCURRENCY", get("CROSSFIRE_EXTRACT_CONCURRENCY", "4"), env_file),
             env_file=env_file,
         )
@@ -183,17 +192,47 @@ def _positive_int(name: str, value: str, env_file: Path) -> int:
     return number
 
 
+def _positive_float(name: str, value: str, env_file: Path) -> float:
+    try:
+        number = float(value)
+    except ValueError:
+        number = 0.0
+    if number <= 0:
+        raise SettingsError(f"{name}={value} 不合法，要一个正数。在 {env_file} 里改。")
+    return number
+
+
 def _path(value: str) -> Path:
     path = Path(value).expanduser()
     return path if path.is_absolute() else ROOT / path
 
 
 def load_questions(settings: Settings) -> list[Question]:
-    """读问题清单。文件不存在时返回空列表：web 端照样能看历史结果。"""
-    if not settings.questions_file.is_file():
-        return []
-    data: Any = yaml.safe_load(settings.questions_file.read_text(encoding="utf-8")) or []
-    return [Question.from_dict(item) for item in data]
+    """读问题清单（演示题 + 用户自提问）。文件不存在时跳过。"""
+    questions: list[Question] = []
+    if settings.questions_file.is_file():
+        data: Any = yaml.safe_load(settings.questions_file.read_text(encoding="utf-8")) or []
+        questions.extend(Question.from_dict(item) for item in data)
+    user_dir = settings.user_questions_dir
+    if user_dir.is_dir():
+        for path in sorted(user_dir.glob("*.yaml")):
+            data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            if isinstance(data, dict) and data.get("id"):
+                questions.append(Question.from_dict(data))
+    return questions
+
+
+def save_user_question(settings: Settings, question: Question, *, has_primary: bool) -> Path:
+    """把用户问过的题存到 questions/user/（不进 git）。"""
+    settings.user_questions_dir.mkdir(parents=True, exist_ok=True)
+    path = settings.user_questions_dir / f"{question.id}.yaml"
+    payload = {
+        **question.to_dict(),
+        "has_primary": has_primary,
+        "origin": "user",
+    }
+    path.write_text(yaml.safe_dump(payload, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    return path
 
 
 def load_bank_questions(settings: Settings, path: Path | None = None) -> list:

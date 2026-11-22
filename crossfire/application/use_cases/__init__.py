@@ -1,12 +1,11 @@
 from crossfire.application.use_cases.bench_runs import BenchReport, RunBench, StepBench, bench_runs
+from crossfire.application.source_filter import page_mentions_topic, select_by_tier_mix
 from crossfire.application.use_cases.build_question_bank import (
     BankBuildInterrupted,
     BuildQuestionBank,
     apply_keep_rules,
     estimate_bank_build,
-    page_mentions_topic,
     remaining_quotas,
-    select_by_tier_mix,
 )
 from crossfire.application.use_cases.export_dataset import (
     EVAL_OVERLAP_IDS,

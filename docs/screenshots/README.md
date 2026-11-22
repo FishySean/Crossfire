@@ -12,3 +12,10 @@
 | 06-legacy-run.png | 旧结果「未记录」 |
 | 07-nli-history.png | 历史里标 NLI |
 | 08-real-nli-run.png | 界面选 NLI 真实跑 python-latest-version |
+| 09-ask-sources.png | fake ask-normal：找来源进度 |
+| 10-ask-insufficient.png | fake：来源不足提前停 |
+| 11-ask-cost-limit.png | fake：费用超限 |
+| 12-ask-nodejs-zh.png | 真实提问：Node.js LTS（中文，NLI） |
+| 13-ask-un-sg-en.png | 真实提问：UN Secretary-General（英文，NLI） |
+| 14-ask-confirm-dialog.png | 提问确认对话框（预计费用） |
+| 15-ask-source-finding.png | 找来源面板（候选 / 过滤） |

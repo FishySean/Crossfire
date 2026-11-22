@@ -64,6 +64,43 @@ def env(tmp_path, monkeypatch):
     return run, tmp_path, built
 
 
+def test_ask_prints_estimate_and_respects_yes(env, monkeypatch, capsys):
+    from crossfire.application.use_cases.ask_question import AskEstimate, AskStopped
+    from crossfire.domain.pricing import ModelPrice
+
+    price = ModelPrice(input_per_mtok=3.0, output_per_mtok=15.0)
+    estimate = AskEstimate(
+        searches=6,
+        steel_pages=8,
+        extract_calls=4,
+        pair_calls=0,
+        judge_calls=1,
+        search_usd=0.06,
+        steel_usd=0.04,
+        anthropic_usd=0.1,
+        pair_usd=0.0,
+        pairer_free=True,
+        max_cost_usd=1.0,
+    )
+
+    class StubAsk:
+        def __init__(self, *a, **k):
+            pass
+
+        def estimate(self, text):
+            return estimate
+
+        def execute(self, text):
+            return AskStopped(reason="too_few_sources", detail="可用来源 0 个，少于 4", estimate=estimate)
+
+    monkeypatch.setattr(composition, "build_ask_question", lambda *a, **k: StubAsk())
+    run, _, _ = env
+    assert run("ask", "Python 最新版？", "--yes", "--pairer", "nli") == 1
+    out = capsys.readouterr()
+    assert "预计费用" in out.out
+    assert "提前停止" in out.err
+
+
 def test_verify_one_question_prints_the_report_and_saves_the_run(env, capsys):
     run, tmp_path, built = env
     assert run("verify", "--question", "q1", "--mode", "cached") == 0

@@ -62,9 +62,20 @@ uv run crossfire eval --case python-2026-11  # 只跑一道
 判分是确定性的正则和数字规则，不用模型打分，每条规则都写了 `why`。`repeats` 大于 1 的题每次都对才算通过；
 告诉模型的日期和题目的 `as_of` 对不上也算没通过。有题没通过时退出码非 0。结果写进 `out/eval-runs/<id>/`。
 
+## 自己提问
+
+```bash
+uv run crossfire ask "当前稳定版 Python 是哪个？"          # 先打印预计费用，确认后再跑
+uv run crossfire ask "Who is the current Prime Minister of Japan?" --yes --pairer nli
+```
+
+流程：上网找来源 → 抓取过滤 → 可用来源 ≥ 4 才提取/比对/汇总。预计费用超过
+`MAX_COST_PER_QUESTION`（默认 1 美元）会直接拒绝。问过的题存进 `questions/user/`（不进 git），
+页面进缓存，之后可用界面的 cached 模式免费重看。
+
 ## 本地结果查看器
 
-渲染 `out/runs/*.json`，也可以在页面上发起一次查证（SSE 推送进度）。
+渲染 `out/runs/*.json`，也可以在页面上选预置题查证，或自己输入新问题（SSE 推送进度）。
 
 ```bash
 python app.py            # 自检 → 选端口 → 就绪后自动开浏览器（uv 环境里用 uv run python app.py）
@@ -74,10 +85,13 @@ python app.py --no-browser
 `app.py` 会在启动前检查工作目录（不在项目根目录会自动切过去）、`.env` 里的 key、依赖、
 以及 `out/cache/` 里有没有抓取缓存，并从 8765 开始挑一个没被占用的端口（最多试到 8775）。
 
-进阶：自己控制参数时直接起 uvicorn。
+**只监听本机**：默认 `127.0.0.1`。自己提问会花你账户里的钱；若改成 `0.0.0.0` / `::`，
+任何能访问到这台机器的人都能用你的 API 额度。启动时会打印醒目警告。
+
+进阶：自己控制参数时直接起 uvicorn（务必加 `--host 127.0.0.1`）。
 
 ```bash
-uv run uvicorn web.server:app --reload --port 8765
+uv run uvicorn web.server:app --host 127.0.0.1 --reload --port 8765
 ```
 
 没有真实结果时，可生成样例数据：`uv run python scripts/make_sample_runs.py`（`--out 目录` 写到别处）。

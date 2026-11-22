@@ -22,7 +22,21 @@ PORT_FIRST = 8765
 PORT_LAST = 8775
 READY_TIMEOUT_SECONDS = 15.0
 READY_POLL_SECONDS = 0.2
+# 默认只本机可访问。自提问会花 Anthropic / Steel 额度；绑到 0.0.0.0 等于把钱包敞口给局域网。
 HOST = "127.0.0.1"
+
+
+def warn_if_public_bind(host: str) -> None:
+    """绑到所有网卡时大声警告。mutation：若默认 HOST 被改成 0.0.0.0，测试会红。"""
+    if host not in {"0.0.0.0", "::", "[::]"}:
+        return
+    print()
+    print("!" * 64)
+    print("警告：服务监听了所有网卡（host=" + host + "）。")
+    print("任何能访问到这台机器的人，都能用你的 Anthropic / Steel API 额度。")
+    print("除非你非常清楚自己在做什么，请改回 127.0.0.1。")
+    print("!" * 64)
+    print()
 
 # 模块名 -> pip 包名，报缺失时按包名提示，import 名和包名不一致的很容易看懵。
 REQUIRED_MODULES = {
@@ -168,6 +182,7 @@ def main():
 
     from web.server import create_app
 
+    warn_if_public_bind(HOST)
     server = uvicorn.Server(uvicorn.Config(create_app(settings), host=HOST, port=port, log_level="warning"))
     thread = threading.Thread(target=server.run, name="uvicorn", daemon=True)
     thread.start()

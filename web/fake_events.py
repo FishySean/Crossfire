@@ -19,6 +19,10 @@ SCENARIOS = (
     "extract-fail",
     "unusable",
     "bad-conflicts",
+    # 第 7c 步：自己提问
+    "ask-normal",
+    "ask-insufficient",
+    "ask-cost-limit",
 )
 
 # The real judge step is one long call that emits nothing else for 15-27s, so the
@@ -586,4 +590,116 @@ def scenario_events(scenario):
                 events[i] = (delay, broken)
                 break
         return events
+    if scenario == "ask-normal":
+        return _ask_source_events() + _base_events()
+    if scenario == "ask-insufficient":
+        return _ask_insufficient_events()
+    if scenario == "ask-cost-limit":
+        return _ask_cost_limit_events()
     return _base_events()
+
+
+def _ask_source_events():
+    """找来源阶段：开始 → 候选 → 过滤一条 → 确定来源。"""
+    return [
+        (0.05, {"type": "source_search_start", "question": QUESTION, "question_id": "u-20261122-abcd1234"}),
+        (0.08, {
+            "type": "source_candidate",
+            "url": "https://www.python.org/downloads/",
+            "title": "Python Releases",
+            "tier": "primary",
+        }),
+        (0.06, {
+            "type": "source_candidate",
+            "url": "https://devguide.python.org/versions/",
+            "title": "Status of Python versions",
+            "tier": "primary",
+        }),
+        (0.05, {
+            "type": "source_candidate",
+            "url": "https://realpython.com/python313-new-features/",
+            "title": "Python 3.13",
+            "tier": "news",
+        }),
+        (0.05, {
+            "type": "source_candidate",
+            "url": "https://spam.example/unrelated",
+            "title": "Unrelated",
+            "tier": "aggregator",
+        }),
+        (0.05, {
+            "type": "source_candidate",
+            "url": "https://www.w3schools.com/python/python_intro.asp",
+            "title": "Python Intro",
+            "tier": "aggregator",
+        }),
+        (0.08, {
+            "type": "source_filtered",
+            "url": "https://spam.example/unrelated",
+            "reason": "off_topic",
+            "detail": "正文未命中关键词",
+        }),
+        (0.1, {
+            "type": "sources_ready",
+            "count": 4,
+            "has_primary": True,
+            "urls": [s["url"] for s in SOURCES],
+        }),
+    ]
+
+
+def _ask_insufficient_events():
+    return [
+        (0.05, {"type": "source_search_start", "question": QUESTION, "question_id": "u-20261122-fewsrc"}),
+        (0.08, {
+            "type": "source_candidate",
+            "url": "https://only.example/",
+            "title": "Only one",
+            "tier": "news",
+        }),
+        (0.08, {
+            "type": "source_filtered",
+            "url": "https://only.example/",
+            "reason": "unusable_page",
+            "detail": "too_short",
+        }),
+        (0.1, {
+            "type": "sources_insufficient",
+            "kept": 0,
+            "found": 1,
+            "filtered": 1,
+            "detail": "可用来源 0 个，少于 4；候选 1，抓取 1，过滤 1",
+        }),
+        (0.05, {
+            "type": "ask_stopped",
+            "reason": "too_few_sources",
+            "detail": "可用来源 0 个，少于 4",
+            "found": 1,
+            "kept": 0,
+            "rejected": [
+                {"url": "https://only.example/", "reason": "unusable_page", "detail": "too_short"},
+            ],
+            "estimate": {"total_usd": 0.42, "max_cost_usd": 1.0, "over_budget": False},
+        }),
+        (0.05, {"type": "done", "judgment": {}, "run_file": "", "elapsed": 1.2, "ask_stopped": True}),
+    ]
+
+
+def _ask_cost_limit_events():
+    return [
+        (0.05, {
+            "type": "ask_cost_rejected",
+            "total_usd": 1.85,
+            "max_cost_usd": 1.0,
+        }),
+        (0.05, {
+            "type": "ask_stopped",
+            "reason": "cost_limit",
+            "detail": "预计 $1.85 超过上限 $1.00",
+            "found": 0,
+            "kept": 0,
+            "rejected": [],
+            "estimate": {"total_usd": 1.85, "max_cost_usd": 1.0, "over_budget": True},
+        }),
+        (0.05, {"type": "done", "judgment": {}, "run_file": "", "elapsed": 0.1, "ask_stopped": True}),
+    ]

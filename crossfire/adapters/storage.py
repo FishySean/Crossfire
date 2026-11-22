@@ -71,3 +71,13 @@ class JsonRunRepository:
             handle.close()
             staging.unlink()
         raise AssertionError("unreachable")
+
+
+def annotate_run_ask_cost(run_file: str, *, actual_usd: float, estimate: dict) -> None:
+    """在已写入的结果 JSON 上追加 ask 费用字段（实际花费 + 运行前估算）。"""
+    path = Path(run_file)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["ask_cost"] = {"actual_usd": actual_usd, "estimate": estimate}
+    staging = path.with_suffix(".json.tmp")
+    staging.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.replace(staging, path)

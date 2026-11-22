@@ -15,15 +15,25 @@ from crossfire.adapters.anthropic.question_proposer import ClaudeQuestionPropose
 from crossfire.adapters.anthropic.source_finder import ClaudeSourceFinder
 from crossfire.adapters.event_sinks import NullEventSink, QueueEventSink
 from crossfire.adapters.steel import CachedPageFetcher, SteelPageFetcher
-from crossfire.adapters.storage import CachePageStore, JsonRunRepository
+from crossfire.adapters.storage import CachePageStore, JsonRunRepository, annotate_run_ask_cost
 from crossfire.adapters.system import SystemClock, ThreadTicker
 from crossfire.application.heartbeat import judge_with_heartbeat
 from crossfire.application.ports import ClaimExtractor, ClaimPairer, EventSink, PageFetcher, VerdictJudge
 from crossfire.application.use_cases import PrefetchPages, RunEvals, RunJudgeEvals, VerifyQuestion
+from crossfire.application.use_cases.ask_question import AskQuestion
 from crossfire.application.use_cases.build_question_bank import BuildQuestionBank
 from dataclasses import replace
 
-from crossfire.config import Key, Pairer, Settings, SettingsError, eval_snapshot_dir
+from crossfire.config import (
+    WEB_SEARCH_PER_THOUSAND_USD,
+    STEEL_SCRAPE_PER_THOUSAND_USD,
+    Key,
+    Pairer,
+    Settings,
+    SettingsError,
+    eval_snapshot_dir,
+    save_user_question,
+)
 from crossfire.domain import Mode, Question
 from crossfire.domain.evals import EvalCase
 
@@ -174,6 +184,59 @@ def build_consistency_runner(settings: Settings):
 
     settings.require(*KEYS_FOR_MODE[Mode.CACHED])
     return MeasureConsistency(lambda model: build_pairer(settings, model))
+
+
+def build_ask_question(
+    settings: Settings,
+    *,
+    pairer: Pairer | None = None,
+    event_sink: EventSink | None = None,
+) -> AskQuestion:
+    """用户自提问：必须 live（搜索 + Steel 抓取）。"""
+    effective = settings if pairer is None else replace(settings, pairer=pairer)
+    effective.require(Key.ANTHROPIC, Key.STEEL)
+    client = ClaudeClient(effective.anthropic_api_key, effective.model_extract)
+    pairer_free = effective.pairer is Pairer.NLI
+
+    def build_verifier(question: Question, *, has_primary: bool = True) -> VerifyQuestion:
+        note = (
+            "本题来源中含有一手来源（primary）。"
+            if has_primary
+            else "本题来源中没有一手来源（primary）。请相应谨慎，并在 reasoning 里说明依据层级。"
+        )
+        return assemble(
+            fetcher=CachedPageFetcher(effective.cache_dir / question.id),
+            extractor=build_extractor(effective),
+            pairer=build_pairer(effective),
+            judge=ClaudeVerdictJudge(
+                ClaudeClient(effective.anthropic_api_key, effective.model_judge),
+                source_note=note,
+            ),
+            runs_dir=effective.runs_dir,
+            event_sink=event_sink,
+        )
+
+    def record_cost(run_file: str, actual_usd: float, estimate) -> None:
+        annotate_run_ask_cost(run_file, actual_usd=actual_usd, estimate=estimate.to_dict())
+
+    return AskQuestion(
+        finder=ClaudeSourceFinder(client),
+        fetcher=SteelPageFetcher(effective.steel_api_key, clock=SystemClock()),
+        store_for=lambda question_id: CachePageStore(effective.cache_dir / question_id),
+        build_verifier=build_verifier,
+        save_question=lambda question, has_primary: str(
+            save_user_question(effective, question, has_primary=has_primary)
+        ),
+        record_cost=record_cost,
+        event_sink=event_sink,
+        max_cost_usd=effective.max_cost_per_question,
+        pairer_free=pairer_free,
+        search_per_thousand_usd=WEB_SEARCH_PER_THOUSAND_USD,
+        steel_per_scrape_usd=STEEL_SCRAPE_PER_THOUSAND_USD / 1000,
+        sonnet_price=effective.price_for(effective.model_extract),
+        pair_price=None if pairer_free else effective.price_for(effective.model_pair),
+        clock=utc_today,
+    )
 
 
 def build_question_bank_builder(

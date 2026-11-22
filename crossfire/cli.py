@@ -123,6 +123,21 @@ def build_parser() -> argparse.ArgumentParser:
     export_cmd = dataset_commands.add_parser("export", help="从批量运行导出 data/pairs.jsonl")
     export_cmd.add_argument("--bank", metavar="PATH", help="题库 YAML，默认 questions/bank.yaml")
     export_cmd.add_argument("--seed", default="crossfire-5c2-2026-11-20", help="按题切分的随机种子")
+
+    ask = commands.add_parser("ask", help="自己提问：找来源 → 抓取 → 查证（会花钱）")
+    ask.add_argument("question", help="问题原文")
+    ask.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="跳过费用确认",
+    )
+    ask.add_argument(
+        "--pairer",
+        default=None,
+        metavar="{claude,nli}",
+        help="比对器；默认跟 .env 的 PAIRER",
+    )
     return parser
 
 
@@ -182,6 +197,13 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
             print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
             return 2
 
+    if args.command == "ask":
+        try:
+            return ask_command(settings, args.question, args.yes, args.pairer, parser)
+        except SettingsError as error:
+            print(f"配置不全，没有开始运行：\n{error}", file=sys.stderr)
+            return 2
+
     if args.all:
         targets = questions
     else:
@@ -201,6 +223,83 @@ def main(argv: Sequence[str] | None = None, settings: Settings | None = None) ->
     except UnknownSnapshotDateError as error:
         print(f"没有调用模型就停下了：\n{error}", file=sys.stderr)
         return 2
+    return 0
+
+
+def ask_command(
+    settings: Settings,
+    question_text: str,
+    yes: bool,
+    pairer_arg: str | None,
+    parser: argparse.ArgumentParser,
+) -> int:
+    from crossfire.application.use_cases.ask_question import AskResult, AskStopped, validate_question_text
+    from crossfire.config import Pairer
+
+    try:
+        text = validate_question_text(question_text)
+    except ValueError as error:
+        parser.error(str(error))
+
+    if pairer_arg is None:
+        run_pairer = settings.pairer
+    else:
+        try:
+            run_pairer = Pairer(pairer_arg)
+        except ValueError:
+            allowed = "、".join(p.value for p in Pairer)
+            parser.error(f"不认识的 pairer：{pairer_arg}，可选：{allowed}")
+
+    asker = composition.build_ask_question(settings, pairer=run_pairer)
+    estimate = asker.estimate(text)
+    print("预计费用（偏高估）：")
+    print(f"  搜索约 {estimate.searches} 次 ${estimate.search_usd:.3f}")
+    print(f"  Steel 抓取约 {estimate.steel_pages} 页 ${estimate.steel_usd:.3f}")
+    print(f"  Anthropic（找来源+提取+汇总）约 ${estimate.anthropic_usd:.3f}")
+    if estimate.pairer_free:
+        print("  比对：NLI 本地免费")
+    else:
+        print(f"  比对：Claude 约 ${estimate.pair_usd:.3f}")
+    print(f"  合计约 ${estimate.total_usd:.2f}（上限 ${estimate.max_cost_usd:.2f}）")
+    print(f"  比对器：{run_pairer.value}")
+    if estimate.over_budget:
+        print(
+            f"预计 ${estimate.total_usd:.2f} 超过上限 ${estimate.max_cost_usd:.2f}，没有开始运行。",
+            file=sys.stderr,
+        )
+        return 2
+    if not yes:
+        answer = input("确认开跑？[y/N] ").strip().casefold()
+        if answer not in {"y", "yes", "是"}:
+            print("已取消。")
+            return 0
+
+    class _PrintSink:
+        def emit(self, event) -> None:
+            data = event if isinstance(event, dict) else event.to_dict()
+            kind = data.get("type")
+            if kind == "source_search_start":
+                print(f"找来源：{data.get('question_id')}")
+            elif kind == "source_candidate":
+                print(f"  候选 [{data.get('tier')}] {data.get('title') or data.get('url')}")
+            elif kind == "source_filtered":
+                print(f"  过滤 {data.get('reason')}: {data.get('url')} — {data.get('detail')}")
+            elif kind == "sources_ready":
+                print(f"来源确定 {data.get('count')} 个（primary={'有' if data.get('has_primary') else '无'}）")
+            elif kind == "sources_insufficient":
+                print(f"来源不足：{data.get('detail')}")
+            elif kind == "ask_cost_rejected":
+                print(f"费用超限：${data.get('total_usd')} > ${data.get('max_cost_usd')}")
+
+    asker = composition.build_ask_question(settings, pairer=run_pairer, event_sink=_PrintSink())
+    outcome = asker.execute(text)
+    if isinstance(outcome, AskStopped):
+        print(f"提前停止（{outcome.reason}）：{outcome.detail}", file=sys.stderr)
+        return 1
+    assert isinstance(outcome, AskResult)
+    print_report(run_record(outcome.saved.result), outcome.saved.location)
+    print(f"实际花费约 ${outcome.actual_cost_usd:.3f}（估算 ${outcome.estimate.total_usd:.3f}）")
+    print(f"问题文件：{outcome.question_file}")
     return 0
 
 

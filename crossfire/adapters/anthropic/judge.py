@@ -18,7 +18,7 @@ RELATION_NAMES = {
 JUDGE_PROMPT = """你在为一个事实查证引擎下最终结论。下面是一个问题、各来源提取出的主张，以及两两比对的结果。
 
 今天的日期：{as_of}
-
+{source_note}
 问题：{question}
 
 各来源的主张（JSON）：
@@ -104,17 +104,26 @@ def without_sources_over_memory(prompt: str = JUDGE_PROMPT) -> str:
 
 
 class ClaudeVerdictJudge:
-    def __init__(self, client: ClaudeClient, prompt: str = JUDGE_PROMPT) -> None:
+    def __init__(
+        self,
+        client: ClaudeClient,
+        prompt: str = JUDGE_PROMPT,
+        *,
+        source_note: str = "",
+    ) -> None:
         self._client = client
         self._prompt = prompt
+        self._source_note = source_note
 
     @property
     def provenance(self) -> Provenance:
         return Provenance(model=self._client.model, prompt_version=prompt_version(self._prompt, JUDGE_SCHEMA))
 
     def judge(self, question: Question, claims: Sequence[Claim], pairs: Sequence[Pair], as_of: date) -> Judgment:
+        note = self._source_note.strip()
         prompt = self._prompt.format(
             as_of=as_of.isoformat(),
+            source_note=("\n" + note + "\n") if note else "",
             question=question.text,
             claims=json.dumps([claim.to_dict() for claim in claims], ensure_ascii=False, indent=2),
             pairs=json.dumps([pair.to_dict() for pair in pairs], ensure_ascii=False, indent=2),

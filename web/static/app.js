@@ -104,6 +104,32 @@ const STRINGS = {
     metricContradictions: "Contradictions",
     metricScope: "Scope differences",
     questionEyebrow: "Fact-check analysis",
+    askTitle: "Ask a question",
+    askLead: "Crossfire will search the web, fetch pages, compare claims, and give a verdict. Each new question costs money.",
+    askButton: "Ask",
+    askAsking: "Asking…",
+    askPlaceholder: "e.g. What is the current stable Node.js LTS version?",
+    askExamplesLabel: "Good examples",
+    askExample1: "What is the current stable version of Python?",
+    askExample2: "Who is the current Secretary-General of the United Nations?",
+    askExample3: "What is the latest LTS release of Ubuntu?",
+    askUnsuitable: "Unsuitable: disputed political claims, open-ended opinions, or questions with no checkable answer.",
+    askDialogTitle: "Confirm before spending",
+    askDialogEstimate: (usd, max) => `Estimated cost about $${usd.toFixed(2)} (cap $${max.toFixed(2)}).`,
+    askDialogPairer: (name, free) => `Pairer: ${name}${free ? " (local, free)" : ""}.`,
+    askConfirm: "Confirm & run",
+    askCancel: "Cancel",
+    askOverBudget: (usd, max) => `Estimate $${usd.toFixed(2)} exceeds the $${max.toFixed(2)} cap — not started.`,
+    sourceFindTitle: "Finding sources",
+    sourceFindCount: (n) => `${n} candidates`,
+    sourceFindCandidate: "candidate",
+    sourceFindFiltered: "filtered",
+    sourceFindReady: "ready",
+    stageSearching: "Searching for sources…",
+    stageSourcesReady: (n) => `Sources ready (${n})`,
+    askStoppedFew: (detail) => `Stopped early — not enough usable sources. ${detail}`,
+    askStoppedCost: (detail) => `Stopped — cost limit. ${detail}`,
+    askStoppedOther: (detail) => `Stopped. ${detail}`,
   },
   zh: {
     tagline: "多来源 · 多视角 · 讲证据",
@@ -195,8 +221,36 @@ const STRINGS = {
     metricContradictions: "矛盾",
     metricScope: "口径差异",
     questionEyebrow: "查证分析",
+    askTitle: "自己提问",
+    askLead: "系统会上网找来源、抓取页面、比对主张并下结论。每问一个新问题都要花钱。",
+    askButton: "提问",
+    askAsking: "提问中…",
+    askPlaceholder: "例如：当前稳定版 Python 是哪个？",
+    askExamplesLabel: "好问题示例",
+    askExample1: "当前稳定版 Python 是哪个？",
+    askExample2: "现任联合国秘书长是谁？",
+    askExample3: "Ubuntu 最新的 LTS 版本是哪个？",
+    askUnsuitable: "不适合：公认有争议的话题、纯观点题、没有可核对答案的问题。",
+    askDialogTitle: "确认后再花钱",
+    askDialogEstimate: (usd, max) => `预计约 $${usd.toFixed(2)}（上限 $${max.toFixed(2)}）。`,
+    askDialogPairer: (name, free) => `比对器：${name}${free ? "（本地免费）" : ""}。`,
+    askConfirm: "确认开跑",
+    askCancel: "取消",
+    askOverBudget: (usd, max) => `预计 $${usd.toFixed(2)} 超过上限 $${max.toFixed(2)}，没有开始。`,
+    sourceFindTitle: "正在找来源",
+    sourceFindCount: (n) => `${n} 个候选`,
+    sourceFindCandidate: "候选",
+    sourceFindFiltered: "已过滤",
+    sourceFindReady: "已确定",
+    stageSearching: "正在上网找来源…",
+    stageSourcesReady: (n) => `来源已确定（${n}）`,
+    askStoppedFew: (detail) => `提前停止——可用来源不够。${detail}`,
+    askStoppedCost: (detail) => `已停止——费用超限。${detail}`,
+    askStoppedOther: (detail) => `已停止。${detail}`,
   },
 };
+
+const ASK_EXAMPLES = ["askExample1", "askExample2", "askExample3"];
 
 let lang = localStorage.getItem("crossfire-lang") === "zh" ? "zh" : "en";
 let currentRun = null;
@@ -218,6 +272,16 @@ function applyStaticStrings() {
   calib.textContent = t("scoresCalibrationShort");
   calib.title = t("scoresCalibrationHover");
   el("run-button").textContent = live.active ? t("runningButton") : t("runButton");
+  el("ask-title").textContent = t("askTitle");
+  el("ask-lead").textContent = t("askLead");
+  el("ask-button").textContent = live.active && live.asking ? t("askAsking") : t("askButton");
+  el("ask-input").placeholder = t("askPlaceholder");
+  el("ask-unsuitable").textContent = t("askUnsuitable");
+  el("ask-dialog-title").textContent = t("askDialogTitle");
+  el("ask-confirm").textContent = t("askConfirm");
+  el("ask-cancel").textContent = t("askCancel");
+  el("source-find-title").textContent = t("sourceFindTitle");
+  renderAskExamples();
   for (const button of document.querySelectorAll("#mode-toggle button")) {
     button.textContent = button.dataset.mode === "live" ? t("modeLive") : t("modeCached");
   }
@@ -239,6 +303,22 @@ function applyStaticStrings() {
   el("judgment-title").textContent = t("verdict");
   for (const button of document.querySelectorAll("#lang-toggle button")) {
     button.classList.toggle("active", button.dataset.lang === lang);
+  }
+}
+
+function renderAskExamples() {
+  const box = el("ask-examples");
+  box.innerHTML = "";
+  for (const key of ASK_EXAMPLES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ask-example";
+    button.textContent = t(key);
+    button.onclick = () => {
+      el("ask-input").value = t(key);
+      el("ask-input").focus();
+    };
+    box.appendChild(button);
   }
 }
 
@@ -1008,6 +1088,8 @@ let pairerOptions = [];
 
 const live = {
   active: false,
+  asking: false,
+  abort: null,
   stream: null,
   slots: [],
   cards: new Map(),
@@ -1024,6 +1106,7 @@ const live = {
   startedAt: 0,
   timer: null,
   stall: null,
+  sourceFind: [],
 };
 
 function setMode(next) {
@@ -1106,11 +1189,16 @@ function clearStall() {
 function stopLive() {
   if (live.stream) live.stream.close();
   live.stream = null;
+  if (live.abort) live.abort.abort();
+  live.abort = null;
   live.active = false;
+  live.asking = false;
   stopTimer();
   clearStall();
   el("run-button").textContent = t("runButton");
   el("run-button").classList.remove("running");
+  el("ask-button").textContent = t("askButton");
+  el("ask-button").classList.remove("running");
 }
 
 function resetLive() {
@@ -1127,6 +1215,7 @@ function resetLive() {
   live.question = "";
   live.errors = [];
   live.stage = null;
+  live.sourceFind = [];
   currentRun = null;
   hideError();
   el("failure-banner").classList.add("hidden");
@@ -1142,6 +1231,9 @@ function resetLive() {
   el("pair-progress").classList.add("hidden");
   el("progress-fill").style.width = "0%";
   el("progress-timer").textContent = "0.0s";
+  el("source-find-panel").classList.add("hidden");
+  el("source-find-list").innerHTML = "";
+  el("source-find-count").textContent = "";
 }
 
 function streamUrl(questionId) {
@@ -1185,6 +1277,25 @@ function startRun() {
 
 function handleEvent(event) {
   switch (event.type) {
+    case "source_search_start":
+      onSourceSearchStart(event);
+      break;
+    case "source_candidate":
+      onSourceCandidate(event);
+      break;
+    case "source_filtered":
+      onSourceFiltered(event);
+      break;
+    case "sources_ready":
+      onSourcesReady(event);
+      break;
+    case "sources_insufficient":
+    case "ask_cost_rejected":
+    case "ask_stopped":
+      onAskStopped(event);
+      break;
+    case "ask_finished":
+      break;
     case "start":
       onStart(event);
       break;
@@ -1214,6 +1325,89 @@ function handleEvent(event) {
       break;
     default:
       break;
+  }
+}
+
+function paintSourceFind() {
+  const list = el("source-find-list");
+  list.innerHTML = "";
+  el("source-find-panel").classList.remove("hidden");
+  el("source-find-count").textContent = t("sourceFindCount", live.sourceFind.length);
+  for (const item of live.sourceFind) {
+    const row = document.createElement("li");
+    row.className = item.kind === "filtered" ? "sf-filtered" : item.kind === "ready" ? "sf-ready" : "";
+    const tag = text(
+      "span",
+      "sf-tag",
+      item.kind === "filtered"
+        ? t("sourceFindFiltered")
+        : item.kind === "ready"
+          ? t("sourceFindReady")
+          : t("sourceFindCandidate"),
+    );
+    const body = text(
+      "span",
+      "sf-body",
+      item.kind === "filtered"
+        ? `${domainOf(item.url)} — ${item.reason}${item.detail ? ` (${item.detail})` : ""}`
+        : item.kind === "ready"
+          ? `${item.count} sources · primary: ${item.has_primary ? "yes" : "no"}`
+          : `[${item.tier}] ${item.title || domainOf(item.url)}`,
+    );
+    row.appendChild(tag);
+    row.appendChild(body);
+    list.appendChild(row);
+  }
+}
+
+function onSourceSearchStart(event) {
+  live.question = event.question || live.question;
+  el("question").textContent = live.question || t("noQuestion");
+  el("content").classList.remove("hidden");
+  setStage("stageSearching");
+  live.sourceFind = [];
+  paintSourceFind();
+}
+
+function onSourceCandidate(event) {
+  live.sourceFind.push({
+    kind: "candidate",
+    url: event.url,
+    title: event.title,
+    tier: event.tier,
+  });
+  paintSourceFind();
+}
+
+function onSourceFiltered(event) {
+  live.sourceFind.push({
+    kind: "filtered",
+    url: event.url,
+    reason: event.reason,
+    detail: event.detail,
+  });
+  paintSourceFind();
+}
+
+function onSourcesReady(event) {
+  live.sourceFind.push({
+    kind: "ready",
+    count: event.count,
+    has_primary: event.has_primary,
+    urls: event.urls || [],
+  });
+  paintSourceFind();
+  setStage("stageSourcesReady", event.count || 0);
+}
+
+function onAskStopped(event) {
+  const detail = event.detail || "";
+  if (event.type === "ask_cost_rejected" || event.reason === "cost_limit") {
+    showError("askStoppedCost", detail || t("askOverBudget", event.total_usd || 0, event.max_cost_usd || 0));
+  } else if (event.reason === "too_few_sources" || event.type === "sources_insufficient") {
+    showError("askStoppedFew", detail);
+  } else if (event.type === "ask_stopped") {
+    showError("askStoppedOther", detail);
   }
 }
 
@@ -1445,6 +1639,10 @@ function onDone(event) {
   updateProgress();
   setStage("stageDone");
   stopLive();
+  if (event.ask_stopped) {
+    el("pair-progress").classList.add("hidden");
+    return;
+  }
   currentRun = {
     question: live.question,
     elapsed_seconds: event.elapsed,
@@ -1541,6 +1739,148 @@ for (const button of document.querySelectorAll("#pairer-toggle button")) {
 }
 el("run-button").onclick = startRun;
 el("stall-switch").onclick = switchToCached;
+el("ask-button").onclick = () => requestAsk();
+el("ask-input").addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    requestAsk();
+  }
+});
+el("ask-cancel").onclick = closeAskDialog;
+el("ask-confirm").onclick = () => {
+  const pending = askPending;
+  closeAskDialog();
+  if (pending) startAsk(pending.question, pending.pairer);
+};
+
+let askPending = null;
+
+function closeAskDialog() {
+  askPending = null;
+  el("ask-dialog").classList.add("hidden");
+}
+
+async function requestAsk() {
+  if (live.active) return;
+  const question = el("ask-input").value.trim() || t("askExample1");
+  if (!el("ask-input").value.trim()) el("ask-input").value = question;
+  hideError();
+  if (FAKE_SCENARIO) {
+    askPending = { question, pairer };
+    el("ask-dialog-question").textContent = question;
+    el("ask-dialog-estimate").textContent = t("askDialogEstimate", 0.42, 1.0);
+    const pairerName = pairer === "nli" ? t("pairerNli") : t("pairerClaude");
+    el("ask-dialog-pairer").textContent = t("askDialogPairer", pairerName, pairer === "nli");
+    el("ask-dialog").classList.remove("hidden");
+    return;
+  }
+  try {
+    const response = await fetch("/api/ask/estimate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, pairer }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.detail || `${response.status}`);
+    const estimate = body.estimate || {};
+    if (estimate.over_budget) {
+      showError("askOverBudget", estimate.total_usd || 0, estimate.max_cost_usd || 0);
+      return;
+    }
+    askPending = { question: body.question || question, pairer: body.pairer || pairer };
+    el("ask-dialog-question").textContent = askPending.question;
+    el("ask-dialog-estimate").textContent = t(
+      "askDialogEstimate",
+      Number(estimate.total_usd || 0),
+      Number(estimate.max_cost_usd || 1),
+    );
+    const pairerName = askPending.pairer === "nli" ? t("pairerNli") : t("pairerClaude");
+    el("ask-dialog-pairer").textContent = t("askDialogPairer", pairerName, Boolean(estimate.pairer_free));
+    el("ask-dialog").classList.remove("hidden");
+  } catch (e) {
+    showError("loadFailed", "ask/estimate", e.message);
+  }
+}
+
+async function startAsk(question, runPairer) {
+  resetLive();
+  live.active = true;
+  live.asking = true;
+  live.question = question;
+  el("content").classList.remove("hidden");
+  el("progress-strip").classList.remove("hidden");
+  el("ask-button").textContent = t("askAsking");
+  el("ask-button").classList.add("running");
+  setStage("stageConnecting");
+  startTimer();
+  armStall();
+
+  if (FAKE_SCENARIO) {
+    const stream = new EventSource(
+      `/api/fake-run/${encodeURIComponent(FAKE_SCENARIO)}?speed=${encodeURIComponent(FAKE_SPEED)}`,
+    );
+    live.stream = stream;
+    stream.onmessage = (message) => {
+      armStall();
+      try {
+        handleEvent(JSON.parse(message.data));
+      } catch {
+        /* ignore */
+      }
+    };
+    stream.onerror = () => {
+      if (!live.active) return;
+      stopLive();
+      showError("streamFailed");
+    };
+    return;
+  }
+
+  const controller = new AbortController();
+  live.abort = controller;
+  try {
+    const response = await fetch("/api/ask/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, pairer: runPairer }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.detail || `${response.status}`);
+    }
+    await readSseStream(response.body, (event) => {
+      armStall();
+      handleEvent(event);
+    });
+  } catch (e) {
+    if (controller.signal.aborted) return;
+    stopLive();
+    showError("streamFailed");
+  }
+}
+
+async function readSseStream(body, onEvent) {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const chunks = buffer.split("\n\n");
+    buffer = chunks.pop() || "";
+    for (const chunk of chunks) {
+      const line = chunk.split("\n").find((row) => row.startsWith("data: "));
+      if (!line) continue;
+      try {
+        onEvent(JSON.parse(line.slice(6)));
+      } catch {
+        /* ignore malformed */
+      }
+    }
+  }
+}
 
 // Demo escape hatch: Ctrl+Alt+C drops back to cached mode mid-run.
 window.addEventListener("keydown", (event) => {

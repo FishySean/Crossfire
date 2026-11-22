@@ -257,4 +257,82 @@ def test_unknown_fake_scenario_is_404(web_env):
 def test_index_and_static_files_are_served(web_env):
     client, _ = web_env()
     assert client.get("/").status_code == 200
+
+
+# ---- /api/ask ----
+
+
+def test_ask_estimate_and_run_with_injected_asker(tmp_path, monkeypatch):
+    """estimate 返回费用；run 推送找来源事件并以 done 收尾（来源不足提前停）。"""
+    monkeypatch.setattr(socket.socket, "connect", _refuse)
+    from crossfire.application.use_cases.ask_question import AskQuestion, AskStopped, estimate_ask_cost
+    from crossfire.domain.pricing import ModelPrice
+
+    price = ModelPrice(input_per_mtok=3.0, output_per_mtok=15.0)
+    settings = Settings.from_mapping(
+        {"CROSSFIRE_RUNS_DIR": str(tmp_path / "runs"), "MAX_COST_PER_QUESTION": "1.0"},
+        env_file=tmp_path / ".env",
+    )
+
+    class StubAsk:
+        def __init__(self, *args, **kwargs):
+            self._sink = kwargs.get("event_sink")
+
+        def estimate(self, text: str):
+            return estimate_ask_cost(
+                pairer_free=True,
+                max_cost_usd=1.0,
+                search_per_thousand_usd=10.0,
+                steel_per_scrape_usd=0.005,
+                sonnet_price=price,
+            )
+
+        def execute(self, text: str):
+            from crossfire.application.events import SourceSearchStart, SourcesInsufficient
+
+            if self._sink:
+                self._sink.emit(SourceSearchStart(question=text, question_id="u-test"))
+                self._sink.emit(
+                    SourcesInsufficient(
+                        kept=0,
+                        found=1,
+                        filtered=1,
+                        detail="可用来源 0 个，少于 4",
+                    )
+                )
+            est = self.estimate(text)
+            return AskStopped(reason="too_few_sources", detail="可用来源 0 个，少于 4", estimate=est, found=1, kept=0)
+
+    client = TestClient(server.create_app(settings, build_ask=lambda *a, **k: StubAsk(*a, **k)))
+    estimate = client.post("/api/ask/estimate", json={"question": "Python 最新版？", "pairer": "nli"}).json()
+    assert estimate["pairer"] == "nli"
+    assert "total_usd" in estimate["estimate"]
+    assert estimate["estimate"]["over_budget"] is False
+
+    events = sse_events(client.post("/api/ask/run", json={"question": "Python 最新版？", "pairer": "nli"}))
+    types = [e["type"] for e in events]
+    assert "source_search_start" in types
+    assert "sources_insufficient" in types
+    assert "ask_stopped" in types
+    assert types[-1] == "done"
+    assert events[-1].get("ask_stopped") is True
+
+
+def test_ask_estimate_rejects_empty_question(web_env):
+    client, _ = web_env()
+    # 注入会走到真实 build_ask；空问题应在校验处 400，不必真组装。
+    # 用 create_app 默认 ask builder 会要 key；这里只测 body 校验——改测 pydantic min_length。
+    response = client.post("/api/ask/estimate", json={"question": "", "pairer": "claude"})
+    assert response.status_code == 422
+
+
+def test_fake_ask_scenarios(web_env):
+    client, _ = web_env()
+    for name in ("ask-normal", "ask-insufficient", "ask-cost-limit"):
+        events = sse_events(client.get(f"/api/fake-run/{name}?speed=1000"))
+        assert events[-1]["type"] == "done"
+    types = [e["type"] for e in sse_events(client.get("/api/fake-run/ask-insufficient?speed=1000"))]
+    assert "sources_insufficient" in types
+    types = [e["type"] for e in sse_events(client.get("/api/fake-run/ask-cost-limit?speed=1000"))]
+    assert "ask_cost_rejected" in types
     assert client.get("/static/app.js").status_code == 200

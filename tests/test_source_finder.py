@@ -10,11 +10,8 @@ from crossfire.adapters.anthropic.source_finder import (
     normalize_url,
     search_urls_from_content,
 )
-from crossfire.application.use_cases.build_question_bank import (
-    BuildQuestionBank,
-    page_mentions_topic,
-    select_by_tier_mix,
-)
+from crossfire.application.source_filter import page_mentions_topic, select_by_tier_mix
+from crossfire.application.use_cases.build_question_bank import BuildQuestionBank
 from crossfire.domain import (
     CandidateSource,
     DropReason,

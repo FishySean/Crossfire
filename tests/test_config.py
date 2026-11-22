@@ -119,13 +119,21 @@ def test_load_questions(env_file, tmp_path):
         "- id: q1\n  question: 几点了？\n  sources:\n    - {url: 'https://a.example/', tier: primary}\n",
         encoding="utf-8",
     )
-    settings = Settings.from_env(env_file(f"CROSSFIRE_QUESTIONS_FILE={questions}\n"))
+    user_dir = tmp_path / "user-q"
+    settings = Settings.from_env(
+        env_file(f"CROSSFIRE_QUESTIONS_FILE={questions}\nCROSSFIRE_USER_QUESTIONS_DIR={user_dir}\n")
+    )
     [question] = load_questions(settings)
     assert question.id == "q1" and question.sources[0].url == "https://a.example/"
 
 
 def test_missing_questions_file_gives_no_questions(env_file, tmp_path):
-    settings = Settings.from_env(env_file(f"CROSSFIRE_QUESTIONS_FILE={tmp_path / 'nope.yaml'}\n"))
+    user_dir = tmp_path / "user-q"
+    settings = Settings.from_env(
+        env_file(
+            f"CROSSFIRE_QUESTIONS_FILE={tmp_path / 'nope.yaml'}\nCROSSFIRE_USER_QUESTIONS_DIR={user_dir}\n"
+        )
+    )
     assert load_questions(settings) == []
 
 

@@ -9,27 +9,25 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 from crossfire.application.ports import PageFetcher, PageStore, QuestionProposer, SourceFinder
+from crossfire.application.source_filter import keep_or_reject_pages, reject_page, select_by_tier_mix
 from crossfire.domain import (
     AsOf,
     BankQuestion,
-    CandidateSource,
     DroppedQuestion,
     DropReason,
-    KeptSource,
-    Page,
     ProposedQuestion,
     QuestionCategory,
-    RejectedSource,
-    Source,
     Tier,
 )
 from crossfire.domain.bank import CATEGORY_QUOTAS, question_text_hint_reason
 
 MIN_USABLE_SOURCES = 5
 MIN_PRIMARY_SOURCES = 1
-TIER_TARGETS = {Tier.PRIMARY: (2, 3), Tier.NEWS: (2, 3), Tier.AGGREGATOR: (2, 3)}
 StoreFor = Callable[[str], PageStore]
 ProgressSaver = Callable[[list[BankQuestion], list[DroppedQuestion]], None]
+
+# 对外仍从本模块导入这些名字（测试/__init__ 依赖）。
+_reject_page = reject_page
 
 
 class BankBuildInterrupted(Exception):
@@ -95,23 +93,6 @@ def estimate_bank_build(
         reuse=reuse,
         redo=redo + propose,
     )
-
-
-def page_mentions_topic(markdown: str | None, keywords: Sequence[str]) -> bool:
-    if not markdown or not keywords:
-        return False
-    text = markdown.casefold()
-    return any(keyword.casefold() in text for keyword in keywords if keyword.strip())
-
-
-def select_by_tier_mix(candidates: Sequence[CandidateSource]) -> list[CandidateSource]:
-    buckets: dict[Tier, list[CandidateSource]] = {tier: [] for tier in Tier}
-    for candidate in candidates:
-        bucket = buckets[candidate.suggested_tier]
-        _low, high = TIER_TARGETS[candidate.suggested_tier]
-        if len(bucket) < high:
-            bucket.append(candidate)
-    return [item for tier in Tier for item in buckets[tier]]
 
 
 def remaining_quotas(kept: Sequence[BankQuestion], quotas: Mapping[QuestionCategory, int] = CATEGORY_QUOTAS) -> dict[QuestionCategory, int]:
@@ -298,24 +279,9 @@ class BuildQuestionBank:
             raise
 
         store = self._store_for(proposed.id)
-        kept_sources: list[KeptSource] = []
-        rejected: list[RejectedSource] = []
-        seen: set[str] = set()
-
-        for candidate, page in zip(candidates, pages, strict=True):
+        for page in pages:
             store.save(page)
-            decision = _reject_page(page, proposed.keywords, seen)
-            if decision is not None:
-                rejected.append(decision)
-                continue
-            seen.add(page.url)
-            kept_sources.append(
-                KeptSource(
-                    source=Source(url=page.url, tier=candidate.suggested_tier),
-                    title=candidate.title or (page.title or page.url),
-                    query=candidate.query,
-                )
-            )
+        kept_sources, rejected = keep_or_reject_pages(candidates, pages, proposed.keywords)
 
         if len(kept_sources) < self._min_usable:
             return DroppedQuestion(
@@ -346,22 +312,6 @@ class BuildQuestionBank:
     def _save(self, kept: list[BankQuestion], dropped: list[DroppedQuestion]) -> None:
         if self._on_progress:
             self._on_progress(kept, dropped)
-
-
-def _reject_page(page: Page, keywords: Sequence[str], seen: set[str]) -> RejectedSource | None:
-    if page.url in seen:
-        return RejectedSource(page.url, DropReason.DUPLICATE_URL, "同一题里 URL 重复")
-    if not page.ok:
-        return RejectedSource(page.url, DropReason.FETCH_FAILED, page.error or "抓取失败")
-    if not page.usable:
-        return RejectedSource(
-            page.url,
-            DropReason.UNUSABLE_PAGE,
-            page.unusable_reason.value if page.unusable_reason else "不可用",
-        )
-    if not page_mentions_topic(page.markdown, keywords):
-        return RejectedSource(page.url, DropReason.KEYWORD_MISS, "正文未出现任何关键词")
-    return None
 
 
 def _is_credit_or_auth(error: BaseException) -> bool:

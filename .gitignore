@@ -12,6 +12,7 @@ wheels/
 # Secrets & local artifacts
 .env
 out/
+questions/user/
 
 # Training checkpoints / weights (large; never commit — results live under out/)
 *.pt

@@ -84,6 +84,44 @@ def test_legacy_run_opens_without_error(page, app_server):
     _shot(page, "06-legacy-run")
 
 
+def test_ask_confirm_dialog_and_source_progress(page, app_server):
+    page.goto(f"{app_server}/?fake=ask-normal&speed=40")
+    page.click("#lang-toggle button[data-lang='zh']")
+    page.fill("#ask-input", "当前稳定版 Python 是哪个？")
+    page.click("#ask-button")
+    page.wait_for_selector("#ask-dialog:not(.hidden)")
+    assert "预计" in page.locator("#ask-dialog-estimate").inner_text()
+    page.click("#ask-confirm")
+    page.wait_for_selector("#source-find-panel:not(.hidden)", timeout=20000)
+    assert page.locator("#source-find-list li").count() >= 2
+    page.wait_for_selector("#judgment .answer, #judgment .thinking", timeout=60000)
+    _shot(page, "09-ask-sources")
+
+
+def test_ask_insufficient_stops(page, app_server):
+    page.goto(f"{app_server}/?fake=ask-insufficient&speed=40")
+    page.click("#lang-toggle button[data-lang='zh']")
+    page.click("#ask-button")
+    page.wait_for_selector("#ask-dialog:not(.hidden)")
+    page.click("#ask-confirm")
+    page.wait_for_selector("#error-banner:not(.hidden)", timeout=20000)
+    text = page.locator("#error-banner").inner_text()
+    assert "来源" in text or "停止" in text
+    _shot(page, "10-ask-insufficient")
+
+
+def test_ask_cost_limit_stops(page, app_server):
+    page.goto(f"{app_server}/?fake=ask-cost-limit&speed=40")
+    page.click("#lang-toggle button[data-lang='zh']")
+    page.click("#ask-button")
+    page.wait_for_selector("#ask-dialog:not(.hidden)")
+    page.click("#ask-confirm")
+    page.wait_for_selector("#error-banner:not(.hidden)", timeout=20000)
+    text = page.locator("#error-banner").inner_text()
+    assert "费用" in text or "超限" in text or "停止" in text
+    _shot(page, "11-ask-cost-limit")
+
+
 def test_nli_history_label(page, app_server):
     page.goto(app_server)
     page.wait_for_selector("#run-select")

@@ -82,6 +82,10 @@ def test_ask_prints_estimate_and_respects_yes(env, monkeypatch, capsys):
         pair_usd=0.0,
         pairer_free=True,
         max_cost_usd=1.0,
+        low_usd=0.2,
+        high_usd=0.4,
+        low_sources=4,
+        high_sources=8,
     )
 
     class StubAsk:

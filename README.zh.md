@@ -99,16 +99,16 @@ uv run crossfire ask "当前稳定版 Python 是哪个？" --pairer nli
 
 ## 费用（每问一题）
 
-按 Sonnet 单价、至少 4 个可用来源估算（`FETCHER=http`）。来源越多越贵。
+按 Sonnet 单价和真实 ask 校准过的 per-call token 上限估算（详见 `ask_question.py` 注释）。`FETCHER=http`。
 
 | 比对器 | ~4 来源 | ~6 来源 | ~8 来源 |
 |---|---|---|---|
-| NLI（比对免费） | ~$0.18 | ~$0.21 | ~$0.24 |
-| Claude 比对 | ~$0.22 | ~$0.31 | ~$0.43 |
+| NLI（比对免费） | ~$0.39 | ~$0.51 | ~$0.63 |
+| Claude 比对 | ~$0.49 | ~$0.75 | ~$1.07 |
 
-确认对话框按 **4 个来源的下限**估（NLI 约 $0.18）。可用来源更多时实际花费更高（NLI + HTTP 通常仍低于 $0.50）。第一次 `PAIRER=nli` 会从 Hugging Face 下载约 550MB 权重到 HF 缓存。
+确认框和 CLI 显示**区间**：约 `$低`（4 个来源）～ `$高`（8 个来源）。运行前的上限检查用 **4 来源下限**；来源数确定后会按真实数量再估一次，若超 `MAX_COST_PER_QUESTION`（默认 `$1`）则在提取前停下。第一次 `PAIRER=nli` 会从 Hugging Face 下载约 550MB 权重到 HF 缓存。
 
-构成：web search + 找来源/提取/判决的 token；若改 `FETCHER=steel`，大约再加 $0.005/页。`MAX_COST_PER_QUESTION`（默认 `$1`）会在开跑前按估算拒绝超限请求。
+构成：web search + 找来源/提取/判决的 token；若改 `FETCHER=steel`，大约再加 $0.005/页。
 
 ## 自训练模型
 

@@ -2,6 +2,8 @@
 
 First tagged release of the multi-source fact-checking engine.
 
+> Prefer **v1.0.1** for the latest release notes (includes this release plus the cost-estimate fix): [`release-v1.0.1.md`](release-v1.0.1.md).
+
 ## What’s in this version
 
 - End-to-end pipeline: find sources → fetch → extract claims → pairwise compare → judge

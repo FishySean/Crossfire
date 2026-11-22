@@ -16,6 +16,7 @@
 - 第 7c：Ask a Question（费用估算 + 确认）
 - 第 7d：`HttpPageFetcher` 默认 `FETCHER=http`
 - 第 8：Source / SourceFinder URL 校验；Actions → Node 24；双语 README；architecture；MIT
+- 第 8b：ask 费用常数按真实运行校准；来源确定后二次上限检查；确认框显示 4～8 来源区间
 
 ---
 

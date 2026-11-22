@@ -18,7 +18,7 @@ from crossfire.domain import Link, Mode, Page, SourceIndex
 try:
     PACKAGE_VERSION = version("crossfire")
 except PackageNotFoundError:
-    PACKAGE_VERSION = "1.0.0"
+    PACKAGE_VERSION = "1.0.1"
 
 # 如实表明身份。变异目标：若伪装成 Mozilla/Chrome，测试会红。
 USER_AGENT = f"Crossfire/{PACKAGE_VERSION} (+https://github.com/FishySean/Crossfire)"

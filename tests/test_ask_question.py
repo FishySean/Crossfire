@@ -359,3 +359,116 @@ def test_mutation_question_id_is_not_raw_user_text():
     assert text not in qid
     assert qid.startswith("u-20261122-")
     assert len(qid) < 40
+
+
+def test_estimate_exposes_four_to_eight_source_range():
+    est = estimate_ask_cost(
+        pairer_free=True,
+        max_cost_usd=1.0,
+        search_per_thousand_usd=10.0,
+        steel_per_scrape_usd=0.0,
+        sonnet_price=PRICE,
+    )
+    assert est.low_sources == 4
+    assert est.high_sources == 8
+    assert est.low_usd == pytest.approx(est.total_usd)
+    assert est.high_usd > est.low_usd
+    high = estimate_ask_cost(
+        pairer_free=True,
+        usable_sources=8,
+        max_cost_usd=1.0,
+        search_per_thousand_usd=10.0,
+        steel_per_scrape_usd=0.0,
+        sonnet_price=PRICE,
+    )
+    assert est.high_usd == pytest.approx(high.total_usd)
+
+
+def test_cost_limit_after_sources_found_stops_before_extract():
+    """来源数确定后若超限，必须在提取前停下（二次检查）。"""
+    low = estimate_ask_cost(
+        pairer_free=True,
+        usable_sources=4,
+        max_cost_usd=1.0,
+        search_per_thousand_usd=10.0,
+        steel_per_scrape_usd=0.0,
+        sonnet_price=PRICE,
+    )
+    high = estimate_ask_cost(
+        pairer_free=True,
+        usable_sources=6,
+        max_cost_usd=1.0,
+        search_per_thousand_usd=10.0,
+        steel_per_scrape_usd=0.0,
+        sonnet_price=PRICE,
+    )
+    assert high.total_usd > low.total_usd
+    # 上限刚好卡在 4 来源之上：运行前能过，6 来源二次检查必须拦下。
+    cap = low.total_usd + (high.total_usd - low.total_usd) * 0.1
+
+    body = "Python keyword version stable. " + ("正文段落。" * 200)
+    pages = {
+        f"https://a{i}.example/": Page(url=f"https://a{i}.example/", ok=True, title="t", markdown=body)
+        for i in range(6)
+    }
+    # 每档最多留 3 个：3 primary + 3 news → 抓取 6 个。
+    candidates = [
+        *[_candidate(f"https://a{i}.example/", Tier.PRIMARY) for i in range(3)],
+        *[_candidate(f"https://a{i}.example/", Tier.NEWS) for i in range(3, 6)],
+    ]
+    sink = RecordingSink()
+    extract_called = {"yes": False}
+
+    def boom_verifier(*a, **k):
+        extract_called["yes"] = True
+        raise AssertionError("二次费用检查超限后不应构建 verifier / 提取")
+
+    ask = AskQuestion(
+        finder=FakeFinder(candidates),
+        fetcher=FakeFetcher(pages),
+        store_for=lambda _qid: RecordingStore(),
+        build_verifier=boom_verifier,
+        save_question=lambda *a, **k: (_ for _ in ()).throw(AssertionError("超限不应保存题目")),
+        event_sink=sink,
+        max_cost_usd=cap,
+        pairer_free=True,
+        search_per_thousand_usd=10.0,
+        steel_per_scrape_usd=0.0,
+        sonnet_price=PRICE,
+        clock=lambda: AS_OF,
+    )
+    result = ask.execute("Python 目前最新稳定版本是哪个？")
+    assert isinstance(result, AskStopped)
+    assert result.reason == "cost_limit"
+    assert extract_called["yes"] is False
+    assert "找到 6 个来源" in result.detail
+    assert "超过上限" in result.detail
+    assert "已停止" in result.detail
+    assert result.kept == 6
+    rejected = [e for e in sink.events if e.get("type") == "ask_cost_rejected"]
+    assert rejected, sink.events
+    assert rejected[0].get("sources") == 6
+    assert rejected[0]["total_usd"] > cap
+
+
+def test_go_step8_tokens_new_estimate_covers_actual():
+    """第 8 步 Go 真实提问的 token：新估算（6 来源）必须 ≥ 实际花费。"""
+    import json
+    from pathlib import Path
+
+    from crossfire.config import MODEL_PRICES, WEB_SEARCH_PER_THOUSAND_USD
+
+    fixture = Path(__file__).parent / "fixtures" / "ask_costs" / "go-20261122.json"
+    data = json.loads(fixture.read_text(encoding="utf-8"))
+    actual = float(data["ask_cost"]["actual_usd"])
+    n = len(data["claims"])
+    assert n == 6
+    est = estimate_ask_cost(
+        pairer_free=True,
+        usable_sources=n,
+        max_cost_usd=1.0,
+        search_per_thousand_usd=WEB_SEARCH_PER_THOUSAND_USD,
+        steel_per_scrape_usd=0.0,
+        sonnet_price=MODEL_PRICES["claude-sonnet-4-6"],
+    )
+    assert est.total_usd >= actual, f"estimate {est.total_usd} < actual {actual}"

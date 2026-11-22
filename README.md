@@ -99,16 +99,16 @@ Only `crossfire/config.py` reads `.env` / environment variables. Same-named env 
 
 ## Cost (per ask)
 
-Estimates use Sonnet pricing and a floor of 4 usable sources (`FETCHER=http`). More sources → higher.
+Estimates use Sonnet pricing and per-call token ceilings calibrated from real ask runs (see comments in `ask_question.py`). `FETCHER=http`.
 
 | Pairer | ~4 sources | ~6 sources | ~8 sources |
 |---|---|---|---|
-| NLI (pairing free) | ~$0.18 | ~$0.21 | ~$0.24 |
-| Claude pairing | ~$0.22 | ~$0.31 | ~$0.43 |
+| NLI (pairing free) | ~$0.39 | ~$0.51 | ~$0.63 |
+| Claude pairing | ~$0.49 | ~$0.75 | ~$1.07 |
 
-The confirm dialog uses the **4-source floor** (~$0.18 with NLI). More usable sources → higher actual spend (still usually under $0.50 with NLI + HTTP). First `PAIRER=nli` run downloads weights from Hugging Face (~550MB) into the HF cache.
+The confirm dialog and CLI show a **range**: about `$low` (4 sources) – `$high` (8 sources). The pre-run cap check uses the **4-source floor**; after sources are selected the estimate is recomputed with the real count and stops before extract if it would exceed `MAX_COST_PER_QUESTION` (default `$1`). First `PAIRER=nli` run downloads weights from Hugging Face (~550MB) into the HF cache.
 
-Breakdown: web search + find/extract/judge tokens; Steel adds ~$0.005/page if you switch `FETCHER=steel`. `MAX_COST_PER_QUESTION` (default `$1`) rejects runs over the estimate before they start.
+Breakdown: web search + find/extract/judge tokens; Steel adds ~$0.005/page if you switch `FETCHER=steel`.
 
 ## Self-trained pairer
 

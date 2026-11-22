@@ -115,7 +115,8 @@ const STRINGS = {
     askExample3: "What is the latest LTS release of Ubuntu?",
     askUnsuitable: "Unsuitable: disputed political claims, open-ended opinions, or questions with no checkable answer.",
     askDialogTitle: "Confirm before spending",
-    askDialogEstimate: (usd, max) => `Estimated cost about $${usd.toFixed(2)} (cap $${max.toFixed(2)}).`,
+    askDialogEstimate: (low, high, lowN, highN, max) =>
+      `Estimated cost about $${low.toFixed(2)} (${lowN} sources) – $${high.toFixed(2)} (${highN} sources) (cap $${max.toFixed(2)}).`,
     askDialogPairer: (name, free) => `Pairer: ${name}${free ? " (local, free)" : ""}.`,
     askConfirm: "Confirm & run",
     askCancel: "Cancel",
@@ -232,7 +233,8 @@ const STRINGS = {
     askExample3: "Ubuntu 最新的 LTS 版本是哪个？",
     askUnsuitable: "不适合：公认有争议的话题、纯观点题、没有可核对答案的问题。",
     askDialogTitle: "确认后再花钱",
-    askDialogEstimate: (usd, max) => `预计约 $${usd.toFixed(2)}（上限 $${max.toFixed(2)}）。`,
+    askDialogEstimate: (low, high, lowN, highN, max) =>
+      `预计约 $${low.toFixed(2)}（${lowN} 个来源）～ $${high.toFixed(2)}（${highN} 个来源）（上限 $${max.toFixed(2)}）。`,
     askDialogPairer: (name, free) => `比对器：${name}${free ? "（本地免费）" : ""}。`,
     askConfirm: "确认开跑",
     askCancel: "取消",
@@ -1768,7 +1770,7 @@ async function requestAsk() {
   if (FAKE_SCENARIO) {
     askPending = { question, pairer };
     el("ask-dialog-question").textContent = question;
-    el("ask-dialog-estimate").textContent = t("askDialogEstimate", 0.42, 1.0);
+    el("ask-dialog-estimate").textContent = t("askDialogEstimate", 0.39, 0.63, 4, 8, 1.0);
     const pairerName = pairer === "nli" ? t("pairerNli") : t("pairerClaude");
     el("ask-dialog-pairer").textContent = t("askDialogPairer", pairerName, pairer === "nli");
     el("ask-dialog").classList.remove("hidden");
@@ -1784,14 +1786,17 @@ async function requestAsk() {
     if (!response.ok) throw new Error(body.detail || `${response.status}`);
     const estimate = body.estimate || {};
     if (estimate.over_budget) {
-      showError("askOverBudget", estimate.total_usd || 0, estimate.max_cost_usd || 0);
+      showError("askOverBudget", estimate.low_usd || estimate.total_usd || 0, estimate.max_cost_usd || 0);
       return;
     }
     askPending = { question: body.question || question, pairer: body.pairer || pairer };
     el("ask-dialog-question").textContent = askPending.question;
     el("ask-dialog-estimate").textContent = t(
       "askDialogEstimate",
-      Number(estimate.total_usd || 0),
+      Number(estimate.low_usd ?? estimate.total_usd ?? 0),
+      Number(estimate.high_usd ?? estimate.total_usd ?? 0),
+      Number(estimate.low_sources || 4),
+      Number(estimate.high_sources || 8),
       Number(estimate.max_cost_usd || 1),
     );
     const pairerName = askPending.pairer === "nli" ? t("pairerNli") : t("pairerClaude");

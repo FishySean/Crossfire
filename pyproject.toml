@@ -1,6 +1,6 @@
 [project]
 name = "crossfire"
-version = "1.0.0"
+version = "1.0.1"
 description = "Fact-checking engine: multi-source fetch, pairwise conflict detection, confidence-tagged answers"
 readme = "README.md"
 authors = [

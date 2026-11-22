@@ -1,0 +1,82 @@
+{
+  "question": "What is the current stable release of Go (golang)?",
+  "ask_cost": {
+    "actual_usd": 0.2747,
+    "estimate": {
+      "searches": 6,
+      "steel_pages": 8,
+      "extract_calls": 6,
+      "pair_calls": 0,
+      "judge_calls": 1,
+      "search_usd": 0.06,
+      "steel_usd": 0.0,
+      "anthropic_usd": 0.153,
+      "pair_usd": 0.0,
+      "pairer_free": true,
+      "total_usd": 0.213,
+      "max_cost_usd": 1.0,
+      "over_budget": false
+    }
+  },
+  "total_input_tokens": 60067,
+  "total_output_tokens": 2300,
+  "claims": [
+    {
+      "usage": {
+        "input_tokens": 3506,
+        "output_tokens": 186,
+        "requests": 1
+      }
+    },
+    {
+      "usage": {
+        "input_tokens": 11484,
+        "output_tokens": 234,
+        "requests": 1
+      }
+    },
+    {
+      "usage": {
+        "input_tokens": 16900,
+        "output_tokens": 240,
+        "requests": 1
+      }
+    },
+    {
+      "usage": {
+        "input_tokens": 14274,
+        "output_tokens": 185,
+        "requests": 1
+      }
+    },
+    {
+      "usage": {
+        "input_tokens": 3784,
+        "output_tokens": 258,
+        "requests": 1
+      }
+    },
+    {
+      "usage": {
+        "input_tokens": 3913,
+        "output_tokens": 280,
+        "requests": 1
+      }
+    }
+  ],
+  "judgment": {
+    "usage": {
+      "input_tokens": 6206,
+      "output_tokens": 917,
+      "requests": 1
+    }
+  },
+  "pages_ok": 6,
+  "pairer": {
+    "model": "FishySean/crossfire-pairer",
+    "prompt_version": null,
+    "implementation": "nli",
+    "revision": "0517c59dfa13038226b4b66c3fa6b605b9215df5"
+  },
+  "note": "Step 8 fresh-verify Go ask; NLI+HTTP; used to lock estimate >= actual"
+}

@@ -146,6 +146,8 @@ class AskCostRejected(_Event):
     type: ClassVar[str] = "ask_cost_rejected"
     total_usd: float
     max_cost_usd: float
+    # 第 8b 步新增：来源确定后的二次检查填真实来源数；运行前检查为 None。
+    sources: int | None = None
 
 
 type Event = (

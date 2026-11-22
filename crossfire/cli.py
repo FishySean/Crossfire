@@ -260,16 +260,21 @@ def ask_command(
         print(f"  HTTP 抓取约 {estimate.steel_pages} 页 $0.000（FETCHER=http）")
     else:
         print(f"  Steel 抓取约 {estimate.steel_pages} 页 ${estimate.steel_usd:.3f}")
-    print(f"  Anthropic（找来源+提取+汇总）约 ${estimate.anthropic_usd:.3f}")
+    print(f"  Anthropic（找来源+提取+汇总）约 ${estimate.anthropic_usd:.3f}（按 {estimate.low_sources} 个来源下限）")
     if estimate.pairer_free:
         print("  比对：NLI 本地免费")
     else:
-        print(f"  比对：Claude 约 ${estimate.pair_usd:.3f}")
-    print(f"  合计约 ${estimate.total_usd:.2f}（上限 ${estimate.max_cost_usd:.2f}）")
+        print(f"  比对：Claude 约 ${estimate.pair_usd:.3f}（按 {estimate.low_sources} 个来源下限）")
+    print(
+        f"  合计约 ${estimate.low_usd:.2f}（{estimate.low_sources} 个来源）"
+        f"～ ${estimate.high_usd:.2f}（{estimate.high_sources} 个来源）"
+        f"（上限 ${estimate.max_cost_usd:.2f}）"
+    )
     print(f"  比对器：{run_pairer.value}    抓取器：{settings.fetcher.value}")
+    print("  运行前按下限检查上限；来源数确定后会再查一次。")
     if estimate.over_budget:
         print(
-            f"预计 ${estimate.total_usd:.2f} 超过上限 ${estimate.max_cost_usd:.2f}，没有开始运行。",
+            f"预计 ${estimate.low_usd:.2f}～${estimate.high_usd:.2f} 超过上限 ${estimate.max_cost_usd:.2f}，没有开始运行。",
             file=sys.stderr,
         )
         return 2
@@ -294,7 +299,14 @@ def ask_command(
             elif kind == "sources_insufficient":
                 print(f"来源不足：{data.get('detail')}")
             elif kind == "ask_cost_rejected":
-                print(f"费用超限：${data.get('total_usd')} > ${data.get('max_cost_usd')}")
+                sources = data.get("sources")
+                if sources is not None:
+                    print(
+                        f"费用超限：找到 {sources} 个来源，预计 ${data.get('total_usd')}，"
+                        f"超过上限 ${data.get('max_cost_usd')}，已停止"
+                    )
+                else:
+                    print(f"费用超限：${data.get('total_usd')} > ${data.get('max_cost_usd')}")
 
     asker = composition.build_ask_question(settings, pairer=run_pairer, event_sink=_PrintSink())
     outcome = asker.execute(text)

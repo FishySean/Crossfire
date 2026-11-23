@@ -340,4 +340,5 @@ def test_fake_ask_scenarios(web_env):
     assert "sources_insufficient" in types
     types = [e["type"] for e in sse_events(client.get("/api/fake-run/ask-cost-limit?speed=1000"))]
     assert "ask_cost_rejected" in types
-    assert client.get("/static/app.js").status_code == 200
+    assert client.get("/static/js/app.js").status_code == 200
+    assert client.get("/static/js/graph.js").status_code == 200

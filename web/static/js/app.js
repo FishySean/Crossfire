@@ -1,5 +1,16 @@
-const el = (id) => document.getElementById(id);
-const SVG_NS = "http://www.w3.org/2000/svg";
+import { SVG_NS, domainOf, el, labeled, prefersReducedMotion, text, tierClass } from "./dom.js";
+import {
+  bindBottomLang,
+  bindHeroLang,
+  bindVerdictLang,
+  renderBottomPanels,
+  renderHeroSubtitle,
+  renderMetrics as renderSummaryMetrics,
+  renderNliNote,
+  renderVerdictPane,
+} from "./dashboard.js";
+import { clearRadialSelection, renderRadialGraph, setEvidenceView } from "./graph.js";
+
 const RELATION_CONTRADICT = "contradict";
 // Both claims are true but measure different things, so the numbers are not
 // comparable — drawn apart from real contradictions.
@@ -131,6 +142,25 @@ const STRINGS = {
     askStoppedFew: (detail) => `Stopped early — not enough usable sources. ${detail}`,
     askStoppedCost: (detail) => `Stopped — cost limit. ${detail}`,
     askStoppedOther: (detail) => `Stopped. ${detail}`,
+    metricFaulty: "Wrong / outdated",
+    metricScopeSources: "Scope sources",
+    legendTrusted: "Consistent",
+    legendFaulty: "Wrong / outdated",
+    legendScopeSources: "Scope differences",
+    noScopeSources: "No scope-difference sources in the summary.",
+    noComposition: "No source composition recorded.",
+    nliRawNote: (n, m) =>
+      `Local model raw calls: ${n} contradiction pair(s), of which ${m} had confidence < 0.5; final call is in the verdict.`,
+    evidenceTitle: "Evidence",
+    viewDetailCta: "View Detailed Analysis →",
+    askCta: "Ask a Question",
+    demoHeading: "Demo run",
+    detailTitle: "Full analysis",
+    contradictionTitle: "Contradictions",
+    scopeTitle: "Scope differences",
+    compositionTitle: "Sources overview",
+    historyFilterPlaceholder: "Search past investigations…",
+    menuLabel: "Menu",
   },
   zh: {
     tagline: "多来源 · 多视角 · 讲证据",
@@ -249,6 +279,25 @@ const STRINGS = {
     askStoppedFew: (detail) => `提前停止——可用来源不够。${detail}`,
     askStoppedCost: (detail) => `已停止——费用超限。${detail}`,
     askStoppedOther: (detail) => `已停止。${detail}`,
+    metricFaulty: "有误来源",
+    metricScopeSources: "口径来源",
+    legendTrusted: "一致",
+    legendFaulty: "有误 / 过时",
+    legendScopeSources: "口径差异",
+    noScopeSources: "摘要里没有口径差异来源。",
+    noComposition: "没有来源构成数据。",
+    nliRawNote: (n, m) =>
+      `本地模型原始判定：${n} 对矛盾，其中 ${m} 对置信度 < 0.5；最终判断见结论。`,
+    evidenceTitle: "证据关系",
+    viewDetailCta: "查看完整分析 →",
+    askCta: "自己提问",
+    demoHeading: "演示重跑",
+    detailTitle: "完整分析",
+    contradictionTitle: "矛盾",
+    scopeTitle: "口径差异",
+    compositionTitle: "来源构成",
+    historyFilterPlaceholder: "搜索历史查证…",
+    menuLabel: "菜单",
   },
 };
 
@@ -299,12 +348,43 @@ function applyStaticStrings() {
     el("stall-text").textContent = t("stallWarning");
     el("stall-switch").textContent = t("switchToCached");
   }
-  el("question-eyebrow").textContent = t("question");
+  el("question-eyebrow").textContent = t("questionEyebrow");
   el("sources-title").textContent = t("sources");
   el("conflicts-title").textContent = t("conflicts");
   el("judgment-title").textContent = t("verdict");
-  for (const button of document.querySelectorAll("#lang-toggle button")) {
+  const evidenceTitle = el("evidence-title");
+  if (evidenceTitle) evidenceTitle.textContent = t("evidenceTitle");
+  const cta = el("view-detail-cta");
+  if (cta) cta.textContent = t("viewDetailCta");
+  const askCta = el("ask-cta-label");
+  if (askCta) askCta.textContent = t("askCta");
+  const demo = el("demo-heading");
+  if (demo) demo.textContent = t("demoHeading");
+  const detailTitle = el("detail-title");
+  if (detailTitle) detailTitle.textContent = t("detailTitle");
+  const detailJudgment = el("detail-judgment-title");
+  if (detailJudgment) detailJudgment.textContent = t("verdict");
+  const c1 = el("contradiction-title");
+  if (c1) c1.textContent = t("contradictionTitle");
+  const c2 = el("scope-title");
+  if (c2) c2.textContent = t("scopeTitle");
+  const c3 = el("composition-title");
+  if (c3) c3.textContent = t("compositionTitle");
+  const hist = el("history-filter");
+  if (hist) hist.placeholder = t("historyFilterPlaceholder");
+  const menu = el("sidebar-toggle");
+  if (menu) menu.textContent = t("menuLabel");
+  for (const button of document.querySelectorAll("#lang-toggle button, #lang-toggle-top button")) {
     button.classList.toggle("active", button.dataset.lang === lang);
+  }
+  if (currentRun) {
+    bindVerdictLang(lang);
+    bindBottomLang(lang);
+    bindHeroLang(lang);
+    renderHeroSubtitle(currentRun, t);
+    renderVerdictPane(currentRun, t, { renderSafeMarkdown, confidenceRing });
+    renderBottomPanels(currentRun, t);
+    renderNliNote(currentRun, t);
   }
 }
 
@@ -334,32 +414,9 @@ function setLang(next) {
   repaintLive();
 }
 
-function domainOf(url) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url || "unknown";
-  }
-}
 
-function tierClass(tier) {
-  const t = (tier || "").toLowerCase();
-  return ["primary", "news", "aggregator"].includes(t) ? t : "unknown";
-}
 
-function text(tag, className, value) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (value !== undefined && value !== null) node.textContent = value;
-  return node;
-}
 
-function labeled(label, node) {
-  const box = document.createElement("div");
-  box.appendChild(text("div", "field-label", label));
-  box.appendChild(node);
-  return box;
-}
 
 async function refreshRunList({ selectName = null, loadSelected = true } = {}) {
   const runs = await fetchJSON("/api/runs");
@@ -432,34 +489,39 @@ function hideError() {
 
 function render(run) {
   el("content").classList.remove("hidden");
+  bindVerdictLang(lang);
+  bindBottomLang(lang);
+  bindHeroLang(lang);
   renderFailures(run);
   renderQuestion(run);
+  renderHeroSubtitle(run, t);
   renderMetrics(run);
   const cards = renderSources(run);
   renderConflicts(run, cards);
   renderJudgment(run);
+  renderVerdictPane(run, t, { renderSafeMarkdown, confidenceRing });
+  renderBottomPanels(run, t);
+  renderNliNote(run, t);
+  renderRadialGraph(run, {
+    onSelect: (url) => {
+      if (!cards.has(url)) return;
+      spotlight([url, ...partnerUrls(run, url)], cards, url);
+    },
+  });
+  setEvidenceView(document.querySelector('#view-toggle button.active')?.dataset.view || "graph");
+}
+
+function partnerUrls(run, url) {
+  const out = [];
+  for (const pair of run.pairs || []) {
+    if (pair.a === url) out.push(pair.b);
+    if (pair.b === url) out.push(pair.a);
+  }
+  return out;
 }
 
 function renderMetrics(run) {
-  const strip = el("metrics-strip");
-  strip.innerHTML = "";
-  const pairs = run.pairs || [];
-  const sources = sourceRows(run).length;
-  const comparisons = pairs.length;
-  const contradictions = pairs.filter((p) => p.relation === RELATION_CONTRADICT).length;
-  const scoped = pairs.filter((p) => p.relation === RELATION_SCOPE).length;
-  const items = [
-    { value: sources, label: t("metricSources"), className: "" },
-    { value: comparisons, label: t("metricComparisons"), className: "" },
-    { value: contradictions, label: t("metricContradictions"), className: "danger" },
-    { value: scoped, label: t("metricScope"), className: "scope" },
-  ];
-  for (const item of items) {
-    const cell = text("div", `metric ${item.className}`.trim());
-    cell.appendChild(text("div", "metric-value", String(item.value)));
-    cell.appendChild(text("div", "metric-label", item.label));
-    strip.appendChild(cell);
-  }
+  renderSummaryMetrics(run, t);
 }
 
 function parseFailures(run) {
@@ -1061,7 +1123,16 @@ function confidenceRing(confidence) {
   arc.setAttribute("r", String(radius));
   arc.setAttribute("stroke", color);
   arc.setAttribute("stroke-dasharray", String(circumference));
-  arc.setAttribute("stroke-dashoffset", String(circumference * (1 - (value ?? 0))));
+  const targetOffset = circumference * (1 - (value ?? 0));
+  if (prefersReducedMotion()) {
+    arc.setAttribute("stroke-dashoffset", String(targetOffset));
+  } else {
+    arc.setAttribute("stroke-dashoffset", String(circumference));
+    requestAnimationFrame(() => {
+      arc.style.transition = "stroke-dashoffset 400ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+      arc.setAttribute("stroke-dashoffset", String(targetOffset));
+    });
+  }
   svg.appendChild(arc);
 
   const label = document.createElementNS(SVG_NS, "text");
@@ -1728,7 +1799,7 @@ window.addEventListener("resize", () => {
   );
 });
 
-for (const button of document.querySelectorAll("#lang-toggle button")) {
+for (const button of document.querySelectorAll("#lang-toggle button, #lang-toggle-top button")) {
   button.onclick = () => setLang(button.dataset.lang);
 }
 for (const button of document.querySelectorAll("#mode-toggle button")) {
@@ -1754,12 +1825,51 @@ el("ask-confirm").onclick = () => {
   closeAskDialog();
   if (pending) startAsk(pending.question, pending.pairer);
 };
+el("ask-open").onclick = () => openAskDialog();
+el("view-detail-cta").onclick = () => {
+  el("detail-section").scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth" });
+};
+for (const button of document.querySelectorAll("#view-toggle button")) {
+  button.onclick = () => {
+    const next = button.dataset.view === "table" ? "table" : "graph";
+    // View Transitions 在部分环境（含 reduced-motion）会拖住回调，切换本身同步完成即可。
+    setEvidenceView(next);
+  };
+}
+el("sidebar-toggle").onclick = () => {
+  const sidebar = el("sidebar");
+  const open = !sidebar.classList.contains("open");
+  sidebar.classList.toggle("open", open);
+  el("sidebar-toggle").setAttribute("aria-expanded", open ? "true" : "false");
+};
+el("history-filter").addEventListener("input", () => filterHistory());
 
 let askPending = null;
+
+function openAskDialog() {
+  el("ask-panel").classList.remove("hidden");
+  el("ask-confirm-block").classList.add("hidden");
+  el("ask-confirm").classList.add("hidden");
+  el("ask-button").classList.remove("hidden");
+  el("ask-dialog").classList.remove("hidden");
+  el("ask-input").focus();
+}
 
 function closeAskDialog() {
   askPending = null;
   el("ask-dialog").classList.add("hidden");
+  el("ask-confirm-block").classList.add("hidden");
+  el("ask-confirm").classList.add("hidden");
+  el("ask-panel").classList.remove("hidden");
+  el("ask-button").classList.remove("hidden");
+}
+
+function filterHistory() {
+  const q = (el("history-filter").value || "").trim().toLowerCase();
+  for (const option of el("run-select").options) {
+    const hay = `${option.textContent || ""} ${option.value || ""}`.toLowerCase();
+    option.hidden = Boolean(q) && !hay.includes(q);
+  }
 }
 
 async function requestAsk() {
@@ -1773,6 +1883,8 @@ async function requestAsk() {
     el("ask-dialog-estimate").textContent = t("askDialogEstimate", 0.39, 0.63, 4, 8, 1.0);
     const pairerName = pairer === "nli" ? t("pairerNli") : t("pairerClaude");
     el("ask-dialog-pairer").textContent = t("askDialogPairer", pairerName, pairer === "nli");
+    el("ask-confirm-block").classList.remove("hidden");
+    el("ask-confirm").classList.remove("hidden");
     el("ask-dialog").classList.remove("hidden");
     return;
   }
@@ -1801,6 +1913,8 @@ async function requestAsk() {
     );
     const pairerName = askPending.pairer === "nli" ? t("pairerNli") : t("pairerClaude");
     el("ask-dialog-pairer").textContent = t("askDialogPairer", pairerName, Boolean(estimate.pairer_free));
+    el("ask-confirm-block").classList.remove("hidden");
+    el("ask-confirm").classList.remove("hidden");
     el("ask-dialog").classList.remove("hidden");
   } catch (e) {
     showError("loadFailed", "ask/estimate", e.message);
@@ -1897,6 +2011,7 @@ window.addEventListener("keydown", (event) => {
 
 setMode("cached");
 applyStaticStrings();
+setEvidenceView("graph");
 loadQuestions().catch(() => {});
 loadPairers().catch(() => {});
 loadRuns().catch((e) => showError("listFailed", e.message));

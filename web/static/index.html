@@ -10,126 +10,211 @@
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <header class="masthead">
-    <div class="masthead-brand">
-      <span class="brand-mark" aria-hidden="true">★</span>
-      <div class="brand-text">
-        <div class="brand-name">CROSSFIRE</div>
-        <div class="brand-sub" id="tagline">Multi-source. Multi-perspective. Fact-based.</div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navigation">
+      <div class="sidebar-brand">
+        <span class="brand-mark" aria-hidden="true">★</span>
+        <div class="brand-text">
+          <div class="brand-name">CROSSFIRE</div>
+          <div class="brand-sub" id="tagline">Multi-source. Multi-perspective. Fact-based.</div>
+        </div>
       </div>
-    </div>
-    <div class="masthead-controls">
-      <label class="run-picker">
-        <span id="question-label">Question</span>
-        <select id="question-select"></select>
-      </label>
-      <div class="mode-toggle" id="mode-toggle">
-        <button type="button" data-mode="cached">Cached</button>
-        <button type="button" data-mode="live">Live</button>
-      </div>
-      <div class="pairer-toggle" id="pairer-toggle" title="">
-        <button type="button" data-pairer="claude" class="active">Claude</button>
-        <button type="button" data-pairer="nli" disabled>本地模型（NLI）</button>
-      </div>
-      <button type="button" id="run-button" class="run-button">Run</button>
-      <label class="run-picker">
-        <span id="run-label">History</span>
-        <select id="run-select"></select>
-      </label>
-      <div class="lang-toggle" id="lang-toggle">
-        <button type="button" data-lang="en">EN</button>
-        <button type="button" data-lang="zh">中文</button>
-      </div>
-    </div>
-  </header>
 
-  <div id="progress-strip" class="progress-strip hidden">
-    <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
-    <div class="progress-meta">
-      <span id="progress-stage"></span>
-      <span id="progress-timer" class="timer">0.0s</span>
+      <button type="button" id="ask-open" class="ask-cta">+ <span id="ask-cta-label">Ask a Question</span></button>
+
+      <section class="sidebar-section" id="demo-controls">
+        <h2 class="sidebar-heading" id="demo-heading">Demo run</h2>
+        <label class="run-picker stacked">
+          <span id="question-label">Question</span>
+          <select id="question-select"></select>
+        </label>
+        <div class="mode-toggle" id="mode-toggle">
+          <button type="button" data-mode="cached">Cached</button>
+          <button type="button" data-mode="live">Live</button>
+        </div>
+        <div class="pairer-toggle" id="pairer-toggle" title="">
+          <button type="button" data-pairer="claude" class="active">Claude</button>
+          <button type="button" data-pairer="nli" disabled>本地模型（NLI）</button>
+        </div>
+        <button type="button" id="run-button" class="run-button">Run</button>
+      </section>
+
+      <section class="sidebar-section history-section">
+        <h2 class="sidebar-heading" id="run-label">History</h2>
+        <label class="history-search">
+          <span class="visually-hidden" id="history-search-label">Search</span>
+          <input id="history-filter" type="search" autocomplete="off" />
+        </label>
+        <label class="run-picker stacked history-select-wrap">
+          <select id="run-select" size="8"></select>
+        </label>
+      </section>
+
+      <div class="sidebar-foot">
+        <div class="lang-toggle" id="lang-toggle">
+          <button type="button" data-lang="en">EN</button>
+          <button type="button" data-lang="zh">中文</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-expanded="false" aria-controls="sidebar">Menu</button>
+        <div class="topbar-spacer"></div>
+        <div class="lang-toggle topbar-lang" id="lang-toggle-top" aria-hidden="true">
+          <button type="button" data-lang="en">EN</button>
+          <button type="button" data-lang="zh">中文</button>
+        </div>
+      </header>
+
+      <div id="progress-strip" class="progress-strip hidden">
+        <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+        <div class="progress-meta">
+          <span id="progress-stage"></span>
+          <span id="progress-timer" class="timer">0.0s</span>
+        </div>
+      </div>
+
+      <div id="stall-banner" class="banner hidden">
+        <span id="stall-text"></span>
+        <button type="button" id="stall-switch" class="inline-button"></button>
+      </div>
+      <div id="failure-banner" class="banner hidden"></div>
+      <div id="error-banner" class="banner error hidden"></div>
+
+      <div id="source-find-panel" class="source-find-panel hidden">
+        <div class="panel-head">
+          <h2 id="source-find-title">Finding sources</h2>
+          <span id="source-find-count" class="count"></span>
+        </div>
+        <ul id="source-find-list" class="source-find-list"></ul>
+      </div>
+
+      <main id="content" class="content hidden">
+        <section class="hero-block enter" style="--stagger: 0">
+          <div class="hero-copy">
+            <div class="section-eyebrow" id="question-eyebrow">Fact-check analysis</div>
+            <h1 id="question"></h1>
+            <p id="question-subtitle" class="hero-subtitle"></p>
+            <div id="run-meta" class="run-meta"></div>
+          </div>
+          <div class="hero-deco" aria-hidden="true">
+            <div class="skyline"></div>
+            <div class="hero-disc"></div>
+          </div>
+        </section>
+
+        <section id="metrics-strip" class="metrics-strip enter" style="--stagger: 1" aria-label="Run metrics"></section>
+
+        <section class="bento-mid enter" style="--stagger: 2">
+          <div class="evidence-pane">
+            <div class="pane-toolbar">
+              <h2 id="evidence-title">Evidence</h2>
+              <div class="segmented" id="view-toggle" role="tablist">
+                <button type="button" role="tab" data-view="graph" class="active" aria-selected="true">Graph</button>
+                <button type="button" role="tab" data-view="table" aria-selected="false">Table</button>
+              </div>
+            </div>
+            <div id="graph-view" class="graph-view">
+              <svg id="radial-graph" class="radial-graph" role="img" aria-label="Source relationship graph"></svg>
+              <aside id="node-detail" class="node-detail hidden"></aside>
+            </div>
+            <div id="table-view" class="table-view hidden">
+              <div class="sources-wrap">
+                <svg id="conflict-links" class="conflict-links"></svg>
+                <div id="sources" class="sources"></div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="verdict-pane" id="verdict-pane">
+            <div class="panel-head"><h2 id="judgment-title">Verdict</h2></div>
+            <h3 id="verdict-headline" class="verdict-headline"></h3>
+            <div id="verdict-answer" class="verdict-answer"></div>
+            <div id="verdict-ring" class="verdict-ring"></div>
+            <ul id="verdict-legend" class="verdict-legend"></ul>
+            <button type="button" id="view-detail-cta" class="primary-cta">View Detailed Analysis →</button>
+          </aside>
+        </section>
+
+        <section class="bento-bottom enter" style="--stagger: 3">
+          <article class="bento-card" id="contradiction-panel">
+            <h3 id="contradiction-title">Contradictions</h3>
+            <div id="contradiction-body"></div>
+          </article>
+          <article class="bento-card" id="scope-panel">
+            <h3 id="scope-title">Scope differences</h3>
+            <div id="scope-body"></div>
+          </article>
+          <article class="bento-card" id="composition-panel">
+            <h3 id="composition-title">Sources overview</h3>
+            <div id="composition-body"></div>
+          </article>
+        </section>
+
+        <section id="detail-section" class="detail-section">
+          <div class="panel-head">
+            <h2 id="detail-title">Full analysis</h2>
+          </div>
+          <p id="nli-raw-note" class="nli-raw-note"></p>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2 id="sources-title">Sources</h2>
+              <span id="source-count" class="count"></span>
+            </div>
+            <div id="detail-sources" class="sources detail-sources"></div>
+          </section>
+
+          <section class="panel conflict-panel">
+            <div class="panel-head">
+              <h2 id="conflicts-title">Conflicts</h2>
+              <span id="conflict-count" class="count"></span>
+              <span id="pair-progress" class="count pair-progress hidden"></span>
+            </div>
+            <div id="conflict-legend" class="legend"></div>
+            <p id="scores-calibration" class="scores-calibration hidden"></p>
+            <div id="conflicts" class="conflicts"></div>
+          </section>
+
+          <section class="panel verdict-panel">
+            <div class="panel-head"><h2 id="detail-judgment-title">Verdict detail</h2></div>
+            <div id="judgment" class="judgment"></div>
+          </section>
+        </section>
+      </main>
     </div>
   </div>
-
-  <section id="ask-panel" class="ask-panel">
-    <div class="ask-head">
-      <h2 id="ask-title">Ask a question</h2>
-      <p id="ask-lead" class="ask-lead"></p>
-    </div>
-    <div class="ask-row">
-      <input id="ask-input" type="text" maxlength="300" autocomplete="off" />
-      <button type="button" id="ask-button" class="run-button ask-button">Ask</button>
-    </div>
-    <div id="ask-examples" class="ask-examples"></div>
-    <p id="ask-unsuitable" class="ask-unsuitable"></p>
-  </section>
 
   <div id="ask-dialog" class="ask-dialog hidden" role="dialog" aria-modal="true">
-    <div class="ask-dialog-card">
-      <h3 id="ask-dialog-title">Confirm run</h3>
-      <p id="ask-dialog-question" class="ask-dialog-question"></p>
-      <p id="ask-dialog-estimate" class="ask-dialog-estimate"></p>
-      <p id="ask-dialog-pairer" class="ask-dialog-pairer"></p>
+    <div class="ask-dialog-card ask-dialog-wide">
+      <div class="ask-panel" id="ask-panel">
+        <div class="ask-head">
+          <h2 id="ask-title">Ask a question</h2>
+          <p id="ask-lead" class="ask-lead"></p>
+        </div>
+        <div class="ask-row">
+          <input id="ask-input" type="text" maxlength="300" autocomplete="off" />
+          <button type="button" id="ask-button" class="run-button ask-button">Ask</button>
+        </div>
+        <div id="ask-examples" class="ask-examples"></div>
+        <p id="ask-unsuitable" class="ask-unsuitable"></p>
+      </div>
+      <div id="ask-confirm-block" class="ask-confirm-block hidden">
+        <h3 id="ask-dialog-title">Confirm run</h3>
+        <p id="ask-dialog-question" class="ask-dialog-question"></p>
+        <p id="ask-dialog-estimate" class="ask-dialog-estimate"></p>
+        <p id="ask-dialog-pairer" class="ask-dialog-pairer"></p>
+      </div>
       <div class="ask-dialog-actions">
         <button type="button" id="ask-cancel" class="inline-button">Cancel</button>
-        <button type="button" id="ask-confirm" class="run-button">Confirm</button>
+        <button type="button" id="ask-confirm" class="run-button hidden">Confirm</button>
       </div>
     </div>
   </div>
-
-  <div id="source-find-panel" class="source-find-panel hidden">
-    <div class="panel-head">
-      <h2 id="source-find-title">Finding sources</h2>
-      <span id="source-find-count" class="count"></span>
-    </div>
-    <ul id="source-find-list" class="source-find-list"></ul>
-  </div>
-
-  <div id="stall-banner" class="banner hidden">
-    <span id="stall-text"></span>
-    <button type="button" id="stall-switch" class="inline-button"></button>
-  </div>
-  <div id="failure-banner" class="banner hidden"></div>
-  <div id="error-banner" class="banner error hidden"></div>
-
-  <main id="content" class="content hidden">
-    <section class="question-block">
-      <div class="section-eyebrow" id="question-eyebrow">Fact-check analysis</div>
-      <h1 id="question"></h1>
-      <div id="run-meta" class="run-meta"></div>
-    </section>
-
-    <section id="metrics-strip" class="metrics-strip" aria-label="Run metrics"></section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h2 id="sources-title">Sources</h2>
-        <span id="source-count" class="count"></span>
-      </div>
-      <div class="sources-wrap">
-        <svg id="conflict-links" class="conflict-links"></svg>
-        <div id="sources" class="sources"></div>
-      </div>
-    </section>
-
-    <section class="panel conflict-panel">
-      <div class="panel-head">
-        <h2 id="conflicts-title">Conflicts</h2>
-        <span id="conflict-count" class="count"></span>
-        <span id="pair-progress" class="count pair-progress hidden"></span>
-      </div>
-      <div id="conflict-legend" class="legend"></div>
-      <p id="scores-calibration" class="scores-calibration hidden"></p>
-      <div id="conflicts" class="conflicts"></div>
-    </section>
-
-    <section class="panel verdict-panel">
-      <div class="panel-head"><h2 id="judgment-title">Verdict</h2></div>
-      <div id="judgment" class="judgment"></div>
-    </section>
-  </main>
 
   <script src="/static/safe_markdown.js"></script>
-  <script src="/static/app.js"></script>
+  <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>

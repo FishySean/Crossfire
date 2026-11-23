@@ -5,7 +5,7 @@
 
 Crossfire is a fact-checking engine: it pulls several sources for a question, extracts one claim per page, compares every pair, and surfaces disagreements instead of smoothing them into one answer.
 
-![Ask run showing sources, conflicts, and a grounded conclusion](docs/screenshots/12-ask-nodejs-zh.png)
+![Newspaper dashboard: radial evidence graph and verdict pane](docs/screenshots/18-dashboard-above-fold.png)
 
 ## What problem it solves
 

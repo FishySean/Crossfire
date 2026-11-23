@@ -1,0 +1,836 @@
+{
+  "question_id": "nodejs-lts-version",
+  "question": "Node.js 目前处于 Active LTS 的版本是哪一个？",
+  "mode": "cached",
+  "started_at": "2026-11-23T02:33:43.066023+00:00",
+  "as_of": "2026-09-12",
+  "elapsed_seconds": 47.51,
+  "sources": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "tier": "primary"
+    },
+    {
+      "url": "https://github.com/nodejs/release",
+      "tier": "primary"
+    },
+    {
+      "url": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "tier": "news"
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "tier": "news"
+    },
+    {
+      "url": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "tier": "news"
+    },
+    {
+      "url": "https://endoflife.date/nodejs",
+      "tier": "aggregator"
+    },
+    {
+      "url": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "tier": "aggregator"
+    },
+    {
+      "url": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "tier": "aggregator"
+    }
+  ],
+  "pages_fetched": 8,
+  "pages_failed": 0,
+  "claude_calls": 9,
+  "failures": [],
+  "steps": {
+    "fetch": {
+      "calls": 8,
+      "seconds": 0.01
+    },
+    "extract": {
+      "calls": 8,
+      "input_tokens": 45177,
+      "output_tokens": 2464,
+      "seconds": 10.91,
+      "requests": 8
+    },
+    "pair": {
+      "calls": 28,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 3.46,
+      "requests": 0
+    },
+    "judge": {
+      "calls": 1,
+      "input_tokens": 10075,
+      "output_tokens": 1983,
+      "seconds": 33.13,
+      "requests": 1
+    }
+  },
+  "provenance": {
+    "extract": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "0ec2868898c6"
+    },
+    "pair": {
+      "model": "FishySean/crossfire-pairer",
+      "prompt_version": null,
+      "implementation": "nli",
+      "revision": "0517c59dfa13038226b4b66c3fa6b605b9215df5"
+    },
+    "judge": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "f88156bfbc2f"
+    }
+  },
+  "total_input_tokens": 55252,
+  "total_output_tokens": 4447,
+  "pages": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "ok": true,
+      "title": "Node.js — Node.js Releases",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://github.com/nodejs/release",
+      "ok": true,
+      "title": "GitHub - nodejs/Release: Node.js Release Working Group · GitHub",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "ok": true,
+      "title": "Node.js v22 Enters Long Term Support (LTS)",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "ok": true,
+      "title": "Release 2024-10-29, Version 22.11.0 'Jod' (LTS), @richardlau · nodejs/node · GitHub",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "ok": true,
+      "title": "Node.js Release and EOL Timeline - LTS Schedule, Active LTS and Maintenance, and End-of-Life Dates | hidekazu-konishi.com",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://endoflife.date/nodejs",
+      "ok": true,
+      "title": "Node.js | endoflife.date",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "ok": true,
+      "title": "Node.js Introduction",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "ok": true,
+      "title": "Node JS Versions - GeeksforGeeks",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    }
+  ],
+  "claims": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "tier": "primary",
+      "claim": "根据该页面的发布版本状态表，目前处于 LTS 状态的版本有 v24（Krypton）和 v22（Jod），页面未明确区分\"Active LTS\"与\"Maintenance LTS\"，仅标注为\"LTS\"。",
+      "evidence": "| [v24](https://nodejs.org/en/download/archive/v24.21.0) | Krypton | May 06, 2025 | Sep 07, 2026 | LTS | | | [v22](https://nodejs.org/en/download/archive/v22.23.2) | Jod | Apr 24, 2024 | Jul 28, 2026 ",
+      "source_type": "official_documentation",
+      "confidence": 0.85,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 4165,
+        "output_tokens": 404,
+        "requests": 1
+      },
+      "content_date": "2026-09-09",
+      "content_date_evidence": "| [v26](https://nodejs.org/en/download/archive/v26.8.2) | \\- | May 05, 2026 | Sep 09, 2026 | Current |",
+      "key_value": "v24, v22 (LTS)"
+    },
+    {
+      "url": "https://github.com/nodejs/release",
+      "tier": "primary",
+      "claim": "Node.js 24.x（代号 Krypton）目前处于 Active LTS 状态",
+      "evidence": "| [24.x](https://nodejs.org/download/release/latest-v24.x/) | **Active LTS** | [Krypton](https://nodejs.org/download/release/latest-krypton/) | 2025-05-06 | 2025-10-28 | 2026-10-20 | 2028-04-30 |",
+      "source_type": "official_documentation",
+      "confidence": 0.99,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 6560,
+        "output_tokens": 382,
+        "requests": 1
+      },
+      "content_date": "2025-10-28",
+      "content_date_evidence": "| [24.x](https://nodejs.org/download/release/latest-v24.x/) | **Active LTS** | [Krypton](https://nodejs.org/download/release/latest-krypton/) | 2025-05-06 | 2025-10-28 | 2026-10-20 | 2028-04-30 |",
+      "key_value": "24.x (Krypton)"
+    },
+    {
+      "url": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "tier": "news",
+      "claim": "截至2024年10月29日（该文发布时），Node.js v22（22.x）处于 Active LTS 状态，代号为 'Jod'",
+      "evidence": "With Node.js v22.11.0, the 22.x release line has officially moved into **Active LTS**.",
+      "source_type": "blog",
+      "confidence": 0.97,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 4979,
+        "output_tokens": 282,
+        "requests": 1
+      },
+      "content_date": "2024-10-29",
+      "content_date_evidence": "On October 29, 2024, Node.js v22 officially transitioned into Long Term Support (LTS) with the codename 'Jod'.",
+      "key_value": "v22 (Jod)"
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "tier": "news",
+      "claim": "截至2024-10-29（该发布页发布时），Node.js 22.x（v22.11.0，代号'Jod'）处于 Active LTS 状态。",
+      "evidence": "The 22.x release line now moves into \"Active LTS\" and will remain so until October 2025.",
+      "source_type": "official_documentation",
+      "confidence": 0.97,
+      "published_date": "2024-10-29",
+      "usage": {
+        "input_tokens": 2488,
+        "output_tokens": 305,
+        "requests": 1
+      },
+      "content_date": "2024-10-29",
+      "content_date_evidence": "This release marks the transition of Node.js 22.x into Long Term Support (LTS) with the codename 'Jod'. The 22.x release line now moves into \"Active LTS\"",
+      "key_value": "v22.11.0 (22.x)"
+    },
+    {
+      "url": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "tier": "news",
+      "claim": "截至 2026-07-24，Node.js 24 \"Krypton\" 是处于 Active LTS 阶段的版本。",
+      "evidence": "As of 2026-07-24, the supported (non-EOL) lines are Node.js 22 (Maintenance LTS), Node.js 24 (Active LTS), and Node.js 26 (Current).",
+      "source_type": "blog",
+      "confidence": 0.99,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 10564,
+        "output_tokens": 316,
+        "requests": 1
+      },
+      "content_date": "2026-07-24",
+      "content_date_evidence": "As of 2026-07-24, the supported (non-EOL) lines are Node.js 22 (Maintenance LTS), Node.js 24 (Active LTS), and Node.js 26 (Current).",
+      "key_value": "Node.js 24"
+    },
+    {
+      "url": "https://endoflife.date/nodejs",
+      "tier": "aggregator",
+      "claim": "根据该页面，Node.js 目前处于 Active LTS 状态的版本是 Node.js 24，最新版本为 24.21.0。",
+      "evidence": "| 24 (LTS) | 1 year and 4 months ago  (06 May 2025) | Ends in 1 month and 1 week  (20 Oct 2026) | Ends in 1 year and 7 months  (30 Apr 2028) | Unavailable | [24.21.0]",
+      "source_type": "other",
+      "confidence": 0.72,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 6117,
+        "output_tokens": 314,
+        "requests": 1
+      },
+      "content_date": "2026-09-08",
+      "content_date_evidence": "24.21.0 ... (08 Sep 2026)",
+      "key_value": "Node.js 24"
+    },
+    {
+      "url": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "tier": "aggregator",
+      "claim": "该页面未指明具体哪个 Node.js 版本处于 Active LTS 状态，仅建议生产项目使用 LTS 版本。",
+      "evidence": "For stability, use an **LTS (Long Term Support)** version for production projects.",
+      "source_type": "official_documentation",
+      "confidence": 0.95,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 6519,
+        "output_tokens": 229,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "tier": "aggregator",
+      "claim": "该页面列出了各Node.js版本及其更新信息，但未明确指出哪个版本当前处于Active LTS状态。",
+      "evidence": "Active LTS: A stable version that receives critical bug fixes, security updates, and non-breaking improvements. This is recommended for production environments.",
+      "source_type": "blog",
+      "confidence": 0.85,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 3785,
+        "output_tokens": 232,
+        "requests": 1
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://github.com/nodejs/release",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.999）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.999098539352417,
+        "contradict": 0.00012281787348911166,
+        "same_question_different_scope": 0.00038879268686287105,
+        "unrelated": 0.00038993338239379227
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.488）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.48798906803131104,
+        "contradict": 0.2155943065881729,
+        "same_question_different_scope": 0.20387157797813416,
+        "unrelated": 0.0925450325012207
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.791）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7907198667526245,
+        "contradict": 0.06103334203362465,
+        "same_question_different_scope": 0.09283780306577682,
+        "unrelated": 0.05540892854332924
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.998）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9978733062744141,
+        "contradict": 0.00014912545157130808,
+        "same_question_different_scope": 0.0007790757226757705,
+        "unrelated": 0.0011984355514869094
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://endoflife.date/nodejs",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.314）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.268524169921875,
+        "contradict": 0.1640654057264328,
+        "same_question_different_scope": 0.2537994682788849,
+        "unrelated": 0.3136109709739685
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.890）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.10055641084909439,
+        "contradict": 0.00047904494567774236,
+        "same_question_different_scope": 0.008820910938084126,
+        "unrelated": 0.8901436924934387
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.601）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.37303024530410767,
+        "contradict": 0.0015141034964472055,
+        "same_question_different_scope": 0.024092810228466988,
+        "unrelated": 0.6013628840446472
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/release",
+      "b": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.985）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.006973201408982277,
+        "contradict": 0.98463374376297,
+        "same_question_different_scope": 0.0073795681819319725,
+        "unrelated": 0.0010134531185030937
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/release",
+      "b": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.549）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.18042077124118805,
+        "contradict": 0.5489924550056458,
+        "same_question_different_scope": 0.20102837681770325,
+        "unrelated": 0.06955840438604355
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/release",
+      "b": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=1.000）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9995019435882568,
+        "contradict": 7.336750422837213e-05,
+        "same_question_different_scope": 0.0002006055583478883,
+        "unrelated": 0.00022401030582841486
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/release",
+      "b": "https://endoflife.date/nodejs",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.834）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.8338782787322998,
+        "contradict": 0.02513180859386921,
+        "same_question_different_scope": 0.06679801642894745,
+        "unrelated": 0.07419182360172272
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/release",
+      "b": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.979）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.0179310105741024,
+        "contradict": 0.00023197523842100054,
+        "same_question_different_scope": 0.0028370979707688093,
+        "unrelated": 0.9789999723434448
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/release",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.848）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.1431388407945633,
+        "contradict": 0.0003740183019544929,
+        "same_question_different_scope": 0.008291096426546574,
+        "unrelated": 0.8481961488723755
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "b": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.998）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9984201192855835,
+        "contradict": 0.00035032149753533304,
+        "same_question_different_scope": 0.0007489086128771305,
+        "unrelated": 0.0004807068035006523
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "b": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.668）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.6678026914596558,
+        "contradict": 0.16545993089675903,
+        "same_question_different_scope": 0.12572172284126282,
+        "unrelated": 0.04101565107703209
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "b": "https://endoflife.date/nodejs",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.356）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.25255340337753296,
+        "contradict": 0.35622259974479675,
+        "same_question_different_scope": 0.2636418342590332,
+        "unrelated": 0.12758226692676544
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "b": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.978）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.017590537667274475,
+        "contradict": 0.0004501536604948342,
+        "same_question_different_scope": 0.004039696883410215,
+        "unrelated": 0.9779195785522461
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.907）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.08633370697498322,
+        "contradict": 0.00033535651164129376,
+        "same_question_different_scope": 0.0066573405638337135,
+        "unrelated": 0.9066736698150635
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "b": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.471）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.47116297483444214,
+        "contradict": 0.22104540467262268,
+        "same_question_different_scope": 0.21216249465942383,
+        "unrelated": 0.09562913328409195
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "b": "https://endoflife.date/nodejs",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.995）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.0011383560486137867,
+        "contradict": 0.9952785968780518,
+        "same_question_different_scope": 0.0028437187429517508,
+        "unrelated": 0.0007392971310764551
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "b": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.976）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.020518196746706963,
+        "contradict": 0.00030270504066720605,
+        "same_question_different_scope": 0.003505111439153552,
+        "unrelated": 0.975674033164978
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.846）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.14677901566028595,
+        "contradict": 0.0002544900344219059,
+        "same_question_different_scope": 0.006660234648734331,
+        "unrelated": 0.8463062644004822
+      }
+    },
+    {
+      "a": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "b": "https://endoflife.date/nodejs",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.476）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.47629496455192566,
+        "contradict": 0.1613406389951706,
+        "same_question_different_scope": 0.21589183807373047,
+        "unrelated": 0.14647257328033447
+      }
+    },
+    {
+      "a": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "b": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.988）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.009531103074550629,
+        "contradict": 0.0001743978646118194,
+        "same_question_different_scope": 0.0018208201508969069,
+        "unrelated": 0.9884737133979797
+      }
+    },
+    {
+      "a": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.946）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.050041042268276215,
+        "contradict": 0.00017872230091597885,
+        "same_question_different_scope": 0.003729088231921196,
+        "unrelated": 0.9460511207580566
+      }
+    },
+    {
+      "a": "https://endoflife.date/nodejs",
+      "b": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.988）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.009475825354456902,
+        "contradict": 0.0002586368646007031,
+        "same_question_different_scope": 0.0022321005817502737,
+        "unrelated": 0.9880334138870239
+      }
+    },
+    {
+      "a": "https://endoflife.date/nodejs",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.951）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.04522368311882019,
+        "contradict": 0.00017687282525002956,
+        "same_question_different_scope": 0.0035944622941315174,
+        "unrelated": 0.9510050415992737
+      }
+    },
+    {
+      "a": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+      "b": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.893）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.0997396782040596,
+        "contradict": 0.00029909118893556297,
+        "same_question_different_scope": 0.006639860104769468,
+        "unrelated": 0.8933213353157043
+      }
+    }
+  ],
+  "judgment": {
+    "answer": "截至2026年9月12日，Node.js 目前处于 Active LTS 状态的版本是 **Node.js 24**（代号 Krypton，最新版本 v24.21.0）。Node.js 22（Jod）已进入 Maintenance LTS 阶段。",
+    "confidence": 0.97,
+    "reasoning": "\n关键判断逻辑：\n\n1. **时间背景**：今天是2026-09-12，需要判断\"当前\"的Active LTS版本。\n\n2. **最权威来源**：`github.com/nodejs/release`（primary，官方发布仓库）明确列出 Node.js 24.x 状态为 **Active LTS**，evidence 中的表格直接写明。该来源 content_date 标注为2025-10-28，但这是表格中某个日期字段（LTS开始日期），并非页面抓取日期。结合其他来源的互相印证，该仓库的数据是动态更新的，应视为当前状态的反映。\n\n3. **交叉印证**：\n   - `hidekazu-konishi.com`（content_date: 2026-07-24）明确写道：\"As of 2026-07-24, the supported lines are Node.js 22 (Maintenance LTS), Node.js 24 (Active LTS), and Node.js 26 (Current)\"。这是最接近今天的具体时间点描述，与 github.com/nodej",
+    "conflicts": [
+      "nodesource.com 和 github.com/nodejs/node/releases/tag/v22.11.0 声称 v22 处于 Active LTS，与 github.com/nodejs/release 和 hidekazu-konishi.com 所说的 v24 是 Active LTS 存在矛盾。但这是时间差异导致的矛盾：前两者 content_date 为2024-10-29，彼时 v22 刚进入 Active LTS 属实；而较新来源（2026年）显示 v22 已过渡到 Maintenance LTS，v24 成为新的 Active LTS。故旧来源视为过时。"
+    ],
+    "trusted_sources": [
+      "https://github.com/nodejs/release",
+      "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+      "https://endoflife.date/nodejs",
+      "https://nodejs.org/en/about/previous-releases"
+    ],
+    "usage": {
+      "input_tokens": 10075,
+      "output_tokens": 1983,
+      "requests": 1
+    },
+    "source_rulings": [
+      {
+        "url": "https://nodejs.org/en/about/previous-releases",
+        "ruling": "trusted",
+        "reason": "官方页面，content_date 2026-09-09，列出 v24 和 v22 均为 LTS，与其他来源一致；未区分 Active/Maintenance 子类属于粒度不足而非错误。"
+      },
+      {
+        "url": "https://github.com/nodejs/release",
+        "ruling": "trusted",
+        "reason": "Node.js 官方发布仓库，直接明确标注 24.x 为 Active LTS，是最权威的一手来源。"
+      },
+      {
+        "url": "https://nodesource.com/blog/Node.js-v22-Long-Term-Support-LTS/",
+        "ruling": "outdated",
+        "reason": "content_date 为 2024-10-29，描述的是 v22 刚进入 Active LTS 时的情况，截至2026年已过时，v22 现已进入 Maintenance LTS。"
+      },
+      {
+        "url": "https://github.com/nodejs/node/releases/tag/v22.11.0",
+        "ruling": "outdated",
+        "reason": "发布日期 2024-10-29，描述 v22.11.0 进入 Active LTS 的历史事件，属实但已过时，不反映2026年的现状。"
+      },
+      {
+        "url": "https://hidekazu-konishi.com/entry/nodejs_release_and_eol_timeline.html",
+        "ruling": "trusted",
+        "reason": "content_date 2026-07-24，明确指出 Node.js 24 是 Active LTS、Node.js 22 是 Maintenance LTS，与官方来源一致，时效性强。"
+      },
+      {
+        "url": "https://endoflife.date/nodejs",
+        "ruling": "trusted",
+        "reason": "content_date 2026-09-08，显示 Node.js 24 的 Active LTS 结束日期为2026-10-20，说明截至今日仍处于 Active LTS，与其他来源一致。"
+      },
+      {
+        "url": "https://www.w3schools.com/nodejs/nodejs_intro.asp",
+        "ruling": "neutral",
+        "reason": "仅建议使用 LTS 版本，未具体说明哪个版本处于 Active LTS，对本问题无实质帮助。"
+      },
+      {
+        "url": "https://www.geeksforgeeks.org/node-js/node-js-versions/",
+        "ruling": "neutral",
+        "reason": "仅定义了 Active LTS 的概念，未明确指出当前处于 Active LTS 的具体版本，无法采信或反驳。"
+      }
+    ]
+  }
+}

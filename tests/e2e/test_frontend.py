@@ -77,10 +77,7 @@ def test_bad_conflicts_warns(page, app_server):
 def test_legacy_run_opens_without_error(page, app_server):
     page.goto(app_server)
     page.wait_for_selector("#run-select")
-    options = page.locator("#run-select option").all_text_contents()
-    legacy = next((o for o in options if "legacy" in o), None)
-    assert legacy is not None
-    page.select_option("#run-select", label=legacy)
+    page.select_option("#run-select", value="legacy_no_provenance.json")
     page.wait_for_selector("#question")
     assert page.locator("#content").is_visible()
     meta = page.locator("#run-meta").inner_text()
@@ -135,10 +132,7 @@ def test_ask_cost_limit_stops(page, app_server):
 def test_nli_history_label(page, app_server):
     page.goto(app_server)
     page.wait_for_selector("#run-select")
-    options = page.locator("#run-select option").all_text_contents()
-    nli = next((o for o in options if "NLI" in o), None)
-    assert nli is not None
-    page.select_option("#run-select", label=nli)
+    page.select_option("#run-select", value="nli_sample.json")
     page.wait_for_selector("#question")
     meta = page.locator("#run-meta").inner_text()
     assert "NLI" in meta and "0517c59" in meta
@@ -158,33 +152,29 @@ def test_nli_history_label(page, app_server):
     assert page.evaluate("window.__xss") is None
     # provenance：真实格式结果文件要显示 NLI 与 revision 前 7 位
     assert "NLI" in meta and "0517c59" in meta
-    assert page.locator("#radial-graph .source-node").count() >= 1
+    assert page.locator("#groups-view .group-card").count() >= 1
     assert page.locator("#verdict-headline").inner_text().strip()
     _shot(page, "07-nli-history")
 
 
-def test_dashboard_graph_table_and_reduced_motion(page, app_server):
+def test_dashboard_groups_table_and_reduced_motion(page, app_server):
     page.emulate_media(reduced_motion="reduce")
     page.goto(app_server)
     page.wait_for_selector("#run-select")
-    options = page.locator("#run-select option").all_text_contents()
-    nli = next((o for o in options if "NLI" in o), None)
-    assert nli is not None
-    page.select_option("#run-select", label=nli)
+    page.select_option("#run-select", value="nli_sample.json")
     page.wait_for_selector("#content:not(.hidden)")
-    assert page.locator("#graph-view").is_visible()
+    assert page.locator("#groups-view").is_visible()
     page.locator('#view-toggle button[data-view="table"]').click()
     page.wait_for_selector("#table-view:not(.hidden)")
     assert page.locator("#sources .card").count() >= 1
-    page.locator('#view-toggle button[data-view="graph"]').click()
-    page.wait_for_selector("#graph-view:not(.hidden)")
-    page.locator("#radial-graph .source-node").first.click()
-    assert page.locator("#node-detail:not(.hidden)").count() == 1
-    # reduced-motion：入场类仍在，但计算样式不应保留进行中的 translate 动画依赖
+    page.locator('#view-toggle button[data-view="groups"]').click()
+    page.wait_for_selector("#groups-view:not(.hidden)")
+    page.locator("#groups-view .group-card").first.click()
+    assert page.locator("#groups-view .group-card.expanded").count() >= 1
     assert page.evaluate(
         "() => matchMedia('(prefers-reduced-motion: reduce)').matches"
     )
-    _shot(page, "16-dashboard-graph-table")
+    _shot(page, "16-dashboard-groups-table")
 
 
 def test_dashboard_mobile_shell(page, app_server, browser):
@@ -196,10 +186,7 @@ def test_dashboard_mobile_shell(page, app_server, browser):
     assert mobile.locator("#sidebar-toggle").is_visible()
     mobile.click("#sidebar-toggle")
     assert "open" in (mobile.locator("#sidebar").get_attribute("class") or "")
-    options = mobile.locator("#run-select option").all_text_contents()
-    nli = next((o for o in options if "NLI" in o), None)
-    assert nli is not None
-    mobile.select_option("#run-select", label=nli)
+    mobile.select_option("#run-select", value="nli_sample.json")
     mobile.wait_for_selector("#question")
     _shot(mobile, "17-dashboard-mobile")
     context.close()

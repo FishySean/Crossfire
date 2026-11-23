@@ -45,3 +45,18 @@
 5. **View Transitions 动画** — 实现了 Graph/Table 同步切换；完整 VT 在 reduced-motion/部分浏览器不稳定，故不依赖。
 
 同步到 `docs/screenshots/`：`17-dashboard-mobile.png`、`18-dashboard-above-fold.png`、`19-dashboard-full.png`、`20-dashboard-node.png`、`21-dashboard-table.png`。
+
+## Round 4（v1.1.1 — 分组视图替换放射图）
+
+参考：用户提供的 NVIDIA CEO 运行截图（`docs/screenshots/22-radial-nvidia-before.png`）显示放射图节点重叠、压住中心、同域名无法区分、详情弹框遮挡、结论截断。
+
+决定：删除绝对定位放射图，改为按结论分组的文档流布局（CSS Grid）。
+
+截图：
+- 旧：`docs/screenshots/22-radial-nvidia-before.png`
+- 新：`docs/screenshots/22-groups-nvidia-above-fold.png`、`23-groups-nvidia-expanded.png`
+
+差异（有意保留）：
+1. 不再绘制中心→来源连线 —— 信息已由分栏状态表达。
+2. 切换文案为「分组 | 表格」，默认分组。
+3. 结论面板改为最多 6 行 +「展开全文」，不再无出口截断。

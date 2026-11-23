@@ -112,14 +112,11 @@
             <div class="pane-toolbar">
               <h2 id="evidence-title">Evidence</h2>
               <div class="segmented" id="view-toggle" role="tablist">
-                <button type="button" role="tab" data-view="graph" class="active" aria-selected="true">Graph</button>
-                <button type="button" role="tab" data-view="table" aria-selected="false">Table</button>
+                <button type="button" role="tab" data-view="groups" class="active" aria-selected="true" id="view-groups-label">Groups</button>
+                <button type="button" role="tab" data-view="table" aria-selected="false" id="view-table-label">Table</button>
               </div>
             </div>
-            <div id="graph-view" class="graph-view">
-              <svg id="radial-graph" class="radial-graph" role="img" aria-label="Source relationship graph"></svg>
-              <aside id="node-detail" class="node-detail hidden"></aside>
-            </div>
+            <div id="groups-view" class="groups-view" aria-label="Sources grouped by ruling"></div>
             <div id="table-view" class="table-view hidden">
               <div class="sources-wrap">
                 <svg id="conflict-links" class="conflict-links"></svg>

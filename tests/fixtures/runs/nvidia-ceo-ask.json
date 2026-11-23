@@ -1,0 +1,420 @@
+{
+  "question_id": "u-20261123-27b0ad28",
+  "question": "Who is the current CEO of NVDIA?",
+  "mode": "cached",
+  "started_at": "2026-11-23T00:19:44.820091+00:00",
+  "as_of": "2026-11-23",
+  "elapsed_seconds": 25.76,
+  "sources": [
+    {
+      "url": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "tier": "news"
+    },
+    {
+      "url": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "tier": "news"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "tier": "aggregator"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "tier": "aggregator"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "tier": "aggregator"
+    }
+  ],
+  "pages_fetched": 5,
+  "pages_failed": 0,
+  "claude_calls": 6,
+  "failures": [],
+  "steps": {
+    "fetch": {
+      "calls": 5,
+      "seconds": 0.02
+    },
+    "extract": {
+      "calls": 5,
+      "input_tokens": 41864,
+      "output_tokens": 1399,
+      "seconds": 8.76,
+      "requests": 5
+    },
+    "pair": {
+      "calls": 10,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 3.53,
+      "requests": 0
+    },
+    "judge": {
+      "calls": 1,
+      "input_tokens": 5510,
+      "output_tokens": 660,
+      "seconds": 13.45,
+      "requests": 1
+    }
+  },
+  "provenance": {
+    "extract": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "f4e4e23a493e"
+    },
+    "pair": {
+      "model": "FishySean/crossfire-pairer",
+      "prompt_version": null,
+      "implementation": "nli",
+      "revision": "0517c59dfa13038226b4b66c3fa6b605b9215df5"
+    },
+    "judge": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "65f85f399f11"
+    }
+  },
+  "total_input_tokens": 47374,
+  "total_output_tokens": 2059,
+  "pages": [
+    {
+      "url": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "ok": true,
+      "title": "Trump calls Huang saga a 'horrible thing' and 'so sad to see'",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "ok": true,
+      "title": "Who is Colette Kress, Nvidia’s new interim CEO?",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "ok": true,
+      "title": "Colette Kress - Wikipedia",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "ok": true,
+      "title": "Jensen Huang - Wikipedia",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "ok": true,
+      "title": "Jensen Huang scandal - Wikipedia",
+      "error": null,
+      "status_code": 200,
+      "usable": true,
+      "unusable_reason": ""
+    }
+  ],
+  "claims": [
+    {
+      "url": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "tier": "news",
+      "claim": "截至2026年11月12日（该文发布时），Nvidia CEO 黄仁勋（Jensen Huang）已辞职，CFO Colette Kress 被任命为临时CEO，公司正在寻找永久继任者。",
+      "evidence": "CFO Colette Kress has been named interim CEO.",
+      "source_type": "news_article",
+      "confidence": 0.98,
+      "published_date": "2026-11-12",
+      "usage": {
+        "input_tokens": 2531,
+        "output_tokens": 279,
+        "requests": 1
+      },
+      "content_date": "2026-11-12",
+      "content_date_evidence": "Nvidia CEO Jensen Huang is stepping down as CEO of the chipmaker he co-founded 33 years ago and built into a $4 trillion company that powered the artificial intelligence boom, the company announced Thursday."
+    },
+    {
+      "url": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "tier": "news",
+      "claim": "截至该文发布时，Colette Kress 是 Nvidia 的临时 CEO，此前 Jensen Huang 在辞职后由她接任。",
+      "evidence": "Kress, Nvidia's chief financial officer, was named interim CEO Thursday following the abrupt resignation of Jensen Huang, who co-founded the company and led it for 33 years.",
+      "source_type": "news_article",
+      "confidence": 0.97,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 3261,
+        "output_tokens": 269,
+        "requests": 1
+      },
+      "content_date": "2025-11-12",
+      "content_date_evidence": "The company's release noted its planned earnings call will go ahead on Nov. 17. Kress is expected to lead it, five days after taking on the new role."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "tier": "aggregator",
+      "claim": "截至2026年11月12日，Colette Kress是NVIDIA的临时首席执行官（interim CEO），此前Jensen Huang因婚外情丑闻辞职。",
+      "evidence": "Colette Marie Kress is the interim chief executive officer (CEO) of Nvidia since November 12, 2026, following the resignation of former Nvidia CEO and co-founder Jensen Huang amid allegations of his extramarital affairs.",
+      "source_type": "encyclopedia",
+      "confidence": 0.98,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 8296,
+        "output_tokens": 300,
+        "requests": 1
+      },
+      "content_date": "2026-11-12",
+      "content_date_evidence": "Colette Marie Kress is the interim chief executive officer (CEO) of Nvidia since November 12, 2026, following the resignation of former Nvidia CEO and co-founder Jensen Huang amid allegations of his extramarital affairs."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "tier": "aggregator",
+      "claim": "截至2026年11月，Jensen Huang已于2026年11月12日辞去NVIDIA总裁兼CEO职务，CFO Colette Kress成为公司临时CEO。",
+      "evidence": "Huang resigned as president and CEO on November 12, with CFO and executive vice president Colette Kress becoming the company's interim CEO.",
+      "source_type": "encyclopedia",
+      "confidence": 0.95,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 14778,
+        "output_tokens": 261,
+        "requests": 1
+      },
+      "content_date": "2026-11-12",
+      "content_date_evidence": "Huang resigned as president and CEO on November 12, with CFO and executive vice president Colette Kress becoming the company's interim CEO."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "tier": "aggregator",
+      "claim": "截至2026年11月12日，Jensen Huang已辞去Nvidia CEO职务，Colette Kress被任命为临时首席执行官。",
+      "evidence": "On November 12, Nvidia announced that Huang had resigned as president, chief executive officer and a director, effective immediately. Colette Kress was appointed interim chief executive while retaining her roles as executive vice president and chief financial officer.",
+      "source_type": "encyclopedia",
+      "confidence": 0.98,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 12998,
+        "output_tokens": 290,
+        "requests": 1
+      },
+      "content_date": "2026-11-12",
+      "content_date_evidence": "On November 12, Nvidia announced that Huang had resigned as president, chief executive officer and a director, effective immediately. Colette Kress was appointed interim chief executive while retaining her roles as executive vice president and chief financial officer."
+    }
+  ],
+  "pairs": [
+    {
+      "a": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "b": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.946）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9462112188339233,
+        "contradict": 0.005337361712008715,
+        "same_question_different_scope": 0.020540278404951096,
+        "unrelated": 0.02791120857000351
+      }
+    },
+    {
+      "a": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "b": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.485）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.48520272970199585,
+        "contradict": 0.010218658484518528,
+        "same_question_different_scope": 0.06922078877687454,
+        "unrelated": 0.43535786867141724
+      }
+    },
+    {
+      "a": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.999）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9991724491119385,
+        "contradict": 6.849714554846287e-05,
+        "same_question_different_scope": 0.00031029837555252016,
+        "unrelated": 0.0004488437552936375
+      }
+    },
+    {
+      "a": "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.999）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9991818070411682,
+        "contradict": 0.00011010240268660709,
+        "same_question_different_scope": 0.00035472141462378204,
+        "unrelated": 0.00035333845880813897
+      }
+    },
+    {
+      "a": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "b": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.973）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.024844301864504814,
+        "contradict": 9.879429853754118e-05,
+        "same_question_different_scope": 0.0018496050033718348,
+        "unrelated": 0.9732072949409485
+      }
+    },
+    {
+      "a": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.997）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9973656535148621,
+        "contradict": 0.00011836940393550321,
+        "same_question_different_scope": 0.000783255323767662,
+        "unrelated": 0.0017326442757621408
+      }
+    },
+    {
+      "a": "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.999）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9991645812988281,
+        "contradict": 6.334900535875931e-05,
+        "same_question_different_scope": 0.0002937822719104588,
+        "unrelated": 0.0004782547475770116
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.992）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9917333126068115,
+        "contradict": 0.000410015054512769,
+        "same_question_different_scope": 0.002601517364382744,
+        "unrelated": 0.005255209747701883
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Colette_Kress",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.998）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9978821873664856,
+        "contradict": 0.00011819961946457624,
+        "same_question_different_scope": 0.0006936074350960553,
+        "unrelated": 0.001305992598645389
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "b": "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.998）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9984536170959473,
+        "contradict": 0.00022487068781629205,
+        "same_question_different_scope": 0.0006987650413066149,
+        "unrelated": 0.0006227095727808774
+      }
+    }
+  ],
+  "judgment": {
+    "answer": "As of November 12, 2026, Nvidia's current CEO is Colette Kress (interim). Jensen Huang resigned as president and CEO on November 12, 2026, and CFO Colette Kress was appointed interim CEO while a permanent successor is being sought.",
+    "confidence": 0.93,
+    "reasoning": "所有五个来源在核心事实上高度一致：Jensen Huang于2026年11月12日辞去Nvidia CEO职务，CFO Colette Kress被任命为临时CEO。两两比对结果中绝大多数为agree（置信度极高），无任何contradict关系。\n\n来源层级说明：本题没有一手来源（primary），最高层级为news（CNBC、NBC News），其次为aggregator（三个Wikipedia页面）。新闻来源（CNBC content_date: 2026-11-12，NBC News content_date: 2025-11-12，注意NBCNews的content_date疑为笔误应为2026-11-12）与aggregator来源（Wikipedia三页均指向2026-11-12）完全一致，可相互印证。\n\n今天日期为2026-11-23，距事件发生（2026-11-12）已过11天，尚无任何来源显示已有永久CEO被任命，因此Colette Kress仍应为现任临时CEO。\n\n由于无一手来源，仅依赖新闻报道和Wikipedia聚合页面，故置信度略有保留，定为0.93。五个来源对\"临时CEO为Colette Kress\"这一事实完全一致，实质分歧为零。",
+    "conflicts": [],
+    "trusted_sources": [
+      "https://www.cnbc.com/2026/11/12/nvidia-jensen-huang-ceo-live-updates.html",
+      "https://www.nbcnews.com/tech/tech-news/colette-kress-nvidia-new-interim-ceo-jensen-huang-replace-who-is-rcna609039",
+      "https://en.wikipedia.org/wiki/Jensen_Huang_spying_scandal",
+      "https://en.wikipedia.org/wiki/Colette_Kress",
+      "https://en.wikipedia.org/wiki/Jensen_Huang"
+    ],
+    "usage": {
+      "input_tokens": 5510,
+      "output_tokens": 660,
+      "requests": 1
+    }
+  },
+  "ask_cost": {
+    "actual_usd": 0.233,
+    "estimate": {
+      "searches": 6,
+      "steel_pages": 8,
+      "extract_calls": 5,
+      "pair_calls": 0,
+      "judge_calls": 1,
+      "search_usd": 0.06,
+      "steel_usd": 0.0,
+      "anthropic_usd": 0.3922,
+      "pair_usd": 0.0,
+      "pairer_free": true,
+      "total_usd": 0.4522,
+      "low_usd": 0.393,
+      "high_usd": 0.63,
+      "low_sources": 4,
+      "high_sources": 8,
+      "max_cost_usd": 1.0,
+      "over_budget": false
+    }
+  }
+}

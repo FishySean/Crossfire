@@ -156,6 +156,22 @@ def app_server(tmp_path_factory):
         ),
         encoding="utf-8",
     )
+    # 仪表盘不变量 / 分组视图样例（含 NVIDIA 精简真实运行）
+    fixtures = ROOT / "tests" / "fixtures" / "runs"
+    for name in (
+        "nvidia-ceo-ask.json",
+        "nodejs-dashboard.json",
+        "three-sources.json",
+        "ten-sources.json",
+        "chinese-long.json",
+        "same-domain-three.json",
+        "with-failed-source.json",
+        "legacy-no-summary-fields.json",
+    ):
+        src = fixtures / name
+        if src.is_file():
+            (runs / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+
     questions = base / "questions.yaml"
     questions.write_text(
         yaml.safe_dump(

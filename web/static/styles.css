@@ -1213,79 +1213,133 @@ input:focus-visible {
   color: var(--paper);
 }
 
-.graph-view {
-  position: relative;
-  min-height: 300px;
-}
-.radial-graph {
-  width: 100%;
-  height: 300px;
-  display: block;
-}
-.radial-graph .edge {
-  fill: none;
-  stroke: var(--rule-light);
-  stroke-width: 1.25;
-}
-.radial-graph .edge.faulty {
-  stroke: var(--danger);
-  stroke-dasharray: 5 4;
-}
-.radial-graph .edge.scope {
-  stroke: var(--scope);
-  stroke-dasharray: 2 5;
-}
-.radial-graph .edge.dimmed { opacity: 0.3; }
-.radial-graph .hub-node rect,
-.radial-graph .source-node rect {
-  fill: #fffdf8;
-  stroke: var(--rule);
-  stroke-width: 1;
-  transition: transform var(--duration-fast) var(--ease-out), opacity var(--duration-base) var(--ease-out);
-}
-.radial-graph .source-node.trusted rect { stroke: var(--ok); }
-.radial-graph .source-node.wrong rect,
-.radial-graph .source-node.outdated rect { stroke: var(--danger); }
-.radial-graph .source-node.scope rect { stroke: var(--scope); }
-.radial-graph .source-node.failed rect {
-  stroke: var(--danger);
-  stroke-dasharray: 3 3;
-  fill: transparent;
-}
-.radial-graph .source-node.dimmed { opacity: 0.3; }
-.radial-graph .source-node:focus { outline: none; }
-.radial-graph .source-node:focus rect {
-  stroke-width: 2;
-  stroke: var(--accent);
-}
-.radial-graph text {
-  fill: var(--ink);
-  font-family: var(--font-body);
-  font-size: 11px;
-}
-.radial-graph .hub-label {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  text-anchor: middle;
-}
-.status-dot { fill: var(--neutral); }
-.status-dot.trusted { fill: var(--ok); }
-.status-dot.wrong,
-.status-dot.outdated,
-.status-dot.failed { fill: var(--danger); }
-.status-dot.scope { fill: var(--scope); }
 
-.node-detail {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  width: min(260px, 46%);
-  padding: 10px 12px;
-  border: 1px solid var(--rule);
-  background: rgba(255, 253, 248, 0.96);
+
+/* ---- grouped evidence (document flow) ---------------------------------- */
+
+.groups-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+  align-items: start;
+  min-height: 0;
+}
+.group-column {
+  min-width: 0;
+  border: 1px solid var(--hairline);
+  background: #fffdf8;
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+}
+.group-column.ok { border-top: 3px solid var(--ok); }
+.group-column.danger { border-top: 3px solid var(--danger); }
+.group-column.scope { border-top: 3px solid var(--scope); }
+.group-column.neutral { border-top: 3px solid var(--neutral); }
+.group-column-head {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hairline);
+}
+.group-column-head h3 {
+  margin: 0;
+  font-size: var(--type-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.group-column.ok .group-column-head h3 { color: var(--ok); }
+.group-column.danger .group-column-head h3 { color: var(--danger); }
+.group-column.scope .group-column-head h3 { color: var(--scope); }
+.group-column-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+.group-empty {
+  color: var(--muted);
   font-size: var(--type-sm);
+  font-style: italic;
+  padding: 12px 4px;
+  text-align: center;
+}
+.group-card {
+  border: 1px solid var(--rule-light);
+  background: var(--paper-raised);
+  padding: 8px 10px;
+  cursor: pointer;
+  min-width: 0;
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.group-card:hover,
+.group-card:focus-visible {
+  transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
+}
+.group-card.status-wrong,
+.group-card.status-outdated,
+.group-card.status-failed {
+  border-color: var(--danger);
+  box-shadow: inset 3px 0 0 var(--danger);
+}
+.group-card.status-scope {
+  border-color: var(--scope);
+  box-shadow: inset 3px 0 0 var(--scope);
+}
+.group-card.status-trusted {
+  border-color: rgba(47, 107, 58, 0.45);
+}
+.group-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.group-card-title {
+  font-size: var(--type-sm);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.group-card-body { min-width: 0; }
+.group-card-key {
+  font-size: var(--type-sm);
+  color: var(--ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.group-card-date {
+  margin-top: 4px;
+  font-size: var(--type-xs);
+  color: var(--muted);
+}
+.group-card-detail {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--hairline);
+  font-size: var(--type-sm);
+}
+.group-card-pairs {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  color: var(--ink-soft);
+}
+.shimmer-bar {
+  height: 10px;
+  border-radius: var(--radius-sm);
+}
+.group-column[data-column="failed"] {
+  background: linear-gradient(180deg, var(--danger-soft), #fffdf8 40%);
+}
+
+@media (max-width: 1199px) {
+  .groups-view { grid-template-columns: 1fr; }
 }
 
 .verdict-pane {
@@ -1305,10 +1359,24 @@ input:focus-visible {
   font-size: var(--type-sm);
   color: var(--ink-soft);
   line-height: 1.45;
+}
+.verdict-answer-text.clamped {
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+.answer-expand {
+  margin-top: 8px;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: var(--type-sm);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
 }
 .verdict-ring { display: flex; justify-content: center; }
 .verdict-ring .ring-wrap {
@@ -1450,7 +1518,6 @@ input:focus-visible {
   .enter,
   .primary-cta,
   .bento-card,
-  .radial-graph .edge,
   .ring-value,
   .shimmer,
   .card,
@@ -1493,8 +1560,6 @@ html { scroll-behavior: smooth; }
   .bento-bottom { grid-template-columns: 1fr; }
   .bento-card { border-right: none; border-bottom: 1px solid var(--hairline); }
   .bento-card:last-child { border-bottom: none; }
-  .graph-view { min-height: 300px; }
-  .radial-graph { height: 300px; }
 }
 
 @media (max-width: 720px) {

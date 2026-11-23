@@ -1,0 +1,206 @@
+{
+  "question_id": "synth",
+  "question": "Same domain pages",
+  "mode": "cached",
+  "started_at": "2026-11-23T00:00:00+00:00",
+  "as_of": "2026-11-23",
+  "elapsed_seconds": 1.0,
+  "sources": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_0",
+      "tier": "primary"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_1",
+      "tier": "news"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_2",
+      "tier": "primary"
+    }
+  ],
+  "pages_fetched": 3,
+  "pages_failed": 0,
+  "claude_calls": 1,
+  "failures": [],
+  "steps": {},
+  "provenance": {
+    "extract": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "x"
+    },
+    "pair": {
+      "model": "nli",
+      "prompt_version": null,
+      "implementation": "nli",
+      "revision": "0517c59"
+    },
+    "judge": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "y"
+    }
+  },
+  "total_input_tokens": 1,
+  "total_output_tokens": 1,
+  "pages": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_0",
+      "ok": true,
+      "usable": true,
+      "unusable_reason": null,
+      "error": null
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_1",
+      "ok": true,
+      "usable": true,
+      "unusable_reason": null,
+      "error": null
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_2",
+      "ok": true,
+      "usable": true,
+      "unusable_reason": null,
+      "error": null
+    }
+  ],
+  "claims": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_0",
+      "tier": "primary",
+      "claim": "Claim value 0",
+      "key_value": "v0",
+      "evidence": "e",
+      "source_type": "blog",
+      "published_date": null,
+      "content_date": "2026-01-01",
+      "content_date_evidence": "x",
+      "confidence": 0.8,
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_1",
+      "tier": "news",
+      "claim": "Claim value 1",
+      "key_value": "v1",
+      "evidence": "e",
+      "source_type": "blog",
+      "published_date": null,
+      "content_date": "2026-01-01",
+      "content_date_evidence": "x",
+      "confidence": 0.8,
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "requests": 1
+      }
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Topic_2",
+      "tier": "primary",
+      "claim": "Claim value 2",
+      "key_value": "v2",
+      "evidence": "e",
+      "source_type": "blog",
+      "published_date": null,
+      "content_date": "2026-01-01",
+      "content_date_evidence": "x",
+      "confidence": 0.8,
+      "usage": {
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "requests": 1
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "a": "https://en.wikipedia.org/wiki/Topic_0",
+      "b": "https://en.wikipedia.org/wiki/Topic_1",
+      "relation": "contradict",
+      "nature": "n",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7,
+        "contradict": 0.2,
+        "same_question_different_scope": 0.05,
+        "unrelated": 0.05
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Topic_0",
+      "b": "https://en.wikipedia.org/wiki/Topic_2",
+      "relation": "same_question_different_scope",
+      "nature": "n",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7,
+        "contradict": 0.2,
+        "same_question_different_scope": 0.05,
+        "unrelated": 0.05
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Topic_1",
+      "b": "https://en.wikipedia.org/wiki/Topic_2",
+      "relation": "agree",
+      "nature": "n",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7,
+        "contradict": 0.2,
+        "same_question_different_scope": 0.05,
+        "unrelated": 0.05
+      }
+    }
+  ],
+  "judgment": {
+    "answer": "Verdict answer long enough to need expand. Verdict answer long enough to need expand. Verdict answer long enough to need expand. Verdict answer long enough to need expand. Verdict answer long enough to need expand. Verdict answer long enough to need expand. Verdict answer long enough to need expand. Verdict answer long enough to need expand. ",
+    "confidence": 0.9,
+    "reasoning": "r",
+    "conflicts": [],
+    "trusted_sources": [
+      "https://en.wikipedia.org/wiki/Topic_0",
+      "https://en.wikipedia.org/wiki/Topic_1"
+    ],
+    "usage": {
+      "input_tokens": 1,
+      "output_tokens": 1,
+      "requests": 1
+    },
+    "source_rulings": [
+      {
+        "url": "https://en.wikipedia.org/wiki/Topic_0",
+        "ruling": "trusted",
+        "reason": "r"
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Topic_1",
+        "ruling": "wrong",
+        "reason": "r"
+      },
+      {
+        "url": "https://en.wikipedia.org/wiki/Topic_2",
+        "ruling": "trusted",
+        "reason": "r"
+      }
+    ]
+  }
+}

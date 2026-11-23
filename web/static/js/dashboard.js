@@ -71,9 +71,25 @@ export function renderVerdictPane(run, t, { renderSafeMarkdown, confidenceRing }
 
   const answer = el("verdict-answer");
   answer.innerHTML = "";
-  const answerNode = text("div", "answer");
+  const answerNode = text("div", "answer verdict-answer-text");
   renderSafeMarkdown(answerNode, judgment.answer || t("noVerdict"));
   answer.appendChild(answerNode);
+  // 最多约 6 行；超出则提供「展开全文」，禁止永久截断且无出口。
+  requestAnimationFrame(() => {
+    const lineHeight = parseFloat(getComputedStyle(answerNode).lineHeight) || 22;
+    const maxHeight = lineHeight * 6 + 2;
+    if (answerNode.scrollHeight <= maxHeight + 4) return;
+    answerNode.classList.add("clamped");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "answer-expand";
+    btn.textContent = t("expandAnswer");
+    btn.addEventListener("click", () => {
+      const clamped = answerNode.classList.toggle("clamped");
+      btn.textContent = clamped ? t("expandAnswer") : t("collapseAnswer");
+    });
+    answer.appendChild(btn);
+  });
 
   const ringHost = el("verdict-ring");
   ringHost.innerHTML = "";

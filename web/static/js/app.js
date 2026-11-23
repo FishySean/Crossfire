@@ -9,7 +9,7 @@ import {
   renderNliNote,
   renderVerdictPane,
 } from "./dashboard.js";
-import { clearRadialSelection, renderRadialGraph, setEvidenceView } from "./graph.js";
+import { renderGroupedEvidence, renderGroupsProcessing, setEvidenceView } from "./groups.js";
 
 const RELATION_CONTRADICT = "contradict";
 // Both claims are true but measure different things, so the numbers are not
@@ -161,6 +161,18 @@ const STRINGS = {
     compositionTitle: "Sources overview",
     historyFilterPlaceholder: "Search past investigations…",
     menuLabel: "Menu",
+    viewGroups: "Groups",
+    viewTable: "Table",
+    groupTrusted: "Trusted",
+    groupFaulty: "Wrong / outdated",
+    groupScope: "Scope differences",
+    groupNeutral: "Neutral",
+    groupFailed: "Failed",
+    groupProcessing: "In progress",
+    groupEmpty: "(none)",
+    groupNoPairs: "No pairwise comparisons involving this source.",
+    expandAnswer: "Show full answer",
+    collapseAnswer: "Show less",
   },
   zh: {
     tagline: "多来源 · 多视角 · 讲证据",
@@ -298,6 +310,18 @@ const STRINGS = {
     compositionTitle: "来源构成",
     historyFilterPlaceholder: "搜索历史查证…",
     menuLabel: "菜单",
+    viewGroups: "分组",
+    viewTable: "表格",
+    groupTrusted: "采信",
+    groupFaulty: "有误 / 过时",
+    groupScope: "口径不同",
+    groupNeutral: "中立",
+    groupFailed: "失败",
+    groupProcessing: "处理中",
+    groupEmpty: "（无）",
+    groupNoPairs: "该来源没有参与比对记录。",
+    expandAnswer: "展开全文",
+    collapseAnswer: "收起",
   },
 };
 
@@ -354,6 +378,10 @@ function applyStaticStrings() {
   el("judgment-title").textContent = t("verdict");
   const evidenceTitle = el("evidence-title");
   if (evidenceTitle) evidenceTitle.textContent = t("evidenceTitle");
+  const vg = el("view-groups-label");
+  if (vg) vg.textContent = t("viewGroups");
+  const vt = el("view-table-label");
+  if (vt) vt.textContent = t("viewTable");
   const cta = el("view-detail-cta");
   if (cta) cta.textContent = t("viewDetailCta");
   const askCta = el("ask-cta-label");
@@ -502,13 +530,8 @@ function render(run) {
   renderVerdictPane(run, t, { renderSafeMarkdown, confidenceRing });
   renderBottomPanels(run, t);
   renderNliNote(run, t);
-  renderRadialGraph(run, {
-    onSelect: (url) => {
-      if (!cards.has(url)) return;
-      spotlight([url, ...partnerUrls(run, url)], cards, url);
-    },
-  });
-  setEvidenceView(document.querySelector('#view-toggle button.active')?.dataset.view || "graph");
+  renderGroupedEvidence(run, t);
+  setEvidenceView(document.querySelector('#view-toggle button.active')?.dataset.view || "groups");
 }
 
 function partnerUrls(run, url) {
@@ -1492,6 +1515,8 @@ function onStart(event) {
   el("source-count").textContent = t("sourceCount", live.totalSources);
   el("conflict-count").textContent = t("relationCount", 0, 0);
   buildSkeletons(live.totalSources);
+  renderGroupsProcessing(live.slots, t);
+  setEvidenceView("groups");
   setStage("stageFetching", 0, live.totalSources);
   updateProgress();
 }
@@ -1582,6 +1607,8 @@ function paintSlot(slot) {
 
 // A language switch during a run has to repaint everything already on screen.
 function repaintLive() {
+  if (live.active) renderGroupsProcessing(live.slots, t);
+
   if (!live.active) return;
   el("question").textContent = live.question || t("noQuestion");
   el("source-count").textContent = t("sourceCount", live.totalSources);
@@ -1831,8 +1858,7 @@ el("view-detail-cta").onclick = () => {
 };
 for (const button of document.querySelectorAll("#view-toggle button")) {
   button.onclick = () => {
-    const next = button.dataset.view === "table" ? "table" : "graph";
-    // View Transitions 在部分环境（含 reduced-motion）会拖住回调，切换本身同步完成即可。
+    const next = button.dataset.view === "table" ? "table" : "groups";
     setEvidenceView(next);
   };
 }
@@ -2011,7 +2037,7 @@ window.addEventListener("keydown", (event) => {
 
 setMode("cached");
 applyStaticStrings();
-setEvidenceView("graph");
+setEvidenceView("groups");
 loadQuestions().catch(() => {});
 loadPairers().catch(() => {});
 loadRuns().catch((e) => showError("listFailed", e.message));

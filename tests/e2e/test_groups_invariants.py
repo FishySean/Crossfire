@@ -45,6 +45,8 @@ def _force_lang_en(page) -> None:
         }"""
     )
     page.wait_for_function("() => document.documentElement.lang === 'en'")
+    # 等 webfont，避免 Logo 宽度在字体切换前后抖动误判
+    page.evaluate("() => document.fonts && document.fonts.ready")
 
 
 def _select_run(page, filename: str) -> None:
@@ -94,6 +96,14 @@ def _assert_group_invariants(page, *, check_logo: bool = True) -> None:
             const domain = el.querySelector('.group-card-domain');
             const pageLabel = el.querySelector('.group-card-page');
             for (const node of [domain, pageLabel].filter(Boolean)) {
+              const cs = getComputedStyle(node);
+              // 末尾省略号是有意截断：scrollWidth>clientWidth 正常；只禁止折成多行。
+              if (cs.whiteSpace === 'nowrap' && cs.textOverflow === 'ellipsis') {
+                if (node.clientHeight > parseFloat(cs.lineHeight) * 1.6 + 2) {
+                  return {ok: false, reason: `multi-line title in ${node.className}`};
+                }
+                continue;
+              }
               if (node.scrollWidth > node.clientWidth + 1) {
                 return {ok: false, reason: `text overflow in ${node.className}`};
               }
@@ -142,16 +152,30 @@ def test_grouped_evidence_invariants(app_server, browser, filename, viewport):
     try:
         pg.goto(app_server)
         _force_lang_en(pg)
-        # 窄屏侧栏默认收起：打开后再验 Logo，避免对离屏节点误判
-        if viewport["width"] < 1200:
-            pg.click("#sidebar-toggle")
-            pg.wait_for_function(
-                "() => document.querySelector('#sidebar')?.classList.contains('open')"
-            )
         _select_run(pg, filename)
         _wait_kpis_settled(pg)
         assert pg.locator("#groups-view").is_visible()
+        # 窄屏侧栏默认收起：短暂打开只为验 Logo；用 classList 开关，避免遮罩挡住 #sidebar-toggle。
+        drawer = viewport["width"] < 1200
+        if drawer:
+            pg.evaluate(
+                """() => {
+                  const s = document.querySelector('#sidebar');
+                  const b = document.querySelector('#sidebar-toggle');
+                  s?.classList.add('open');
+                  b?.setAttribute('aria-expanded', 'true');
+                }"""
+            )
         _assert_group_invariants(pg)
+        if drawer:
+            pg.evaluate(
+                """() => {
+                  const s = document.querySelector('#sidebar');
+                  const b = document.querySelector('#sidebar-toggle');
+                  s?.classList.remove('open');
+                  b?.setAttribute('aria-expanded', 'false');
+                }"""
+            )
 
         # 英文 UI 下，分组/比对界面字不应出现中文（主张原文除外）
         # 先展开一张卡，确保 .group-card-pairs 进 DOM 可见文本

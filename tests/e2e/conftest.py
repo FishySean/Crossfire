@@ -172,6 +172,16 @@ def app_server(tmp_path_factory):
         if src.is_file():
             (runs / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
 
+    # README 首图历史栏用真实运行（短文件名），避免压测假数据混进截图
+    real_runs = ROOT / "out" / "runs"
+    for src_name, dest_name in (
+        ("apple-ceo-current_20261120T230948Z.json", "apple-ceo-current.json"),
+        ("python-latest-stable_20261120T230824Z.json", "python-latest-stable.json"),
+    ):
+        src = real_runs / src_name
+        if src.is_file():
+            (runs / dest_name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+
     questions = base / "questions.yaml"
     questions.write_text(
         yaml.safe_dump(

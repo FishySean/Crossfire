@@ -84,12 +84,32 @@ def create_app(
         runs: list[dict[str, Any]] = []
         for path in runs_dir.glob("*.json"):
             pairer = "未记录"
+            question = ""
+            started_at = None
             try:
                 data = json.loads(path.read_text(encoding="utf-8"))
                 pairer = _pairer_label(data)
+                raw_q = data.get("question")
+                if isinstance(raw_q, str):
+                    question = raw_q
+                elif isinstance(raw_q, dict) and isinstance(raw_q.get("text"), str):
+                    question = raw_q["text"]
+                elif isinstance(data.get("question_id"), str):
+                    question = data["question_id"]
+                started = data.get("started_at")
+                if isinstance(started, str):
+                    started_at = started
             except (OSError, json.JSONDecodeError, TypeError):
                 pairer = "未记录"
-            runs.append({"name": path.name, "modified_at": path.stat().st_mtime, "pairer": pairer})
+            runs.append(
+                {
+                    "name": path.name,
+                    "modified_at": path.stat().st_mtime,
+                    "pairer": pairer,
+                    "question": question,
+                    "started_at": started_at,
+                }
+            )
         return sorted(runs, key=lambda r: (r["modified_at"], r["name"]), reverse=True)
 
     @app.get("/api/runs/{name}")

@@ -60,3 +60,18 @@
 1. 不再绘制中心→来源连线 —— 信息已由分栏状态表达。
 2. 切换文案为「分组 | 表格」，默认分组。
 3. 结论面板改为最多 6 行 +「展开全文」，不再无出口截断。
+
+## Round 5（v1.1.2 — 分组视图打磨）
+
+对照：`notes/ui-diff/round5-before-*.png` → `round5-above-fold.png` / `round5-expanded.png`（视口 1440×900，`prefers-reduced-motion`）。
+
+| 区域 | 修改前 | 修改后 |
+|---|---|---|
+| 侧栏 Logo | `CROSSF` 被裁切 | 侧栏 288px + 16px 字号，`CROSSFIRE` 完整；不变量 `scrollWidth ≤ clientWidth` |
+| KPI | 截到 count-up 半途（4/8） | reduced-motion 或等 `dataset.target`；截图断言 = `summary.counts`（5/10） |
+| 历史 | `ten-sources.json` 等文件名/压测条 | 问题·日期·比对器；README 首图只留 nvidia / apple / python 真实运行 |
+| 维基卡片 | 域名中间折行；无页面区分 | 域名单行末尾省略；tier 下行；`wikipedia · Colette Kress` |
+| 空分组 | 四栏等宽，空栏写 (none) | 空栏收成一行摘要；有内容栏 `auto-fill minmax(220px,1fr)` |
+| 展开比对 | 「本地 NLI」+ 关系/p 重复 | `vs domain · relation · p=`；p&lt;0.5 灰显 uncertain；英文无中文界面字 |
+
+有意保留：主张原文可为中文（提取结果，非 UI 文案）。

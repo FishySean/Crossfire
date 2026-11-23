@@ -20,16 +20,17 @@ function countsFrom(run) {
 }
 
 function animateCount(node, target) {
+  const end = Number(target) || 0;
+  node.dataset.target = String(end);
   if (prefersReducedMotion()) {
-    node.textContent = String(target);
+    node.textContent = String(end);
     return;
   }
-  const end = Number(target) || 0;
   const start = performance.now();
   const duration = 400;
   const tick = (now) => {
     const p = Math.min(1, (now - start) / duration);
-    node.textContent = String(Math.round(end * p));
+    node.textContent = String(p < 1 ? Math.round(end * p) : end);
     if (p < 1) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);

@@ -181,7 +181,7 @@ def test_runs_lists_json_files_newest_first(web_env):
     runs = client.get("/api/runs").json()
     assert [r["name"] for r in runs] == ["new.json", "mid.json", "old.json"]
     # 第 7 步有意修改：列表项多 pairer 字段（旧文件为「未记录」）。
-    assert set(runs[0]) == {"name", "modified_at", "pairer"}
+    assert set(runs[0]) >= {"name", "modified_at", "pairer", "question", "started_at"}
     assert runs[0]["pairer"] == "未记录"
     assert runs[0]["modified_at"] == 3000
 

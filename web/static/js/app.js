@@ -173,6 +173,13 @@ const STRINGS = {
     groupNoPairs: "No pairwise comparisons involving this source.",
     expandAnswer: "Show full answer",
     collapseAnswer: "Show less",
+    groupColumnTitle: (label, n) => `${label} (${n})`,
+    pairWith: (domain, relation, conf, low) => {
+      const p = conf == null ? "" : ` · p=${Number(conf).toFixed(2)}`;
+      const u = low ? " · uncertain" : "";
+      return `vs ${domain} · ${relation}${p}${u}`;
+    },
+    pairUncertain: "uncertain",
   },
   zh: {
     tagline: "多来源 · 多视角 · 讲证据",
@@ -322,6 +329,13 @@ const STRINGS = {
     groupNoPairs: "该来源没有参与比对记录。",
     expandAnswer: "展开全文",
     collapseAnswer: "收起",
+    groupColumnTitle: (label, n) => `${label}（${n}）`,
+    pairWith: (domain, relation, conf, low) => {
+      const p = conf == null ? "" : ` · p=${Number(conf).toFixed(2)}`;
+      const u = low ? " · 不确定" : "";
+      return `与 ${domain} · ${relation}${p}${u}`;
+    },
+    pairUncertain: "不确定",
   },
 };
 
@@ -437,6 +451,8 @@ function setLang(next) {
   lang = next;
   localStorage.setItem("crossfire-lang", lang);
   applyStaticStrings();
+  // 历史下拉的「未记录」等标签依赖 t()，换语言时重刷文案（不重载当前 run）
+  void refreshRunList({ selectName: el("run-select")?.value, loadSelected: false });
   if (currentError) showError(currentError.key, ...currentError.args);
   if (currentRun) render(currentRun);
   repaintLive();
@@ -445,6 +461,20 @@ function setLang(next) {
 
 
 
+
+
+function formatRunLabel(run, { full = false } = {}) {
+  const rawQ = run.question || "";
+  const q = full ? rawQ : (rawQ.length > 42 ? `${rawQ.slice(0, 41)}…` : rawQ) || run.name;
+  let date = "";
+  if (run.started_at) {
+    const d = String(run.started_at);
+    date = d.slice(0, 10);
+  }
+  let pairer = run.pairer || "";
+  if (!pairer || pairer === "未记录" || pairer === "Not recorded") pairer = t("pairerUnknown");
+  return [q, date, pairer].filter(Boolean).join(" · ");
+}
 
 async function refreshRunList({ selectName = null, loadSelected = true } = {}) {
   const runs = await fetchJSON("/api/runs");
@@ -459,7 +489,8 @@ async function refreshRunList({ selectName = null, loadSelected = true } = {}) {
   for (const run of runs) {
     const option = document.createElement("option");
     option.value = run.name;
-    option.textContent = `${run.name} · ${run.pairer || t("pairerUnknown")}`;
+    option.textContent = formatRunLabel(run);
+    option.title = formatRunLabel(run, { full: true });
     select.appendChild(option);
   }
   select.onchange = () => loadRun(select.value);
@@ -1893,7 +1924,7 @@ function closeAskDialog() {
 function filterHistory() {
   const q = (el("history-filter").value || "").trim().toLowerCase();
   for (const option of el("run-select").options) {
-    const hay = `${option.textContent || ""} ${option.value || ""}`.toLowerCase();
+    const hay = `${option.textContent || ""} ${option.title || ""} ${option.value || ""}`.toLowerCase();
     option.hidden = Boolean(q) && !hay.includes(q);
   }
 }

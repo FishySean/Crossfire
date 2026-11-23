@@ -183,8 +183,17 @@ class VerifyQuestion:
         return judgment, stats
 
     def _save(self, result: RunResult) -> str:
+        from crossfire.application.summarize import summary_to_dict
+
         location = self._runs.save(result)
-        self._events.emit(Done(judgment=result.judgment, run_file=location, elapsed=result.elapsed_seconds))
+        self._events.emit(
+            Done(
+                judgment=result.judgment,
+                run_file=location,
+                elapsed=result.elapsed_seconds,
+                summary=summary_to_dict(result),
+            )
+        )
         return location
 
     def _report(self, failure: Failure | None) -> None:

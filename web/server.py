@@ -94,13 +94,22 @@ def create_app(
 
     @app.get("/api/runs/{name}")
     def get_run(name: str) -> Any:
+        from crossfire.application.summarize import summary_to_dict
+        from crossfire.domain import RunResult
+
         path = (runs_dir / name).resolve()
         if path.parent != runs_dir.resolve() or path.suffix != ".json" or not path.is_file():
             raise HTTPException(status_code=404, detail="run not found")
         error: json.JSONDecodeError | None = None
         for attempt in range(READ_RETRIES):
             try:
-                return json.loads(path.read_text(encoding="utf-8"))
+                data = json.loads(path.read_text(encoding="utf-8"))
+                try:
+                    data["summary"] = summary_to_dict(RunResult.from_dict(data))
+                except (KeyError, TypeError, ValueError):
+                    # 坏文件或半截写入：原样返回，不编造 summary。
+                    data.setdefault("summary", None)
+                return data
             except json.JSONDecodeError as e:
                 error = e
                 if attempt < READ_RETRIES - 1:

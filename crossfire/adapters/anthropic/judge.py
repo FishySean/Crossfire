@@ -5,7 +5,7 @@ from datetime import date
 from typing import Any
 
 from crossfire.adapters.anthropic.client import ClaudeClient, prompt_version
-from crossfire.domain import Claim, Judgment, Pair, Provenance, Question, Relation
+from crossfire.domain import Claim, Judgment, Pair, Provenance, Question, Relation, SourceRulingKind
 
 # prompt 里出现的关系名一律从 Relation 填入，不手写字符串。
 RELATION_NAMES = {
@@ -57,11 +57,21 @@ as_of 修好之后，靠「官方下载页 + 时效」就够了，这段没有�
 confidence 应反映 {contradict} 的多少和一手源的有无；
 {scope} 再多也不该把置信度压低。
 
+source_rulings：本题 claims 里每一个来源 URL 恰好一条裁定（url 必须逐字相同）：
+- trusted：采信、正确
+- wrong：事实错误
+- outdated：过时
+- scope：口径/粒度不同，本身不算错
+- neutral：未采信但也说不上错（例如无关、信息不足）
+reason 用一两句中文或英文说明。不要漏掉任何来源 URL，也不要编造 claims 里没有的 URL。
+
 请通过 record 工具返回结果。"""
 
 # 只有 judge 需要长篇说理，它要复述每条冲突，输出长度随来源数增长，8 来源时 1000 会被截断。
 # extract 和 pair 仍用 client.MAX_TOKENS=1000，小上限能防止模型啰嗦。judge 每次运行只调一次，成本可忽略。
 JUDGE_MAX_TOKENS = 3000
+
+_RULING_ENUM = [kind.value for kind in SourceRulingKind]
 
 JUDGE_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -82,15 +92,35 @@ JUDGE_SCHEMA: dict[str, Any] = {
             "items": {"type": "string"},
             "description": "实际采信的来源 URL，按可信度从高到低排列",
         },
+        "source_rulings": {
+            "type": "array",
+            "description": "每个来源一条裁定；url 必须来自本题 claims",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string"},
+                    "ruling": {"type": "string", "enum": _RULING_ENUM},
+                    "reason": {"type": "string"},
+                },
+                "required": ["url", "ruling", "reason"],
+            },
+        },
     },
-    "required": ["answer", "confidence", "reasoning", "conflicts", "trusted_sources"],
+    "required": ["answer", "confidence", "reasoning", "conflicts", "trusted_sources", "source_rulings"],
 }
 
 _NO_USAGE = {"input_tokens": 0, "output_tokens": 0, "requests": 0}
 
 
-def _parse(data: dict[str, Any]) -> Judgment:
-    return Judgment.from_dict({**data, "usage": _NO_USAGE})
+def _parse_for(question: Question):
+    known = {source.url for source in question.sources}
+
+    def _parse(data: dict[str, Any]) -> Judgment:
+        judgment = Judgment.from_dict({**data, "usage": _NO_USAGE})
+        judgment.validate_ruling_urls(known)
+        return judgment
+
+    return _parse
 
 
 SOURCES_OVER_MEMORY_HEADING = "关于你自己的知识，"
@@ -129,7 +159,9 @@ class ClaudeVerdictJudge:
             pairs=json.dumps([pair.to_dict() for pair in pairs], ensure_ascii=False, indent=2),
             **RELATION_NAMES,
         )
-        call = self._client.call(prompt, JUDGE_SCHEMA, "judge", _parse, max_tokens=JUDGE_MAX_TOKENS)
+        call = self._client.call(
+            prompt, JUDGE_SCHEMA, "judge", _parse_for(question), max_tokens=JUDGE_MAX_TOKENS
+        )
         if call.value is not None:
             return replace(call.value, usage=call.usage)
         return Judgment(
@@ -140,4 +172,5 @@ class ClaudeVerdictJudge:
             trusted_sources=(),
             usage=call.usage,
             failure=call.failure,
+            source_rulings=None,
         )

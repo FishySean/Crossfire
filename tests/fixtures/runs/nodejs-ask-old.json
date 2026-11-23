@@ -1,0 +1,652 @@
+{
+  "question_id": "u-20261122-04825f0f",
+  "question": "Node.js 当前最新的 LTS 版本号是多少？",
+  "mode": "cached",
+  "started_at": "2026-11-22T02:43:22.946880+00:00",
+  "as_of": "2026-11-22",
+  "elapsed_seconds": 76.13,
+  "sources": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "tier": "primary"
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases",
+      "tier": "primary"
+    },
+    {
+      "url": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "tier": "news"
+    },
+    {
+      "url": "https://privatedevops.com/news/nodejs-26-lts",
+      "tier": "news"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Node.js",
+      "tier": "aggregator"
+    },
+    {
+      "url": "https://tecadmin.net/software/nodejs/",
+      "tier": "aggregator"
+    },
+    {
+      "url": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "tier": "aggregator"
+    }
+  ],
+  "pages_fetched": 7,
+  "pages_failed": 0,
+  "claude_calls": 8,
+  "failures": [],
+  "steps": {
+    "fetch": {
+      "calls": 7,
+      "seconds": 0.02
+    },
+    "extract": {
+      "calls": 7,
+      "input_tokens": 60193,
+      "output_tokens": 1997,
+      "seconds": 11.71,
+      "requests": 7
+    },
+    "pair": {
+      "calls": 21,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "seconds": 47.07,
+      "requests": 0
+    },
+    "judge": {
+      "calls": 1,
+      "input_tokens": 8051,
+      "output_tokens": 1004,
+      "seconds": 17.34,
+      "requests": 1
+    }
+  },
+  "provenance": {
+    "extract": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "f4e4e23a493e"
+    },
+    "pair": {
+      "model": "FishySean/crossfire-pairer",
+      "prompt_version": null,
+      "implementation": "nli",
+      "revision": "0517c59dfa13038226b4b66c3fa6b605b9215df5"
+    },
+    "judge": {
+      "model": "claude-sonnet-4-6",
+      "prompt_version": "65f85f399f11"
+    }
+  },
+  "total_input_tokens": 68244,
+  "total_output_tokens": 3001,
+  "pages": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "ok": true,
+      "title": "Node.js — Node.js Releases",
+      "markdown": "## Node.js Releases\n\nCommercial support for versions past the Maintenance LTS phase is available through our [OpenJS Ecosystem Sustainability Program partners](https://nodejs.org/en/about/eol)\n\nMajor ",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:14.399527+00:00",
+      "links": []
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases",
+      "ok": true,
+      "title": "Releases · nodejs/node",
+      "markdown": "## 2026-11-16, Version 27.0.0-alpha.0.1.1 (Alpha), @aduh95\n\n[2026-11-16, Version 27.0.0-alpha.0.1.1 (Alpha), @aduh95](https://github.com/nodejs/node/releases/tag/v27.0.0-alpha.0.1.1) [Latest](https://",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:16.596568+00:00",
+      "links": []
+    },
+    {
+      "url": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "ok": true,
+      "title": "The Node.js Release Schedule Is Changing",
+      "markdown": "**One major per year, every major headed for LTS, and a new Alpha phase: here’s why Node.js is changing a release model that has been in place for more than a decade.**\n\nFor more than ten years, Node.",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:15.426646+00:00",
+      "links": []
+    },
+    {
+      "url": "https://privatedevops.com/news/nodejs-26-lts",
+      "ok": true,
+      "title": "Node.js 26 LTS Adds a Modern Date API and Support to 2029",
+      "markdown": "Node.js 26 became the long-term support release on October 28, with fixes until April 2029. It turns on the Temporal date API by default, and Node.js 24 stays supported until 2028, so the upgrade can ",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:14.585909+00:00",
+      "links": []
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Node.js",
+      "ok": true,
+      "title": "Node.js - Wikipedia",
+      "markdown": "**Node.js** is a [cross-platform](https://en.wikipedia.org/wiki/Cross-platform \"Cross-platform\"), [open-source](https://en.wikipedia.org/wiki/Open-source_software \"Open-source software\") [JavaScript](",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:16.091611+00:00",
+      "links": []
+    },
+    {
+      "url": "https://tecadmin.net/software/nodejs/",
+      "ok": true,
+      "title": "Node.js Versions, Release History & EOL Dates | TecAdmin",
+      "markdown": "## Node.js\n\nThe JavaScript runtime built on Chrome's V8 engine, used for web servers, APIs and developer tooling. Even-numbered releases get long-term support.\n\n- Active project\n- Latest 26.13.1\n- Sup",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:15.754396+00:00",
+      "links": []
+    },
+    {
+      "url": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "ok": true,
+      "title": "Node.js Versions: Latest Releases & EOL Dates (Nov 2026)",
+      "markdown": "## Node.js Versions, EOL Dates, and Latest Releases (Nov 2026)\n\nA complete reference for every Node.js release timeline, the CVEs hitting end-of-life versions, and what your options are once official ",
+      "error": null,
+      "status_code": 200,
+      "fetched_at": "2026-11-22T02:43:16.187015+00:00",
+      "links": []
+    }
+  ],
+  "claims": [
+    {
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "tier": "primary",
+      "claim": "截至页面最新更新，Node.js 当前处于 LTS 状态的最新版本号为 v26.13.1（codename Lithium），v24 和 v22 也处于 LTS 状态。",
+      "evidence": "| [v26](https://nodejs.org/en/download/archive/v26.13.1) | Lithium | May 05, 2026 | Nov 10, 2026 | LTS | Details |",
+      "source_type": "official_documentation",
+      "confidence": 0.85,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 4030,
+        "output_tokens": 317,
+        "requests": 1
+      },
+      "content_date": "2026-11-10",
+      "content_date_evidence": "| [v26](https://nodejs.org/en/download/archive/v26.13.1) | Lithium | May 05, 2026 | Nov 10, 2026 | LTS | Details |"
+    },
+    {
+      "url": "https://github.com/nodejs/node/releases",
+      "tier": "primary",
+      "claim": "Node.js 当前最新的 LTS 版本号是 26.13.1（代号 'Lithium'），发布于 2026-11-11。",
+      "evidence": "2026-11-11, Version 26.13.1 'Lithium' (LTS), @aduh95",
+      "source_type": "official_documentation",
+      "confidence": 0.9,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 17743,
+        "output_tokens": 251,
+        "requests": 1
+      },
+      "content_date": "2026-11-11",
+      "content_date_evidence": "2026-11-11, Version 26.13.1 'Lithium' (LTS), @aduh95"
+    },
+    {
+      "url": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "tier": "news",
+      "claim": "截至2026年10月28日，Node.js 26 将成为最新的 LTS 版本（此前 Node.js 26 是在旧模型下创建的最后一个发布线，届时进入 LTS）。",
+      "evidence": "On **October 28, 2026**, two things are planned to happen on the same day: **Node.js 26 becomes LTS.**",
+      "source_type": "blog",
+      "confidence": 0.72,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 5604,
+        "output_tokens": 278,
+        "requests": 1
+      },
+      "content_date": "2026-10-28",
+      "content_date_evidence": "On **October 28, 2026**, two things are planned to happen on the same day: **Node.js 26 becomes LTS.**"
+    },
+    {
+      "url": "https://privatedevops.com/news/nodejs-26-lts",
+      "tier": "news",
+      "claim": "截至2026年10月28日，Node.js 当前最新的 LTS 版本号为 26.13.0（代号 Lithium）",
+      "evidence": "On October 28, 2026, the Node.js project published version 26.13.0 and moved the 26 line into Long Term Support under the codename Lithium.",
+      "source_type": "blog",
+      "confidence": 0.97,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 5630,
+        "output_tokens": 272,
+        "requests": 1
+      },
+      "content_date": "2026-10-28",
+      "content_date_evidence": "On October 28, 2026, the Node.js project published version 26.13.0 and moved the 26 line into Long Term Support under the codename Lithium."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Node.js",
+      "tier": "aggregator",
+      "claim": "根据页面版本发布表，Node.js 当前最新的 LTS 版本为 26.x（代号 Lithium），状态为 Active LTS。",
+      "evidence": "Latest version: 26.x | Latest version: Active LTS | Lithium | 2026-05-05 | 2029-04-30",
+      "source_type": "encyclopedia",
+      "confidence": 0.95,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 14742,
+        "output_tokens": 277,
+        "requests": 1
+      },
+      "content_date": "2026-11-11",
+      "content_date_evidence": "[\"Release 26.13.1\"](https://github.com/nodejs/node/releases/tag/v26.13.1). 11 November 2026. Retrieved 12 November 2026."
+    },
+    {
+      "url": "https://tecadmin.net/software/nodejs/",
+      "tier": "aggregator",
+      "claim": "Node.js 当前最新的 LTS 版本号为 26.13.1（Node.js 26 LTS）",
+      "evidence": "The newest Node.js release is Node.js 26 LTS, released on 5 May 2026. Its latest update is 26.13.1 (11 Nov 2026).",
+      "source_type": "other",
+      "confidence": 0.98,
+      "published_date": null,
+      "usage": {
+        "input_tokens": 5604,
+        "output_tokens": 298,
+        "requests": 1
+      },
+      "content_date": "2026-11-22",
+      "content_date_evidence": "As of 22 Nov 2026, 3 versions are supported: Node.js 26 LTS (until 30 Apr 2029); Node.js 24 LTS (until 30 Apr 2028); Node.js 22 LTS (until 30 Apr 2027)."
+    },
+    {
+      "url": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "tier": "aggregator",
+      "claim": "截至2026年11月，Node.js 当前最新的 LTS 版本为 Node.js 26（Active LTS），最新发布号为 26.13.1。",
+      "evidence": "Node.js 26 (\"Lithium\") is the Active LTS line and the recommended choice for new production deployments; 24 and 22 are in Maintenance LTS.",
+      "source_type": "blog",
+      "confidence": 0.98,
+      "published_date": "2026-11-20",
+      "usage": {
+        "input_tokens": 6840,
+        "output_tokens": 304,
+        "requests": 1
+      },
+      "content_date": "2026-11-20",
+      "content_date_evidence": "Updated November 20, 2026: Node.js 26 is now Active LTS and 24 is in Maintenance LTS, the November 11, 2026 security release (26.13.1, 24.22.3, 22.23.5)"
+    }
+  ],
+  "pairs": [
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://github.com/nodejs/node/releases",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.982）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9818127155303955,
+        "contradict": 0.0015469349455088377,
+        "same_question_different_scope": 0.006772282067686319,
+        "unrelated": 0.009868056513369083
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "relation": "unrelated",
+      "nature": "本地 NLI：unrelated（p=0.686）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.22434364259243011,
+        "contradict": 0.014489625580608845,
+        "same_question_different_scope": 0.07518240809440613,
+        "unrelated": 0.6859843134880066
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://privatedevops.com/news/nodejs-26-lts",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.999）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.0003322618722449988,
+        "contradict": 0.9992021918296814,
+        "same_question_different_scope": 0.00040117590106092393,
+        "unrelated": 6.447483610827476e-05
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://en.wikipedia.org/wiki/Node.js",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.393）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.28474026918411255,
+        "contradict": 0.39258161187171936,
+        "same_question_different_scope": 0.2341352105140686,
+        "unrelated": 0.08854284882545471
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://tecadmin.net/software/nodejs/",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.467）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.4673064053058624,
+        "contradict": 0.1279105246067047,
+        "same_question_different_scope": 0.21192103624343872,
+        "unrelated": 0.1928621083498001
+      }
+    },
+    {
+      "a": "https://nodejs.org/en/about/previous-releases",
+      "b": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.965）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9646514654159546,
+        "contradict": 0.004582100082188845,
+        "same_question_different_scope": 0.014820119366049767,
+        "unrelated": 0.015946315601468086
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases",
+      "b": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.908）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9079661965370178,
+        "contradict": 0.0019515600288286805,
+        "same_question_different_scope": 0.017225028946995735,
+        "unrelated": 0.07285725325345993
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases",
+      "b": "https://privatedevops.com/news/nodejs-26-lts",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.998）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.001296826172620058,
+        "contradict": 0.9976751208305359,
+        "same_question_different_scope": 0.0009267998393625021,
+        "unrelated": 0.00010127812856808305
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases",
+      "b": "https://en.wikipedia.org/wiki/Node.js",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.703）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.703385591506958,
+        "contradict": 0.16613322496414185,
+        "same_question_different_scope": 0.10217694193124771,
+        "unrelated": 0.02830432541668415
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases",
+      "b": "https://tecadmin.net/software/nodejs/",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.446）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.44583162665367126,
+        "contradict": 0.22643347084522247,
+        "same_question_different_scope": 0.2189316749572754,
+        "unrelated": 0.10880322754383087
+      }
+    },
+    {
+      "a": "https://github.com/nodejs/node/releases",
+      "b": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.995）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9947308301925659,
+        "contradict": 0.0012040314031764865,
+        "same_question_different_scope": 0.0024417294189333916,
+        "unrelated": 0.0016233687056228518
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "b": "https://privatedevops.com/news/nodejs-26-lts",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.360）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.35999390482902527,
+        "contradict": 0.1439405083656311,
+        "same_question_different_scope": 0.2379559725522995,
+        "unrelated": 0.2581096589565277
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "b": "https://en.wikipedia.org/wiki/Node.js",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.765）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7654588222503662,
+        "contradict": 0.04646585136651993,
+        "same_question_different_scope": 0.09894628077745438,
+        "unrelated": 0.0891290083527565
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "b": "https://tecadmin.net/software/nodejs/",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.729）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7286069989204407,
+        "contradict": 0.02838944084942341,
+        "same_question_different_scope": 0.09290377795696259,
+        "unrelated": 0.15009981393814087
+      }
+    },
+    {
+      "a": "https://nodesource.com/blog/nodejs-release-schedule-is-changing",
+      "b": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.560）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.5604610443115234,
+        "contradict": 0.11193517595529556,
+        "same_question_different_scope": 0.18289034068584442,
+        "unrelated": 0.14471349120140076
+      }
+    },
+    {
+      "a": "https://privatedevops.com/news/nodejs-26-lts",
+      "b": "https://en.wikipedia.org/wiki/Node.js",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.737）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.15713125467300415,
+        "contradict": 0.7369290590286255,
+        "same_question_different_scope": 0.09063029289245605,
+        "unrelated": 0.015309418551623821
+      }
+    },
+    {
+      "a": "https://privatedevops.com/news/nodejs-26-lts",
+      "b": "https://tecadmin.net/software/nodejs/",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.994）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.0022966540418565273,
+        "contradict": 0.9940284490585327,
+        "same_question_different_scope": 0.0031792607624083757,
+        "unrelated": 0.0004957171622663736
+      }
+    },
+    {
+      "a": "https://privatedevops.com/news/nodejs-26-lts",
+      "b": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.996）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.001452283700928092,
+        "contradict": 0.9956647753715515,
+        "same_question_different_scope": 0.0024464097805321217,
+        "unrelated": 0.00043648065184243023
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Node.js",
+      "b": "https://tecadmin.net/software/nodejs/",
+      "relation": "contradict",
+      "nature": "本地 NLI：contradict（p=0.327）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.28654107451438904,
+        "contradict": 0.3270604610443115,
+        "same_question_different_scope": 0.25918447971343994,
+        "unrelated": 0.12721392512321472
+      }
+    },
+    {
+      "a": "https://en.wikipedia.org/wiki/Node.js",
+      "b": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.717）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.7167243957519531,
+        "contradict": 0.1128498911857605,
+        "same_question_different_scope": 0.1189606711268425,
+        "unrelated": 0.05146501958370209
+      }
+    },
+    {
+      "a": "https://tecadmin.net/software/nodejs/",
+      "b": "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "relation": "agree",
+      "nature": "本地 NLI：agree（p=0.998）",
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      },
+      "scores": {
+        "agree": 0.9979701638221741,
+        "contradict": 9.42452679737471e-05,
+        "same_question_different_scope": 0.0005985639290884137,
+        "unrelated": 0.001337081310339272
+      }
+    }
+  ],
+  "judgment": {
+    "answer": "截至2026年11月22日，Node.js 当前最新的 LTS 版本号为 **v26.13.1**（代号 Lithium），于2026年11月11日发布，属于 Active LTS 状态。",
+    "confidence": 0.97,
+    "reasoning": "\n两个一手来源（nodejs.org 官方发布页和 GitHub 官方 releases 页）均明确指出当前最新 LTS 版本为 v26.13.1（代号 Lithium）：\n- nodejs.org/en/about/previous-releases（content_date: 2026-11-10）：表格行显示 v26.13.1 处于 LTS 状态；\n- github.com/nodejs/node/releases（content_date: 2026-11-11）：明确记录 \"2026-11-11, Version 26.13.1 'Lithium' (LTS)\"。\n\n两者高度吻合（NLI agree p=0.982），采信这两个一手来源。\n\n唯一的真分歧（contradict）来自 privatedevops.com，其 content_date 为 2026-10-28，主张版本号为 26.13.0。这是因为它记录的是 Node.js 26 刚进入 LTS 时（2026-10-28）的初始版本，而一手来源记录了此后（2026-11-11）发布的补丁版本 26.13.1。该博客文章比两个一手来源更旧，属于过时信息，不采信。\n\nherodevs.com（published_date: 2026-11-20）和 tecadmin.net（content_date: 2026-11-22）两个聚合源均与一手来源一致，确认最新版本为 26.13.1，进一步佐证。\n\nWikipedia 仅记录到大版本 26.x，属于粒度差异（same_question_different_scope 性质），不影响结论。\n\nnodesource.com 的文章讨论的是 Node.js 26 进入 LTS 的计划事件（2026-10-28），未具体涉及精确版本号，不产生冲突。\n",
+    "conflicts": [
+      "privatedevops.com 主张最新 LTS 版本为 26.13.0，而两个一手来源（nodejs.org 和 GitHub）均明确记录最新版本为 26.13.1。性质：privatedevops.com 的 content_date 为 2026-10-28（Node.js 26 刚进入 LTS 的初始版本），而一手来源记录了之后 2026-11-11 发布的补丁版本。该博客内容已过时，裁定以更新的一手来源为准，采信 26.13.1。",
+      "Wikipedia 仅记录大版本号 26.x，未给出精确补丁版本号。性质：粒度/口径差异（same_question_different_scope），Wikipedia 的陈述在其粒度层面仍然正确，不构成事实冲突。"
+    ],
+    "trusted_sources": [
+      "https://github.com/nodejs/node/releases",
+      "https://nodejs.org/en/about/previous-releases",
+      "https://www.herodevs.com/blog-posts/node-js-end-of-life-dates-you-should-be-aware-of",
+      "https://tecadmin.net/software/nodejs/"
+    ],
+    "usage": {
+      "input_tokens": 8051,
+      "output_tokens": 1004,
+      "requests": 1
+    }
+  }
+}

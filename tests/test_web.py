@@ -195,7 +195,8 @@ def test_runs_is_empty_when_the_directory_is_missing(web_env):
 def test_run_file_is_returned_as_json(web_env):
     client, runs_dir = web_env()
     (runs_dir / "q_1.json").write_text('{"question": "?"}', encoding="utf-8")
-    assert client.get("/api/runs/q_1.json").json() == {"question": "?"}
+    # 第 9 步：能解析则附带 summary；半截/旧残缺文件解析失败时 summary=null。
+    assert client.get("/api/runs/q_1.json").json() == {"question": "?", "summary": None}
 
 
 @pytest.mark.parametrize(

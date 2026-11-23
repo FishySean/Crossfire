@@ -49,7 +49,8 @@ EVENT_FIELDS = {
     "pair_done": {"type", "a_url", "b_url", "relation", "nature", "index", "total", "scores"},
     "judge_start": {"type"},
     "heartbeat": {"type", "step", "elapsed"},
-    "done": {"type", "judgment", "run_file", "elapsed"},
+    # 第 9 步有意修改：done 末尾加 summary（仪表盘摘要）；旧键不动。
+    "done": {"type", "judgment", "run_file", "elapsed", "summary"},
     "error": {"type", "step", "detail"},
 }
 

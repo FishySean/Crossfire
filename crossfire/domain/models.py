@@ -47,6 +47,42 @@ class SourceType(StrEnum):
     OTHER = "other"
 
 
+class SourceRulingKind(StrEnum):
+    """值与 judge.JUDGE_SCHEMA 的 source_rulings.ruling enum 逐字相同。"""
+
+    TRUSTED = "trusted"
+    WRONG = "wrong"
+    OUTDATED = "outdated"
+    SCOPE = "scope"
+    NEUTRAL = "neutral"
+
+
+KEY_VALUE_MAX_CHARS = 20
+
+
+@dataclass(frozen=True)
+class SourceRuling:
+    """判决对单个来源的裁定。url 是否属于本题在 RunResult / judge 适配器里核对。"""
+
+    url: str
+    ruling: SourceRulingKind
+    reason: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"url": self.url, "ruling": self.ruling.value, "reason": self.reason}
+
+    @classmethod
+    def from_dict(cls, data: object) -> Self:
+        if not isinstance(data, dict):
+            raise TypeError("source_rulings 的每一项必须是对象")
+        body = cast(Mapping[str, object], data)
+        return cls(
+            url=_str(body["url"], "source_rulings.url"),
+            ruling=SourceRulingKind(_str(body["ruling"], "source_rulings.ruling")),
+            reason=_str(body["reason"], "source_rulings.reason"),
+        )
+
+
 # 下面这组 _xxx(value, key) 校验标量类型，不做任何转换：类型不对就抛 TypeError。
 # 模型输出也走 from_dict，"0.9" 这样的字符串 confidence 混进去，前端算百分比会得到 NaN。
 # bool 是 int 的子类，必须单独排除，否则 true 会被当成数字 1 放行。
@@ -346,6 +382,8 @@ class Claim:
     # 主张所描述情况的时间点（可与页面发布日不同）。旧文件没有这两个键，读成 None。
     content_date: str | None = None
     content_date_evidence: str | None = None
+    # 第 9 步：主张核心值（短标签）。旧文件没有；缺失为 None，不算失败。
+    key_value: str | None = None
 
     @property
     def answered(self) -> bool:
@@ -368,10 +406,17 @@ class Claim:
             body["content_date"] = self.content_date
         if self.content_date_evidence is not None:
             body["content_date_evidence"] = self.content_date_evidence
+        if self.key_value is not None:
+            body["key_value"] = self.key_value
         return _with_failure(body, self.failure)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
+        key_value = None
+        if "key_value" in data:
+            key_value = _optional_str(data["key_value"], "key_value")
+            if key_value is not None and len(key_value) > KEY_VALUE_MAX_CHARS:
+                key_value = key_value[:KEY_VALUE_MAX_CHARS]
         return cls(
             source_url=_str(data["url"], "url"),
             tier=Tier(_str(data["tier"], "tier")),
@@ -388,6 +433,7 @@ class Claim:
             content_date_evidence=_optional_str(data["content_date_evidence"], "content_date_evidence")
             if "content_date_evidence" in data
             else None,
+            key_value=key_value,
         )
 
 
@@ -449,6 +495,7 @@ class Judgment:
 
     conflicts 是模型写的自由文本，没有指回具体哪一对 Pair。
     trusted_sources 是模型给出的 URL 字符串，不保证都在问题的来源列表里，所以没有用 SourceIndex。
+    source_rulings 是第 9 步新增：每个来源一条裁定。旧文件没有该键 → None。
     """
 
     answer: str | None
@@ -458,22 +505,30 @@ class Judgment:
     trusted_sources: tuple[str, ...]
     usage: Usage
     failure: Failure | None = None
+    source_rulings: tuple[SourceRuling, ...] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return _with_failure(
-            {
-                "answer": self.answer,
-                "confidence": self.confidence,
-                "reasoning": self.reasoning,
-                "conflicts": list(self.conflicts),
-                "trusted_sources": list(self.trusted_sources),
-                "usage": self.usage.to_dict(),
-            },
-            self.failure,
-        )
+        body: dict[str, Any] = {
+            "answer": self.answer,
+            "confidence": self.confidence,
+            "reasoning": self.reasoning,
+            "conflicts": list(self.conflicts),
+            "trusted_sources": list(self.trusted_sources),
+            "usage": self.usage.to_dict(),
+        }
+        if self.source_rulings is not None:
+            body["source_rulings"] = [item.to_dict() for item in self.source_rulings]
+        return _with_failure(body, self.failure)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
+        rulings: tuple[SourceRuling, ...] | None = None
+        if "source_rulings" in data:
+            raw = data["source_rulings"]
+            if not isinstance(raw, list):
+                raise TypeError("source_rulings 必须是数组")
+            items = cast(list[object], raw)
+            rulings = tuple(SourceRuling.from_dict(item) for item in items)
         return cls(
             answer=_optional_str(data["answer"], "answer"),
             confidence=_optional_number(data["confidence"], "confidence"),
@@ -482,7 +537,17 @@ class Judgment:
             trusted_sources=_string_list(data, "trusted_sources"),
             usage=Usage.from_dict(data["usage"]),
             failure=_failure_from(data),
+            source_rulings=rulings,
         )
+
+    def validate_ruling_urls(self, known_urls: Iterable[str]) -> None:
+        """source_rulings 里的 url 必须都在 known_urls 里；否则大声失败。"""
+        if self.source_rulings is None:
+            return
+        allowed = set(known_urls)
+        for ruling in self.source_rulings:
+            if ruling.url not in allowed:
+                raise ValueError(f"source_rulings.url 不在本题来源里：{ruling.url}")
 
 
 @dataclass(frozen=True)
@@ -691,11 +756,14 @@ class RunResult:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
+        sources = tuple(Source.from_dict(s) for s in data["sources"])
+        judgment = Judgment.from_dict(data["judgment"])
+        judgment.validate_ruling_urls(source.url for source in sources)
         return cls(
             question=Question(
                 id=_str(data["question_id"], "question_id"),
                 text=_str(data["question"], "question"),
-                sources=tuple(Source.from_dict(s) for s in data["sources"]),
+                sources=sources,
             ),
             mode=Mode(_str(data["mode"], "mode")),
             started_at=datetime.fromisoformat(_str(data["started_at"], "started_at")),
@@ -708,5 +776,5 @@ class RunResult:
             pages=tuple(Page.from_dict(page) for page in data["pages"]),
             claims=tuple(Claim.from_dict(claim) for claim in data["claims"]),
             pairs=tuple(Pair.from_dict(pair) for pair in data["pairs"]),
-            judgment=Judgment.from_dict(data["judgment"]),
+            judgment=judgment,
         )

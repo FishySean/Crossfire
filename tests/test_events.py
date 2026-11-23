@@ -37,7 +37,7 @@ EXPECTED = [
     ),
     (JudgeStart(), ["type"]),
     (Heartbeat("judge", 5.0), ["type", "step", "elapsed"]),
-    (Done(JUDGMENT, "out/runs/q.json", 12.5), ["type", "judgment", "run_file", "elapsed"]),
+    (Done(JUDGMENT, "out/runs/q.json", 12.5), ["type", "judgment", "run_file", "elapsed", "summary"]),
     (Error("fetch", "503"), ["type", "step", "detail"]),
 ]
 
@@ -56,7 +56,13 @@ def test_every_event_type_in_the_contract_has_a_class():
 def test_done_carries_the_judgment_as_a_plain_dict():
     data = Done(JUDGMENT, "out/runs/q.json", 12.5).to_dict()
     assert data["judgment"] == JUDGMENT.to_dict()
-    assert data == {"type": "done", "judgment": JUDGMENT.to_dict(), "run_file": "out/runs/q.json", "elapsed": 12.5}
+    assert data == {
+        "type": "done",
+        "judgment": JUDGMENT.to_dict(),
+        "run_file": "out/runs/q.json",
+        "elapsed": 12.5,
+        "summary": None,
+    }
 
 
 def test_values_are_passed_through_unchanged():

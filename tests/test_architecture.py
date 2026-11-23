@@ -89,6 +89,7 @@ ENTRY_POINT_ALLOWED = (
     "crossfire.application.use_cases",
     "crossfire.application.events",
     "crossfire.application.records",
+    "crossfire.application.summarize",
     "web",
 )
 

@@ -62,6 +62,10 @@ EXTRACT_PROMPT = """你在为一个事实查证引擎工作。下面给你一个
 
 confidence 衡量的是「这确实是该网页的立场」，不是对主张本身真假的判断。
 
+key_value（可选）：主张的核心值，不超过 20 个字符，便于仪表盘节点展示。
+例如版本号 "v26.13.1"、人数 "37.4M (2024)"、人名 "António Guterres"。
+没有清晰短值时填 null；不要为此编造；缺失不算错误。
+
 请通过 record 工具返回结果。"""
 
 EXTRACT_SCHEMA: dict[str, Any] = {
@@ -104,6 +108,13 @@ EXTRACT_SCHEMA: dict[str, Any] = {
             "description": (
                 "支撑 content_date 的原文句子，照抄。"
                 "content_date 非 null 时必填；content_date 为 null 时为 null"
+            ),
+        },
+        "key_value": {
+            "type": ["string", "null"],
+            "description": (
+                "主张的核心短值，≤20 字符（如 v26.13.1）。没有则 null；"
+                "不是必填，缺失不重试"
             ),
         },
     },

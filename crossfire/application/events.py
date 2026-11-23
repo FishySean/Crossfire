@@ -86,9 +86,15 @@ class Done(_Event):
     judgment: Judgment
     run_file: str
     elapsed: float
+    # 第 9 步新增：仪表盘摘要；旧假事件可不填。
+    summary: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {**super().to_dict(), "judgment": self.judgment.to_dict()}
+        return {
+            **super().to_dict(),
+            "judgment": self.judgment.to_dict(),
+            "summary": self.summary,
+        }
 
 
 @dataclass(frozen=True)

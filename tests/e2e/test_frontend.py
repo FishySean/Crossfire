@@ -135,7 +135,7 @@ def test_nli_history_label(page, app_server):
     page.select_option("#run-select", value="nli_sample.json")
     page.wait_for_selector("#question")
     meta = page.locator("#run-meta").inner_text()
-    assert "NLI" in meta and "0517c59" in meta
+    assert "NLI" in meta and "2f8d20c" in meta
     assert page.locator(".answer strong").count() >= 1
     assert "**" not in page.locator("#judgment .answer").inner_text()
     assert page.locator("#metrics-strip .metric").count() == 4
@@ -151,7 +151,7 @@ def test_nli_history_label(page, app_server):
     assert page.locator("#judgment .answer a[href='https://example.com/safe']").count() == 1
     assert page.evaluate("window.__xss") is None
     # provenance：真实格式结果文件要显示 NLI 与 revision 前 7 位
-    assert "NLI" in meta and "0517c59" in meta
+    assert "NLI" in meta and "2f8d20c" in meta
     assert page.locator("#groups-view .group-card").count() >= 1
     assert page.locator("#verdict-headline").inner_text().strip()
     _shot(page, "07-nli-history")

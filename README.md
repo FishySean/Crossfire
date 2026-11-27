@@ -114,10 +114,10 @@ Breakdown: web search + find/extract/judge tokens; Steel adds ~$0.005/page if yo
 
 Hugging Face: [FishySean/crossfire-pairer](https://huggingface.co/FishySean/crossfire-pairer)
 
-- Fine-tuned mDeBERTa on Claude-labeled claim pairs from this repo’s question bank.
-- Locked revision: `0517c59dfa13038226b4b66c3fa6b605b9215df5` (also the default in `crossfire/config.py`).
-- Test macro-F1 ≈ **0.614** (seed 44); mean over three seeds ≈ **0.576**.
-- Known issues: `same_question_different_scope` recall is low; contradict barely beats the untuned base; confidence scores are **not calibrated** (high `p` ≠ correct).
+- Fine-tuned mDeBERTa on Claude-labeled claim pairs from this repo’s question bank (v2: 474 pairs; frozen 89-pair test).
+- Locked revision: `2f8d20c46d994b023a098362dcaed7750f2ef2a0` (seed 43 by val loss; also the default in `crossfire/config.py`).
+- With inference `unrelated` masking (default on): three-seed macro-F1 ≈ **0.59 ± 0.06**, accuracy ≈ **81%**; published model macro-F1 ≈ **0.55**, accuracy ≈ **81%**.
+- Known issues: published seed’s test F1 is below the best seed (selection is val loss only); `scope` recall is still low; confidence scores are **not calibrated** (high `p` ≠ correct).
 
 Training docs: [`training/README.md`](training/README.md) (Colab T4 notebook is the main path).
 

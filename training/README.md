@@ -108,6 +108,13 @@ uv run python -m training.train --cv 5 --epochs 25 --class-weight-scheme sqrt \
 
 选型：每个种子按 **验证加权损失** 留最好一轮；三种子之间仍按验证损失选最终模型；**测试集只在全部结束后评估**。
 
+### 已发布权重（v2）
+
+- Hugging Face：[FishySean/crossfire-pairer](https://huggingface.co/FishySean/crossfire-pairer)
+- Revision：`2f8d20c46d994b023a098362dcaed7750f2ef2a0`（`iter2-final-20261127-064414`，seed **43**）
+- 推理默认 `NLI_MASK_UNRELATED=1`：三种子 macro-F1 **0.59 ± 0.06**、准确率 **81%**；发布模型 F1 **0.55**、准确率 **81%**
+- 记录：`notes/iteration-2.md`、`notes/iter2-mask-eval.json`；Colab §10 可复现开/关对照
+
 ---
 
 ## 备用：RunPod RTX 4090

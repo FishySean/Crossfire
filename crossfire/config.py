@@ -23,11 +23,11 @@ ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = ROOT / ".env"
 DEFAULT_MODEL = "claude-sonnet-4-6"
 DEFAULT_HAIKU = "claude-haiku-4-5"
-# 默认走 Hugging Face；开发可用 NLI_MODEL=models/crossfire-pairer-v1 覆盖。
+# 默认走 Hugging Face；开发可用 NLI_MODEL=models/crossfire-pairer-v2 覆盖。
 # NLI_MODEL_REVISION 在模型上传后由 publish_model.py 打印的 commit hash 填死，保证可复现。
 DEFAULT_NLI_MODEL = "FishySean/crossfire-pairer"
-# 锁定到「model card + spm.model 等分词器补丁」之后的 revision（全新用户验证已通过）。
-DEFAULT_NLI_MODEL_REVISION = "0517c59dfa13038226b4b66c3fa6b605b9215df5"
+# 锁定到 v2（iter2 seed 43 + model card）；推理默认屏蔽 unrelated。
+DEFAULT_NLI_MODEL_REVISION = "2f8d20c46d994b023a098362dcaed7750f2ef2a0"
 DEFAULT_NLI_BATCH_SIZE = 16
 # 推理时屏蔽 unrelated（同一问题下的主张对按构造不应无关）。可用 NLI_MASK_UNRELATED=0 关闭。
 DEFAULT_NLI_MASK_UNRELATED = True

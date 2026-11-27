@@ -114,10 +114,10 @@ uv run crossfire ask "当前稳定版 Python 是哪个？" --pairer nli
 
 Hugging Face：[FishySean/crossfire-pairer](https://huggingface.co/FishySean/crossfire-pairer)
 
-- 在本仓库题库上，用 Claude 打的比对标签微调 mDeBERTa。
-- 锁定 revision：`0517c59dfa13038226b4b66c3fa6b605b9215df5`（也是 `crossfire/config.py` 的默认值）。
-- 测试宏平均 F1 ≈ **0.614**（seed 44）；三种子均值 ≈ **0.576**。
-- 已知问题：`same_question_different_scope` 召回偏低；contradict 几乎没超过未微调基座；置信度**未校准**（`p` 高 ≠ 答对）。
+- 在本仓库题库上，用 Claude 打的比对标签微调 mDeBERTa（v2：474 对；测试集 89 对冻结）。
+- 锁定 revision：`2f8d20c46d994b023a098362dcaed7750f2ef2a0`（验证损失入选 seed 43；也是 `crossfire/config.py` 的默认值）。
+- 推理默认屏蔽 `unrelated`：三种子宏平均 F1 ≈ **0.59 ± 0.06**，准确率 ≈ **81%**；发布模型宏 F1 ≈ **0.55**，准确率 ≈ **81%**。
+- 已知问题：发布种子的测试 F1 低于同轮最优种子（选型只看验证损失）；`scope` 召回仍偏低；置信度**未校准**（`p` 高 ≠ 答对）。
 
 训练说明：[`training/README.md`](training/README.md)（主线是 Colab T4 笔记本）。
 

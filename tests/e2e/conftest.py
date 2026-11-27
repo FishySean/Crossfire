@@ -86,7 +86,7 @@ def app_server(tmp_path_factory):
                         "model": "FishySean/crossfire-pairer",
                         "prompt_version": None,
                         "implementation": "nli",
-                        "revision": "0517c59dfa13038226b4b66c3fa6b605b9215df5",
+                        "revision": "2f8d20c46d994b023a098362dcaed7750f2ef2a0",
                     },
                     "judge": {"model": "claude-sonnet-4-6", "prompt_version": "y"},
                 },

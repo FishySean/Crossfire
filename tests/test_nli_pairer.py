@@ -44,7 +44,10 @@ def _claim(url: str, text: str) -> Claim:
 
 class _FakeTensor:
     def __init__(self, rows: list[list[float]]):
-        self._rows = rows
+        self._rows = [list(row) for row in rows]
+
+    def clone(self) -> "_FakeTensor":
+        return _FakeTensor(self._rows)
 
     def float(self) -> "_FakeTensor":
         return self
@@ -61,8 +64,18 @@ class _FakeTensor:
         ids = [max(range(len(row)), key=lambda i: row[i]) for row in self._rows]
         return SimpleNamespace(tolist=lambda: ids)
 
-    def __getitem__(self, index: int) -> "_FakeRow":
+    def __getitem__(self, index: int | tuple) -> "_FakeRow" | list[float]:
+        if isinstance(index, tuple):
+            rows, col = index
+            assert rows == slice(None)
+            return [row[col] for row in self._rows]
         return _FakeRow(self._rows[index])
+
+    def __setitem__(self, key: tuple, value: float) -> None:
+        rows, col = key
+        assert rows == slice(None)
+        for row in self._rows:
+            row[col] = float(value)
 
 
 class _FakeRow:
@@ -174,7 +187,7 @@ def test_pair_all_uses_encode_pair_and_fills_scores(monkeypatch):
     a = _claim("https://a.example/", "版本是 3.14.7")
     b = _claim("https://b.example/", "版本是 3.13")
     c = _claim("https://a.example/", "版本是 3.14.7")
-    pairer = NliClaimPairer("/tmp/fake-model", batch_size=8, device="cpu")
+    pairer = NliClaimPairer("/tmp/fake-model", batch_size=8, device="cpu", mask_unrelated=False)
     pairs = pairer.pair_all(QUESTION, [(a, b), (a, c)], date(2026, 11, 21))
     assert [p.relation for p in pairs] == [Relation.CONTRADICT, Relation.AGREE]
     assert pairs[0].scores is not None and pairs[0].scores["contradict"] == pytest.approx(0.7)
@@ -185,6 +198,29 @@ def test_pair_all_uses_encode_pair_and_fills_scores(monkeypatch):
     ]
     assert captured["premises"] == [e.premise for e in expected]
     assert captured["hypotheses"] == [e.hypothesis for e in expected]
+
+
+def test_mask_unrelated_blocks_unrelated_argmax(monkeypatch):
+    """unrelated logit 最高时，默认屏蔽后应落到次高类。"""
+    # id2label: 0 agree, 1 contradict, 2 scope, 3 unrelated — unrelated 最大
+    _install_fake_stack(monkeypatch, logits_rows=[[0.2, 0.3, 0.1, 0.9]])
+    a = _claim("https://a.example/", "甲")
+    b = _claim("https://b.example/", "乙")
+    masked = NliClaimPairer("/tmp/fake-model", device="cpu", mask_unrelated=True)
+    open_ = NliClaimPairer("/tmp/fake-model", device="cpu", mask_unrelated=False)
+    assert masked.pair_all(QUESTION, [(a, b)], date(2026, 1, 1))[0].relation == Relation.CONTRADICT
+    assert open_.pair_all(QUESTION, [(a, b)], date(2026, 1, 1))[0].relation == Relation.UNRELATED
+
+
+def test_mask_unrelated_helper_sets_minus_inf():
+    from crossfire.adapters.nli.mask import mask_unrelated_logits, unrelated_class_index
+
+    id2label = {0: "agree", 1: "contradict", 2: "same_question_different_scope", 3: "unrelated"}
+    assert unrelated_class_index(id2label) == 3
+    logits = _FakeTensor([[0.1, 0.2, 0.3, 0.99]])
+    masked = mask_unrelated_logits(logits, id2label, enabled=True)
+    assert masked[0][3] == float("-inf")
+    assert mask_unrelated_logits(logits, id2label, enabled=False) is logits
 
 
 def test_mutation_different_encoding_changes_model_input(monkeypatch):

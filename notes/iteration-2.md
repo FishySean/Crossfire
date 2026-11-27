@@ -72,3 +72,83 @@ _待 Colab 结果回来后填写：有用 / 没用 / 持平。_
 ## 6. 花费
 
 _待填实际 Anthropic 用量（bank + batch）。粗估仍 <$6。_
+
+## 7. 第 10b 步：推理时屏蔽 unrelated
+
+### 理由（系统设计，与测试集无关）
+
+Crossfire 中所有被比较的主张都回答同一个问题，按构造不应出现 `unrelated`；标签体系仍保留该类（训练不动），只在**推理**时把 unrelated 的 logit 设为 `-inf`。配置项：`NLI_MASK_UNRELATED`（默认开）；评估脚本：`--mask-unrelated` / `--compare-mask`。
+
+### 验证集闸门（v1 入选权重 `models/crossfire-pairer-v1`，n=25）
+
+原定标准是「开/关 macro-F1 不变差」。实测：
+
+| | macro-F1 | agree F1 | contradict F1 | scope F1 | unrelated F1 | unrelated 预测数 |
+|---|---:|---:|---:|---:|---:|---:|
+| 关 | **0.4349** | 0.905 | 0.400 | 0.000 | 0.000 | 1 |
+| 开 | **0.4279** | 0.884 | 0.400 | 0.000 | 0.000 | 0 |
+| Δ | **−0.0070** | −0.021 | 0 | 0 | 0 | −1 |
+
+唯一翻转：
+
+- `#2` gold=`same_question_different_scope`，关=`unrelated`（错）→ 开=`agree`（错）
+- A: 大堡礁世界遗产区面积为348,000平方公里，比英国、荷兰和瑞士的总面积还大。
+- B: 大堡礁约有2,900个独立礁石及900个大小岛屿，分布在约344,400平方公里的范围内。
+
+验证集真实 unrelated=0。准确率不变（仍错）；没有正确预测被改错。macro-F1 −0.007 来自错误在类别间转移（unrelated→agree 拉低 agree precision 0.826→0.792），n=25 下属于单样本噪声。
+
+**标准调整：** 闸门改为「屏蔽是否把原本正确的预测改错」（正确→错误 = 0）。原定「不变差」没有设容差，规则写得不严谨。按调整后的标准，验证集通过，继续测试集评估。
+
+本地无第 10 步 5 折 CV 的逐对预测文件，无法做 CV 开/关对照。
+
+### 测试集（进行中）
+
+闸门：测试集上若出现任何「正确→错误」，停、不发布。
+
+#### v1 seed 44（本地入选包 `models/crossfire-pairer-v1`，= 验证损失入选种子）
+
+| | macro-F1 | accuracy | unrelated 预测 | agree F1 | contradict F1 | scope F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| 关 | 0.6141 | 0.6854 | 11 | 0.800 | 0.679 | 0.364 |
+| 开 | **0.6656** | **0.7528** | 0 | 0.818 | 0.679 | 0.500 |
+
+翻转：正确→错误 **0**；错误→正确 **6**；仍错但改类 **5**。闸门通过。
+
+混淆矩阵（关 → 开）：
+
+关：
+
+| gold \\ pred | agree | contradict | scope | unrelated |
+|---|---:|---:|---:|---:|
+| agree | 40 | 6 | 1 | 5 |
+| contradict | 7 | 19 | 0 | 3 |
+| scope | 1 | 2 | 2 | 3 |
+
+开：
+
+| gold \\ pred | agree | contradict | scope | unrelated |
+|---|---:|---:|---:|---:|
+| agree | 45 | 6 | 1 | 0 |
+| contradict | 10 | 19 | 0 | 0 |
+| scope | 3 | 2 | 3 | 0 |
+
+#### 缺权重（未评，故未算三种子均值 ± 标准差，未发布）
+
+- **v1 seed 42 / 43**：本地 `models/crossfire-pairer-v1/seeds/seed_{42,43}/` 只有 history / test_report，**没有** `best_checkpoint`。请从 Google Drive 下载：
+  - `我的云端硬盘/crossfire-runs/run-20261121-235427/seeds/seed_42/best_checkpoint/`
+  - `我的云端硬盘/crossfire-runs/run-20261121-235427/seeds/seed_43/best_checkpoint/`
+  - （可选对照）`…/seed_44/best_checkpoint/`（与已解压的 package 入选权重同源）
+- **v2 全部三种子**：本地无任何 iter2 权重。请下载 Drive 上最新的  
+  `我的云端硬盘/crossfire-runs/iter2-final-*/seeds/seed_{42,43,44}/best_checkpoint/`  
+  （若只有 `package/`，至少需要三种子各自的 `best_checkpoint`，不能只下入选 package。）
+
+放到例如：
+
+```
+models/crossfire-pairer-v1/seeds/seed_42/best_checkpoint/
+models/crossfire-pairer-v1/seeds/seed_43/best_checkpoint/
+models/crossfire-pairer-v2/seeds/seed_42/best_checkpoint/
+…
+```
+
+下载齐后再跑开/关对比 → 三种子均值 ± 标准差 → 文档 / 全测 / 推送 / tag **v1.2.0**（发布模型仍为 v1 + 屏蔽 unrelated）。

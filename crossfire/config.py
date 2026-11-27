@@ -29,6 +29,8 @@ DEFAULT_NLI_MODEL = "FishySean/crossfire-pairer"
 # 锁定到「model card + spm.model 等分词器补丁」之后的 revision（全新用户验证已通过）。
 DEFAULT_NLI_MODEL_REVISION = "0517c59dfa13038226b4b66c3fa6b605b9215df5"
 DEFAULT_NLI_BATCH_SIZE = 16
+# 推理时屏蔽 unrelated（同一问题下的主张对按构造不应无关）。可用 NLI_MASK_UNRELATED=0 关闭。
+DEFAULT_NLI_MASK_UNRELATED = True
 DEFAULT_MAX_COST_PER_QUESTION = 1.0
 
 # 单价查自 https://docs.anthropic.com/en/docs/about-claude/pricing ，2026-11-20。
@@ -85,6 +87,7 @@ class Settings:
     nli_model: str
     nli_model_revision: str
     nli_batch_size: int
+    nli_mask_unrelated: bool
     runs_dir: Path
     cache_dir: Path
     questions_file: Path
@@ -145,6 +148,14 @@ class Settings:
             nli_model_revision=get("NLI_MODEL_REVISION", DEFAULT_NLI_MODEL_REVISION),
             nli_batch_size=_positive_int(
                 "NLI_BATCH_SIZE", get("NLI_BATCH_SIZE", str(DEFAULT_NLI_BATCH_SIZE)), env_file
+            ),
+            nli_mask_unrelated=_bool(
+                "NLI_MASK_UNRELATED",
+                get(
+                    "NLI_MASK_UNRELATED",
+                    "1" if DEFAULT_NLI_MASK_UNRELATED else "0",
+                ),
+                env_file,
             ),
             runs_dir=_path(get("CROSSFIRE_RUNS_DIR", "out/runs")),
             cache_dir=_path(get("CROSSFIRE_CACHE_DIR", "out/cache")),
@@ -216,6 +227,17 @@ def _positive_float(name: str, value: str, env_file: Path) -> float:
     if number <= 0:
         raise SettingsError(f"{name}={value} 不合法，要一个正数。在 {env_file} 里改。")
     return number
+
+
+def _bool(name: str, value: str, env_file: Path) -> bool:
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise SettingsError(
+        f"{name}={value} 不合法，要用 true/false（或 1/0）。在 {env_file} 里改。"
+    )
 
 
 def _path(value: str) -> Path:

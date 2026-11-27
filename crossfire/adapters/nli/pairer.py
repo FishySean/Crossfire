@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from crossfire.adapters.nli.encoding import encode_pair
+from crossfire.adapters.nli.mask import mask_unrelated_logits
 from crossfire.application.ports import OnPair
 from crossfire.domain import Claim, Failure, Pair, Provenance, Question, Relation, Usage
 
@@ -88,6 +89,7 @@ class NliClaimPairer:
         batch_size: int = DEFAULT_BATCH_SIZE,
         device: str | None = None,
         local_files_only: bool = False,
+        mask_unrelated: bool = True,
     ) -> None:
         if batch_size < 1:
             raise ValueError(f"batch_size 必须 ≥ 1，收到 {batch_size}")
@@ -96,6 +98,7 @@ class NliClaimPairer:
         self._batch_size = batch_size
         self._device_name = pick_device(device)
         self._local_files_only = local_files_only
+        self._mask_unrelated = bool(mask_unrelated)
         self._tokenizer: Any | None = None
         self._model: Any | None = None
         self._id2label: dict[int, str] = {}
@@ -218,6 +221,9 @@ class NliClaimPairer:
         encoded_batch = {key: value.to(device) for key, value in encoded_batch.items()}
         with torch.inference_mode():
             logits = self._model(**encoded_batch).logits
+            logits = mask_unrelated_logits(
+                logits, self._id2label, enabled=self._mask_unrelated
+            )
             probs = torch.softmax(logits.float(), dim=-1).cpu()
             pred_ids = probs.argmax(dim=-1).tolist()
 

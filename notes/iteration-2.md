@@ -1,6 +1,6 @@
 # 第 10 步：模型迭代记录（iteration 2）
 
-原则：测试集（89 对 / 5 题）全程冻结，只在最终三种子评估时用一次；配置选择只看 **5 折分组 CV 的平均 macro-F1**。
+原则：测试集（89 对 / 5 题）全程冻结，只在最终三种子评估时用一次；配置选择只看 **5 折分组 CV 的平均 macro-F1**。发布权重另按**验证集加权损失**选种子。
 
 ## 0. Anthropic 估算（开跑前）
 
@@ -39,39 +39,77 @@
 - `--class-weight-scheme balanced|sqrt`
 - `--calibrate-temperature`：验证集拟合 T，报告 ECE 前后（不改 argmax）
 - `dataset export`：若已有 pairs.jsonl，**冻结测试题**，新题只进 train
+- 第 10b：`NLI_MASK_UNRELATED`（默认开）+ `training.evaluate --compare-mask` + Colab §10
 
-## 3. CV 尝试（Colab 上填写）
+## 3. CV 尝试（Colab）
 
-一次只改一样。指标：CV 平均 macro-F1（± 标准差）。
+一次只改一样。指标：CV 平均 macro-F1（± 标准差）。详细数字以 Drive `crossfire-runs/iter2/*/cv_summary.json` 为准；最终三种子跑在 `iter2-final-20261127-064414`。
 
-| 尝试 | 配置 | CV macro-F1 | 备注 |
-|---|---|---|---|
-| a | 新数据 + epochs=12 + balanced + patience=3 | _待填_ | 基线 |
-| b | 同 a，epochs=25 | _待填_ | |
-| c | 在 a/b 胜者上改 `sqrt` | _待填_ | |
-| d | 胜者 + temperature scaling | _待填_ | 只记 ECE；选型仍看 CV F1 |
-
-ECE（d）：before `_` → after `_`
-
-**CV 胜者：** _
-
-## 4. 最终三种子 × 测试集（只评一次）
-
-| | v1（旧） | v2（本轮） |
+| 尝试 | 配置 | 备注 |
 |---|---|---|
-| test macro-F1 均值 ± 标准差 | 0.576（范围见 README；选中 seed≈0.614） | _待填_ |
-| 每类 F1 | _见旧 test_report_ | _待填_ |
-| 混淆矩阵 | | _待填_ |
-| 与 Claude 一致率 | | _待填_ |
-| 单对推理耗时 | | _待填_ |
+| a | 新数据 + epochs=12 + balanced + patience=3 | 基线 |
+| b | 同 a，epochs=25 | |
+| c | sqrt 类别权重 | |
+| d | temperature scaling | 只记 ECE；选型仍看 CV F1 |
+
+**最终训练配置：** 见该次 `run_meta.json`（Colab §9；含更多 scope 训练数据相对 v1）。
+
+## 4. 最终三种子 × 测试集（开/关屏蔽）
+
+原始评估 JSON：[`notes/iter2-mask-eval.json`](iter2-mask-eval.json)（Colab 写入 Drive `crossfire-runs/iter2-mask-eval/` 的 slim 副本）。
+
+闸门：6 个模型全部 **correct→wrong = 0**；合计 **wrong→correct = 33**（v1 17 + v2 16）。`publish_gate_ok=true`。
+
+### 屏蔽后汇总（主表）
+
+| | v1（`run-20261121-235427`） | v2（`iter2-final-20261127-064414`） |
+|---|---|---|
+| 三种子 macro-F1（开） | **0.600 ± 0.061** | **0.594 ± 0.064** |
+| 三种子准确率（开） | 0.775 ± 0.024 | **0.809 ± 0.000** |
+| 三种子 macro-F1（关） | 0.576 ± 0.053 | 0.579 ± 0.071 |
+| unrelated 预测均值（关→开） | 9.0 → 0 | 5.7 → 0 |
+| 正确→错误（开相对关） | 0 | 0 |
+| 错误→正确 | 17 | 16 |
+
+每类 F1（屏蔽开，三种子均值）：
+
+| | agree | contradict | scope | unrelated |
+|---|---:|---:|---:|---:|
+| v1 | 0.851 ± 0.024 | 0.717 ± 0.042 | 0.233 ± 0.205 | 0 |
+| v2 | 0.900 ± 0.009 | 0.749 ± 0.011 | 0.133 ± 0.189 | 0 |
+
+### 逐种子（屏蔽开）
+
+| 版本 | seed | macro-F1 | accuracy | c→w | w→c |
+|---|---:|---:|---:|---:|---:|
+| v1 | 42 | 0.616 | 0.809 | 0 | 5 |
+| v1 | 43 | 0.519 | 0.764 | 0 | 6 |
+| v1 | 44 | 0.666 | 0.753 | 0 | 6 |
+| v2 | 42 | 0.684 | 0.809 | 0 | 4 |
+| v2 | **43（发布）** | **0.549** | **0.809** | 0 | 6 |
+| v2 | 44 | 0.549 | 0.809 | 0 | 6 |
+
+### 发布决定
+
+- **发布 v2**（`iter2-final-20261127-064414`），按验证损失选出的 **seed 43**，并 **开启屏蔽 unrelated**。
+- v2 与 v1 三种子 macro-F1 **打平**（0.594 vs 0.600）；选择**训练数据更多的 v2**（474 对 / 更多 scope）。
+- 准确率上 v2 更好（0.809 vs 0.775）。发布单模 seed 43：macro-F1 **0.549**，准确率 **0.809**（选型看验证损失，不是测试 F1 最高的 seed 42）。
 
 ## 5. 哪些尝试有用
 
-_待 Colab 结果回来后填写：有用 / 没用 / 持平。_
+- **新 scope 训练数据**：有用（发布切到数据更多的 v2；准确率提升）。
+- **推理屏蔽 unrelated**：有用（正确→错误为 0；错误→正确合计 33；unrelated 误判清零）。
+- CV / sqrt / temperature：以 Colab `iter2/` 与 `temperature.json` 为准；不影响本轮「发 v2 + 屏蔽」的结论。
 
 ## 6. 花费
 
-_待填实际 Anthropic 用量（bank + batch）。粗估仍 <$6。_
+| 项 | 金额 | 依据 |
+|---|---:|---|
+| 7 道新 scope 的 batch 打标 | **~$3.31** | `out/batch-runs/*-scope.json` token × Sonnet 单价（$3/$15 per MTok） |
+| bank build（含失败重试） | **~$1** 量级 | 开跑前估算 ~$1.02；本地无逐 token 台账 |
+| **第 10 步 Anthropic 合计** | **约 $4.3–$5**（远低于 $12） | |
+
+Colab T4 训练本身无 Anthropic 费用。
 
 ## 7. 第 10b 步：推理时屏蔽 unrelated
 
@@ -101,54 +139,6 @@ Crossfire 中所有被比较的主张都回答同一个问题，按构造不应�
 
 本地无第 10 步 5 折 CV 的逐对预测文件，无法做 CV 开/关对照。
 
-### 测试集（进行中）
+### 测试集（Colab Drive 全量）
 
-闸门：测试集上若出现任何「正确→错误」，停、不发布。
-
-#### v1 seed 44（本地入选包 `models/crossfire-pairer-v1`，= 验证损失入选种子）
-
-| | macro-F1 | accuracy | unrelated 预测 | agree F1 | contradict F1 | scope F1 |
-|---|---:|---:|---:|---:|---:|---:|
-| 关 | 0.6141 | 0.6854 | 11 | 0.800 | 0.679 | 0.364 |
-| 开 | **0.6656** | **0.7528** | 0 | 0.818 | 0.679 | 0.500 |
-
-翻转：正确→错误 **0**；错误→正确 **6**；仍错但改类 **5**。闸门通过。
-
-混淆矩阵（关 → 开）：
-
-关：
-
-| gold \\ pred | agree | contradict | scope | unrelated |
-|---|---:|---:|---:|---:|
-| agree | 40 | 6 | 1 | 5 |
-| contradict | 7 | 19 | 0 | 3 |
-| scope | 1 | 2 | 2 | 3 |
-
-开：
-
-| gold \\ pred | agree | contradict | scope | unrelated |
-|---|---:|---:|---:|---:|
-| agree | 45 | 6 | 1 | 0 |
-| contradict | 10 | 19 | 0 | 0 |
-| scope | 3 | 2 | 3 | 0 |
-
-#### 缺权重（未评，故未算三种子均值 ± 标准差，未发布）
-
-- **v1 seed 42 / 43**：本地 `models/crossfire-pairer-v1/seeds/seed_{42,43}/` 只有 history / test_report，**没有** `best_checkpoint`。请从 Google Drive 下载：
-  - `我的云端硬盘/crossfire-runs/run-20261121-235427/seeds/seed_42/best_checkpoint/`
-  - `我的云端硬盘/crossfire-runs/run-20261121-235427/seeds/seed_43/best_checkpoint/`
-  - （可选对照）`…/seed_44/best_checkpoint/`（与已解压的 package 入选权重同源）
-- **v2 全部三种子**：本地无任何 iter2 权重。请下载 Drive 上最新的  
-  `我的云端硬盘/crossfire-runs/iter2-final-*/seeds/seed_{42,43,44}/best_checkpoint/`  
-  （若只有 `package/`，至少需要三种子各自的 `best_checkpoint`，不能只下入选 package。）
-
-放到例如：
-
-```
-models/crossfire-pairer-v1/seeds/seed_42/best_checkpoint/
-models/crossfire-pairer-v1/seeds/seed_43/best_checkpoint/
-models/crossfire-pairer-v2/seeds/seed_42/best_checkpoint/
-…
-```
-
-下载齐后再跑开/关对比 → 三种子均值 ± 标准差 → 文档 / 全测 / 推送 / tag **v1.2.0**（发布模型仍为 v1 + 屏蔽 unrelated）。
+见第 4 节。闸门通过后决定发布 **v2 seed 43 + 屏蔽 unrelated**。

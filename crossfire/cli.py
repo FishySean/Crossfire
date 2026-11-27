@@ -949,12 +949,29 @@ def dataset_export_command(settings: Settings, bank_path: Path, seed: str, parse
             parser.error(f"缺少批量结果 {path}，先跑 crossfire batch")
         runs[question.id] = RunResult.from_dict(json.loads(path.read_text(encoding="utf-8")))
 
+    # 若已有 pairs.jsonl：冻结其中的测试题，新题只进训练集（第 10 步不改 89 对测试集）。
+    freeze_test: frozenset[str] | None = None
+    existing_pairs = settings.dataset_dir / "pairs.jsonl"
+    if existing_pairs.is_file():
+        frozen = {
+            str(json.loads(line)["question_id"])
+            for line in existing_pairs.read_text(encoding="utf-8").splitlines()
+            if line.strip() and json.loads(line).get("split") == "test"
+        }
+        if frozen:
+            freeze_test = frozenset(frozen)
+            print(f"冻结已有测试题 {len(freeze_test)} 道：{sorted(freeze_test)}")
+
     sonnet_consistency = _load_batch_consistency(settings, settings.model_pair)
     export = export_pair_dataset(
         bank,
         runs,
         sonnet_consistency=sonnet_consistency,
-        split=split_question_ids([question.id for question in bank], seed=seed),
+        split=split_question_ids(
+            [question.id for question in bank],
+            seed=seed,
+            freeze_test_ids=freeze_test,
+        ),
         seed=seed,
         pair_model=settings.model_pair,
     )

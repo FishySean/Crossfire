@@ -64,10 +64,11 @@ class DropReason(StrEnum):
     INTERRUPTED = "interrupted"
 
 
+# 第 10 步：在保留现有题的前提下只扩 scope（+9），避免续跑时降级 time_lag / 再出 reprint。
 CATEGORY_QUOTAS: dict[QuestionCategory, int] = {
-    QuestionCategory.TIME_LAG: 8,
-    QuestionCategory.SCOPE: 8,
-    QuestionCategory.REPRINT_ERROR: 4,
+    QuestionCategory.TIME_LAG: 9,
+    QuestionCategory.SCOPE: 16,
+    QuestionCategory.REPRINT_ERROR: 3,
 }
 
 

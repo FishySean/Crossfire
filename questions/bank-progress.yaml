@@ -1,4 +1,4 @@
-as_of: '2026-11-20'
+as_of: '2026-11-27'
 kept:
 - id: nodejs-lts-version
   question: Node.js 当前的 LTS（长期支持）稳定版本号是多少？
@@ -912,6 +912,334 @@ kept:
   - url: https://www.britannica.com/facts/Great-Barrier-Reef
     reason: unusable_page
     detail: empty_content
+- id: great-lakes-area-scope
+  question: 北美五大湖的总面积是多少？
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - Great Lakes
+  - total area
+  - surface area
+  - North America
+  - square kilometers
+  sources:
+  - url: https://archive.epa.gov/airquality/gr8water/web/html/lakes.html
+    tier: primary
+    title: The Great Lakes – U.S. EPA Great Waters Program (EPA官方存档页)
+    found_by: EPA Great Lakes physical features surface area facts
+  - url: https://greatlakesledger.com/2026/10/01/the-great-lakes-size-depth-facts/
+    tier: news
+    title: 'The Great Lakes: Size, Depth and Each Lake Compared – Great Lakes Ledger
+      (2026年10月新闻报道)'
+    found_by: EPA Great Lakes physical features surface area facts
+  - url: https://www.nature.org/en-us/about-us/where-we-work/priority-landscapes/great-lakes/great-lakes-facts/
+    tier: news
+    title: Top 6 Great Lakes Facts and Why They Matter – The Nature Conservancy
+    found_by: Great Lakes total surface area official
+  - url: https://en.wikipedia.org/wiki/Great_Lakes
+    tier: aggregator
+    title: Great Lakes – Wikipedia (英文维基百科)
+    found_by: Great Lakes total area square kilometers Wikipedia
+  - url: https://zh.wikipedia.org/wiki/%E4%BA%94%E5%A4%A7%E6%B9%96
+    tier: aggregator
+    title: 五大湖 – 维基百科（中文简体）
+    found_by: 五大湖 总面积 平方公里
+  rejected_sources:
+  - url: https://www.michigan.gov/egle/public/learn/great-lakes
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.michiganseagrant.org/topics/great-lakes-fast-facts/
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.britannica.com/place/Great-Lakes
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: euro-zone-member-count-scope
+  question: 目前有多少个国家使用欧元作为官方货币？
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - euro
+  - eurozone
+  - member states
+  - official currency
+  - countries
+  sources:
+  - url: https://european-union.europa.eu/institutions-law-budget/euro/countries-using-euro_en
+    tier: primary
+    title: Countries using the euro – European Union official website
+    found_by: eurozone countries using euro official currency 2024
+  - url: https://eur-lex.europa.eu/EN/legal-content/glossary/euro-area.html
+    tier: primary
+    title: Euro area – EUR-Lex (European Union Law)
+    found_by: European Central Bank eurozone member states number
+  - url: https://trade.ec.europa.eu/access-to-markets/en/news/bulgaria-adopts-euro-1-january-2026
+    tier: news
+    title: Bulgaria adopts euro as of 1 January 2026 – European Commission
+    found_by: Bulgaria joins eurozone 2026 euro official currency
+  - url: https://www.bundesbank.de/en/tasks/topics/bulgaria-introduces-the-euro-973616
+    tier: news
+    title: Bulgaria introduces the euro – Deutsche Bundesbank
+    found_by: Bulgaria joins eurozone 2026 euro official currency
+  - url: https://www.aljazeera.com/news/2025/12/30/which-countries-will-start-using-the-euro-in-2026
+    tier: news
+    title: Which countries will start using the euro in 2026? – Al Jazeera
+    found_by: Bulgaria joins eurozone 2026 euro official currency
+  - url: https://en.wikipedia.org/wiki/Eurozone
+    tier: aggregator
+    title: Eurozone – Wikipedia
+    found_by: euro official currency countries list Wikipedia
+  - url: https://en.wikipedia.org/wiki/Euro
+    tier: aggregator
+    title: Euro – Wikipedia
+    found_by: euro official currency countries list Wikipedia
+  - url: https://www.chasingthedonkey.com/countries-that-use-the-euro-as-currency/
+    tier: aggregator
+    title: A List Of 26 Countries That Use The Euro – Chasing the Donkey
+    found_by: eurozone countries using euro official currency 2024
+  rejected_sources:
+  - url: https://www.consilium.europa.eu/en/policies/join-the-euro-area/timeline-joining-the-euro-area/
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: us-gdp-scope
+  question: 美国GDP是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-27'
+  keywords:
+  - 美国
+  - GDP
+  - 国内生产总值
+  - 名义
+  - 购买力平价
+  - PPP
+  sources:
+  - url: https://www.bea.gov/news/2026/gdp-third-estimate-industries-corporate-profits-state-gdp-and-state-personal-income-4th
+    tier: primary
+    title: GDP (Third Estimate), Industries, Corporate Profits, State GDP, and State
+      Personal Income, 4th Quarter and Year 2025 — BEA
+    found_by: 美国GDP 2025 官方数据 BEA
+  - url: https://www.bea.gov/news/2026/gdp-second-estimate-4th-quarter-and-year-2025
+    tier: primary
+    title: GDP (Second Estimate), 4th Quarter and Year 2025 — BEA
+    found_by: 美国GDP 2025 官方数据 BEA
+  - url: https://finance.yahoo.com/news/us-gdp-growth-disappoints-to-cap-2025-trump-blames-government-shutdown-133942251.html
+    tier: news
+    title: US GDP growth disappoints to cap 2025. Trump blames government shutdown
+      — Yahoo Finance
+    found_by: US GDP 2025 latest news report
+  - url: https://www.foxbusiness.com/economy/us-economy-q4-2025-final
+    tier: news
+    title: US economic growth revised lower in final fourth quarter reading — Fox
+      Business
+    found_by: US GDP 2025 latest news report
+  - url: https://www.foxbusiness.com/economy/us-economy-gdp-q4-2025
+    tier: news
+    title: US economy grew 1.4% in fourth quarter, Commerce Department finds — Fox
+      Business
+    found_by: US GDP 2025 latest news report
+  - url: https://en.wikipedia.org/wiki/Economy_of_the_United_States
+    tier: aggregator
+    title: Economy of the United States — Wikipedia
+    found_by: United States GDP Wikipedia World Bank
+  - url: https://whatisgdp.com/us-gdp-data
+    tier: aggregator
+    title: US Nominal GDP by Year (BEA Table 1.1.5) and the Latest Release — WhatIsGDP.com
+    found_by: 美国GDP 2025 官方数据 BEA
+  - url: https://en.wikipedia.org/wiki/World_Bank_historical_list_of_ten_largest_countries_by_GDP
+    tier: aggregator
+    title: World Bank historical list of ten largest countries by GDP — Wikipedia
+    found_by: United States GDP Wikipedia World Bank
+  rejected_sources:
+  - url: https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?locations=US
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: india-population-scope
+  question: India's current population is how much?
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - India
+  - population
+  - census
+  - estimate
+  - UN projection
+  - billion
+  sources:
+  - url: https://currentaffairs.khanglobalstudies.com/unfpa-state-of-world-population-report-2026/
+    tier: primary
+    title: UNFPA State of World Population Report 2026 – Key Findings (India 1,476.6
+      million)
+    found_by: India population 2026 news report
+  - url: https://www.aljazeera.com/news/2026/4/1/india-begins-worlds-biggest-population-count
+    tier: news
+    title: India begins world's largest population census – Al Jazeera
+    found_by: India population 2026 news report
+  - url: https://www.rnamedia.in/top-story/indias-population-hits-1-47-billion-widens-lead-over-china-as-un-warns-of-shrinking-youth-advantage/26905
+    tier: news
+    title: India's population hits 1.47 billion, widens lead over China – RNA Media
+    found_by: India population 2026 news report
+  - url: https://english.tupaki.com/latest-news/india-population-reaches-1-4766-billion-in-2026-1516020
+    tier: news
+    title: India's Population Reaches 1.4766 Billion in 2026 – Tupaki English
+    found_by: India population 2026 news report
+  - url: https://www.worldometers.info/world-population/india-population/
+    tier: aggregator
+    title: India Population (2026) – Worldometer (Live Counter)
+    found_by: India current population 2026 official statistics
+  - url: https://en.wikipedia.org/wiki/Demographics_of_India
+    tier: aggregator
+    title: Demographics of India – Wikipedia
+    found_by: India population Wikipedia worldometer
+  - url: https://worldpopulationreview.com/countries/india
+    tier: aggregator
+    title: India Population 2026 – World Population Review
+    found_by: India population 2026 news report
+  rejected_sources: []
+- id: us-national-park-count-scope
+  question: How many national parks does the United States have?
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - United States
+  - national parks
+  - NPS
+  - national monuments
+  - protected areas
+  - count
+  sources:
+  - url: https://www.nps.gov/orgs/1207/03-13-26-2025-visitation-statsitics.htm
+    tier: primary
+    title: 'News Release: Public Interest in National Parks Remains Strong as Visits
+      Top 323 Million in 2025'
+    found_by: number of US national parks 2025 2026 news
+  - url: https://thehill.com/policy/energy-environment/6162134-meet-the-uss-newest-national-park-chiricahua/
+    tier: news
+    title: Meet the US's newest national park, Chiricahua – The Hill
+    found_by: number of US national parks 2025 2026 news
+  - url: https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States
+    tier: aggregator
+    title: List of national parks of the United States – Wikipedia
+    found_by: list of United States national parks Wikipedia total count
+  - url: https://en.wikipedia.org/wiki/List_of_the_United_States_National_Park_System_official_units
+    tier: aggregator
+    title: List of the United States National Park System official units – Wikipedia
+    found_by: list of United States national parks Wikipedia total count
+  - url: https://morethanjustparks.com/how-many-national-parks-are-there/
+    tier: aggregator
+    title: How Many National Parks Are There? (The Definitive Answer) – More Than
+      Just Parks
+    found_by: how many national parks United States NPS official
+  rejected_sources:
+  - url: https://www.nationalparks.org/connect/blog/how-many-national-parks-are-there
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.yahoo.com/news/us/articles/u-officially-national-park-100114665.html
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 429），不重试绕过
+- id: amazon-river-basin-area-scope
+  question: 亚马孙河流域的面积是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-27'
+  keywords:
+  - 亚马孙河
+  - 流域面积
+  - drainage basin
+  - Amazon
+  - 平方公里
+  sources:
+  - url: https://otca.org/recursoshidricos/en/the-amazon-basin/
+    tier: primary
+    title: 'The Amazon Basin: a strategic global resource – OTCA (Amazon Cooperation
+      Treaty Organization)'
+    found_by: OTCA ACTO Amazon basin area official organization
+  - url: https://www.ebsco.com/research-starters/geology/amazon-river-basin/
+    tier: primary
+    title: Amazon River Basin – EBSCO Research Starters
+    found_by: Amazon River basin area square kilometers official
+  - url: https://phys.org/news/2025-08-amazon-lost-area-larger-spain.html
+    tier: news
+    title: The Amazon has lost an area larger than Spain in 40 years, report shows
+      – Phys.org
+    found_by: Amazon basin size area news 2024 2025
+  - url: https://www.butlernature.com/2025/06/08/an-inferno-in-the-amazon-in-2024-undermined-progress-in-saving-earths-largest-rainforest/
+    tier: news
+    title: An inferno in the Amazon in 2024 undermined progress in saving Earth's
+      largest rainforest – Butler Nature
+    found_by: Amazon basin size area news 2024 2025
+  - url: https://terradaily.com/brazils-amazon-lost-area-the-size-of-spain-in-40-years-study-999/
+    tier: news
+    title: 'Brazil''s Amazon lost area the size of Spain in 40 years: study – Terra
+      Daily (AFP, Sept 2025)'
+    found_by: Amazon basin size area news 2024 2025
+  - url: https://en.wikipedia.org/wiki/Amazon_basin
+    tier: aggregator
+    title: Amazon basin – Wikipedia (English)
+    found_by: Amazon basin area Wikipedia
+  - url: https://zh.wikipedia.org/wiki/%E4%BA%9A%E9%A9%AC%E9%80%8A%E6%B2%B3
+    tier: aggregator
+    title: 亚马逊河 – 维基百科（中文）
+    found_by: 亚马孙河流域面积
+  rejected_sources:
+  - url: https://baike.baidu.com/item/%E4%BA%9A%E9%A9%AC%E5%AD%99%E6%B2%B3/155637
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: us-hispanic-population-scope
+  question: How many Hispanic or Latino people live in the United States?
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - Hispanic
+  - Latino
+  - United States
+  - population
+  - census
+  - self-identified
+  sources:
+  - url: https://www.census.gov/newsroom/press-releases/2024/population-estimates-characteristics.html
+    tier: primary
+    title: New Estimates Highlight Differences in Growth Between the U.S. Hispanic
+      and Non-Hispanic Populations
+    found_by: Hispanic Latino population United States census.gov
+  - url: https://www.pewresearch.org/short-reads/2025/10/22/key-facts-about-us-latinos/
+    tier: primary
+    title: Facts about U.S. Latinos for Hispanic Heritage Month – Pew Research Center
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://www.cnn.com/2025/11/19/us/latino-population-us-tradition-identity-cec
+    tier: news
+    title: Amid anti-immigration sentiment and policies, the US Latino population
+      grows and cultural traditions remain – CNN
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://thelatinonewsletter.org/p/latino-population-growth-fell-by-nearly-1-million
+    tier: news
+    title: Latino Population Growth Fell by Nearly 1 Million in Latest Census Estimates
+      – The Latino Newsletter
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://newsroom.ucla.edu/releases/u-s-latinos-population-labor-force-growth
+    tier: news
+    title: U.S. Latinos hit new population and labor force records – UCLA Newsroom
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://en.wikipedia.org/wiki/Hispanic_and_Latino_Americans
+    tier: aggregator
+    title: Hispanic and Latino Americans – Wikipedia
+    found_by: Hispanic Latino population United States Wikipedia
+  - url: https://en.wikipedia.org/wiki/Demographics_of_Hispanic_and_Latino_Americans
+    tier: aggregator
+    title: Demographics of Hispanic and Latino Americans – Wikipedia
+    found_by: Hispanic Latino population United States Wikipedia
+  rejected_sources:
+  - url: https://data.census.gov/table/ACSDT1Y2025.B03001
+    reason: unusable_page
+    detail: too_short
+  - url: https://salud-america.org/latinos-rise-to-21-of-u-s-population/
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
 dropped:
 - id: imf-world-gdp-rank-2024
   question: According to IMF data, which country has the largest GDP in the world?
@@ -1261,3 +1589,452 @@ dropped:
 
       {"error":"Unprocessable Entity","message":"The hostname in ''url'' could not
       be resolved. Verify it is publicly reachable and retry.","retryable":false}'
+- id: amazon-river-length-scope
+  question: 亚马逊河的长度是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 亚马逊河
+  - 长度
+  - 公里
+  - 南美洲
+  - 河流
+  design_note: 亚马逊河长度因测量起点和河源认定不同，各来源数字出入明显，从约6400km到6992km都有，部分研究甚至认为其比尼罗河更长。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 1 个，少于 5
+  rejected_sources:
+  - url: https://science.nasa.gov/earth/earth-observatory/source-of-the-amazon-river-7823/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://baike.baidu.com/item/%E4%BA%9A%E9%A9%AC%E5%AD%99%E6%B2%B3/155637
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.britannica.com/place/Amazon-River
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.britannica.com/story/how-long-is-the-amazon-river
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://zhuanlan.zhihu.com/p/636591814
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://en.wikipedia.org/wiki/Amazon_River
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://simple.wikipedia.org/wiki/Amazon_River
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: sahara-desert-area-scope
+  question: 撒哈拉沙漠的面积是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 撒哈拉沙漠
+  - 面积
+  - 平方公里
+  - 非洲
+  - 沙漠
+  design_note: 撒哈拉沙漠面积因边界定义（含沙石荒漠还是仅沙丘区域）不同，从约900万到920万平方公里不等。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources:
+  - url: https://www.britannica.com/place/Sahara-desert-Africa
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.livescience.com/23140-sahara-desert.html
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://en.wikipedia.org/wiki/Sahara
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://simple.wikipedia.org/wiki/Sahara
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.encyclopedia.com/places/africa/african-physical-geography/sahara
+    reason: fetch_failed
+    detail: 'InvalidURL: Invalid non-printable ASCII character in URL, ''\n'' at position
+      62.'
+- id: china-coastline-length-scope
+  question: 中国大陆海岸线有多长？
+  category: scope
+  language: zh
+  keywords:
+  - 中国
+  - 海岸线
+  - 长度
+  - 大陆
+  - 公里
+  design_note: 海岸线长度因测量精度、是否包含岛屿岸线、基线选取等口径不同，常见数字有1.8万公里（大陆岸线）和3.2万公里（含岛屿）两种说法并存。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.gov.cn/guoqing/
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.igsnrr.cas.cn/cbkx/kpyd/zgdl/cndlwz/
+    reason: fetch_failed
+    detail: 'ConnectError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
+      self-signed certificate (_ssl.c:1000)'
+  - url: https://baike.baidu.com/item/%E4%B8%AD%E5%9B%BD%E6%B5%B7%E5%B2%B8%E5%B8%A6/22739943
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: russia-population-scope
+  question: 俄罗斯的人口是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 俄罗斯
+  - 人口
+  - 人口普查
+  - 统计
+  - 百万
+  design_note: 俄罗斯人口因统计口径（是否含克里米亚等争议领土居民）不同，各来源数字存在差异。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 0 个，少于 5
+  rejected_sources:
+  - url: https://rosstat.gov.ru/bgd/free/B00_25/IssWWW.exe/Stg/d000/I000150R.HTM
+    reason: fetch_failed
+    detail: 'ConnectError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
+      self-signed certificate in certificate chain (_ssl.c:1000)'
+  - url: https://roschart.ru/en/blog/chislennost-naseleniya-rossii-po-godam
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://tass.com/society/1907243
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.themoscowtimes.com/2025/04/14/russias-birth-rate-plunges-to-200-year-low-a88709
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.dagens.com/war/putins-flagship-plan-to-save-russias-population-spectacularly-backfires
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.worldometers.info/world-population/russia-population/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://en.wikipedia.org/wiki/Demographics_of_Russia
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://statisticstimes.com/demographics/country/russia-population.php
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: antarctic-ice-sheet-area-scope
+  question: 南极洲的面积通常被引用为多少？
+  category: scope
+  language: en
+  keywords:
+  - Antarctica
+  - area
+  - square kilometers
+  - ice sheet
+  - continent
+  design_note: 南极洲面积因是否含冰架（ice shelves）差异显著：仅陆地约1200万km²，含冰架则约1400万km²，不同来源引用数字不一。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 2 个，少于 5
+  rejected_sources:
+  - url: https://www.gov.cn/jrzg/2005-11/18/content_102276_2.htm
+    reason: fetch_failed
+    detail: HTTP 404
+  - url: https://pole.whu.edu.cn/cn/gb_article.php?modid=03003
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://news.qq.com/rain/a/20241231A0821T00
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://news.qq.com/rain/a/20220728A06DEZ00
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.britannica.com/place/Antarctica
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: mount-everest-height-scope
+  question: 珠穆朗玛峰的海拔高度是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 珠穆朗玛峰
+  - 海拔
+  - 高度
+  - 米
+  - 测量
+  design_note: 珠峰高度因测量方法（含雪盖/不含雪盖、大地水准面基准）不同，历史上有8848m（1954年印度测量）、8844.43m（2005年中国测量）、8848.86m（2020年中尼联合测量）等多个被广泛引用的数字并存。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.xizang.gov.cn/zmhd/hygq/202012/t20201209_183973.html
+    reason: fetch_failed
+    detail: HTTP 508
+  - url: https://kathmandupost.com/national/2020/12/08/it-s-official-mount-everest-is-8-848-86-metres-tall
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.aljazeera.com/news/2020/12/8/mt-everest-nepal-china-announce-revised-height-at-8848-metres
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://baike.baidu.com/item/%E7%8F%A0%E7%A9%86%E6%9C%97%E7%8E%9B%E5%B3%B0/3058
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: us-national-debt-scope
+  question: 美国国家债务总额是多少？
+  category: scope
+  language: en
+  keywords:
+  - US national debt
+  - federal debt
+  - gross debt
+  - debt held by public
+  - trillion dollars
+  design_note: 美国国债因统计口径不同存在显著差异：'债务总额'（gross federal debt）包含政府内部持有债务，'公众持有债务'（debt
+    held by the public）则不含，两者相差数万亿美元，不同网站引用不同口径。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources:
+  - url: https://fiscaldata.treasury.gov/static-data/published-reports/treasury_bulletin/Treasury_Bulletin_2026_09.pdf
+    reason: fetch_failed
+    detail: HTTP 504
+  - url: https://www.independent.org/article/2026/10/20/size-national-debt/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://thedebtclock.com/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.wikiwand.com/en/National_debt_of_the_United_States
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: china-population-scope
+  question: 中国现在有多少人口？
+  category: scope
+  language: zh
+  keywords:
+  - 中国
+  - 人口
+  - 常住人口
+  - 户籍人口
+  - 统计
+  - 普查
+  design_note: 常住人口与户籍人口口径不同，数字相差数千万；不同年份数据并存；港澳台是否纳入也影响总数。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.caixinglobal.com/2026-10-27/chinas-population-falls-by-339-million-largest-drop-since-2022-102498005.html
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.thestandard.com.hk/china/article/346552/China-population-drops-339m-edging-closer-to-sub-14b-mark
+    reason: unusable_page
+    detail: too_short
+  - url: https://www.worldometers.info/world-population/china-population/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://statisticstimes.com/demographics/country/china-population.php
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: solar-system-planet-count-scope
+  question: 太阳系中有多少颗卫星？
+  category: scope
+  language: zh
+  keywords:
+  - 太阳系
+  - 卫星
+  - 天然卫星
+  - 数量
+  - 行星
+  - 小行星
+  design_note: 统计口径不同：只算围绕八大行星的卫星，还是也算围绕矮行星、小行星的卫星，数字差异极大；且新卫星持续被发现。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 0 个，少于 5
+  rejected_sources:
+  - url: https://science.nasa.gov/solar-system/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://ssd.jpl.nasa.gov/sats/discovery.html
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://earthsky.org/space/more-moons-for-jupiter-and-saturn-total-satellite-discoveries/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.thenews.com.pk/latest/1396397-scientists-find-new-moons-expanding-solar-system-count
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.livescience.com/space/astronomy/how-many-moons-are-in-the-solar-system
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://en.wikipedia.org/wiki/List_of_natural_satellites
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://en.wikipedia.org/wiki/Natural_satellite
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: caspian-sea-area-scope
+  question: 里海的面积是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 里海
+  - 面积
+  - 湖泊
+  - 海
+  - 水体
+  - 平方公里
+  design_note: 里海水位随季节和年份波动，不同来源测量时间不同；有些来源使用历史高水位，有些用近年低水位，导致面积数字差异明显。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 1 个，少于 5
+  rejected_sources:
+  - url: https://tehranconvention.org/en/tc
+    reason: fetch_failed
+    detail: 'ConnectTimeout: '
+  - url: https://modis.gsfc.nasa.gov/gallery/individual.php?db_date=2022-05-24
+    reason: fetch_failed
+    detail: 'ConnectError: All connection attempts failed'
+  - url: https://zhuanlan.zhihu.com/p/77839437
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://en.wikipedia.org/wiki/Kaspiyskoye_more
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://baike.baidu.com/item/%E9%87%8C%E6%B5%B7?page=7
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: antarctica-area-scope
+  question: What is the total area of Antarctica?
+  category: scope
+  language: en
+  keywords:
+  - Antarctica
+  - area
+  - ice shelf
+  - land area
+  - square kilometers
+  - continent
+  design_note: Antarctica's stated area varies depending on whether floating ice shelves
+    are included. Land-only area vs. total area including ice shelves differ by about
+    1.5 million km².
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.cia.gov/the-world-factbook/field/area/country-comparison/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.britannica.com/place/Antarctica
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://eos.org/articles/new-map-reveals-the-extent-of-vegetation-in-antarctica
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: los-angeles-population-scope
+  question: 洛杉矶的人口是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 洛杉矶
+  - 人口
+  - 城市
+  - 都市圈
+  - 大洛杉矶
+  design_note: 洛杉矶市区人口约390万，但大洛杉矶都市圈人口超过1300万，不同口径差异悬殊，网页来源经常混用。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 3 个，少于 5
+  rejected_sources:
+  - url: https://www.census.gov/quickfacts/fact/table/losangelescitycalifornia
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.census.gov/quickfacts/fact/table/losangelescountycalifornia,losangelescitycalifornia,US/PST045222
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://en.wikipedia.org/wiki/City_of_Los_Angeles
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.wikiwand.com/en/Los_Angeles
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://worldpopulationreview.com/us-cities/california/los-angeles
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: new-york-metro-population-scope
+  question: What is the population of New York City?
+  category: scope
+  language: en
+  keywords:
+  - New York City
+  - population
+  - metro area
+  - five boroughs
+  - greater New York
+  design_note: NYC五区人口约820万，但纽约都市统计区（MSA）人口超2000万，不同定义来源数字差距极大。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.census.gov/quickfacts/fact/table/newyorkcitynewyork/PST045225
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.nyc.gov/site/planning/planning-level/nyc-population/nyc-population.page
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://s-media.nyc.gov/agencies/dcp/assets/files/pdf/data-tools/population/population-estimates/new-york-city-population-estimates-and-trends-july-2026.pdf
+    reason: fetch_failed
+    detail: 不支持的内容类型：'application/pdf'（只要 HTML）
+  - url: https://edc.nyc/press-release/mayor-celebrates-two-consecutive-years-population-growth-new-york-city
+    reason: unusable_page
+    detail: too_short
+- id: chicago-population-scope
+  question: 芝加哥的人口是多少？
+  category: scope
+  language: zh
+  keywords:
+  - 芝加哥
+  - 人口
+  - 城市
+  - 都市圈
+  - 人口统计
+  design_note: 芝加哥市行政区人口约270万，大芝加哥都市圈人口约950万，不同口径差异巨大，各类报道引用数字不一。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 0 个，少于 5
+  rejected_sources:
+  - url: https://www.census.gov/quickfacts/fact/table/chicagocityillinois,IL,US/PST045221
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.census.gov/newsroom/press-releases/2025/vintage-2024-popest.html
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://chicago.suntimes.com/news/2026/05/14/chicago-population-increasing-covid-census
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.nbcchicago.com/news/local/where-does-chicagos-population-stand-compared-to-other-big-cities-the-latest-census-data-reveals-unexpected-change/3936544/
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://www.fox32chicago.com/news/chicago-population-grew-2025-census-estimate
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://en.wikipedia.org/wiki/Chicago
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://en.wikipedia.org/wiki/Demographics_of_Chicago
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+  - url: https://worldpopulationreview.com/us-cities/illinois/chicago
+    reason: keyword_miss
+    detail: 正文未出现任何关键词
+- id: nile-amazon-longest-river-scope
+  question: What is the length of the Amazon River?
+  category: scope
+  language: en
+  keywords:
+  - Amazon River
+  - length
+  - kilometers
+  - miles
+  - source
+  - measurement
+  design_note: 亚马孙河的长度因测量起点（源头的认定）和测量方法不同，各方数据在6,400 km至6,992 km之间波动，不同地理机构给出不同数字，与尼罗河谁更长也因此存在争议——但本题只问亚马孙河长度，答案按口径分别是确定的。
+  drop_reason: too_few_usable
+  drop_detail: 可用来源 4 个，少于 5
+  rejected_sources:
+  - url: https://www.britannica.com/place/Amazon-River
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.abc12.com/news/what-s-the-world-s-longest-river-new-expedition-aims-to-settle-the-debate-once/article_eb585ba9-39c6-5231-aa76-6e417807faea.html
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 429），不重试绕过
+  - url: https://www.britannica.com/story/how-long-is-the-amazon-river
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://kids.britannica.com/students/article/Amazon-River/272828
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过

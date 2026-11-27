@@ -47,6 +47,9 @@ class TrainConfig:
     # 日志每隔多少个 batch 打一行（epoch 末尾无论如何都会打）。
     log_every_batches: int = 10
 
+    # 类别权重：balanced（默认）或 sqrt（缓和稀有类过重）。
+    class_weight_scheme: str = "balanced"
+
 
 DEFAULT_CONFIG = TrainConfig()
 

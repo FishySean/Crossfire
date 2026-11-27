@@ -66,6 +66,23 @@ uv run python -m training.train \
 
 没有 GPU 时正式训练会直接退出。本机调试可加 `--allow-cpu`（极慢）。
 
+### 第 10 步：分组 CV 选型（不碰测试集）
+
+```bash
+# a 基线
+uv run python -m training.train --cv 5 --mirror-dir "$MIRROR/a"
+# b 更长训练
+uv run python -m training.train --cv 5 --epochs 25 --mirror-dir "$MIRROR/b"
+# c 平方根类别权重
+uv run python -m training.train --cv 5 --epochs 25 --class-weight-scheme sqrt --mirror-dir "$MIRROR/c"
+# d 校准（只报告 ECE）
+uv run python -m training.train --cv 5 --epochs 25 --class-weight-scheme sqrt \
+  --calibrate-temperature --mirror-dir "$MIRROR/d"
+```
+
+`--cv K` 只在 `split=train` 的题目上按题切 K 折；测试集 89 对不会进入任何折。  
+选型看 `cv_summary.json` 的 `cv_macro_f1_mean`。胜者再三种子正式训，**那时才**评估测试集。
+
 每个种子结束后会立刻把该种子目录同步到 `--mirror-dir`。全部结束后再打包：
 
 - `package/final_model_fp16/`：fp16 导出的最终模型（约一半体积）
@@ -84,8 +101,9 @@ uv run python -m training.train \
 | weight_decay | 0.01 | 轻微正则 |
 | batch_size | 16 | T4 / 4090 都合适 |
 | max_length | **160** | 第 3 步最长约 146；当前实测 139 |
-| max_epochs | 12 | 上限；靠早停 |
+| max_epochs | 12 | 上限；靠早停（迭代 2 可试 25） |
 | early_stop_patience | 3 | 验证损失 3 轮不刷新就停 |
+| class_weight_scheme | balanced | 可选 `sqrt`（缓和稀有类权重） |
 | seeds | 42,43,44 | 看随机性 |
 
 选型：每个种子按 **验证加权损失** 留最好一轮；三种子之间仍按验证损失选最终模型；**测试集只在全部结束后评估**。

@@ -39,8 +39,11 @@ from training.loop import (
 from training.metrics import macro_f1, summarize_seed_scores
 from training.pack import pack_run_artifacts
 from training.plot_curves import try_plot_loss_curves
+from training.cv import grouped_kfold_by_question
 from training.prepare import prepare_from_pairs
 from training.resize_head import load_four_way_model
+from training.split import load_pair_rows
+from training.temperature import calibration_report, fit_temperature, stack_logits_labels
 
 
 class PairDataset(Dataset):
@@ -393,12 +396,125 @@ def _write_test_report_md(path: Path, summary: dict, winner_entry: dict) -> None
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def _collect_val_logits(model, rows, tokenizer, max_length: int) -> tuple[torch.Tensor, torch.Tensor]:
+    from training.labels import LABEL2ID
+
+    model.eval()
+    device = next(model.parameters()).device
+    logits_chunks: list[torch.Tensor] = []
+    label_ids: list[int] = []
+    with torch.no_grad():
+        for start in range(0, len(rows), 16):
+            chunk = rows[start : start + 16]
+            batch = batch_encode(chunk, tokenizer, max_length=max_length)
+            inputs = {key: value.to(device) for key, value in batch.items() if key != "labels"}
+            logits_chunks.append(model(**inputs).logits.detach().float().cpu())
+            label_ids.extend(LABEL2ID[str(row["label"])] for row in chunk)
+    return stack_logits_labels(logits_chunks, label_ids)
+
+
+def run_cv(
+    config: TrainConfig,
+    *,
+    n_folds: int,
+    allow_cpu: bool = False,
+    mirror_dir: Path | None = None,
+    calibrate_temperature: bool = False,
+) -> Path:
+    """分组 K 折 CV：只用 split=train 的题目；测试集完全不碰。"""
+    pairs_path = Path(config.pairs_path)
+    if not pairs_path.is_file():
+        raise FileNotFoundError(pairs_path)
+    device = require_gpu(smoke=False, allow_cpu=allow_cpu)
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    run_dir = Path(f"{config.output_dir}-cv{n_folds}-{stamp}")
+    run_dir.mkdir(parents=True, exist_ok=True)
+    if mirror_dir is not None:
+        mirror_dir = Path(mirror_dir)
+        mirror_dir.mkdir(parents=True, exist_ok=True)
+
+    all_rows = load_pair_rows(pairs_path)
+    train_pool = [row for row in all_rows if row["split"] == "train"]
+    folds = grouped_kfold_by_question(train_pool, n_folds=n_folds)
+    fold_scores: list[dict[str, Any]] = []
+    seed = config.seeds[0]
+
+    print(f"分组 {n_folds} 折 CV（seed={seed}，scheme={config.class_weight_scheme}）")
+    print("测试集不参与任何折。")
+
+    for fold in folds:
+        print(f"\n----- fold {fold.fold_index + 1}/{n_folds} val={list(fold.val_ids)} -----")
+        prepared = prepare_from_pairs(
+            pairs_path,
+            seed=f"{config.val_split_seed}|fold{fold.fold_index}",
+            class_weight_scheme=config.class_weight_scheme,  # type: ignore[arg-type]
+            train_ids=fold.train_ids,
+            val_ids=fold.val_ids,
+        )
+        result = train_one_seed(
+            config=config,
+            prepared=prepared,
+            run_dir=run_dir / f"fold_{fold.fold_index}",
+            seed=seed,
+            device=device,
+            smoke=False,
+            mirror_dir=None,
+        )
+        model, tokenizer = _load_four_way_from_dir(result.checkpoint_dir, device)
+        val_f1 = _val_macro_f1(model, list(prepared.val_rows), tokenizer, config.max_length)
+        entry: dict[str, Any] = {
+            "fold": fold.fold_index,
+            "val_ids": list(fold.val_ids),
+            "best_epoch": result.best_epoch,
+            "best_val_weighted_loss": result.best_val_loss,
+            "val_macro_f1": val_f1,
+        }
+        if calibrate_temperature:
+            logits, labels = _collect_val_logits(
+                model, list(prepared.val_rows), tokenizer, config.max_length
+            )
+            temperature = fit_temperature(logits, labels)
+            entry["calibration"] = calibration_report(logits, labels, temperature=temperature)
+            print(
+                f"  temperature={temperature:.3f}  "
+                f"ECE {entry['calibration']['ece_before']:.4f} → {entry['calibration']['ece_after']:.4f}"
+            )
+        fold_scores.append(entry)
+        print(f"  fold {fold.fold_index} val_macro_f1={val_f1:.4f}")
+
+    f1s = [item["val_macro_f1"] for item in fold_scores]
+    summary = {
+        "n_folds": n_folds,
+        "class_weight_scheme": config.class_weight_scheme,
+        "max_epochs": config.max_epochs,
+        "patience": config.early_stop_patience,
+        "seed": seed,
+        "fold_scores": fold_scores,
+        "cv_macro_f1_mean": sum(f1s) / len(f1s),
+        "cv_macro_f1_std": (sum((x - sum(f1s) / len(f1s)) ** 2 for x in f1s) / len(f1s)) ** 0.5,
+        "note": "CV 只在 train 池上按题分组；测试集未使用",
+    }
+    (run_dir / "cv_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    if mirror_dir is not None:
+        shutil.copy2(run_dir / "cv_summary.json", mirror_dir / "cv_summary.json")
+    print(
+        f"\nCV macro-F1 = {summary['cv_macro_f1_mean']:.4f} "
+        f"± {summary['cv_macro_f1_std']:.4f}"
+    )
+    print(f"结果目录：{run_dir.resolve()}")
+    return run_dir
+
+
 def run_training(
     config: TrainConfig,
     *,
     smoke: bool = False,
     allow_cpu: bool = False,
     mirror_dir: Path | None = None,
+    calibrate_temperature: bool = False,
+    skip_test: bool = False,
 ) -> Path:
     pairs_path = Path(config.pairs_path)
     if not pairs_path.is_file():
@@ -418,7 +534,11 @@ def run_training(
         mirror_dir = Path(mirror_dir)
         mirror_dir.mkdir(parents=True, exist_ok=True)
 
-    prepared = prepare_from_pairs(pairs_path, seed=config.val_split_seed)
+    prepared = prepare_from_pairs(
+        pairs_path,
+        seed=config.val_split_seed,
+        class_weight_scheme=config.class_weight_scheme,  # type: ignore[arg-type]
+    )
     meta = {
         "config": config_to_dict(config),
         "pairs_sha256": file_sha256(pairs_path),
@@ -434,6 +554,7 @@ def run_training(
         },
         "counts": prepared.counts_table(),
         "class_weights": prepared.class_weights,
+        "class_weight_scheme": prepared.class_weight_scheme,
         "label2id": LABEL2ID,
         "id2label": ID2LABEL,
     }
@@ -459,6 +580,23 @@ def run_training(
             )
         )
 
+    if calibrate_temperature and seed_results:
+        winner = min(seed_results, key=lambda item: (item.best_val_loss, item.seed))
+        model, tokenizer = _load_four_way_from_dir(winner.checkpoint_dir, device)
+        logits, labels = _collect_val_logits(
+            model, list(prepared.val_rows), tokenizer, config.max_length
+        )
+        temperature = fit_temperature(logits, labels)
+        calib = calibration_report(logits, labels, temperature=temperature)
+        meta["temperature_scaling"] = calib
+        (run_dir / "temperature.json").write_text(
+            json.dumps(calib, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+        print(
+            f"temperature={calib['temperature']:.3f}  "
+            f"ECE {calib['ece_before']:.4f} → {calib['ece_after']:.4f}"
+        )
+
     if device.type == "cuda":
         peak_mb = torch.cuda.max_memory_allocated(device) / (1024 * 1024)
         print(f"峰值显存：{peak_mb:.0f} MB")
@@ -467,13 +605,23 @@ def run_training(
             json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
-    evaluate_all_seeds_on_test(
-        seed_results=seed_results,
-        prepared=prepared,
-        config=config,
-        device=device,
-        run_dir=run_dir,
-    )
+    if not skip_test and not smoke:
+        evaluate_all_seeds_on_test(
+            seed_results=seed_results,
+            prepared=prepared,
+            config=config,
+            device=device,
+            run_dir=run_dir,
+        )
+    elif smoke:
+        # 冒烟仍走原打包路径所需的最少产物
+        evaluate_all_seeds_on_test(
+            seed_results=seed_results,
+            prepared=prepared,
+            config=config,
+            device=device,
+            run_dir=run_dir,
+        )
 
     pack_dir = run_dir / "package"
     pack_meta = pack_run_artifacts(
@@ -492,7 +640,13 @@ def run_training(
         if dest_pack.exists():
             shutil.rmtree(dest_pack)
         shutil.copytree(pack_dir, dest_pack)
-        for name in ("summary.json", "test_report.json", "test_report.md", "run_meta.json"):
+        for name in (
+            "summary.json",
+            "test_report.json",
+            "test_report.md",
+            "run_meta.json",
+            "temperature.json",
+        ):
             src = run_dir / name
             if src.exists():
                 shutil.copy2(src, mirror_dir / name)
@@ -512,6 +666,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--lr", type=float, default=DEFAULT_CONFIG.learning_rate)
     parser.add_argument("--max-length", type=int, default=DEFAULT_CONFIG.max_length)
     parser.add_argument("--patience", type=int, default=DEFAULT_CONFIG.early_stop_patience)
+    parser.add_argument(
+        "--class-weight-scheme",
+        choices=("balanced", "sqrt"),
+        default=DEFAULT_CONFIG.class_weight_scheme,
+        help="balanced=sklearn 公式；sqrt=再开平方缓和稀有类",
+    )
+    parser.add_argument(
+        "--cv",
+        type=int,
+        default=0,
+        help=">0 时跑按题分组 K 折 CV（只用 train 池，不碰测试集）",
+    )
+    parser.add_argument(
+        "--calibrate-temperature",
+        action="store_true",
+        help="在验证集上拟合 temperature scaling，并报告 ECE 前后",
+    )
     parser.add_argument(
         "--seeds",
         default=",".join(str(s) for s in DEFAULT_CONFIG.seeds),
@@ -543,12 +714,26 @@ def main(argv: list[str] | None = None) -> int:
         max_length=args.max_length,
         early_stop_patience=args.patience,
         seeds=seeds,
+        class_weight_scheme=args.class_weight_scheme,
     )
+    mirror = Path(args.mirror_dir) if args.mirror_dir else None
+    if args.cv and args.cv > 0:
+        if args.smoke:
+            raise SystemExit("--cv 与 --smoke 不能一起用")
+        run_cv(
+            config,
+            n_folds=args.cv,
+            allow_cpu=args.allow_cpu,
+            mirror_dir=mirror,
+            calibrate_temperature=args.calibrate_temperature,
+        )
+        return 0
     run_training(
         config,
         smoke=args.smoke,
         allow_cpu=args.allow_cpu,
-        mirror_dir=Path(args.mirror_dir) if args.mirror_dir else None,
+        mirror_dir=mirror,
+        calibrate_temperature=args.calibrate_temperature,
     )
     return 0
 

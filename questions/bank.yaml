@@ -910,3 +910,331 @@
   - url: https://www.britannica.com/facts/Great-Barrier-Reef
     reason: unusable_page
     detail: empty_content
+- id: great-lakes-area-scope
+  question: 北美五大湖的总面积是多少？
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - Great Lakes
+  - total area
+  - surface area
+  - North America
+  - square kilometers
+  sources:
+  - url: https://archive.epa.gov/airquality/gr8water/web/html/lakes.html
+    tier: primary
+    title: The Great Lakes – U.S. EPA Great Waters Program (EPA官方存档页)
+    found_by: EPA Great Lakes physical features surface area facts
+  - url: https://greatlakesledger.com/2026/10/01/the-great-lakes-size-depth-facts/
+    tier: news
+    title: 'The Great Lakes: Size, Depth and Each Lake Compared – Great Lakes Ledger
+      (2026年10月新闻报道)'
+    found_by: EPA Great Lakes physical features surface area facts
+  - url: https://www.nature.org/en-us/about-us/where-we-work/priority-landscapes/great-lakes/great-lakes-facts/
+    tier: news
+    title: Top 6 Great Lakes Facts and Why They Matter – The Nature Conservancy
+    found_by: Great Lakes total surface area official
+  - url: https://en.wikipedia.org/wiki/Great_Lakes
+    tier: aggregator
+    title: Great Lakes – Wikipedia (英文维基百科)
+    found_by: Great Lakes total area square kilometers Wikipedia
+  - url: https://zh.wikipedia.org/wiki/%E4%BA%94%E5%A4%A7%E6%B9%96
+    tier: aggregator
+    title: 五大湖 – 维基百科（中文简体）
+    found_by: 五大湖 总面积 平方公里
+  rejected_sources:
+  - url: https://www.michigan.gov/egle/public/learn/great-lakes
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.michiganseagrant.org/topics/great-lakes-fast-facts/
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.britannica.com/place/Great-Lakes
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: euro-zone-member-count-scope
+  question: 目前有多少个国家使用欧元作为官方货币？
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - euro
+  - eurozone
+  - member states
+  - official currency
+  - countries
+  sources:
+  - url: https://european-union.europa.eu/institutions-law-budget/euro/countries-using-euro_en
+    tier: primary
+    title: Countries using the euro – European Union official website
+    found_by: eurozone countries using euro official currency 2024
+  - url: https://eur-lex.europa.eu/EN/legal-content/glossary/euro-area.html
+    tier: primary
+    title: Euro area – EUR-Lex (European Union Law)
+    found_by: European Central Bank eurozone member states number
+  - url: https://trade.ec.europa.eu/access-to-markets/en/news/bulgaria-adopts-euro-1-january-2026
+    tier: news
+    title: Bulgaria adopts euro as of 1 January 2026 – European Commission
+    found_by: Bulgaria joins eurozone 2026 euro official currency
+  - url: https://www.bundesbank.de/en/tasks/topics/bulgaria-introduces-the-euro-973616
+    tier: news
+    title: Bulgaria introduces the euro – Deutsche Bundesbank
+    found_by: Bulgaria joins eurozone 2026 euro official currency
+  - url: https://www.aljazeera.com/news/2025/12/30/which-countries-will-start-using-the-euro-in-2026
+    tier: news
+    title: Which countries will start using the euro in 2026? – Al Jazeera
+    found_by: Bulgaria joins eurozone 2026 euro official currency
+  - url: https://en.wikipedia.org/wiki/Eurozone
+    tier: aggregator
+    title: Eurozone – Wikipedia
+    found_by: euro official currency countries list Wikipedia
+  - url: https://en.wikipedia.org/wiki/Euro
+    tier: aggregator
+    title: Euro – Wikipedia
+    found_by: euro official currency countries list Wikipedia
+  - url: https://www.chasingthedonkey.com/countries-that-use-the-euro-as-currency/
+    tier: aggregator
+    title: A List Of 26 Countries That Use The Euro – Chasing the Donkey
+    found_by: eurozone countries using euro official currency 2024
+  rejected_sources:
+  - url: https://www.consilium.europa.eu/en/policies/join-the-euro-area/timeline-joining-the-euro-area/
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: us-gdp-scope
+  question: 美国GDP是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-27'
+  keywords:
+  - 美国
+  - GDP
+  - 国内生产总值
+  - 名义
+  - 购买力平价
+  - PPP
+  sources:
+  - url: https://www.bea.gov/news/2026/gdp-third-estimate-industries-corporate-profits-state-gdp-and-state-personal-income-4th
+    tier: primary
+    title: GDP (Third Estimate), Industries, Corporate Profits, State GDP, and State
+      Personal Income, 4th Quarter and Year 2025 — BEA
+    found_by: 美国GDP 2025 官方数据 BEA
+  - url: https://www.bea.gov/news/2026/gdp-second-estimate-4th-quarter-and-year-2025
+    tier: primary
+    title: GDP (Second Estimate), 4th Quarter and Year 2025 — BEA
+    found_by: 美国GDP 2025 官方数据 BEA
+  - url: https://finance.yahoo.com/news/us-gdp-growth-disappoints-to-cap-2025-trump-blames-government-shutdown-133942251.html
+    tier: news
+    title: US GDP growth disappoints to cap 2025. Trump blames government shutdown
+      — Yahoo Finance
+    found_by: US GDP 2025 latest news report
+  - url: https://www.foxbusiness.com/economy/us-economy-q4-2025-final
+    tier: news
+    title: US economic growth revised lower in final fourth quarter reading — Fox
+      Business
+    found_by: US GDP 2025 latest news report
+  - url: https://www.foxbusiness.com/economy/us-economy-gdp-q4-2025
+    tier: news
+    title: US economy grew 1.4% in fourth quarter, Commerce Department finds — Fox
+      Business
+    found_by: US GDP 2025 latest news report
+  - url: https://en.wikipedia.org/wiki/Economy_of_the_United_States
+    tier: aggregator
+    title: Economy of the United States — Wikipedia
+    found_by: United States GDP Wikipedia World Bank
+  - url: https://whatisgdp.com/us-gdp-data
+    tier: aggregator
+    title: US Nominal GDP by Year (BEA Table 1.1.5) and the Latest Release — WhatIsGDP.com
+    found_by: 美国GDP 2025 官方数据 BEA
+  - url: https://en.wikipedia.org/wiki/World_Bank_historical_list_of_ten_largest_countries_by_GDP
+    tier: aggregator
+    title: World Bank historical list of ten largest countries by GDP — Wikipedia
+    found_by: United States GDP Wikipedia World Bank
+  rejected_sources:
+  - url: https://data.worldbank.org/indicator/NY.GDP.MKTP.CD?locations=US
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: india-population-scope
+  question: India's current population is how much?
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - India
+  - population
+  - census
+  - estimate
+  - UN projection
+  - billion
+  sources:
+  - url: https://currentaffairs.khanglobalstudies.com/unfpa-state-of-world-population-report-2026/
+    tier: primary
+    title: UNFPA State of World Population Report 2026 – Key Findings (India 1,476.6
+      million)
+    found_by: India population 2026 news report
+  - url: https://www.aljazeera.com/news/2026/4/1/india-begins-worlds-biggest-population-count
+    tier: news
+    title: India begins world's largest population census – Al Jazeera
+    found_by: India population 2026 news report
+  - url: https://www.rnamedia.in/top-story/indias-population-hits-1-47-billion-widens-lead-over-china-as-un-warns-of-shrinking-youth-advantage/26905
+    tier: news
+    title: India's population hits 1.47 billion, widens lead over China – RNA Media
+    found_by: India population 2026 news report
+  - url: https://english.tupaki.com/latest-news/india-population-reaches-1-4766-billion-in-2026-1516020
+    tier: news
+    title: India's Population Reaches 1.4766 Billion in 2026 – Tupaki English
+    found_by: India population 2026 news report
+  - url: https://www.worldometers.info/world-population/india-population/
+    tier: aggregator
+    title: India Population (2026) – Worldometer (Live Counter)
+    found_by: India current population 2026 official statistics
+  - url: https://en.wikipedia.org/wiki/Demographics_of_India
+    tier: aggregator
+    title: Demographics of India – Wikipedia
+    found_by: India population Wikipedia worldometer
+  - url: https://worldpopulationreview.com/countries/india
+    tier: aggregator
+    title: India Population 2026 – World Population Review
+    found_by: India population 2026 news report
+  rejected_sources: []
+- id: us-national-park-count-scope
+  question: How many national parks does the United States have?
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - United States
+  - national parks
+  - NPS
+  - national monuments
+  - protected areas
+  - count
+  sources:
+  - url: https://www.nps.gov/orgs/1207/03-13-26-2025-visitation-statsitics.htm
+    tier: primary
+    title: 'News Release: Public Interest in National Parks Remains Strong as Visits
+      Top 323 Million in 2025'
+    found_by: number of US national parks 2025 2026 news
+  - url: https://thehill.com/policy/energy-environment/6162134-meet-the-uss-newest-national-park-chiricahua/
+    tier: news
+    title: Meet the US's newest national park, Chiricahua – The Hill
+    found_by: number of US national parks 2025 2026 news
+  - url: https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States
+    tier: aggregator
+    title: List of national parks of the United States – Wikipedia
+    found_by: list of United States national parks Wikipedia total count
+  - url: https://en.wikipedia.org/wiki/List_of_the_United_States_National_Park_System_official_units
+    tier: aggregator
+    title: List of the United States National Park System official units – Wikipedia
+    found_by: list of United States national parks Wikipedia total count
+  - url: https://morethanjustparks.com/how-many-national-parks-are-there/
+    tier: aggregator
+    title: How Many National Parks Are There? (The Definitive Answer) – More Than
+      Just Parks
+    found_by: how many national parks United States NPS official
+  rejected_sources:
+  - url: https://www.nationalparks.org/connect/blog/how-many-national-parks-are-there
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+  - url: https://www.yahoo.com/news/us/articles/u-officially-national-park-100114665.html
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 429），不重试绕过
+- id: amazon-river-basin-area-scope
+  question: 亚马孙河流域的面积是多少？
+  category: scope
+  language: zh
+  generated_on: '2026-11-27'
+  keywords:
+  - 亚马孙河
+  - 流域面积
+  - drainage basin
+  - Amazon
+  - 平方公里
+  sources:
+  - url: https://otca.org/recursoshidricos/en/the-amazon-basin/
+    tier: primary
+    title: 'The Amazon Basin: a strategic global resource – OTCA (Amazon Cooperation
+      Treaty Organization)'
+    found_by: OTCA ACTO Amazon basin area official organization
+  - url: https://www.ebsco.com/research-starters/geology/amazon-river-basin/
+    tier: primary
+    title: Amazon River Basin – EBSCO Research Starters
+    found_by: Amazon River basin area square kilometers official
+  - url: https://phys.org/news/2025-08-amazon-lost-area-larger-spain.html
+    tier: news
+    title: The Amazon has lost an area larger than Spain in 40 years, report shows
+      – Phys.org
+    found_by: Amazon basin size area news 2024 2025
+  - url: https://www.butlernature.com/2025/06/08/an-inferno-in-the-amazon-in-2024-undermined-progress-in-saving-earths-largest-rainforest/
+    tier: news
+    title: An inferno in the Amazon in 2024 undermined progress in saving Earth's
+      largest rainforest – Butler Nature
+    found_by: Amazon basin size area news 2024 2025
+  - url: https://terradaily.com/brazils-amazon-lost-area-the-size-of-spain-in-40-years-study-999/
+    tier: news
+    title: 'Brazil''s Amazon lost area the size of Spain in 40 years: study – Terra
+      Daily (AFP, Sept 2025)'
+    found_by: Amazon basin size area news 2024 2025
+  - url: https://en.wikipedia.org/wiki/Amazon_basin
+    tier: aggregator
+    title: Amazon basin – Wikipedia (English)
+    found_by: Amazon basin area Wikipedia
+  - url: https://zh.wikipedia.org/wiki/%E4%BA%9A%E9%A9%AC%E9%80%8A%E6%B2%B3
+    tier: aggregator
+    title: 亚马逊河 – 维基百科（中文）
+    found_by: 亚马孙河流域面积
+  rejected_sources:
+  - url: https://baike.baidu.com/item/%E4%BA%9A%E9%A9%AC%E5%AD%99%E6%B2%B3/155637
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过
+- id: us-hispanic-population-scope
+  question: How many Hispanic or Latino people live in the United States?
+  category: scope
+  language: en
+  generated_on: '2026-11-27'
+  keywords:
+  - Hispanic
+  - Latino
+  - United States
+  - population
+  - census
+  - self-identified
+  sources:
+  - url: https://www.census.gov/newsroom/press-releases/2024/population-estimates-characteristics.html
+    tier: primary
+    title: New Estimates Highlight Differences in Growth Between the U.S. Hispanic
+      and Non-Hispanic Populations
+    found_by: Hispanic Latino population United States census.gov
+  - url: https://www.pewresearch.org/short-reads/2025/10/22/key-facts-about-us-latinos/
+    tier: primary
+    title: Facts about U.S. Latinos for Hispanic Heritage Month – Pew Research Center
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://www.cnn.com/2025/11/19/us/latino-population-us-tradition-identity-cec
+    tier: news
+    title: Amid anti-immigration sentiment and policies, the US Latino population
+      grows and cultural traditions remain – CNN
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://thelatinonewsletter.org/p/latino-population-growth-fell-by-nearly-1-million
+    tier: news
+    title: Latino Population Growth Fell by Nearly 1 Million in Latest Census Estimates
+      – The Latino Newsletter
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://newsroom.ucla.edu/releases/u-s-latinos-population-labor-force-growth
+    tier: news
+    title: U.S. Latinos hit new population and labor force records – UCLA Newsroom
+    found_by: Hispanic Latino population US 2024 2025 news
+  - url: https://en.wikipedia.org/wiki/Hispanic_and_Latino_Americans
+    tier: aggregator
+    title: Hispanic and Latino Americans – Wikipedia
+    found_by: Hispanic Latino population United States Wikipedia
+  - url: https://en.wikipedia.org/wiki/Demographics_of_Hispanic_and_Latino_Americans
+    tier: aggregator
+    title: Demographics of Hispanic and Latino Americans – Wikipedia
+    found_by: Hispanic Latino population United States Wikipedia
+  rejected_sources:
+  - url: https://data.census.gov/table/ACSDT1Y2025.B03001
+    reason: unusable_page
+    detail: too_short
+  - url: https://salud-america.org/latinos-rise-to-21-of-u-s-population/
+    reason: fetch_failed
+    detail: 站点拒绝访问（HTTP 403），不重试绕过

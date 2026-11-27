@@ -99,11 +99,38 @@ def split_question_ids(
     seed: str = DEFAULT_SEED,
     train_ratio: float = DEFAULT_TRAIN_RATIO,
     force_test: frozenset[str] = EVAL_OVERLAP_IDS,
+    force_train: frozenset[str] = frozenset(),
+    freeze_test_ids: frozenset[str] | None = None,
 ) -> DatasetSplit:
-    """按题目切分。force_test 里的题固定进测试集；其余按稳定哈希分流。"""
+    """按题目切分。force_test 里的题固定进测试集；其余按稳定哈希分流。
+
+    freeze_test_ids：冻结已有测试题（第 10 步扩训练数据时用），新题全部进 train，
+    不重算旧题归属，保证测试集 89 对不变。
+    """
     if not 0.0 < train_ratio < 1.0:
         raise ValueError("train_ratio 必须在 (0, 1) 之间")
-    remaining = sorted(qid for qid in question_ids if qid not in force_test)
+    all_ids = set(question_ids)
+    if freeze_test_ids is not None:
+        frozen_test = frozenset(qid for qid in freeze_test_ids if qid in all_ids)
+        train_ids = tuple(sorted((all_ids - frozen_test) | (force_train & all_ids)))
+        # force_train 不得覆盖冻结测试题
+        leaked = set(train_ids) & frozen_test
+        if leaked:
+            raise RuntimeError(f"冻结测试题被写进训练集：{sorted(leaked)}")
+        test_ids = tuple(sorted(frozen_test | (force_test & all_ids)))
+        overlap = set(train_ids) & set(test_ids)
+        if overlap:
+            raise RuntimeError(f"同一道题被切到两个集合：{sorted(overlap)}")
+        return DatasetSplit(
+            train_ids=train_ids,
+            test_ids=test_ids,
+            seed=seed,
+            train_ratio=train_ratio,
+        )
+
+    remaining = sorted(
+        qid for qid in question_ids if qid not in force_test and qid not in force_train
+    )
     # 稳定伪随机：同一 seed 永远得到同一顺序。
     ordered = sorted(remaining, key=lambda qid: sha256(f"{seed}:{qid}".encode()).hexdigest())
     train_n = int(round(len(ordered) * train_ratio))
@@ -112,8 +139,8 @@ def split_question_ids(
         train_n = len(ordered) - 1
     if ordered and train_n < 1 and len(ordered) > 1:
         train_n = 1
-    train_ids = tuple(ordered[:train_n])
-    test_ids = tuple(sorted(set(ordered[train_n:]) | (force_test & set(question_ids))))
+    train_ids = tuple(sorted(set(ordered[:train_n]) | (force_train & all_ids)))
+    test_ids = tuple(sorted(set(ordered[train_n:]) | (force_test & all_ids)))
     # 变异防护：评测重叠题绝不能进训练集。
     leaked = set(train_ids) & force_test
     if leaked:

@@ -206,6 +206,7 @@ def build_pairer(settings: Settings, model: str | None = None) -> ClaimPairer:
                 model_ref,
                 revision=settings.nli_model_revision or None,
                 batch_size=settings.nli_batch_size,
+                mask_unrelated=settings.nli_mask_unrelated,
             )
 
 
